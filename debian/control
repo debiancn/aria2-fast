@@ -1,0 +1,28 @@
+Source: aria2
+Section: net
+Priority: extra
+Maintainer: Patrick Ruckstuhl <patrick@tario.org>
+Uploaders: Kartik Mistry <kartik@debian.org>
+Build-Depends: debhelper (>= 7),
+               autotools-dev,
+               hardening-wrapper,
+               libc-ares-dev,
+               libgcrypt11-dev (>= 1.5.0-3) | libgcrypt-dev,
+               libgnutls-dev,
+               libxml2-dev,
+               libsqlite3-dev,
+               pkg-config,
+               zlib1g-dev | libz-dev
+Standards-Version: 3.9.3
+Homepage: http://aria2.sourceforge.net/
+Vcs-Svn: https://svn.origo.ethz.ch/tario-debian-package/aria2/trunk
+Vcs-Browser: http://svn.origo.ethz.ch/wsvn/tario-debian-package/aria2/trunk/
+
+Package: aria2
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: ca-certificates
+Description: High speed download utility
+ Aria2 is a command line download client with resuming and segmented
+ downloading. Supported protocols are HTTP/HTTPS/FTP/BitTorrent and it also
+ supports Metalink.
