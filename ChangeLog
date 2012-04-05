@@ -1,0 +1,212 @@
+commit c63a524a889415bb321231ac723de8547318900d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-27
+
+    Added .gitignore files
+
+commit 09c94b8c39988d7790fe27f19c7169f76d824771
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-27
+
+    Updated NEWS for 1.14.2 release
+
+commit 72e76b48541da9085b2b599b9bf68858d9e84d8b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-27
+
+    Updated Russian and Chinese (Simplified) translations.
+    Thanks to all translators.
+
+commit 02be87253d3aa7940678ca912b63497999cbc385
+Merge: 4f09e6e 1a0f8a4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-27
+
+    Merge branch 'master' of github.com:tatsuhiro-t/aria2
+
+commit 1a0f8a46014e8e983f15b88f3031a8ad541c15ff
+Merge: f4e0eae 1d4768b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-26
+
+    Merge pull request #12 from ITriskTI/patch-6
+    
+    Update doc/ru/aria2c.1.asciidoc
+
+commit 1d4768bbea701a6da4f16159b4588cfb5eb6b6a8
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2012-02-26
+
+    fixed some bugs
+
+commit 4f09e6e7ccde4603e1801ee8158f82d2ef5d644a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-26
+
+    Updated bash_completion
+
+commit f4e0eae904ff94af3f6b80cbfc3175cb4b24c2cd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-26
+
+    Added checkRequiredInteger() to check integer param is in valid range.
+    
+    Ensure that fileIndex in aria2.changeUri RPC method is greater than or
+    equal to 1.
+
+commit ad11d746f09977ce151ef6f49dd971f4af451d44
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-26
+
+    Only accepts 32 bit integer values from int and i4 elements in XML-RPC.
+    
+    Fixed overflow in AbstractPaginationRpcMethod::getPaginationRange().
+    Fixes bug#3494165
+
+commit 7a1cba2c596dc6330fd30b6249b24a894b5bea62
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-26
+
+    Updated Spanish and Italian translations. Thanks to all translators.
+
+commit 663cfec9f6eab4660ae369fecaa42b74aa7785ca
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-22
+
+    Fixed the bug that aria2 does not listen on address given in --interface.
+
+commit 075ea06ad78509bf23023711c37adec2faf1a3ce
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-19
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-19
+
+    Supported Windows UNC path.
+
+commit b7dbcea58bf0fea8792a653a64d8a87ae584d839
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-15
+
+    Check scheme part in redirected URI more strictly.
+    
+    The previous implementation mistakenly sees '/abspath?uri=http://foo'
+    as an absolute URI because it contains '://', but actually it is not.
+    This change checks scheme part is constructed in the allowed character
+    set described in RFC 3986 Section 3.1.
+
+commit 9e302b86df6ed9ada7399c91fb33a8d955912d59
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-12
+
+    Code cleanup: use empty() to check size() == 0
+
+commit 7dc2b9ff1670856136b5843b2cf718d94dce54ca
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-12
+
+    Allow missing params in XML-RPC request.
+    
+    Now following request is legal:
+    
+    <methodCall>
+      <methodName>aria2.getVersion</methodName>
+    </methodCall>
+
+commit 9b7e4219d97b546ab9076d2b0e33fb0d5e8ff0a4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-09
+
+    Reserve PeerConnection's buffer capacity according to number of pieces.
+    
+    If the number of pieces gets bigger, the length of Bitfield message
+    payload exceeds the initial buffer capacity of PeerConnection, which
+    is MAX_PAYLOAD_LEN.  We expand buffer as necessary so that
+    PeerConnection can receive the Bitfield message.
+
+commit 7489bbe1a7b8a497a8f59dc565882d3e97d82cb5
+Merge: f2d55f0 5a594b0
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-05
+
+    Merge pull request #9 from ITriskTI/patch-5
+    
+    Update doc/ru/aria2c.1.asciidoc
+
+commit 5a594b04cbd4854943a5fd8d1b11b22486dbc4ce
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2012-02-05
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2012-02-05
+
+    Update doc/ru/aria2c.1.asciidoc
+
+commit f2d55f0edc7173c7921dc43b8082de9f9025ab49
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-05
+
+    Added --deferred-input option.
+    
+    If true is given to --deferred-input option, aria2 does not read all
+    URIs and options from file specified by -i option at startup, but it
+    reads one by one when it needs later. This may reduce memory usage if
+    input file contains a lot of URIs to download. If false is given,
+    aria2 reads all URIs and options at startup. This option defaults to
+    false.
+
+commit b8121faf93370c9ee912452a11254bc02d825118
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-05
+
+    Bump up version number to 1.14.2
+
+commit 18d51e9404528ff6725b1598ddf6ecd2d0627558
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-02-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-02-05
+
+    Added sentence to clarify URI quotation in input file.
+
+commit 39d8f57237fc66d43ba5b3302d00326faf46f93b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-01-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-01-16
+
+    Fixed doc: neither libnettle nor libgcrypt will not be used with OpenSSL.
