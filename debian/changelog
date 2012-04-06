@@ -1,3 +1,15 @@
+aria2 (1.14.2-2) unstable; urgency=low
+
+  * Fix FTBFS with gcc 4.7 (Closes: #667102):
+    - Move some declarations before the code that uses them.
+    - Fix missing <unistd.h> include.
+
+  [Kartik Mistry]
+  * debian/control:
+    + Updated VCS-* URLs. We're on git.debian.org now.
+
+ -- Patrick Ruckstuhl <patrick@tario.org>  Fri, 06 Apr 2012 11:52:05 +0530
+
 aria2 (1.14.2-1) unstable; urgency=low
 
   * New upstream release.
