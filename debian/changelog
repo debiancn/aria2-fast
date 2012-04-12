@@ -1,3 +1,11 @@
+aria2 (1.15.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/patches/fix-ftbfs-with-gcc-4.7:
+    + Removed patch. Merged upstream.
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 12 Apr 2012 16:10:39 +0530
+
 aria2 (1.14.2-2) unstable; urgency=low
 
   * Fix FTBFS with gcc 4.7 (Closes: #667102):
