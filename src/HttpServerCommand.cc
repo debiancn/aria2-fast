@@ -50,6 +50,14 @@
 #include "wallclock.h"
 #include "fmt.h"
 #include "SocketRecvBuffer.h"
+#include "base64.h"
+#ifdef ENABLE_MESSAGE_DIGEST
+#  include "MessageDigest.h"
+#  include "message_digest_helper.h"
+#endif // ENABLE_MESSAGE_DIGEST
+#ifdef ENABLE_WEBSOCKET
+#  include "WebSocketResponseCommand.h"
+#endif // ENABLE_WEBSOCKET
 
 namespace aria2 {
 
@@ -104,6 +112,41 @@ void HttpServerCommand::checkSocketRecvBuffer()
   }
 }
 
+#ifdef ENABLE_WEBSOCKET
+
+namespace {
+// Creates server's WebSocket accept key which will be sent in
+// Sec-WebSocket-Accept header field. The |clientKey| is the value
+// found in Sec-WebSocket-Key header field in the request.
+std::string createWebSocketServerKey(const std::string& clientKey)
+{
+  std::string src = clientKey;
+  src += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+  unsigned char digest[20];
+  message_digest::digest(digest, sizeof(digest), MessageDigest::sha1(),
+                         src.c_str(), src.size());
+  return base64::encode(&digest[0], &digest[sizeof(digest)]);
+}
+} // namespace
+
+namespace {
+int websocketHandshake(const SharedHandle<HttpHeader>& header)
+{
+  if(header->getMethod() != "GET" ||
+     header->find("sec-websocket-key").empty()) {
+    return 400;
+  } else if(header->find("sec-websocket-version") != "13") {
+    return 426;
+  } else if(header->getRequestPath() != "/jsonrpc") {
+    return 404;
+  } else {
+    return 101;
+  }
+}
+} // namespace
+
+#endif // ENABLE_WEBSOCKET
+
 bool HttpServerCommand::execute()
 {
   if(e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
@@ -123,30 +166,65 @@ bool HttpServerCommand::execute()
       }
       if(!httpServer_->authenticate()) {
         httpServer_->disableKeepAlive();
-        std::string text;
-        httpServer_->feedResponse("401 Unauthorized",
-                                  "WWW-Authenticate: Basic realm=\"aria2\"",
-                                  text,"text/html");
+        httpServer_->feedResponse
+          (401, "WWW-Authenticate: Basic realm=\"aria2\"\r\n");
         Command* command =
           new HttpServerResponseCommand(getCuid(), httpServer_, e_, socket_);
         e_->addCommand(command);
         e_->setNoWait(true);
         return true;
       }
-      if(e_->getOption()->getAsInt(PREF_RPC_MAX_REQUEST_SIZE) <
-         httpServer_->getContentLength()) {
-        A2_LOG_INFO
-          (fmt("Request too long. ContentLength=%lld."
-               " See --rpc-max-request-size option to loose"
-               " this limitation.",
-               static_cast<long long int>(httpServer_->getContentLength())));
+      if(header->fieldContains("upgrade", "websocket") &&
+         header->fieldContains("connection", "upgrade")) {
+#ifdef ENABLE_WEBSOCKET
+        int status = websocketHandshake(header);
+        Command* command;
+        if(status == 101) {
+          std::string serverKey =
+            createWebSocketServerKey(header->find("sec-websocket-key"));
+          httpServer_->feedUpgradeResponse("websocket",
+                                           fmt("Sec-WebSocket-Accept: %s\r\n",
+                                               serverKey.c_str()));
+          httpServer_->getSocket()->setTcpNodelay(true);
+          command = new rpc::WebSocketResponseCommand(getCuid(), httpServer_,
+                                                      e_, socket_);
+        } else {
+          if(status == 426) {
+            httpServer_->feedResponse(426, "Sec-WebSocket-Version: 13\r\n");
+          } else {
+            httpServer_->feedResponse(status);
+          }
+          command = new HttpServerResponseCommand(getCuid(), httpServer_, e_,
+                                                  socket_);
+        }
+        e_->addCommand(command);
+        e_->setNoWait(true);
+        return true;
+#else // !ENABLE_WEBSOCKET
+        httpServer_->feedResponse(400);
+        Command* command = new HttpServerResponseCommand(getCuid(),
+                                                         httpServer_, e_,
+                                                         socket_);
+        e_->addCommand(command);
+        e_->setNoWait(true);
+        return true;
+#endif // !ENABLE_WEBSOCKET
+      } else {
+        if(e_->getOption()->getAsInt(PREF_RPC_MAX_REQUEST_SIZE) <
+           httpServer_->getContentLength()) {
+          A2_LOG_INFO
+            (fmt("Request too long. ContentLength=%lld."
+                 " See --rpc-max-request-size option to loose"
+                 " this limitation.",
+                 static_cast<long long int>(httpServer_->getContentLength())));
+          return true;
+        }
+        Command* command = new HttpServerBodyCommand(getCuid(), httpServer_, e_,
+                                                     socket_);
+        e_->addCommand(command);
+        e_->setNoWait(true);
         return true;
       }
-      Command* command = new HttpServerBodyCommand(getCuid(), httpServer_, e_,
-                                                   socket_);
-      e_->addCommand(command);
-      e_->setNoWait(true);
-      return true;
     } else {
       if(timeoutTimer_.difference(global::wallclock()) >= 30) {
         A2_LOG_INFO("HTTP request timeout.");

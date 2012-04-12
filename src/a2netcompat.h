@@ -54,7 +54,9 @@
 
 #ifdef __MINGW32__
 # define a2_sockopt_t char *
-# define HAVE_GETADDRINFO
+# ifndef HAVE_GETADDRINFO
+#   define HAVE_GETADDRINFO
+# endif // !HAVE_GETADDRINFO
 # undef HAVE_GAI_STRERROR
 # undef gai_strerror
 #else
@@ -72,6 +74,10 @@
 #ifdef HAVE_NETINET_IN_H
 # include <netinet/in.h>
 #endif // HAVE_NETINET_IN_H
+
+#ifdef HAVE_NETINET_TCP_H
+# include <netinet/tcp.h>
+#endif // HAVE_NETINET_TCP_H
 
 #ifdef HAVE_ARPA_INET_H
 # include <arpa/inet.h>

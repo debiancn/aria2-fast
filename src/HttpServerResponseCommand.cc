@@ -40,9 +40,6 @@
 #include "LogFactory.h"
 #include "HttpServerCommand.h"
 #include "RequestGroupMan.h"
-#include "RecoverableException.h"
-#include "wallclock.h"
-#include "util.h"
 #include "fmt.h"
 
 namespace aria2 {
@@ -52,54 +49,22 @@ HttpServerResponseCommand::HttpServerResponseCommand
  const SharedHandle<HttpServer>& httpServer,
  DownloadEngine* e,
  const SharedHandle<SocketCore>& socket)
- : Command(cuid),
-   e_(e),
-   socket_(socket),
-   httpServer_(httpServer)
-{
-  setStatus(Command::STATUS_ONESHOT_REALTIME); 
-  e_->addSocketForWriteCheck(socket_, this);
-}
+  : AbstractHttpServerResponseCommand(cuid, httpServer, e, socket)
+{}
 
 HttpServerResponseCommand::~HttpServerResponseCommand()
-{
-  e_->deleteSocketForWriteCheck(socket_, this);
-}
+{}
 
-bool HttpServerResponseCommand::execute()
+void HttpServerResponseCommand::afterSend
+(const SharedHandle<HttpServer>& httpServer,
+ DownloadEngine* e)
 {
-  if(e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
-    return true;
-  }
-  try {
-    httpServer_->sendResponse();
-  } catch(RecoverableException& e) {
-    A2_LOG_INFO_EX
-      (fmt("CUID#%lld - Error occurred while transmitting response body.",
-           getCuid()),
-       e);
-    return true;
-  }
-  if(httpServer_->sendBufferIsEmpty()) {
-    A2_LOG_INFO(fmt("CUID#%lld - HttpServer: all response transmitted.",
+  if(httpServer->supportsPersistentConnection()) {
+    A2_LOG_INFO(fmt("CUID#%lld - Persist connection.",
                     getCuid()));
-    if(httpServer_->supportsPersistentConnection()) {
-      A2_LOG_INFO(fmt("CUID#%lld - Persist connection.",
-                      getCuid()));
-      e_->addCommand
-        (new HttpServerCommand(getCuid(), httpServer_, e_, socket_));
-    }
-    return true;
-  } else {
-    if(timeoutTimer_.difference(global::wallclock()) >= 10) {
-      A2_LOG_INFO(fmt("CUID#%lld - HttpServer: Timeout while trasmitting"
-                      " response.",
-                      getCuid()));
-      return true;
-    } else {
-      e_->addCommand(this);
-      return false;
-    }
+    e->addCommand
+      (new HttpServerCommand(getCuid(), httpServer, e,
+                             httpServer->getSocket()));
   }
 }
 

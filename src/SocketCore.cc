@@ -42,6 +42,11 @@
 #include <cerrno>
 #include <cstring>
 
+#ifdef HAVE_OPENSSL
+# include <openssl/x509.h>
+# include <openssl/x509v3.h>
+#endif // HAVE_OPENSSL
+
 #ifdef HAVE_LIBGNUTLS
 # include <gnutls/x509.h>
 #endif // HAVE_LIBGNUTLS
@@ -506,6 +511,12 @@ void SocketCore::joinMulticastGroup
   setSockOpt(IPPROTO_IP, IP_ADD_MEMBERSHIP, &mreq, sizeof(mreq));
 }
 
+void SocketCore::setTcpNodelay(bool f)
+{
+  int val = f;
+  setSockOpt(IPPROTO_TCP, TCP_NODELAY, &val, sizeof(val));
+}
+
 void SocketCore::setNonBlockingMode()
 {
 #ifdef __MINGW32__
@@ -876,32 +887,61 @@ bool SocketCore::initiateSecureConnection(const std::string& hostname)
           (fmt(MSG_CERT_VERIFICATION_FAILED,
                X509_verify_cert_error_string(verifyResult)));
       }
-      X509_NAME* name = X509_get_subject_name(peerCert);
-      if(!name) {
-        throw DL_ABORT_EX("Could not get X509 name object from the certificate.");
+      std::string commonName;
+      std::vector<std::string> dnsNames;
+      std::vector<std::string> ipAddrs;
+      GENERAL_NAMES* altNames;
+      altNames = reinterpret_cast<GENERAL_NAMES*>
+        (X509_get_ext_d2i(peerCert, NID_subject_alt_name, NULL, NULL));
+      if(altNames) {
+        auto_delete<GENERAL_NAMES*> altNamesDeleter
+          (altNames, GENERAL_NAMES_free);
+        size_t n = sk_GENERAL_NAME_num(altNames);
+        for(size_t i = 0; i < n; ++i) {
+          const GENERAL_NAME* altName = sk_GENERAL_NAME_value(altNames, i);
+          if(altName->type == GEN_DNS) {
+            const char* name =
+              reinterpret_cast<char*>(ASN1_STRING_data(altName->d.ia5));
+            if(!name) {
+              continue;
+            }
+            size_t len = ASN1_STRING_length(altName->d.ia5);
+            dnsNames.push_back(std::string(name, len));
+          } else if(altName->type == GEN_IPADD) {
+            const unsigned char* ipAddr = altName->d.iPAddress->data;
+            if(!ipAddr) {
+              continue;
+            }
+            size_t len = altName->d.iPAddress->length;
+            ipAddrs.push_back(std::string(reinterpret_cast<const char*>(ipAddr),
+                                          len));
+          }
+        }
       }
-
-      bool hostnameOK = false;
+      X509_NAME* subjectName = X509_get_subject_name(peerCert);
+      if(!subjectName) {
+        throw DL_ABORT_EX
+          ("Could not get X509 name object from the certificate.");
+      }
       int lastpos = -1;
-      while(true) {
-        lastpos = X509_NAME_get_index_by_NID(name, NID_commonName, lastpos);
+      while(1) {
+        lastpos = X509_NAME_get_index_by_NID(subjectName, NID_commonName,
+                                             lastpos);
         if(lastpos == -1) {
           break;
         }
-        X509_NAME_ENTRY* entry = X509_NAME_get_entry(name, lastpos);
+        X509_NAME_ENTRY* entry = X509_NAME_get_entry(subjectName, lastpos);
         unsigned char* out;
-        int outlen = ASN1_STRING_to_UTF8(&out, X509_NAME_ENTRY_get_data(entry));
+        int outlen = ASN1_STRING_to_UTF8(&out,
+                                         X509_NAME_ENTRY_get_data(entry));
         if(outlen < 0) {
           continue;
         }
-        std::string commonName(&out[0], &out[outlen]);
+        commonName.assign(&out[0], &out[outlen]);
         OPENSSL_free(out);
-        if(commonName == hostname) {
-          hostnameOK = true;
-          break;
-        }
+        break;
       }
-      if(!hostnameOK) {
+      if(!net::verifyHostname(hostname, dnsNames, ipAddrs, commonName)) {
         throw DL_ABORT_EX(MSG_HOSTNAME_NOT_MATCH);
       }
     }
@@ -947,7 +987,7 @@ bool SocketCore::initiateSecureConnection(const std::string& hostname)
       unsigned int peerCertsLength;
       const gnutls_datum_t* peerCerts = gnutls_certificate_get_peers
         (sslSession_, &peerCertsLength);
-      if(!peerCerts) {
+      if(!peerCerts || peerCertsLength == 0 ) {
         throw DL_ABORT_EX(MSG_NO_CERT_FOUND);
       }
       Time now;
@@ -968,7 +1008,30 @@ bool SocketCore::initiateSecureConnection(const std::string& hostname)
                  gnutls_strerror(ret)));
         }
         if(i == 0) {
-          if(!gnutls_x509_crt_check_hostname(cert, hostname.c_str())) {
+          std::string commonName;
+          std::vector<std::string> dnsNames;
+          std::vector<std::string> ipAddrs;
+          int ret = 0;
+          char altName[256];
+          size_t altNameLen;
+          for(int j = 0; !(ret < 0); ++j) {
+            altNameLen = sizeof(altName);
+            ret = gnutls_x509_crt_get_subject_alt_name(cert, j, altName,
+                                                       &altNameLen, 0);
+            if(ret == GNUTLS_SAN_DNSNAME) {
+              dnsNames.push_back(std::string(altName, altNameLen));
+            } else if(ret == GNUTLS_SAN_IPADDRESS) {
+              ipAddrs.push_back(std::string(altName, altNameLen));
+            }
+          }
+          altNameLen = sizeof(altName);
+          ret = gnutls_x509_crt_get_dn_by_oid(cert,
+                                              GNUTLS_OID_X520_COMMON_NAME, 0, 0,
+                                              altName, &altNameLen);
+          if(ret == 0) {
+            commonName.assign(altName, altNameLen);
+          }
+          if(!net::verifyHostname(hostname, dnsNames, ipAddrs, commonName)) {
             throw DL_ABORT_EX(MSG_HOSTNAME_NOT_MATCH);
           }
         }
@@ -1259,6 +1322,42 @@ size_t getBinAddr(unsigned char* dest, const std::string& ip)
     }
   }
   return len;
+}
+
+bool verifyHostname(const std::string& hostname,
+                    const std::vector<std::string>& dnsNames,
+                    const std::vector<std::string>& ipAddrs,
+                    const std::string& commonName)
+{
+  if(util::isNumericHost(hostname)) {
+    if(ipAddrs.empty()) {
+      return commonName == hostname;
+    }
+    // We need max 16 bytes to store IPv6 address.
+    unsigned char binAddr[16];
+    size_t addrLen = getBinAddr(binAddr, hostname);
+    if(addrLen == 0) {
+      return false;
+    }
+    for(std::vector<std::string>::const_iterator i = ipAddrs.begin(),
+          eoi = ipAddrs.end(); i != eoi; ++i) {
+      if(addrLen == (*i).size() &&
+         memcmp(binAddr, (*i).c_str(), addrLen) == 0) {
+        return true;
+      }
+    }
+  } else {
+    if(dnsNames.empty()) {
+      return util::tlsHostnameMatch(commonName, hostname);
+    }
+    for(std::vector<std::string>::const_iterator i = dnsNames.begin(),
+          eoi = dnsNames.end(); i != eoi; ++i) {
+      if(util::tlsHostnameMatch(*i, hostname)) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
 
 } // namespace net

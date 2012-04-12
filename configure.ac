@@ -2,7 +2,11 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.14.2],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+LT_PREREQ([2.2.6])
+AC_INIT([aria2],[1.15.0],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_USE_SYSTEM_EXTENSIONS
+LT_INIT()
+AC_CONFIG_MACRO_DIR([m4])
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
 AM_INIT_AUTOMAKE()
@@ -13,7 +17,7 @@ AC_CONFIG_HEADERS([config.h])
 case "$target" in
   *mingw*|*cygwin*)
     win_build=yes
-    LIBS="-lws2_32 -lcrypto -lwsock32 -lgdi32 -lwinmm $LIBS"
+    LIBS="-lws2_32 -lwsock32 -lgdi32 -lwinmm $LIBS"
     ;;
 esac
 
@@ -44,7 +48,6 @@ AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_MKDIR_P
-AC_PROG_RANLIB
 AC_PROG_YACC
 
 AC_CHECK_TOOL([AR], [ar], [:])
@@ -64,9 +67,6 @@ AM_CONDITIONAL([HAVE_ASCIIDOC], [ test "x$ASCIIDOC" != "x" ])
 # Setting language choice
 AC_LANG([C++])
 
-# Enable system extensions
-AC_USE_SYSTEM_EXTENSIONS
-
 # Check pkg-config is available
 PKG_PROG_PKG_CONFIG([0.20])
 
@@ -85,20 +85,25 @@ fi
 if test "x$with_libexpat" = "xyes" && test "x$have_libxml2" != "xyes"; then
   AM_PATH_LIBEXPAT
   if test "x$have_libexpat" = "xyes"; then
-    LIBS="$LIBEXPAT_LIBS $LIBS"
-    CPPFLAGS="$LIBEXPAT_CPPFLAGS $CPPFLAGS"
+    LIBS="$EXPAT_LIBS $LIBS"
+    CPPFLAGS="$EXPAT_CFLAGS $CPPFLAGS"
   elif test "x$with_libexpat_requested" = "xyes"; then
     ARIA2_DEP_NOT_MET([libexpat])
   fi
 fi
 
 if test "x$with_sqlite3" = "xyes"; then
-  AM_PATH_SQLITE3
+  PKG_CHECK_MODULES([SQLITE3],[sqlite3],[have_sqlite3=yes],[have_sqlite3=no])
   if test "x$have_sqlite3" = "xyes"; then
+    AC_DEFINE([HAVE_SQLITE3], [1], [Define to 1 if you have sqlite3.])
     LIBS="$SQLITE3_LIBS $LIBS"
     CPPFLAGS="$SQLITE3_CFLAGS $CPPFLAGS"
-  elif test "x$with_sqlite3_requested" = "xyes"; then
-    ARIA2_DEP_NOT_MET([sqlite3])
+    AC_CHECK_FUNCS([sqlite3_open_v2])
+  else
+    AC_MSG_WARN([$SQLITE3_PKG_ERRORS])
+    if test "x$with_sqlite3_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([sqlite3])
+    fi
   fi
 fi
 
@@ -111,18 +116,35 @@ if test "x$with_gnutls" = "xyes"; then
     AC_DEFINE([HAVE_LIBGNUTLS], [1], [Define to 1 if you have libgnutls.])
     LIBS="$LIBGNUTLS_LIBS $LIBS"
     CPPFLAGS="$LIBGNUTLS_CFLAGS $CPPFLAGS"
-  elif test "x$with_gnutls_requested" = "xyes"; then
-    ARIA2_DEP_NOT_MET([gnutls])
+  else
+    AC_MSG_WARN([$LIBGNUTLS_PKG_ERRORS])
+    if test "x$with_gnutls_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([gnutls])
+    fi
   fi
 fi
 
 if test "x$with_openssl" = "xyes" && test "x$have_libgnutls" != "xyes"; then
-  AM_PATH_OPENSSL
+  PKG_CHECK_MODULES([OPENSSL], [openssl >= 0.9.8],
+                    [have_openssl=yes], [have_openssl=no])
   if test "x$have_openssl" = "xyes"; then
+    AC_DEFINE([HAVE_OPENSSL], [1], [Define to 1 if you have openssl.])
     LIBS="$OPENSSL_LIBS $LIBS"
     CPPFLAGS="$OPENSSL_CFLAGS $CPPFLAGS"
-  elif test "x$with_openssl_requested" = "xyes"; then
-    ARIA2_DEP_NOT_MET([openssl])
+
+    AC_CHECK_FUNCS([EVP_DigestInit_ex], [have_digestinit_ex=yes])
+    if test "x$have_digestinit_ex" = "x"; then
+      AC_DEFINE([HAVE_OLD_OPENSSL], [1], [Define to 1 if you have old openssl.])
+    fi
+    AC_CHECK_FUNCS([EVP_sha224])
+    AC_CHECK_FUNCS([EVP_sha256])
+    AC_CHECK_FUNCS([EVP_sha384])
+    AC_CHECK_FUNCS([EVP_sha512])
+  else
+    AC_MSG_WARN([$OPENSSL_PKG_ERRORS])
+    if test "x$with_openssl_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([openssl])
+    fi
   fi
 fi
 
@@ -154,23 +176,34 @@ if test "x$have_openssl" != "xyes"; then
 fi
 
 if test "x$with_libcares" = "xyes"; then
-  AM_PATH_LIBCARES
+  PKG_CHECK_MODULES([LIBCARES], [libcares >= 1.7.0], [have_libcares=yes],
+                    [have_libcares=no])
   if test "x$have_libcares" = "xyes"; then
+    AC_DEFINE([HAVE_LIBCARES], [1], [Define to 1 if you have libcares.])
     LIBS="$LIBCARES_LIBS $LIBS"
     CPPFLAGS="$LIBCARES_CFLAGS $CPPFLAGS"
-  elif test "x$with_libcares_requested" = "xyes"; then
-    ARIA2_DEP_NOT_MET([libcares])
+    AC_CHECK_TYPES([ares_addr_node], [], [], [[#include <ares.h>]])
+    AC_CHECK_FUNCS([ares_set_servers])
+  else
+    AC_MSG_WARN([$LIBCARES_PKG_ERRORS])
+    if test "x$with_libcares_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([libcares])
+    fi
   fi
 fi
 
 # Check availability of libz
 if test "x$with_libz" = "xyes"; then
-  AM_PATH_LIBZ
+  PKG_CHECK_MODULES([ZLIB], [zlib >= 1.2.3], [have_zlib=yes], [have_zlib=no])
   if test "x$have_zlib" = "xyes"; then
+    AC_DEFINE([HAVE_ZLIB], [1], [Define to 1 if you have zlib.])
     LIBS="$ZLIB_LIBS $LIBS"
     CPPFLAGS="$ZLIB_CFLAGS $CPPFLAGS"
-  elif test "x$with_libz_requested" = "xyes"; then
-    ARIA2_DEP_NOT_MET([libz])
+  else
+    AC_MSG_WARN([$ZLIB_PKG_ERRORS])
+    if test "x$with_libz_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([libz])
+    fi
   fi
 fi
 
@@ -300,6 +333,7 @@ AC_CHECK_HEADERS([argz.h \
                   malloc.h \
                   netdb.h \
                   netinet/in.h \
+                  netinet/tcp.h \
 		  poll.h \
 		  port.h \
                   stddef.h \
@@ -316,7 +350,8 @@ AC_CHECK_HEADERS([argz.h \
                   unistd.h \
 		  utime.h \
                   wchar.h \
-		  ifaddrs.h])
+		  ifaddrs.h \
+		  pwd.h])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -526,6 +561,17 @@ if test "x$have_option_const_name" = "xyes"; then
   AC_DEFINE([HAVE_OPTION_CONST_NAME], [1], [Define 1 if struct option.name is const char*])
 fi
 
+AC_CONFIG_SUBDIRS([deps/wslay])
+if test "x$enable_message_digest" = "xyes"; then
+  enable_websocket=yes
+  AC_DEFINE([ENABLE_WEBSOCKET], [1],
+            [Define 1 if WebSocket support is enabled.])
+  LIBS="\$(top_builddir)/deps/wslay/lib/libwslay.la $LIBS"
+  # $(top_srcdir) for `make distcheck`
+  CPPFLAGS="-I\$(top_builddir)/deps/wslay/lib/includes -I\$(top_srcdir)/deps/wslay/lib/includes $CPPFLAGS"
+fi
+AM_CONDITIONAL([ENABLE_WEBSOCKET], [test "x$enable_websocket" = "xyes"])
+
 AC_CONFIG_FILES([Makefile
 		src/Makefile
 		test/Makefile
@@ -533,7 +579,8 @@ AC_CONFIG_FILES([Makefile
 		intl/Makefile
 		lib/Makefile
 		doc/Makefile
-		doc/ru/Makefile])
+		doc/ru/Makefile
+		deps/Makefile])
 AC_OUTPUT
 
 echo " "
@@ -558,3 +605,5 @@ echo "Epoll:          $have_epoll"
 echo "Bittorrent:     $enable_bittorrent"
 echo "Metalink:       $enable_metalink"
 echo "XML-RPC:        $enable_xml_rpc"
+echo "Message Digest: $enable_message_digest"
+echo "WebSocket:      $enable_websocket"

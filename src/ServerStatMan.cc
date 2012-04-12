@@ -61,23 +61,17 @@ SharedHandle<ServerStat> ServerStatMan::find(const std::string& hostname,
                                              const std::string& protocol) const
 {
   SharedHandle<ServerStat> ss(new ServerStat(hostname, protocol));
-  std::deque<SharedHandle<ServerStat> >::const_iterator i =
-    std::lower_bound(serverStats_.begin(), serverStats_.end(), ss,
-                     DerefLess<SharedHandle<ServerStat> >());
-  if(i != serverStats_.end() &&
-     (*i)->getHostname() == hostname && (*i)->getProtocol() == protocol) {
-    return *i;
-  } else {
+  ServerStatSet::iterator i = serverStats_.find(ss);
+  if(i == serverStats_.end()) {
     return SharedHandle<ServerStat>();
+  } else {
+    return *i;
   }
 }
 
 bool ServerStatMan::add(const SharedHandle<ServerStat>& serverStat)
 {
-  std::deque<SharedHandle<ServerStat> >::iterator i =
-    std::lower_bound(serverStats_.begin(), serverStats_.end(), serverStat,
-                     DerefLess<SharedHandle<ServerStat> >());
-
+  ServerStatSet::iterator i = serverStats_.lower_bound(serverStat);
   if(i != serverStats_.end() && *(*i) == *serverStat) {
     return false;
   } else {
@@ -97,8 +91,8 @@ bool ServerStatMan::save(const std::string& filename) const
                        filename.c_str()));
       return false;
     }
-    for(std::deque<SharedHandle<ServerStat> >::const_iterator i =
-          serverStats_.begin(), eoi = serverStats_.end(); i != eoi; ++i) {
+    for(ServerStatSet::iterator i = serverStats_.begin(),
+          eoi = serverStats_.end(); i != eoi; ++i) {
       std::string l = (*i)->toString();
       l += "\n";
       if(fp.write(l.data(), l.size()) != l.size()) {
@@ -137,26 +131,27 @@ bool ServerStatMan::load(const std::string& filename)
                      filename.c_str()));
     return false;
   }
-  char buf[4096];
   while(1) {
-    if(!fp.getsn(buf, sizeof(buf))) {
+    std::string line = fp.getLine();
+    if(line.empty()) {
       if(fp.eof()) {
         break;
-      } else {
+      } else if(!fp) {
         A2_LOG_ERROR(fmt(MSG_READING_SERVER_STAT_FILE_FAILED,
                          filename.c_str()));
         return false;
+      } else {
+        continue;
       }
     }
     std::pair<std::string::const_iterator,
               std::string::const_iterator> p =
-      util::stripIter(&buf[0], &buf[strlen(buf)]);
+      util::stripIter(line.begin(), line.end());
     if(p.first == p.second) {
       continue;
     }
-    std::string line(p.first, p.second);
     std::vector<Scip> items;
-    util::splitIter(line.begin(), line.end(), std::back_inserter(items), ',');
+    util::splitIter(p.first, p.second, std::back_inserter(items), ',');
     std::map<std::string, std::string> m;
     for(std::vector<Scip>::const_iterator i = items.begin(),
           eoi = items.end(); i != eoi; ++i) {
@@ -216,9 +211,15 @@ public:
 
 void ServerStatMan::removeStaleServerStat(time_t timeout)
 {
-  serverStats_.erase(std::remove_if(serverStats_.begin(), serverStats_.end(),
-                                    FindStaleServerStat(timeout)),
-                     serverStats_.end());
+  FindStaleServerStat finder(timeout);
+  for(ServerStatSet::iterator i = serverStats_.begin(),
+        eoi = serverStats_.end(); i != eoi;) {
+    if(finder(*i)) {
+      serverStats_.erase(i++);
+    } else {
+      ++i;
+    }
+  }
 }
 
 } // namespace aria2

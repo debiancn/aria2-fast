@@ -35,6 +35,8 @@
 #ifndef D_A2_FUNCTIONAL_H
 #define D_A2_FUNCTIONAL_H
 
+#include "common.h"
+
 #include <functional>
 #include <string>
 #include <algorithm>
@@ -286,6 +288,12 @@ std::string strjoin(InputIterator first, InputIterator last,
 template<typename T>
 class LeastRecentAccess:public std::binary_function<T, T, bool> {
 public:
+  bool operator()(const SharedHandle<T>& lhs,
+                  const SharedHandle<T>& rhs) const
+  {
+    return lhs->getLastAccessTime() < rhs->getLastAccessTime();
+  }
+
   bool operator()(const T& lhs, const T& rhs) const
   {
     return lhs.getLastAccessTime() < rhs.getLastAccessTime();
@@ -330,6 +338,14 @@ struct DerefEqual<T> derefEqual(const T& t)
 {
   return DerefEqual<T>(t);
 }
+
+template<typename T>
+struct RefLess {
+  bool operator()(const SharedHandle<T>& lhs, const SharedHandle<T>& rhs) const
+  {
+    return lhs.get() < rhs.get();
+  }
+};
 
 } // namespace aria2
 

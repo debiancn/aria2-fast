@@ -65,7 +65,6 @@ private:
   void sendJsonRpcBatchResponse
   (const std::vector<rpc::RpcResponse>& results,
    const std::string& callback);
-  rpc::RpcResponse processJsonRpcRequest(const Dict* jsondict);
   void addHttpServerResponseCommand();
 public:
   HttpServerBodyCommand(cuid_t cuid,

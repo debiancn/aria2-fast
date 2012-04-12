@@ -35,6 +35,10 @@
 #include "util.h"
 
 #include <signal.h>
+#include <sys/types.h>
+#ifdef HAVE_PWD_H
+#  include <pwd.h>
+#endif // HAVE_PWD_H
 
 #include <cerrno>
 #include <cassert>
@@ -941,24 +945,40 @@ std::string randomAlpha(size_t length, const RandomizerHandle& randomizer) {
 
 std::string toUpper(const std::string& src) {
   std::string temp = src;
-  std::transform(temp.begin(), temp.end(), temp.begin(), ::toupper);
+  std::transform(temp.begin(), temp.end(), temp.begin(), toUpperChar);
   return temp;
 }
 
 std::string toLower(const std::string& src) {
   std::string temp = src;
-  std::transform(temp.begin(), temp.end(), temp.begin(), ::tolower);
+  std::transform(temp.begin(), temp.end(), temp.begin(), toLowerChar);
   return temp;
 }
 
 void uppercase(std::string& s)
 {
-  std::transform(s.begin(), s.end(), s.begin(), ::toupper);
+  std::transform(s.begin(), s.end(), s.begin(), toUpperChar);
 }
 
 void lowercase(std::string& s)
 {
-  std::transform(s.begin(), s.end(), s.begin(), ::tolower);
+  std::transform(s.begin(), s.end(), s.begin(), toLowerChar);
+}
+
+char toUpperChar(char c)
+{
+  if('a' <= c && c <= 'z') {
+    c += 'A'-'a';
+  }
+  return c;
+}
+
+char toLowerChar(char c)
+{
+  if('A' <= c && c <= 'Z') {
+    c += 'a'-'A';
+  }
+  return c;
 }
 
 bool isNumericHost(const std::string& name)
@@ -1008,7 +1028,12 @@ std::string getHomeDir()
         }
       }
     }
-#endif
+#elif HAVE_PWD_H
+    passwd* pw = getpwuid(geteuid());
+    if(pw && pw->pw_dir) {
+      return pw->pw_dir;
+    }
+#endif // HAVE_PWD_H
     return A2STR::NIL;
   }
 }
@@ -1058,14 +1083,14 @@ std::string abbrevSize(int64_t size)
 }
 
 void sleep(long seconds) {
-#ifdef HAVE_SLEEP
+#if defined(HAVE_WINSOCK2_H)
+  ::Sleep(seconds * 1000);
+#elif HAVE_SLEEP
   ::sleep(seconds);
 #elif defined(HAVE_USLEEP)
   ::usleep(seconds * 1000000);
-#elif defined(HAVE_WINSOCK2_H)
-  ::Sleep(seconds * 1000);
 #else
-#error no sleep function is available (nanosleep?)
+#  error no sleep function is available (nanosleep?)
 #endif
 }
 
@@ -1490,7 +1515,7 @@ void executeHook
   }
 #else
   PROCESS_INFORMATION pi;
-  STARTUPINFO si;
+  STARTUPINFOW si;
 
   memset(&si, 0, sizeof (si));
   si.cb = sizeof(STARTUPINFO);
@@ -1524,18 +1549,22 @@ void executeHook
   if(batch) {
     cmdline += "\"";
   }
+  int cmdlineLen = utf8ToWChar(0, 0, cmdline.c_str());
+  assert(cmdlineLen > 0);
+  array_ptr<wchar_t> wcharCmdline(new wchar_t[cmdlineLen]);
+  cmdlineLen = utf8ToWChar(wcharCmdline, cmdlineLen, cmdline.c_str());
+  assert(cmdlineLen > 0);
   A2_LOG_INFO(fmt("Executing user command: %s", cmdline.c_str()));
-  DWORD rc = CreateProcess(
-                           batch ? cmdexe.c_str() : NULL,
-                           (LPSTR)cmdline.c_str(),
-                           NULL,
-                           NULL,
-                           true,
-                           NULL,
-                           NULL,
-                           0,
-                           &si,
-                           &pi);
+  DWORD rc = CreateProcessW(batch ? utf8ToWChar(cmdexe).c_str() : NULL,
+                            wcharCmdline,
+                            NULL,
+                            NULL,
+                            true,
+                            0,
+                            NULL,
+                            0,
+                            &si,
+                            &pi);
 
   if(!rc) {
     A2_LOG_ERROR("CreateProcess() failed. Cannot execute user command.");
@@ -1609,6 +1638,51 @@ bool noProxyDomainMatch
   } else {
     return hostname == domain;
   }
+}
+
+bool tlsHostnameMatch(const std::string& pattern, const std::string& hostname)
+{
+  std::string::const_iterator ptWildcard = std::find(pattern.begin(),
+                                                     pattern.end(),
+                                                     '*');
+  if(ptWildcard == pattern.end()) {
+    return strieq(pattern.begin(), pattern.end(),
+                  hostname.begin(), hostname.end());
+  }
+  std::string::const_iterator ptLeftLabelEnd = std::find(pattern.begin(),
+                                                         pattern.end(),
+                                                         '.');
+  bool wildcardEnabled = true;
+  // Do case-insensitive match. At least 2 dots are required to enable
+  // wildcard match. Also wildcard must be in the left-most label.
+  // Don't attempt to match a presented identifier where the wildcard
+  // character is embedded within an A-label.
+  if(ptLeftLabelEnd == pattern.end() ||
+     std::find(ptLeftLabelEnd+1, pattern.end(), '.') == pattern.end() ||
+     ptLeftLabelEnd < ptWildcard ||
+     istartsWith(pattern, "xn--")) {
+    wildcardEnabled = false;
+  }
+  if(!wildcardEnabled) {
+    return strieq(pattern.begin(), pattern.end(),
+                  hostname.begin(), hostname.end());
+  }
+  std::string::const_iterator hnLeftLabelEnd = std::find(hostname.begin(),
+                                                         hostname.end(),
+                                                         '.');
+  if(!strieq(ptLeftLabelEnd, pattern.end(), hnLeftLabelEnd, hostname.end())) {
+    return false;
+  }
+  // Perform wildcard match. Here '*' must match at least one
+  // character.
+  if(hnLeftLabelEnd - hostname.begin() < ptLeftLabelEnd - pattern.begin()) {
+    return false;
+  }
+  return
+    istartsWith(hostname.begin(), hnLeftLabelEnd,
+                pattern.begin(), ptWildcard) &&
+    iendsWith(hostname.begin(), hnLeftLabelEnd,
+              ptWildcard+1, ptLeftLabelEnd);
 }
 
 bool startsWith(const std::string& a, const char* b)
