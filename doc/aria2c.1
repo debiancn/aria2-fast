@@ -1,13 +1,13 @@
 '\" t
 .\"     Title: aria2c
 .\"    Author: Tatsuhiro Tsujikawa <t-tujikawa@users.sourceforge.net>
-.\" Generator: DocBook XSL Stylesheets v1.75.2 <http://docbook.sf.net/>
-.\"      Date: 02/27/2012
+.\" Generator: DocBook XSL Stylesheets v1.76.1 <http://docbook.sf.net/>
+.\"      Date: 04/08/2012
 .\"    Manual: Aria2 Manual
-.\"    Source: Aria2 1.14.2
+.\"    Source: Aria2 1.15.0
 .\"  Language: English
 .\"
-.TH "ARIA2C" "1" "02/27/2012" "Aria2 1\&.14\&.2" "Aria2 Manual"
+.TH "ARIA2C" "1" "04/08/2012" "Aria2 1\&.15\&.0" "Aria2 Manual"
 .\" -----------------------------------------------------------------
 .\" * Define some portability stuff
 .\" -----------------------------------------------------------------
@@ -781,6 +781,14 @@ and
 \fIK\fR
 or
 \fIM\fR(1K = 1024, 1M = 1024K)\&. If SIZE is omitted, SIZE=1M is used\&.
+.RE
+.PP
+\fB\-\-bt\-remove\-unselected\-file\fR[=\fItrue\fR|\fIfalse\fR]
+.RS 4
+Removes the unselected files when download is completed in BitTorrent\&. To selecting files, use
+\fB\-\-select\-file\fR
+option\&. If it is not used, all files are assumed to be selected\&. Please use this option with care because it will actually remove files from your disk\&. Default:
+\fIfalse\fR
 .RE
 .PP
 \fB\-\-bt\-require\-crypto\fR[=\fItrue\fR|\fIfalse\fR]
@@ -2320,6 +2328,18 @@ Additionally, the following options can be specified after each line of URIs\&. 
 .IP \(bu 2.3
 .\}
 
+\fBbt\-remove\-unselected\-file\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
 \fBcheck\-integrity\fR
 .RE
 .sp
@@ -3279,13 +3299,15 @@ host=localhost, protocol=ftp, dl_speed=0, last_updated=1222491632, status=ERROR
 .\}
 .SH "RPC INTERFACE"
 .sp
-aria2 provides both JSON\-RPC and XML\-RPC and they basically have the same functionality\&.
+aria2 provides JSON\-RPC over HTTP and XML\-RPC over HTTP and they basically have the same functionality\&. aria2 also provides JSON\-RPC over WebSocket\&. JSON\-RPC over WebSocket uses same method signatures and response format with JSON\-RPC over HTTP, but it additionally has server\-initiated notifications\&. See \fBJSON\-RPC over WebSocket\fR section for details\&.
 .sp
-The request path of JSON\-RPC interface is \fI/jsonrpc\fR\&. The request path of XML\-RPC interface is \fI/rpc\fR\&.
+The request path of JSON\-RPC interface (for both over HTTP and over WebSocket) is \fI/jsonrpc\fR\&. The request path of XML\-RPC interface is \fI/rpc\fR\&.
 .sp
-The implemented JSON\-RPC is based on JSON\-RPC 2\&.0 Specification (2010\-03\-26) and supports HTTP POST and GET (JSONP)\&.
+The WebSocket URI for JSON\-RPC over WebSocket is ws://HOST:PORT/jsonrpc\&.
 .sp
-The JSON\-RPC interface does not support notification\&. It also does not support floating point number\&. The character encoding must be UTF\-8\&.
+The implemented JSON\-RPC is based on JSON\-RPC 2\&.0 Specification and supports HTTP POST and GET (JSONP)\&. Using WebSocket as a transport is the original extension of aria2\&.
+.sp
+The JSON\-RPC interface does not support notification in HTTP, but the RPC server will send the notification in WebSocket\&. It also does not support floating point number\&. The character encoding must be UTF\-8\&.
 .sp
 When reading following document for JSON\-RPC, interpret struct as JSON object\&.
 .SS "Terminology"
@@ -4333,7 +4355,7 @@ The following example adds 1 URI http://example\&.org/file to the file whose ind
 \fBaria2.getOption (gid)\fR
 .RS 4
 .sp
-This method returns options of the download denoted by \fIgid\fR\&. The response is of type struct\&. Its key is the name of option\&. The value type is string\&.
+This method returns options of the download denoted by \fIgid\fR\&. The response is of type struct\&. Its key is the name of option\&. The value type is string\&. Note that this method does not return options which have no default value and have not been set by the command\-line options, configuration files or RPC methods\&.
 .sp
 The following example gets options of the download whose GID is "1":
 .sp
@@ -4424,6 +4446,18 @@ This method changes options of the download denoted by \fIgid\fR dynamically\&. 
 .IP \(bu 2.3
 .\}
 
+\fBbt\-remove\-unselected\-file\fR
+.RE
+.sp
+.RS 4
+.ie n \{\
+\h'-04'\(bu\h'+03'\c
+.\}
+.el \{\
+.sp -1
+.IP \(bu 2.3
+.\}
+
 \fBmax\-download\-limit\fR
 .RE
 .sp
@@ -4484,7 +4518,7 @@ The following example sets \fBmax\-download\-limit\fR option to "20K" for the do
 \fBaria2.getGlobalOption ()\fR
 .RS 4
 .sp
-This method returns global options\&. The response is of type struct\&. Its key is the name of option\&. The value type is string\&. Because global options are used as a template for the options of newly added download, the response contains keys returned by \fBaria2\&.getOption\fR method\&.
+This method returns global options\&. The response is of type struct\&. Its key is the name of option\&. The value type is string\&. Note that this method does not return options which have no default value and have not been set by the command\-line options, configuration files or RPC methods\&. Because global options are used as a template for the options of newly added download, the response contains keys returned by \fBaria2\&.getOption\fR method\&.
 .RE
 .sp
 .it 1 an-trap
@@ -5169,6 +5203,84 @@ will be encoded like this:
 .if n \{\
 .RE
 .\}
+.SS "JSON\-RPC over WebSocket"
+.sp
+JSON\-RPC over WebSocket uses same method signatures and response format with JSON\-RPC over HTTP\&. The supported WebSocket version is 13 which is detailed in RFC 6455\&.
+.sp
+To send a RPC request to the RPC server, send serialized JSON string in Text frame\&. The response from the RPC server is delivered also in Text frame\&.
+.sp
+The RPC server will send the notification to the client\&. The notification is unidirectional, therefore the client which received the notification must not respond to it\&. The method signature of notification is much like a normal method request but lacks id key\&. The value associated by the params key is the data which this notification carries\&. The format of this value varies depending on the notification method\&. Following notification methods are defined\&.
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onDownloadStart (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is started\&. The \fIevent\fR is of type struct and it contains following keys\&. The value type is string\&.
+.PP
+gid
+.RS 4
+GID of the download\&.
+.RE
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onDownloadPause (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is paused\&. The \fIevent\fR is the same struct of the \fIevent\fR argument of \fBaria2\&.onDownloadStart\fR method\&.
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onDownloadStop (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is stopped by the user\&. The \fIevent\fR is the same struct of the \fIevent\fR argument of \fBaria2\&.onDownloadStart\fR method\&.
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onDownloadComplete (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is completed\&. In BitTorrent downloads, this notification is sent when the download is completed and seeding is over\&. The \fIevent\fR is the same struct of the \fIevent\fR argument of \fBaria2\&.onDownloadStart\fR method\&.
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onDownloadError (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is stopped due to error\&. The \fIevent\fR is the same struct of the \fIevent\fR argument of \fBaria2\&.onDownloadStart\fR method\&.
+.RE
+.sp
+.it 1 an-trap
+.nr an-no-space-flag 1
+.nr an-break-flag 1
+.br
+.ps +1
+\fBaria2.onBtDownloadComplete (event)\fR
+.RS 4
+.sp
+This notification will be sent if a download is completed in BitTorrent (but seeding may not be over)\&. The \fIevent\fR is the same struct of the \fIevent\fR argument of \fBaria2\&.onDownloadStart\fR method\&.
+.RE
 .SS "Sample XML\-RPC Client Code"
 .sp
 The following Ruby script adds \fIhttp://localhost/aria2\&.tar\&.bz2\fR to aria2c operated on localhost with option \fB\-\-dir\fR=\fI/downloads\fR and prints its reponse\&.

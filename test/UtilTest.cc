@@ -86,6 +86,7 @@ class UtilTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testNoProxyDomainMatch);
   CPPUNIT_TEST(testInPrivateAddress);
   CPPUNIT_TEST(testSecfmt);
+  CPPUNIT_TEST(testTlsHostnameMatch);
   CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -157,6 +158,7 @@ public:
   void testNoProxyDomainMatch();
   void testInPrivateAddress();
   void testSecfmt();
+  void testTlsHostnameMatch();
 };
 
 
@@ -1841,6 +1843,30 @@ void UtilTest::testSecfmt()
   CPPUNIT_ASSERT_EQUAL(std::string("2m"), util::secfmt(120));
   CPPUNIT_ASSERT_EQUAL(std::string("59m59s"), util::secfmt(3599));
   CPPUNIT_ASSERT_EQUAL(std::string("1h"), util::secfmt(3600));
+}
+
+void UtilTest::testTlsHostnameMatch()
+{
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("Foo.com", "foo.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("*.a.com", "foo.a.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("*.a.com", "bar.foo.a.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("f*.com", "foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("*.com", "bar.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("com", "com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("foo.*", "foo.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("a.foo.com", "A.foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("a.foo.com", "b.foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("*a.foo.com", "a.foo.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("*a.foo.com", "ba.foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("a*.foo.com", "a.foo.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("a*.foo.com", "ab.foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("foo.b*z.foo.com", "foo.baz.foo.com"));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("B*z.foo.com", "bAZ.Foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("b*z.foo.com", "bz.foo.com"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("*", "foo"));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("*", ""));
+  CPPUNIT_ASSERT(util::tlsHostnameMatch("", ""));
+  CPPUNIT_ASSERT(!util::tlsHostnameMatch("xn--*.a.b", "xn--c.a.b"));
 }
 
 } // namespace aria2

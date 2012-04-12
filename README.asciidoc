@@ -61,7 +61,7 @@ Here is a list of features:
 * BitTorrent Local Peer Discovery
 * Rename/change the directory structure of BitTorrent downloads
   completely
-* JSON-RPC/XML-RPC interface
+* JSON-RPC (over HTTP and WebSocket)/XML-RPC interface
 * Run as a daemon process
 * Selective download in multi-file torrent/Metalink
 * Chunk checksum validation in Metalink
@@ -77,7 +77,7 @@ How to get source code
 ----------------------
 
 We maintain the source code at Github:
-http://github.com/tatsuhiro-t/aria2
+https://github.com/tatsuhiro-t/aria2
 
 To download the latest source code, run following command:
 
@@ -93,7 +93,7 @@ Dependency
 
 .External Library Dependency
 [options="header"]
-|====================================================
+|==================================================================
 |features                |dependency
 |HTTPS                   |GnuTLS or OpenSSL
 |BitTorrent              |libnettle+libgmp or libgcrypt or OpenSSL
@@ -103,7 +103,13 @@ Dependency
 |Async DNS               |C-Ares
 |Firefox3/Chromium cookie|libsqlite3
 |XML-RPC                 |libxml2 or Expat.
-|====================================================
+|JSON-RPC over WebSocket |libnettle or libgcrypt or OpenSSL
+|==================================================================
+
+Note;;
+
+  libxml2 has precedence over Expat if both libraries are installed.
+  If you prefer Expat, run configure with \--without-libxml2.
 
 Note;;
 
@@ -118,10 +124,14 @@ Note;;
   \--without-libnettle \--with-libgcrypt. If OpenSSL is selected over
   GnuTLS, neither libnettle nor libgcrypt will be used.
 
-Note;;
+A user can have one of the following configurations for SSL and crypto
+libraries:
 
-  libxml2 has precedence over Expat if both libraries are installed.
-  If you prefer Expat, run configure with \--without-libxml2.
+* libgcrypt
+* libnettle
+* OpenSSL
+* GnuTLS + libgcrypt
+* GnuTLS + libnettle
 
 You can disable BitTorrent, Metalink support by providing
 \--disable-bittorrent, \--disable-metalink respectively to configure
@@ -171,6 +181,9 @@ necessary to build the program:
 ---------------
 $ autoreconf -i
 ---------------
+
+If you are building aria2 for Mac OS X, take a look at
+build_osx_release.sh, which builds OSX universal binary DMG.
 
 The quickest way to build aria2 is just type following commands:
 
@@ -313,11 +326,18 @@ netrc support is enabled by default for HTTP(S)/FTP.  To disable netrc
 support, specify -n command-line option.  Your .netrc file should have
 correct permissions(600).
 
+WebSocket
+---------
+
+The WebSocket server embedded in aria2 implements the specification
+defined in RFC 6455. The supported protocol version is 13.
+
 References
 ----------
  * http://aria2.sourceforge.net/aria2c.1.html[aria2 Online Manual]
  * http://aria2.sourceforge.net/
  * http://sourceforge.net/apps/trac/aria2/wiki
- * http://github.com/tatsuhiro-t/aria2
+ * https://github.com/tatsuhiro-t/aria2
  * http://tools.ietf.org/html/rfc5854
  * http://tools.ietf.org/html/rfc6249
+ * http://tools.ietf.org/html/rfc6455

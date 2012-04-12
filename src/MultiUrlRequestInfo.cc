@@ -61,6 +61,13 @@
 #include "SocketCore.h"
 #include "OutputFile.h"
 #include "UriListParser.h"
+#include "SingletonHolder.h"
+#include "Notifier.h"
+#ifdef ENABLE_WEBSOCKET
+# include "WebSocketSessionMan.h"
+#else // !ENABLE_WEBSOCKET
+# include "NullWebSocketSessionMan.h"
+#endif // !ENABLE_WEBSOCKET
 #ifdef ENABLE_SSL
 # include "TLSContext.h"
 #endif // ENABLE_SSL
@@ -167,6 +174,13 @@ error_code::Value MultiUrlRequestInfo::execute()
 {
   error_code::Value returnValue = error_code::FINISHED;
   try {
+    SharedHandle<rpc::WebSocketSessionMan> wsSessionMan;
+    if(option_->getAsBool(PREF_ENABLE_RPC)) {
+      wsSessionMan.reset(new rpc::WebSocketSessionMan());
+    }
+    Notifier notifier(wsSessionMan);
+    SingletonHolder<Notifier>::instance(&notifier);
+
     DownloadEngineHandle e =
       DownloadEngineFactory().newDownloadEngine(option_.get(), requestGroups_);
 
@@ -290,6 +304,7 @@ error_code::Value MultiUrlRequestInfo::execute()
     }
     A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
   }
+  SingletonHolder<Notifier>::instance(0);
 #ifdef SIGHUP
   util::setGlobalSignalHandler(SIGHUP, SIG_DFL, 0);
 #endif // SIGHUP

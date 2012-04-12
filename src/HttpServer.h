@@ -86,10 +86,20 @@ public:
 
   void feedResponse(std::string& text, const std::string& contentType);
 
-  void feedResponse(const std::string& status,
-                    const std::string& headers,
-                    std::string& text,
-                    const std::string& contentType);
+  // Feeds HTTP response with the status code |status| (e.g.,
+  // 200). The |headers| is zero or more lines of HTTP header field
+  // and each line must end with "\r\n". The |text| is the response
+  // body. The |contentType" is the content-type of the response body.
+  void feedResponse(int status,
+                    const std::string& headers = "",
+                    const std::string& text = "",
+                    const std::string& contentType = "");
+
+  // Feeds "101 Switching Protocols" response. The |protocol| will
+  // appear in Upgrade header field. The |headers| is zero or more
+  // lines of HTTP header field and each line must end with "\r\n".
+  void feedUpgradeResponse(const std::string& protocol,
+                           const std::string& headers);
 
   bool authenticate();
 
@@ -128,6 +138,11 @@ public:
   void setAllowOrigin(const std::string& allowOrigin)
   {
     allowOrigin_ = allowOrigin;
+  }
+
+  const SharedHandle<SocketCore>& getSocket() const
+  {
+    return socket_;
   }
 };
 

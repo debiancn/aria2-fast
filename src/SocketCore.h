@@ -125,6 +125,9 @@ public:
   (const std::string& multicastAddr, uint16_t multicastPort,
    const std::string& localAddr);
   
+  // Enables TCP_NODELAY socket option if f == true.
+  void setTcpNodelay(bool f);
+
   void create(int family, int protocol = 0);
 
   void bindWithFamily(uint16_t port, int family, int flags = AI_PASSIVE);
@@ -387,6 +390,13 @@ namespace net {
 // number of bytes written in dest, that is 4 for IPv4 and 16 for
 // IPv6. Return 0 if error occurred.
 size_t getBinAddr(unsigned char* dest, const std::string& ip);
+
+// Verifies hostname against presented identifiers in the certificate.
+// The implementation is based on the procedure described in RFC 6125.
+bool verifyHostname(const std::string& hostname,
+                    const std::vector<std::string>& dnsNames,
+                    const std::vector<std::string>& ipAddrs,
+                    const std::string& commonName);
 
 } // namespace net
 

@@ -76,6 +76,11 @@
 #include "OutputFile.h"
 #include "download_helper.h"
 #include "UriListParser.h"
+#include "SingletonHolder.h"
+#include "Notifier.h"
+#ifdef ENABLE_BITTORRENT
+#  include "bittorrent_helper.h"
+#endif // ENABLE_BITTORRENT
 
 namespace aria2 {
 
@@ -252,6 +257,16 @@ bool RequestGroupMan::removeReservedGroup(a2_gid_t gid)
 
 namespace {
 
+void notifyDownloadEvent
+(const std::string& event, const SharedHandle<RequestGroup>& group)
+{
+  SingletonHolder<Notifier>::instance()->notifyDownloadEvent(event, group);
+}
+
+} // namespace
+
+namespace {
+
 void executeStopHook
 (const SharedHandle<RequestGroup>& group,
  const Option* option,
@@ -266,6 +281,14 @@ void executeStopHook
     util::executeHookByOptName(group, option, PREF_ON_DOWNLOAD_ERROR);
   } else if(!option->blank(PREF_ON_DOWNLOAD_STOP)) {
     util::executeHookByOptName(group, option, PREF_ON_DOWNLOAD_STOP);
+  }
+  if(result == error_code::FINISHED) {
+    notifyDownloadEvent(Notifier::ON_DOWNLOAD_COMPLETE, group);
+  } else if(result != error_code::IN_PROGRESS &&
+            result != error_code::REMOVED) {
+    notifyDownloadEvent(Notifier::ON_DOWNLOAD_ERROR, group);
+  } else {
+    notifyDownloadEvent(Notifier::ON_DOWNLOAD_STOP, group);
   }
 }
 
@@ -339,6 +362,29 @@ public:
                    static_cast<unsigned long>(nextGroups.size())));
             e_->getRequestGroupMan()->insertReservedGroup(0, nextGroups);
           }
+#ifdef ENABLE_BITTORRENT
+          // For in-memory download (e.g., Magnet URI), the
+          // FileEntry::getPath() does not return actual file path, so
+          // we don't remove it.
+          if(group->getOption()->getAsBool(PREF_BT_REMOVE_UNSELECTED_FILE) &&
+             !group->inMemoryDownload() &&
+             dctx->hasAttribute(bittorrent::BITTORRENT)) {
+            A2_LOG_INFO(fmt(MSG_REMOVING_UNSELECTED_FILE, group->getGID()));
+            const std::vector<SharedHandle<FileEntry> >& files =
+              dctx->getFileEntries();
+            for(std::vector<SharedHandle<FileEntry> >::const_iterator i =
+                  files.begin(), eoi = files.end(); i != eoi; ++i) {
+              if(!(*i)->isRequested()) {
+                if(File((*i)->getPath()).remove()) {
+                  A2_LOG_INFO(fmt(MSG_FILE_REMOVED, (*i)->getPath().c_str()));
+                } else {
+                  A2_LOG_INFO(fmt(MSG_FILE_COULD_NOT_REMOVED,
+                                  (*i)->getPath().c_str()));
+                }
+              }
+            }
+          }
+#endif // ENABLE_BITTORRENT
         } else {
           A2_LOG_NOTICE
             (fmt(_("Download GID#%lld not complete: %s"),
@@ -353,8 +399,9 @@ public:
         reservedGroups_.push_front(group);
         group->releaseRuntimeResource(e_);
         group->setForceHaltRequested(false);
-        util::executeHookByOptName
-          (group, e_->getOption(), PREF_ON_DOWNLOAD_PAUSE);
+        util::executeHookByOptName(group, e_->getOption(),
+                                   PREF_ON_DOWNLOAD_PAUSE);
+        notifyDownloadEvent(Notifier::ON_DOWNLOAD_PAUSE, group);
         // TODO Should we have to prepend spend uris to remaining uris
         // in case PREF_REUSE_URI is disabed?
       } else {
@@ -536,8 +583,9 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
       requestGroups_.push_back(groupToAdd);
       requestQueueCheck();
     }
-    util::executeHookByOptName
-      (groupToAdd, e->getOption(), PREF_ON_DOWNLOAD_START);
+    util::executeHookByOptName(groupToAdd, e->getOption(),
+                               PREF_ON_DOWNLOAD_START);
+    notifyDownloadEvent(Notifier::ON_DOWNLOAD_START, groupToAdd);
   }
   if(!temp.empty()) {
     reservedGroups_.insert(reservedGroups_.begin(), temp.begin(), temp.end());
@@ -949,9 +997,9 @@ void RequestGroupMan::getUsedHosts
   std::vector<Triplet<size_t, int, std::string> > tempHosts;
   for(std::deque<SharedHandle<RequestGroup> >::const_iterator i =
         requestGroups_.begin(), eoi = requestGroups_.end(); i != eoi; ++i) {
-    const std::deque<SharedHandle<Request> >& inFlightReqs =
+    const FileEntry::InFlightRequestSet& inFlightReqs =
       (*i)->getDownloadContext()->getFirstFileEntry()->getInFlightRequests();
-    for(std::deque<SharedHandle<Request> >::const_iterator j =
+    for(FileEntry::InFlightRequestSet::iterator j =
           inFlightReqs.begin(), eoj = inFlightReqs.end(); j != eoj; ++j) {
       uri::UriStruct us;
       if(uri::parse(us, (*j)->getUri())) {

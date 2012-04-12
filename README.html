@@ -902,7 +902,7 @@ Rename/change the directory structure of BitTorrent downloads
 </li>
 <li>
 <p>
-JSON-RPC/XML-RPC interface
+JSON-RPC (over HTTP and WebSocket)/XML-RPC interface
 </p>
 </li>
 <li>
@@ -958,7 +958,7 @@ IPv6 support
 <h2 id="_how_to_get_source_code">4. How to get source code</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>We maintain the source code at Github:
-<a href="http://github.com/tatsuhiro-t/aria2">http://github.com/tatsuhiro-t/aria2</a></p></div>
+<a href="https://github.com/tatsuhiro-t/aria2">https://github.com/tatsuhiro-t/aria2</a></p></div>
 <div class="paragraph"><p>To download the latest source code, run following command:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1018,10 +1018,23 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">XML-RPC</p></td>
 <td align="left" valign="top"><p class="table">libxml2 or Expat.</p></td>
 </tr>
+<tr>
+<td align="left" valign="top"><p class="table">JSON-RPC over WebSocket</p></td>
+<td align="left" valign="top"><p class="table">libnettle or libgcrypt or OpenSSL</p></td>
+</tr>
 </tbody>
 </table>
 </div>
 <div class="dlist"><dl>
+<dt class="hdlist1">
+Note
+</dt>
+<dd>
+<p>
+  libxml2 has precedence over Expat if both libraries are installed.
+  If you prefer Expat, run configure with --without-libxml2.
+</p>
+</dd>
 <dt class="hdlist1">
 Note
 </dt>
@@ -1043,16 +1056,36 @@ Note
   GnuTLS, neither libnettle nor libgcrypt will be used.
 </p>
 </dd>
-<dt class="hdlist1">
-Note
-</dt>
-<dd>
-<p>
-  libxml2 has precedence over Expat if both libraries are installed.
-  If you prefer Expat, run configure with --without-libxml2.
-</p>
-</dd>
 </dl></div>
+<div class="paragraph"><p>A user can have one of the following configurations for SSL and crypto
+libraries:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+libgcrypt
+</p>
+</li>
+<li>
+<p>
+libnettle
+</p>
+</li>
+<li>
+<p>
+OpenSSL
+</p>
+</li>
+<li>
+<p>
+GnuTLS + libgcrypt
+</p>
+</li>
+<li>
+<p>
+GnuTLS + libnettle
+</p>
+</li>
+</ul></div>
 <div class="paragraph"><p>You can disable BitTorrent, Metalink support by providing
 --disable-bittorrent, --disable-metalink respectively to configure
 script.</p></div>
@@ -1149,6 +1182,8 @@ necessary to build the program:</p></div>
 <div class="content">
 <pre><tt>$ autoreconf -i</tt></pre>
 </div></div>
+<div class="paragraph"><p>If you are building aria2 for Mac OS X, take a look at
+build_osx_release.sh, which builds OSX universal binary DMG.</p></div>
 <div class="paragraph"><p>The quickest way to build aria2 is just type following commands:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1319,7 +1354,14 @@ correct permissions(600).</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_references">11. References</h2>
+<h2 id="_websocket">11. WebSocket</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The WebSocket server embedded in aria2 implements the specification
+defined in RFC 6455. The supported protocol version is 13.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_references">12. References</h2>
 <div class="sectionbody">
 <div class="ulist"><ul>
 <li>
@@ -1339,7 +1381,7 @@ correct permissions(600).</p></div>
 </li>
 <li>
 <p>
-<a href="http://github.com/tatsuhiro-t/aria2">http://github.com/tatsuhiro-t/aria2</a>
+<a href="https://github.com/tatsuhiro-t/aria2">https://github.com/tatsuhiro-t/aria2</a>
 </p>
 </li>
 <li>
@@ -1352,6 +1394,11 @@ correct permissions(600).</p></div>
 <a href="http://tools.ietf.org/html/rfc6249">http://tools.ietf.org/html/rfc6249</a>
 </p>
 </li>
+<li>
+<p>
+<a href="http://tools.ietf.org/html/rfc6455">http://tools.ietf.org/html/rfc6455</a>
+</p>
+</li>
 </ul></div>
 </div>
 </div>
@@ -1359,7 +1406,7 @@ correct permissions(600).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2012-02-27 21:58:32 JST
+Last updated 2012-04-08 22:46:31 JST
 </div>
 </div>
 </body>

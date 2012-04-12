@@ -229,7 +229,17 @@ OptionHandlerFactory::createOptionHandlers()
     SharedHandle<OptionHandler> op(new BooleanOptionHandler
                                    (PREF_DISABLE_IPV6,
                                     TEXT_DISABLE_IPV6,
+#if defined(__MINGW32__) && !defined(__MINGW64__)
+                                    // Disable IPv6 by default for
+                                    // MinGW build.  This is because
+                                    // numerous IPv6 routines are
+                                    // available from Vista.  Checking
+                                    // getaddrinfo failed in
+                                    // configure.
+                                    A2_V_TRUE,
+#else // !defined(__MINGW32__) || defined(__MINGW64__)
                                     A2_V_FALSE,
+#endif // !defined(__MINGW32__) || defined(__MINGW64__)
                                     OptionHandler::OPT_ARG));
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
@@ -1642,6 +1652,19 @@ OptionHandlerFactory::createOptionHandlers()
                                     TEXT_BT_PRIORITIZE_PIECE));
     op->addTag(TAG_BITTORRENT);
     op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
+    SharedHandle<OptionHandler> op(new BooleanOptionHandler
+                                   (PREF_BT_REMOVE_UNSELECTED_FILE,
+                                    TEXT_BT_REMOVE_UNSELECTED_FILE,
+                                    A2_V_FALSE,
+                                    OptionHandler::OPT_ARG));
+    op->addTag(TAG_BITTORRENT);
+    op->setInitialOption(true);
+    op->setChangeOption(true);
     op->setChangeGlobalOption(true);
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
