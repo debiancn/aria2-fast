@@ -1,3 +1,10 @@
+aria2 (1.15.0-2) UNRELEASED; urgency=low
+
+  * debian/control, debian/rules:
+    + Used proper dpkg-buildflags for hardening (Closes: #674537)
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 25 May 2012 17:55:28 +0530
+
 aria2 (1.15.0-1) unstable; urgency=low
 
   * New upstream release.

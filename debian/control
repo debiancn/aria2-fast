@@ -4,8 +4,8 @@ Priority: extra
 Maintainer: Patrick Ruckstuhl <patrick@tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
 Build-Depends: debhelper (>= 7),
+               dpkg-dev (>= 1.16.1~),
                autotools-dev,
-               hardening-wrapper,
                libc-ares-dev,
                libgcrypt11-dev (>= 1.5.0-3) | libgcrypt-dev,
                libgnutls-dev,
