@@ -36,7 +36,7 @@ ifneq "$(wildcard /usr/share/misc/config.sub)" ""
 endif
 
 	./configure $(CROSS) CFLAGS="$(CFLAGS)" \
-			     LDFLAGS="-Wl,-z,defs,--as-needed" \
+			     LDFLAGS="$(LDFLAGS) -Wl,-z,defs,--as-needed" \
 			   --prefix=/usr \
 			   --with-gnutls \
 			   --without-openssl \

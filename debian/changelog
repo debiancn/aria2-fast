@@ -1,3 +1,12 @@
+aria2 (1.15.1-1) UNRELEASED; urgency=low
+
+  * New upstream release.
+  * debian/rules:
+    + Applied patch from Simon Ruderich <simon@ruderich.org> to fix partial
+      hardening flags (Closes: #674537)
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 28 May 2012 11:45:00 +0530
+
 aria2 (1.15.0-2) unstable; urgency=low
 
   * debian/control, debian/rules:
