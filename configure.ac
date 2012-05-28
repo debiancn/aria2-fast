@@ -3,7 +3,7 @@
 #
 AC_PREREQ([2.67])
 LT_PREREQ([2.2.6])
-AC_INIT([aria2],[1.15.0],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.15.1],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
 AC_USE_SYSTEM_EXTENSIONS
 LT_INIT()
 AC_CONFIG_MACRO_DIR([m4])
@@ -42,6 +42,11 @@ ARIA2_ARG_ENABLE([epoll])
 AC_ARG_WITH([ca-bundle],
   AS_HELP_STRING([--with-ca-bundle=FILE],[Use FILE as default CA bundle.]),
   [ca_bundle=$withval], [ca_bundle=""])
+
+AC_ARG_WITH([bashcompletiondir],
+  AS_HELP_STRING([--with-bashcompletiondir=DIR],
+                 [Directory to install bash_completion file]),
+  [bashcompletiondir=$withval], [bashcompletiondir=$docdir/bash_completion])
 
 # Checks for programs.
 AC_PROG_CXX
@@ -299,7 +304,6 @@ AC_SEARCH_LIBS([clock_gettime], [rt])
 case "$target" in
 	*solaris*)
                 AC_SEARCH_LIBS([getaddrinfo], [nsl socket])
-                AC_SEARCH_LIBS([inet_aton], [nsl socket])
 		;;
 esac
 
@@ -470,9 +474,6 @@ AC_CHECK_FUNCS([getaddrinfo],
 AC_CHECK_FUNCS([gettimeofday],
 	[AM_CONDITIONAL([HAVE_GETTIMEOFDAY], true)],
 	[AM_CONDITIONAL([HAVE_GETTIMEOFDAY], false)])
-AC_CHECK_FUNCS([inet_aton],
-	[AM_CONDITIONAL([HAVE_INET_ATON], true)],
-	[AM_CONDITIONAL([HAVE_INET_ATON], false)])
 AC_CHECK_FUNCS([localtime_r],
 	[AM_CONDITIONAL([HAVE_LOCALTIME_R], true)],
 	[AM_CONDITIONAL([HAVE_LOCALTIME_R], false)])
@@ -540,7 +541,21 @@ AC_CHECK_MEMBER([struct sockaddr_in.sin_len],
                 [AC_DEFINE([HAVE_SOCKADDR_IN_SIN_LEN],[1],
                   [Define to 1 if struct sockaddr_in has sin_len member.])],
                 [],
-                [[#include <netinet/in.h>]])
+                [[
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+]])
+
+AC_CHECK_MEMBER([struct sockaddr_in6.sin6_len],
+                [AC_DEFINE([HAVE_SOCKADDR_IN6_SIN6_LEN],[1],
+                  [Define to 1 if struct sockaddr_in6 has sin6_len member.])],
+                [],
+                [[
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+]])
 
 # Check struct option.name is assignable from const char*.  struct
 # option.name in opensolaris is of type char*. In Linux, it is const
@@ -572,6 +587,8 @@ if test "x$enable_message_digest" = "xyes"; then
 fi
 AM_CONDITIONAL([ENABLE_WEBSOCKET], [test "x$enable_websocket" = "xyes"])
 
+AC_SUBST([bashcompletiondir])
+
 AC_CONFIG_FILES([Makefile
 		src/Makefile
 		test/Makefile
@@ -579,7 +596,11 @@ AC_CONFIG_FILES([Makefile
 		intl/Makefile
 		lib/Makefile
 		doc/Makefile
-		doc/ru/Makefile
+		doc/manual-src/Makefile
+		doc/manual-src/en/Makefile
+		doc/manual-src/en/conf.py
+		doc/manual-src/ru/Makefile
+		doc/manual-src/ru/conf.py
 		deps/Makefile])
 AC_OUTPUT
 
@@ -607,3 +628,4 @@ echo "Metalink:       $enable_metalink"
 echo "XML-RPC:        $enable_xml_rpc"
 echo "Message Digest: $enable_message_digest"
 echo "WebSocket:      $enable_websocket"
+echo "bash_completion dir: $bashcompletiondir"
