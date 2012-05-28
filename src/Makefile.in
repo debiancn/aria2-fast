@@ -280,16 +280,15 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @HAVE_GETADDRINFO_FALSE@am__append_24 = getaddrinfo.c getaddrinfo.h
 @HAVE_GAI_STRERROR_FALSE@am__append_25 = gai_strerror.c gai_strerror.h
 @HAVE_GETTIMEOFDAY_FALSE@am__append_26 = gettimeofday.c gettimeofday.h
-@HAVE_INET_ATON_FALSE@am__append_27 = inet_aton.c inet_aton.h
-@HAVE_LOCALTIME_R_FALSE@am__append_28 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_29 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_30 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_31 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_32 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_33 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_34 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_35 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_36 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_LOCALTIME_R_FALSE@am__append_27 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_28 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_29 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_30 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_31 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_32 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_33 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_34 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_35 = KqueueEventPoll.cc KqueueEventPoll.h
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in alloca.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -646,9 +645,9 @@ am__libaria2c_a_SOURCES_DIST = Socket.h SocketCore.cc SocketCore.h \
 	MetalinkPostDownloadHandler.cc MetalinkPostDownloadHandler.h \
 	metalink_helper.cc metalink_helper.h asctime_r.c asctime_r.h \
 	libgen.c libgen.h getaddrinfo.c getaddrinfo.h gai_strerror.c \
-	gai_strerror.h gettimeofday.c gettimeofday.h inet_aton.c \
-	inet_aton.h localtime_r.c localtime_r.h strptime.c strptime.h \
-	timegm.c timegm.h daemon.cc daemon.h clock_gettime_mingw.cc \
+	gai_strerror.h gettimeofday.c gettimeofday.h localtime_r.c \
+	localtime_r.h strptime.c strptime.h timegm.c timegm.h \
+	daemon.cc daemon.h clock_gettime_mingw.cc \
 	clock_gettime_mingw.h clock_gettime_osx.cc clock_gettime_osx.h \
 	PollEventPoll.cc PollEventPoll.h PortEventPoll.cc \
 	PortEventPoll.h KqueueEventPoll.cc KqueueEventPoll.h
@@ -851,18 +850,17 @@ am__objects_3 =
 @HAVE_GETADDRINFO_FALSE@am__objects_23 = getaddrinfo.$(OBJEXT)
 @HAVE_GAI_STRERROR_FALSE@am__objects_24 = gai_strerror.$(OBJEXT)
 @HAVE_GETTIMEOFDAY_FALSE@am__objects_25 = gettimeofday.$(OBJEXT)
-@HAVE_INET_ATON_FALSE@am__objects_26 = inet_aton.$(OBJEXT)
-@HAVE_LOCALTIME_R_FALSE@am__objects_27 = localtime_r.$(OBJEXT)
-@HAVE_STRPTIME_FALSE@am__objects_28 = strptime.$(OBJEXT)
-@HAVE_TIMEGM_FALSE@am__objects_29 = timegm.$(OBJEXT)
-@HAVE_DAEMON_FALSE@am__objects_30 = daemon.$(OBJEXT)
-@HAVE_TIMEGETTIME_TRUE@am__objects_31 = clock_gettime_mingw.$(OBJEXT)
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_32 =  \
+@HAVE_LOCALTIME_R_FALSE@am__objects_26 = localtime_r.$(OBJEXT)
+@HAVE_STRPTIME_FALSE@am__objects_27 = strptime.$(OBJEXT)
+@HAVE_TIMEGM_FALSE@am__objects_28 = timegm.$(OBJEXT)
+@HAVE_DAEMON_FALSE@am__objects_29 = daemon.$(OBJEXT)
+@HAVE_TIMEGETTIME_TRUE@am__objects_30 = clock_gettime_mingw.$(OBJEXT)
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_31 =  \
 @HAVE_MACH_ABSOLUTE_TIME_TRUE@	clock_gettime_osx.$(OBJEXT)
-@HAVE_POLL_TRUE@am__objects_33 = PollEventPoll.$(OBJEXT)
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_34 = PortEventPoll.$(OBJEXT)
-@HAVE_KQUEUE_TRUE@am__objects_35 = KqueueEventPoll.$(OBJEXT)
-am__objects_36 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
+@HAVE_POLL_TRUE@am__objects_32 = PollEventPoll.$(OBJEXT)
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_33 = PortEventPoll.$(OBJEXT)
+@HAVE_KQUEUE_TRUE@am__objects_34 = KqueueEventPoll.$(OBJEXT)
+am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	AbstractCommand.$(OBJEXT) \
 	InitiateConnectionCommandFactory.$(OBJEXT) \
 	DownloadCommand.$(OBJEXT) \
@@ -971,9 +969,8 @@ am__objects_36 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
 	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
 	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
-	$(am__objects_32) $(am__objects_33) $(am__objects_34) \
-	$(am__objects_35)
-am_libaria2c_a_OBJECTS = $(am__objects_36)
+	$(am__objects_32) $(am__objects_33) $(am__objects_34)
+am_libaria2c_a_OBJECTS = $(am__objects_35)
 libaria2c_a_OBJECTS = $(am_libaria2c_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -1162,6 +1159,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+bashcompletiondir = @bashcompletiondir@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -1364,7 +1362,7 @@ SRCS = Socket.h SocketCore.cc SocketCore.h BinaryStream.h Command.cc \
 	$(am__append_25) $(am__append_26) $(am__append_27) \
 	$(am__append_28) $(am__append_29) $(am__append_30) \
 	$(am__append_31) $(am__append_32) $(am__append_33) \
-	$(am__append_34) $(am__append_35) $(am__append_36)
+	$(am__append_34) $(am__append_35)
 noinst_LIBRARIES = libaria2c.a
 libaria2c_a_SOURCES = $(SRCS)
 aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
@@ -1831,7 +1829,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gai_strerror.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getaddrinfo.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/inet_aton.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/json.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgen.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localtime_r.Po@am__quote@

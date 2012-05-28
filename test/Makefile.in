@@ -153,6 +153,7 @@ check_PROGRAMS = $(am__EXEEXT_1)
 @ENABLE_METALINK_TRUE@	MetalinkParserControllerTest.cc\
 @ENABLE_METALINK_TRUE@	MetalinkProcessorTest.cc
 
+@ENABLE_ASYNC_DNS_TRUE@am__append_8 = AsyncNameResolverTest.cc
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -276,7 +277,8 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 	Bencode2Test.cc PeerConnectionTest.cc MetalinkerTest.cc \
 	MetalinkEntryTest.cc Metalink2RequestGroupTest.cc \
 	MetalinkPostDownloadHandlerTest.cc MetalinkHelperTest.cc \
-	MetalinkParserControllerTest.cc MetalinkProcessorTest.cc
+	MetalinkParserControllerTest.cc MetalinkProcessorTest.cc \
+	AsyncNameResolverTest.cc
 @ENABLE_XML_RPC_TRUE@am__objects_1 = XmlRpcRequestParserControllerTest.$(OBJEXT)
 @HAVE_SOME_FALLOCATE_TRUE@am__objects_2 = FallocFileAllocationIteratorTest.$(OBJEXT)
 @HAVE_ZLIB_TRUE@am__objects_3 = GZipDecoderTest.$(OBJEXT) \
@@ -373,6 +375,8 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 @ENABLE_METALINK_TRUE@	MetalinkHelperTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkParserControllerTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkProcessorTest.$(OBJEXT)
+@ENABLE_ASYNC_DNS_TRUE@am__objects_8 =  \
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverTest.$(OBJEXT)
 am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	SocketCoreTest.$(OBJEXT) array_funTest.$(OBJEXT) \
 	Base64Test.$(OBJEXT) Base32Test.$(OBJEXT) \
@@ -419,7 +423,7 @@ am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	AbstractCommandTest.$(OBJEXT) SinkStreamFilterTest.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
-	$(am__objects_7)
+	$(am__objects_7) $(am__objects_8)
 aria2c_OBJECTS = $(am_aria2c_OBJECTS)
 aria2c_DEPENDENCIES = ../src/libaria2c.a
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
@@ -605,6 +609,7 @@ am__leading_dot = @am__leading_dot@
 am__quote = @am__quote@
 am__tar = @am__tar@
 am__untar = @am__untar@
+bashcompletiondir = @bashcompletiondir@
 bindir = @bindir@
 build = @build@
 build_alias = @build_alias@
@@ -686,7 +691,7 @@ aria2c_SOURCES = AllTest.cc TestUtil.cc TestUtil.h SocketCoreTest.cc \
 	ParamedStringTest.cc RpcHelperTest.cc AbstractCommandTest.cc \
 	SinkStreamFilterTest.cc $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7)
+	$(am__append_6) $(am__append_7) $(am__append_8)
 aria2c_LDADD = ../src/libaria2c.a @LIBINTL@ @CPPUNIT_LIBS@
 AM_CPPFLAGS = -Wall\
 	-I$(top_srcdir)/src\
@@ -787,6 +792,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractCommandTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AllTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceListTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolverTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfigFactoryTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Base32Test.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Base64Test.Po@am__quote@

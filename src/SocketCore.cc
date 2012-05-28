@@ -471,8 +471,9 @@ void SocketCore::setMulticastInterface(const std::string& localAddr)
   if(localAddr.empty()) {
     addr.s_addr = htonl(INADDR_ANY);
   } else {
-    if(inet_aton(localAddr.c_str(), &addr) == 0) {
-      throw DL_ABORT_EX(fmt("inet_aton failed for %s", localAddr.c_str()));
+    if(inetPton(AF_INET, localAddr.c_str(), &addr) != 0) {
+      throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
+                            localAddr.c_str()));
     }
   }
   setSockOpt(IPPROTO_IP, IP_MULTICAST_IF, &addr, sizeof(addr));
@@ -493,15 +494,17 @@ void SocketCore::joinMulticastGroup
  const std::string& localAddr)
 {
   in_addr multiAddr;
-  if(inet_aton(multicastAddr.c_str(), &multiAddr) == 0) {
-    throw DL_ABORT_EX(fmt("inet_aton failed for %s", multicastAddr.c_str()));
+  if(inetPton(AF_INET, multicastAddr.c_str(), &multiAddr) != 0) {
+    throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
+                          multicastAddr.c_str()));
   }
   in_addr ifAddr;
   if(localAddr.empty()) {
     ifAddr.s_addr = htonl(INADDR_ANY);
   } else {
-    if(inet_aton(localAddr.c_str(), &ifAddr) == 0) {
-      throw DL_ABORT_EX(fmt("inet_aton failed for %s", localAddr.c_str()));
+    if(inetPton(AF_INET, localAddr.c_str(), &ifAddr) != 0) {
+      throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
+                            localAddr.c_str()));
     }
   }
   struct ip_mreq mreq;
@@ -730,14 +733,14 @@ ssize_t SocketCore::writeData(const char* data, size_t len)
     }
   } else {
 #ifdef HAVE_OPENSSL
+    ERR_clear_error();
     ret = SSL_write(ssl, data, len);
     if(ret < 0) {
       ret = sslHandleEAGAIN(ret);
     }
     if(ret < 0) {
       throw DL_RETRY_EX
-        (fmt(EX_SOCKET_SEND,
-             ERR_error_string(SSL_get_error(ssl, ret), 0)));
+        (fmt(EX_SOCKET_SEND, ERR_error_string(ERR_get_error(), 0)));
     }
 #endif // HAVE_OPENSSL
 #ifdef HAVE_LIBGNUTLS
@@ -777,13 +780,14 @@ void SocketCore::readData(char* data, size_t& len)
 #ifdef HAVE_OPENSSL
     // for SSL
     // TODO handling len == 0 case required
+    ERR_clear_error();
     ret = SSL_read(ssl, data, len);
     if(ret < 0) {
       ret = sslHandleEAGAIN(ret);
     }
     if(ret < 0) {
       throw DL_RETRY_EX
-        (fmt(EX_SOCKET_RECV, ERR_error_string(SSL_get_error(ssl, ret), 0)));
+        (fmt(EX_SOCKET_RECV, ERR_error_string(ERR_get_error(), 0)));
     }
 #endif // HAVE_OPENSSL
 #ifdef HAVE_LIBGNUTLS
@@ -843,6 +847,7 @@ bool SocketCore::initiateSecureConnection(const std::string& hostname)
     wantRead_ = false;
     wantWrite_ = false;
 #ifdef HAVE_OPENSSL
+    ERR_clear_error();
     int e = SSL_connect(ssl);
 
     if (e <= 0) {
@@ -1277,19 +1282,23 @@ int callGetaddrinfo
 int inetNtop(int af, const void* src, char* dst, socklen_t size)
 {
   int s;
+  sockaddr_union su;
+  memset(&su, 0, sizeof(su));
   if(af == AF_INET) {
-    sockaddr_in sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sin_family = AF_INET;
-    memcpy(&sa.sin_addr, src, sizeof(in_addr));
-    s = getnameinfo(reinterpret_cast<const sockaddr*>(&sa), sizeof(sa),
+    su.in.sin_family = AF_INET;
+#ifdef HAVE_SOCKADDR_IN_SIN_LEN
+    su.in.sin_len = sizeof(su.in);
+#endif // HAVE_SOCKADDR_IN_SIN_LEN
+    memcpy(&su.in.sin_addr, src, sizeof(su.in.sin_addr));
+    s = getnameinfo(&su.sa, sizeof(su.in),
                     dst, size, 0, 0, NI_NUMERICHOST);
   } else if(af == AF_INET6) {
-    sockaddr_in6 sa;
-    memset(&sa, 0, sizeof(sa));
-    sa.sin6_family = AF_INET6;
-    memcpy(&sa.sin6_addr, src, sizeof(in6_addr));
-    s = getnameinfo(reinterpret_cast<const sockaddr*>(&sa), sizeof(sa),
+    su.in6.sin6_family = AF_INET6;
+#ifdef HAVE_SOCKADDR_IN6_SIN6_LEN
+    su.in6.sin6_len = sizeof(su.in6);
+#endif // HAVE_SOCKADDR_IN6_SIN6_LEN
+    memcpy(&su.in6.sin6_addr, src, sizeof(su.in6.sin6_addr));
+    s = getnameinfo(&su.sa, sizeof(su.in6),
                     dst, size, 0, 0, NI_NUMERICHOST);
   } else {
     s = EAI_FAMILY;
@@ -1297,9 +1306,34 @@ int inetNtop(int af, const void* src, char* dst, socklen_t size)
   return s;
 }
 
+int inetPton(int af, const char* src, void* dst)
+{
+  union {
+    uint32_t ipv4_addr;
+    unsigned char ipv6_addr[16];
+  } binaddr;
+  size_t len = net::getBinAddr(binaddr.ipv6_addr, src);
+  if(af == AF_INET) {
+    if(len != 4) {
+      return -1;
+    }
+    in_addr* addr = reinterpret_cast<in_addr*>(dst);
+    addr->s_addr = binaddr.ipv4_addr;
+  } else if(af == AF_INET6) {
+    if(len != 16) {
+      return -1;
+    }
+    in6_addr* addr = reinterpret_cast<in6_addr*>(dst);
+    memcpy(addr->s6_addr, binaddr.ipv6_addr, sizeof(addr->s6_addr));
+  } else {
+    return -1;
+  }
+  return 0;
+}
+
 namespace net {
 
-size_t getBinAddr(unsigned char* dest, const std::string& ip)
+size_t getBinAddr(void* dest, const std::string& ip)
 {
   size_t len = 0;
   addrinfo* res;
@@ -1309,16 +1343,16 @@ size_t getBinAddr(unsigned char* dest, const std::string& ip)
   }
   WSAAPI_AUTO_DELETE<addrinfo*> resDeleter(res, freeaddrinfo);
   for(addrinfo* rp = res; rp; rp = rp->ai_next) {
+    sockaddr_union su;
+    memcpy(&su, rp->ai_addr, rp->ai_addrlen);
     if(rp->ai_family == AF_INET) {
-      sockaddr_in* addr = &reinterpret_cast<sockaddr_union*>(rp->ai_addr)->in;
-      len = 4;
-      memcpy(dest, &(addr->sin_addr), len);
-      return len;
+      len = sizeof(in_addr);
+      memcpy(dest, &(su.in.sin_addr), len);
+      break;
     } else if(rp->ai_family == AF_INET6) {
-      sockaddr_in6* addr = &reinterpret_cast<sockaddr_union*>(rp->ai_addr)->in6;
-      len = 16;
-      memcpy(dest, &(addr->sin6_addr), len);
-      return len;
+      len = sizeof(in6_addr);
+      memcpy(dest, &(su.in6.sin6_addr), len);
+      break;
     }
   }
   return len;

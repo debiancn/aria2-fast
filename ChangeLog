@@ -1,579 +1,335 @@
-commit 713f210a7e38c720757f80e685e0350d7b53725e
+commit f3a5aa3bef17a0d8f86460f034ced4e318699e54
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-27
 
-    Updated German and Russian translations. Thanks to all translators.
+    Renamed clean as doclean in Makefile for manuals.
+    
+    This will prevent `make clean` in unpacked archive from removing
+    aria2c.1. We don't want to remove them by `make clean` because to
+    generate aria2c.1, user has to install Sphinx. That is why we
+    distribute aria2c.1 in the archive.
 
-commit c1ef86fd58c60eefcc56f57db9cde32daf1fb04d
+commit 6b3aa97cdbd337d7217071c2a489c61b722e836a
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-27
+
+    Updated Brazilian Portuguese translation. Thanks to all translators.
+
+commit d917f40c6dea44857fefe221703d04c02574fd2b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-05-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-05-27
 
     Updated po templates
 
-commit 59d0796527cc515fb1ae2070e01bd53cb1e07bf3
+commit 3027a8a2f5ca916e2d20bb4c539d406f6e0e7958
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-27
 
-    Updated README
+    Updated NEWS for 1.15.1 release
 
-commit e2091b5b41b99a61af07134e5cc91305bf89919f
+commit 0ba12fdc32c1435ea778bca0beb23bf44d079fc3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-19
 
-    Fixed missing wslay.h and wslayver.h in distribution
+    Removed outdated README.txt
 
-commit f5d3cd1bb064d402b1c4b7655659cc4a3a904241
+commit b05959ec9241a13a802e03eb2cc5b5bb25fcfca9
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-19
 
-    Updated copyright year
+    Updated README.rst.
+    
+    Added section which describes building documentation using Sphinx.
+    Several documentaiton updates.
 
-commit 9d5e173645d8cde86ce358cf1194d89ba4ce654b
+commit afcd95dec7667b2566f37648ffb6c709a337ea86
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-19
 
-    Don't install wslay
+    Return appropriate HTTP status code on RPC failure.
+    
+    In this change, we return 404 if the request path is neither /json-rpc
+    nor /rpc. If XML feature is not enabled and /rpc is requested, return
+    404.  If XML parser failed, return 400. JSON parser failure has been
+    handled well in the existing code.
 
-commit 62f40b8f9663829db2853e56ce346e47944d1d77
+commit 8ebba32fd9e417f9adb6511255216971b0591a72
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-19
 
-    Added missing deps/wslay/examples/Makefile
+    Change manual build dir to doc/manual-src/*/_build. Drop html install.
+    
+    Sphinx HTML markups are beautiful, but it uses many asset files, such
+    as stylesheets, javascripts and images.  While it is no problem to
+    upload them in web site, but distributing and installing them in
+    individual user have some problems.  For example, Sphinx uses same
+    assets for generated sites, so if many applications uses Sphinx
+    generated docs and they are installed in the PC, it is huge waste of
+    the disk space. I'm also not comfortable to copy HTML trees to the
+    install directory using 'cp -r' command.  I seeked other format like
+    pdf and texi which Sphinx can generate but annoyingly they all convert
+    '--' into en-dash and there is no workaround to disable it. So I
+    decided to drop HTML manual from distribution and installation.  For
+    users who want to HTML version manual, see it online:
+    http://aria2.sourceforge.net/manual/en/html/
 
-commit aee28c8b0d0731f70c3221998252bfa960c575f6
+commit 68eb1b6737bf10d00360cab9b85c1ee090acd272
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-17
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-17
 
-    Fixed compile warning with clang
+    Ignore unacceptable options in RPC request instead of throwing error.
+    
+    This change allows RPC client to send same options for the different
+    type of downloads.
 
-commit 1e0068e4d4ce79d10a2ea4f6462242bee3708dc8
+commit 7785ea8c4bea18e911d7ae26d707140b12ca91b7
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-16
 
-    WebSocket: Check keyword string in comma separeted values in HTTP
-    header field.
+    Code cleanup
 
-commit c648ca0c5c328827327f0973ec4f8a06bacf912f
+commit 0e5ae22f7323e30d1b266e4266cad554517c2bd0
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-16
 
-    Include common.h from a2algo.h and a2functional.h
+    Fixed memory leak
 
-commit 7a302041097460b037f8c2a740d092bc97b9c2c8
+commit 0d507bba004cf6f78bc29effd04ebffe7e7bdb79
+Merge: 92c518a 8019ad6
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-16
 
-    Updated NEWS for 1.15.0 release
+    Merge branch 'master' of https://github.com/ITriskTI/aria2 into itriskti
 
-commit 52826433d939dc9d8a3145570f0747b4e319f510
+commit 92c518a2ba214fe605b213830fc2ec3fd5d0fe14
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-16
+
+    Moved parseAsyncDNSServers() to AsyncNameResolver.cc and refactored.
+    
+    The parseAsyncDNSServers() now uses net::getBinAddr() internally,
+    which makes the function simpler. Also added unit test.
+
+commit 36051cca5e03c6268c62a5eca1f756b14435a29d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-05-16
+
+    Handle sockaddr_in.sin_len and sockaddr_in6.sin6_len
+    
+    Check sockaddr_in.sin_len and sockaddr_in6.sin6_len are available and
+    assign values to them properly.  This change fixes unit test error and
+    most error related to getnameinfo() on netbsd.
+
+commit 8019ad602a7d2536aa8eca0fc25edf4dd7e6fb2c
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2012-05-15
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2012-05-15
 
     Fixed typo
 
-commit 9e8676af2c7751f0288d0d04905a44cb93f6d8f9
+commit 448f03fa7e9f66b17b259f07f5bef84b8664c714
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-14
 
-    Disable IPv6 by default only if MinGW 32bit build.
-
-commit d9bb24a2e090febb6ff152ca3db075eab5f724fb
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
-
-    Fixed gcc-4.7 warnings
-
-commit fcbdecfd1e6aaa92cb1769ed1d395d59648ad5a6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
-
-    Conditional compile for WebSocket.
+    Moved doc before test in SUBDIRS
     
-    WebSocket support depends on Message Digest support.
+    With this change we can see the test results more easily.
 
-commit 7bc2a14d9f2f16bca991ecf22507b7ef0e8f4d6a
+commit ca60020fa4230b27c0c3ded1ddac375061a027a9
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-08
+AuthorDate: 2012-05-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-08
+CommitDate: 2012-05-14
 
-    Fixed compile error without BitTorrent support
-
-commit ef86d760cc0d6fe464d3b8bcba4a6922410c587f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Use CreateProcessW instead of CreateProcessA
-
-commit 3f7561b80c48654e21bc14366593799acca0eaf5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Define HAVE_GETADDRINFO only if it is not defined in MinGW build.
-
-commit 9996d4ef4b878bf193449304694c44469bb5ed75
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Removed -lcrypto from mingw LIBS
-
-commit e5932879db7bc33bdc34bd06009dc231da944eda
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Print pkg-config error if the module is not available
-
-commit 7e5814f0f9c8871b9d37b6af004753660984ecf7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Check with pkg-config only: c-ares, openssl, sqlite3 and zlib.
+    Removed dependency on inet_aton
     
-    Removed --with-*-prefix configure option for c-ares, openssl, sqlite3,
-    zlib and expat. Use CPPFLAGS and/or PKG_CONFIG_PATH instead.
-
-commit fcb102b6508fc03f8a0c5e6fdf070c1e115adc26
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Fixed compile error with i686-w64-mingw32
-
-commit 840ca5adb630e33e793b64cb62d353d443e44d5b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Check availability of pwd.h
-
-commit c7c26e67c43e94be2474dd6a0a17dfaa737db3d2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-07
-
-    Disable IPv6 for MinGW build by default
-
-commit 847ebd54bcc610e8c83e713a39e9a8527240515f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-02
-
-    Use https for github URI
-
-commit 3dc5437ee296e684178ef4f34aefc791c1e75f57
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-02
-
-    Updated bash_completion
-
-commit b82b25bc326c6b2c3b5acd8f6474e5d113b9527b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-02
-
-    Clarify possible SSL+crypto library configuration.
+    Implemented inetPton as a replacement of inet_aton. inetPton is
+    implemented using net::getBinAddr.
     
-    See http://sourceforge.net/tracker/?func=detail&aid=3474175&group_id=159897&atid=813673
+    This change fixes bug#3525424.
 
-commit 65a20f50708ac4b5d73516598bc0d11eba6b4fbc
+commit 06405ce97b3da52241adb3f6732846f824823951
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-01
+AuthorDate: 2012-05-13
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-01
+CommitDate: 2012-05-13
 
-    First check there is wildcard character or not in tls hostname check.
-
-commit b9471d745280a3615b623514a8468ffb4b8d7d1c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-04-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-04-01
-
-    Compare IPAddress in commonName as string.
-    Added test for net::verifyHostname().
-
-commit b68e0a5527bad4faa9bc665c3d069ddbf0bb7c1a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-31
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-31
-
-    Use net::verifyHostname() with gnutls.
+    Removed aria2c.rst from the prerequisites of $(HTML)
     
-    We now don't use gnutls_x509_crt_check_hostname() any more.
+    $(HTML) is the root directory of html documents and since we don't
+    remove $(HTML) when re-building htmls, it is useless to use aria2c.rst
+    as a prerequisites.
 
-commit e6f04416d9fd2a1cf11175a69e5f8f29fc2ded18
+commit 19798f09aea1eb6463d32531733c60e50fa26168
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-31
+AuthorDate: 2012-05-12
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-31
+CommitDate: 2012-05-12
 
-    Don't use locale dependent toupper and tolower.
+    Fixed typo
 
-commit 0a9abd89c6c801ae69f3e658e821cec8b68ca96d
+commit 3640374f66f0222c0a17b1426dcb6755a38c5c67
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-30
+AuthorDate: 2012-05-12
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-30
+CommitDate: 2012-05-12
 
-    Rewritten TLS hostname check based on RFC 6125.
+    Bump up version number to 1.15.1
 
-commit e4e9562c9250423c45a52009659b632eab905f8c
+commit 57519611ffe2cf8394159b262d6dfd2d2055a4ad
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-30
+AuthorDate: 2012-05-12
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-30
+CommitDate: 2012-05-12
 
-    Get the home directory of the effective user ID using getpwuid() if
-    $HOME is not defined.
-
-commit 25ef6677e90a9628e8cbc5c0093940e0d92f695b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-28
-
-    Added hostname check described in RFC 2818 with OpenSSL.
-
-commit cd00b012d99e6061bbe054e08696aab00e885c42
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-28
-
-    Updated README.asciidoc
-
-commit aa7a2a1c3b186d57e853da1dfc7ee50c6635ce3c
-Merge: 06b6bef 4ab8e63
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-26
-
-    Merge pull request #14 from ITriskTI/patch-2
+    Added --with-bashcompletiondir configure option.
     
-    Updated Russian man page
+    By default, bash_completion file named aria2c is installed to the
+    directory $prefix/share/doc/aria2/bash_completion.  To change the
+    install directory of the file, use --with-bashcompletiondir option.
 
-commit 4ab8e63d82407e922ecf912432b3cddc63ce908d
-Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2012-03-26
-Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2012-03-26
-
-    Updated Russian man page
-
-commit 06b6bef860d6ac232c6372829b8415160b48f220
+commit b4f3f414644312e6578437675d4483414174b22f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
+AuthorDate: 2012-05-12
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Made WebSocket handshake more strict.
-    Refactored HttpServer as well.
-
-commit 8499a47d21b73e78bc1030684b2cd187b05360cc
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Added --bt-remove-unselected-file option.
-    
-    Removes the unselected files when download is completed in
-    BitTorrent. To selecting files, use --select-file option. If it is not
-    used, all files are assumed to be selected. Please use this option
-    with care because it will actually remove files from your disk.
-    This option is default to false.
-
-commit 9669bafb7fbc1fdd61dc7fba9068d7b7c605bc25
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Updated man page
-
-commit 2b3469dad90f0756cf7280ea6d112503257b51d4
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Use std::set for socketEntries_ and nameResolverEntries_ in PortEventPoll
-
-commit ae393329f7adf1c3009219ba703fc7fa2ca98fcd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Fixed segmentation fault in open solaris in unit test.
-    
-    This is due to the fact that the maximum value of random() in open
-    solaris is not RAND_MAX, but (2**31)-1.
-
-commit 4d8c17d104ad81b4f5983d0edacefcfc5f868bf8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-25
-
-    Fixed compile error on open solaris
-    
-    Fixes bug#3497518
-
-commit d8948056b3bf54d55eaa13b918e3d54f2fd3a683
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-24
-
-    Use std::set for socketEntries_ and nameResolverEntries_ in KqueueEventPoll
-
-commit 9f892d92f38561c58cdf59c61fed674b6648800a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-24
-
-    Fixed filename typo
-
-commit 4fba27103696f77786e74cd5450b1056acfb25a7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-24
-
-    Updated wslay
-
-commit 16d67e9b32453fb2828f7a6abcac4496b1aed7e5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-23
-
-    Updated wslay
-
-commit 4c4e1dcf9bec203e1100e6b43727da27e7af9466
-Merge: eed804b 2b19882
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-23
-
-    Merge branch 'master' of github.com:tatsuhiro-t/aria2
-
-commit 2b19882ea4264dbadd0737866ba3dc9f00199533
-Merge: 4acc0f8 6af4827
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-22
-
-    Merge pull request #13 from ITriskTI/patch-1
-    
-    Updated Russian man page
-
-commit eed804baaa02b4f81a27ba2844868b19992a90a1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-23
-
-    Use std::set instead of std::deque if the elements are sorted and
-    insertions and deletions are frequent.
-
-commit 6af4827493218c7934310402a5c48292dd986672
-Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2012-03-21
-
-    Updated Russian man page
-
-commit 4acc0f88317287b86c6b89ba5e5262d3ebd30cc9
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Updated doc
-
-commit ad596fa03f470471459f2a098bf6fe7b3b723997
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Updated .gitignore
-
-commit 332bda83b42d04b8c40e88238cdc24961fe48161
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Enable TCP_NODELAY for WebSocket connection.
-
-commit bdd37fe3dee436d815328aedcedba7726c5545d0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Bump up version number to 1.15.0
-
-commit 3e885c57f66ca5293e955aca157d7e15cca3b7ed
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Documented JSON-RPC over WebSocket
-
-commit 0792540bf246d69774966f5cb121c71f536d800d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Prefixed notification method name with "aria2."
-
-commit 6eb5283bca2b8179203893ca267bafa479284511
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Added AC_CONFIG_MACRO_DIR
-
-commit 86ecf36abbf121221a344738bf1b292ebd0fb82c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Added wslay WebSocket library.
-    
-    I made following modifications to the original library: The doc
-    directory was removed. Made shared library disabled by
-    configure. Removed doc from SUBDIRS in Makefile.am.
-
-commit 41c77ab852378d3e9e0b579441a8a3e2cc6cdf91
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-21
-
-    Fixed autoreconf warning
-
-commit ac26124b5990d40996b762fd8151d82d6345709f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-20
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-20
+CommitDate: 2012-05-12
 
     Fixed `make distcheck` error
 
-commit f4e2c7f0603fdb0609bf163ee5ea683a44b98d69
+commit a1d5d5ef9d40a8f0656932188acb190652940ca0
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-20
+AuthorDate: 2012-05-10
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-20
+CommitDate: 2012-05-10
 
-    Added JSON-RPC over WebSocket.
+    Added aria2c.rst to EXTRA_DIST
+
+commit 5323fa1029b754a07145a20cffa1d103470d26f8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-05-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-05-08
+
+    Honor DESTDIR when installing HTML version manual.
+    Generate HTML version manual on `make install`.
+
+commit a998e32f95bce4b5ef9952771553a62c956a4e3b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-05-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-05-08
+
+    Call ERR_clear_error() before OpenSSL I/O functions.
+    Use ERR_get_error() with ERR_error_string().
+
+commit c046573ab8a5555aad5fe7c1db9c99c1a3b1370c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-04-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-04-23
+
+    Fixed typo and nits
+
+commit 927499d98f126ac543102b703b24f4ef9ad23e50
+Merge: 003aaf4 4d17715
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-04-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-04-23
+
+    Merge pull request #16 from ITriskTI/master
     
-    Wslay library must be placed under deps/wslay.
+    Fixed some bugs
 
-commit f16511012e28d1303e300e695b310d01b6200c2c
+commit 4d17715b66eb0e3e9d133d6a32ac916538c1aef1
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2012-04-23
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2012-04-23
+
+    Update doc/manual-src/ru/index.rst
+
+commit 3c5753baf2435421d0328253ef351b8327999bb8
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2012-04-23
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2012-04-23
+
+    fixed some bugs
+
+commit 003aaf4a09c998572e50043885be25f3b4c20bf7
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-14
+AuthorDate: 2012-04-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-14
+CommitDate: 2012-04-22
 
-    New upstream release
+    Converted README.asciidoc into README.rst
 
-commit 4d510b30326680e024e1f4b012a7632a734efcc7
+commit eec761ec4381fcd7176c783a136be316df074084
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-12
+AuthorDate: 2012-04-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-12
+CommitDate: 2012-04-22
 
-    Added build_osx_release.sh, which builds OSX universal binary DMG.
+    Removed old manual page sources.
 
-commit 5bff877eaeb11ef0db72c570768e3b1f9256a7c2
+commit 4a5f2b6f9f189ed67e51054e40b5073a2abeb509
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-05
+AuthorDate: 2012-04-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-05
+CommitDate: 2012-04-22
 
-    Fixed assertion failure if Chunked encoding along with Content-Length is used.
-
-commit e73c3c53ffb9ce681fe712142143777eaf50da47
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-03-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-03-01
-
-    Fixed clang warning and errors.
+    Use Sphinx for aria2 manual page documentation.
     
-    Test for the zero-length array with A2_ARRAY_LEN was commented out
-    since it is only used in unit test code and clang and old gcc 3.4.3
-    emit error.
+    The source files for manual pages are placed under doc/manual-src.
+    The built manual pages are placed under doc/manual.
+    When installed, manual pages are placed under $(docdir)/manual/.
 
-commit 037f1512dbcdf19237d6064660d5c75b4121f0bf
+commit d16071d1088e2501273c412d7990f4017546d863
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-02-29
+AuthorDate: 2012-04-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-02-29
+CommitDate: 2012-04-22
 
-    Added BufferedFile::getLine() to make reading one line more flexible.
+    Fixed the bug which prevents --bt-lpd-interface from working.
     
-    Fixes bug#3495336
+    Fixes bug#3520125
+
+commit a0912d9e4aa69eb1d5432f532686e1e996c470dc
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-04-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-04-09
+
+    Use noinst_HEADERS instead of EXTRA_DIST for wslay public headers.
