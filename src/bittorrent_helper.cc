@@ -61,6 +61,7 @@
 #include "error_code.h"
 #include "array_fun.h"
 #include "DownloadFailureException.h"
+#include "ValueBaseBencodeParser.h"
 
 namespace aria2 {
 
@@ -234,7 +235,7 @@ void extractFileEntries
   if(filesList) {
     fileEntries.reserve(filesList->size());
     int64_t length = 0;
-    off_t offset = 0;
+    int64_t offset = 0;
     // multi-file mode
     torrent->mode = MULTI;
     for(List::ValueType::const_iterator itr = filesList->begin(),
@@ -248,10 +249,12 @@ void extractFileEntries
         throw DL_ABORT_EX2(fmt(MSG_MISSING_BT_INFO, C_LENGTH.c_str()),
                            error_code::BITTORRENT_PARSE_ERROR);
       }
+      if(length > std::numeric_limits<int64_t>::max() - fileLengthData->i()) {
+        throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, length));
+      }
       length += fileLengthData->i();
-      if(length > std::numeric_limits<off_t>::max()) {
-        throw DOWNLOAD_FAILURE_EXCEPTION
-          (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(length)));
+      if(fileLengthData->i() > std::numeric_limits<off_t>::max()) {
+        throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, length));
       }
       std::string pathKey;
       if(fileDict->containsKey(C_PATH_UTF8)) {
@@ -310,8 +313,7 @@ void extractFileEntries
     }
     int64_t totalLength = lengthData->i();
     if(totalLength > std::numeric_limits<off_t>::max()) {
-      throw DOWNLOAD_FAILURE_EXCEPTION
-        (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(totalLength)));
+      throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, totalLength));
     }
     // For each uri in urlList, if it ends with '/', then
     // concatenate name to it. Specification just says so.
@@ -522,8 +524,9 @@ void load(const std::string& torrentFile,
           const SharedHandle<Option>& option,
           const std::string& overrideName)
 {
+  ValueBaseBencodeParser parser;
   processRootDictionary(ctx,
-                        bencode2::decodeFromFile(torrentFile),
+                        parseFile(parser, torrentFile),
                         option,
                         torrentFile,
                         overrideName,
@@ -536,8 +539,9 @@ void load(const std::string& torrentFile,
           const std::vector<std::string>& uris,
           const std::string& overrideName)
 {
+  ValueBaseBencodeParser parser;
   processRootDictionary(ctx,
-                        bencode2::decodeFromFile(torrentFile),
+                        parseFile(parser, torrentFile),
                         option,
                         torrentFile,
                         overrideName,
@@ -552,7 +556,7 @@ void loadFromMemory(const unsigned char* content,
                     const std::string& overrideName)
 {
   processRootDictionary(ctx,
-                        bencode2::decode(content, content+length),
+                        bencode2::decode(content, length),
                         option,
                         defaultName,
                         overrideName,
@@ -568,7 +572,7 @@ void loadFromMemory(const unsigned char* content,
                     const std::string& overrideName)
 {
   processRootDictionary(ctx,
-                        bencode2::decode(content, content+length),
+                        bencode2::decode(content, length),
                         option,
                         defaultName,
                         overrideName,
@@ -583,7 +587,7 @@ void loadFromMemory(const std::string& context,
 {
   processRootDictionary
     (ctx,
-     bencode2::decode(context.begin(), context.end()),
+     bencode2::decode(context),
      option,
      defaultName, overrideName,
      std::vector<std::string>());
@@ -598,7 +602,22 @@ void loadFromMemory(const std::string& context,
 {
   processRootDictionary
     (ctx,
-     bencode2::decode(context.begin(), context.end()),
+     bencode2::decode(context),
+     option,
+     defaultName, overrideName,
+     uris);
+}
+
+void loadFromMemory(const SharedHandle<ValueBase>& torrent,
+                    const SharedHandle<DownloadContext>& ctx,
+                    const SharedHandle<Option>& option,
+                    const std::vector<std::string>& uris,
+                    const std::string& defaultName,
+                    const std::string& overrideName)
+{
+  processRootDictionary
+    (ctx,
+     torrent,
      option,
      defaultName, overrideName,
      uris);

@@ -94,7 +94,7 @@ void SegmentMan::init()
   // PieceStorage here?
 }
 
-off_t SegmentMan::getTotalLength() const
+int64_t SegmentMan::getTotalLength() const
 {
   if(!pieceStorage_) {
     return 0;
@@ -120,7 +120,7 @@ SharedHandle<Segment> SegmentMan::checkoutSegment
   if(!piece) {
     return SharedHandle<Segment>();
   }
-  A2_LOG_DEBUG(fmt("Attach segment#%lu to CUID#%lld.",
+  A2_LOG_DEBUG(fmt("Attach segment#%lu to CUID#%" PRId64 ".",
                    static_cast<unsigned long>(piece->getIndex()),
                    cuid));
   piece->setUsedBySegment(true);
@@ -340,7 +340,7 @@ bool SegmentMan::hasSegment(size_t index) const {
   return pieceStorage_->hasPiece(index);
 }
 
-off_t SegmentMan::getDownloadLength() const {
+int64_t SegmentMan::getDownloadLength() const {
   if(!pieceStorage_) {
     return 0;
   } else {
@@ -442,14 +442,14 @@ void SegmentMan::updateDownloadSpeedFor(const SharedHandle<PeerStat>& pstat)
 namespace {
 class PeerStatDownloadLengthOperator {
 public:
-  off_t operator()(off_t total, const SharedHandle<PeerStat>& ps)
+  int64_t operator()(int64_t total, const SharedHandle<PeerStat>& ps)
   {
     return ps->getSessionDownloadLength()+total;
   }
 };
 } // namespace
 
-off_t SegmentMan::calculateSessionDownloadLength() const
+int64_t SegmentMan::calculateSessionDownloadLength() const
 {
   return std::accumulate(fastestPeerStats_.begin(), fastestPeerStats_.end(),
                          0LL, PeerStatDownloadLengthOperator());
@@ -468,10 +468,11 @@ size_t SegmentMan::countFreePieceFrom(size_t index) const
 
 void SegmentMan::ignoreSegmentFor(const SharedHandle<FileEntry>& fileEntry)
 {
-  A2_LOG_DEBUG(fmt("ignoring segment for path=%s, offset=%lld, length=%lld",
+  A2_LOG_DEBUG(fmt("ignoring segment for path=%s, offset=%" PRId64
+                   ", length=%" PRId64 "",
                    fileEntry->getPath().c_str(),
-                   static_cast<long long int>(fileEntry->getOffset()),
-                   static_cast<long long int>(fileEntry->getLength())));
+                   fileEntry->getOffset(),
+                   fileEntry->getLength()));
   ignoreBitfield_.addFilter(fileEntry->getOffset(), fileEntry->getLength());
 }
 

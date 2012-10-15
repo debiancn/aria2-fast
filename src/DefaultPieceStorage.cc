@@ -513,38 +513,53 @@ bool DefaultPieceStorage::isPieceUsed(size_t index)
   return bitfieldMan_->isUseBitSet(index);
 }
 
-off_t DefaultPieceStorage::getTotalLength()
+int64_t DefaultPieceStorage::getTotalLength()
 {
   return bitfieldMan_->getTotalLength();
 }
 
-off_t DefaultPieceStorage::getFilteredTotalLength()
+int64_t DefaultPieceStorage::getFilteredTotalLength()
 {
   return bitfieldMan_->getFilteredTotalLength();
 }
 
-off_t DefaultPieceStorage::getCompletedLength()
+int64_t DefaultPieceStorage::getCompletedLength()
 {
-  off_t completedLength =
+  int64_t completedLength =
     bitfieldMan_->getCompletedLength()+getInFlightPieceCompletedLength();
-  off_t totalLength = getTotalLength();
+  int64_t totalLength = getTotalLength();
   if(completedLength > totalLength) {
     completedLength = totalLength;
   }
   return completedLength;
 }
 
-off_t DefaultPieceStorage::getFilteredCompletedLength()
+int64_t DefaultPieceStorage::getFilteredCompletedLength()
 {
   return bitfieldMan_->getFilteredCompletedLength()+
-    getInFlightPieceCompletedLength();
+    getInFlightPieceFilteredCompletedLength();
 }
 
-size_t DefaultPieceStorage::getInFlightPieceCompletedLength() const
+int64_t DefaultPieceStorage::getInFlightPieceCompletedLength() const
 {
-  return std::accumulate(usedPieces_.begin(), usedPieces_.end(),
-                         0, adopt2nd(std::plus<size_t>(),
-                                     mem_fun_sh(&Piece::getCompletedLength)));
+  int64_t len = 0;
+  for(UsedPieceSet::const_iterator i = usedPieces_.begin(),
+        eoi = usedPieces_.end(); i != eoi; ++i) {
+    len += (*i)->getCompletedLength();
+  }
+  return len;
+}
+
+int64_t DefaultPieceStorage::getInFlightPieceFilteredCompletedLength() const
+{
+  int64_t len = 0;
+  for(UsedPieceSet::const_iterator i = usedPieces_.begin(),
+        eoi = usedPieces_.end(); i != eoi; ++i) {
+    if(bitfieldMan_->isFilterBitSet((*i)->getIndex())) {
+      len += (*i)->getCompletedLength();
+    }
+  }
+  return len;
 }
 
 // not unittested
@@ -619,7 +634,9 @@ void DefaultPieceStorage::initStorage()
     diskAdaptor_ = multiDiskAdaptor;
   }
   if(option_->get(PREF_FILE_ALLOCATION) == V_FALLOC) {
-    diskAdaptor_->enableFallocate();
+    diskAdaptor_->setFileAllocationMethod(DiskAdaptor::FILE_ALLOC_FALLOC);
+  } else if(option_->get(PREF_FILE_ALLOCATION) == V_TRUNC) {
+    diskAdaptor_->setFileAllocationMethod(DiskAdaptor::FILE_ALLOC_TRUNC);
   }
 }
 
@@ -707,7 +724,7 @@ void DefaultPieceStorage::markAllPiecesDone()
   bitfieldMan_->setAllBit();
 }
 
-void DefaultPieceStorage::markPiecesDone(off_t length)
+void DefaultPieceStorage::markPiecesDone(int64_t length)
 {
   if(length == bitfieldMan_->getTotalLength()) {
     bitfieldMan_->setAllBit();

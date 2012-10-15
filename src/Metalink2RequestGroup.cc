@@ -57,6 +57,7 @@
 #include "download_helper.h"
 #include "fmt.h"
 #include "SegList.h"
+#include "DownloadFailureException.h"
 #ifdef ENABLE_BITTORRENT
 # include "BtDependency.h"
 # include "download_helper.h"
@@ -293,7 +294,7 @@ Metalink2RequestGroup::createRequestGroup
       // piece length is overridden by the one in torrent file.
       dctx->setPieceLength(option->getAsInt(PREF_PIECE_LENGTH));
       std::vector<SharedHandle<FileEntry> > fileEntries;
-      off_t offset = 0;
+      int64_t offset = 0;
       for(std::vector<SharedHandle<MetalinkEntry> >::const_iterator i =
             mes.begin(), eoi = mes.end(); i != eoi; ++i) {
         A2_LOG_INFO(fmt("Metalink: Queueing %s for download as a member.",
@@ -313,6 +314,10 @@ Metalink2RequestGroup::createRequestGroup
         }
         fe->setOriginalName((*i)->metaurls[0]->name);
         fileEntries.push_back(fe);
+        if(offset >
+           std::numeric_limits<int64_t>::max() - (*i)->file->getLength()) {
+          throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, offset));
+        }
         offset += (*i)->file->getLength();
       }
       dctx->setFileEntries(fileEntries.begin(), fileEntries.end());

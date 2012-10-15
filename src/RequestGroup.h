@@ -73,8 +73,7 @@ class BtRuntime;
 class PeerStorage;
 #endif // ENABLE_BITTORRENT
 
-// To make %lld happy, we use long long int instead of int64_t.
-typedef long long int a2_gid_t;
+typedef int64_t a2_gid_t;
 
 class RequestGroup {
 public:
@@ -83,10 +82,18 @@ public:
     SHUTDOWN_SIGNAL,
     USER_REQUEST
   };
+  enum State {
+    // Waiting in the reserved queue
+    STATE_WAITING,
+    // Download has begun
+    STATE_ACTIVE
+  };
 private:
   static a2_gid_t gidCounter_;
 
   a2_gid_t gid_;
+
+  int state_;
 
   SharedHandle<Option> option_;
 
@@ -231,9 +238,9 @@ public:
 
   std::string getFirstFilePath() const;
 
-  off_t getTotalLength() const;
+  int64_t getTotalLength() const;
 
-  off_t getCompletedLength() const;
+  int64_t getCompletedLength() const;
 
   /**
    * Compares expected filename with specified actualFilename.
@@ -242,10 +249,10 @@ public:
    */
   void validateFilename(const std::string& actualFilename) const;
 
-  void validateTotalLength(off_t expectedTotalLength,
-                           off_t actualTotalLength) const;
+  void validateTotalLength(int64_t expectedTotalLength,
+                           int64_t actualTotalLength) const;
 
-  void validateTotalLength(off_t actualTotalLength) const;
+  void validateTotalLength(int64_t actualTotalLength) const;
 
   void setNumConcurrentCommand(int num)
   {
@@ -549,6 +556,16 @@ public:
   const SharedHandle<MetadataInfo>& getMetadataInfo() const
   {
     return metadataInfo_;
+  }
+
+  int getState() const
+  {
+    return state_;
+  }
+
+  void setState(int state)
+  {
+    state_ = state;
   }
 
   static void resetGIDCounter() { gidCounter_ = 0; }

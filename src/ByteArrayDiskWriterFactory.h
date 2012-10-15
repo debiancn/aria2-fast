@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,17 +35,13 @@
 #ifndef D_BYTE_ARRAY_DISK_WRITER_FACTORY_H
 #define D_BYTE_ARRAY_DISK_WRITER_FACTORY_H
 
-#include "DiskWriterFactory.h"
+#include "AnonDiskWriterFactory.h"
+#include "ByteArrayDiskWriter.h"
 
 namespace aria2 {
 
-class ByteArrayDiskWriter;
-
-class ByteArrayDiskWriterFactory:public DiskWriterFactory
-{
-public:
-  SharedHandle<DiskWriter> newDiskWriter(const std::string& filename);
-};
+typedef AnonDiskWriterFactory<ByteArrayDiskWriter>
+ByteArrayDiskWriterFactory;
 
 typedef SharedHandle<ByteArrayDiskWriterFactory> ByteArrayDiskWriterFactoryHandle;
 

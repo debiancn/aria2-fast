@@ -111,6 +111,8 @@ public:
    const char* nsUri,
    const std::string& characters);
 
+  virtual void reset();
+
   void setSkipTagState();
 
   void setMetalinkState();
@@ -159,7 +161,7 @@ public:
 
   void setFileNameOfEntry(const std::string& filename);
 
-  void setFileLengthOfEntry(off_t length);
+  void setFileLengthOfEntry(int64_t length);
 
   void setVersionOfEntry(const std::string& version);
 

@@ -9,6 +9,8 @@ Aria2 Manual
 Contents:
 
 .. toctree::
-   :maxdepth: 3
+   :maxdepth: 2
 
    aria2c
+   README
+   technical-notes

@@ -117,7 +117,7 @@ BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
   if(memcmp(message->getPeerId(), bittorrent::getStaticPeerId(),
             PEER_ID_LENGTH) == 0) {
     throw DL_ABORT_EX
-      (fmt("CUID#%lld - Drop connection from the same Peer ID",
+      (fmt("CUID#%" PRId64 " - Drop connection from the same Peer ID",
            cuid_));
   }
   std::vector<SharedHandle<Peer> > activePeers;
@@ -126,7 +126,7 @@ BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
         eoi = activePeers.end(); i != eoi; ++i) {
     if(memcmp((*i)->getPeerId(), message->getPeerId(), PEER_ID_LENGTH) == 0) {
       throw DL_ABORT_EX
-        (fmt("CUID#%lld - Same Peer ID has been already seen.",
+        (fmt("CUID#%" PRId64 " - Same Peer ID has been already seen.",
              cuid_));
     }
   }
@@ -274,7 +274,7 @@ void DefaultBtInteractive::sendKeepAlive() {
 size_t DefaultBtInteractive::receiveMessages() {
   size_t countOldOutstandingRequest = dispatcher_->countOutstandingRequest();
   size_t msgcount = 0;
-  for(int i = 0; i < UB_MAX_OUTSTANDING_REQUEST+50; ++i) {
+  while(1) {
     if(requestGroupMan_->doesOverallDownloadSpeedExceed() ||
        downloadContext_->getOwnerRequestGroup()->doesDownloadSpeedExceed()) {
       break;

@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,24 +32,22 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#include "MemoryBufferPreDownloadHandler.h"
-#include "RequestGroup.h"
-#include "ByteArrayDiskWriterFactory.h"
-#include "DownloadContext.h"
+#ifndef D_VALUE_BASE_JSON_PARSER_H
+#define D_VALUE_BASE_JSON_PARSER_H
+
+#include "GenericParser.h"
+#include "JsonParser.h"
+#include "ValueBaseStructParserStateMachine.h"
 
 namespace aria2 {
 
-MemoryBufferPreDownloadHandler::MemoryBufferPreDownloadHandler() {}
+namespace json {
 
-MemoryBufferPreDownloadHandler::~MemoryBufferPreDownloadHandler() {}
+typedef GenericParser<JsonParser, ValueBaseStructParserStateMachine>
+ValueBaseJsonParser;
 
-void MemoryBufferPreDownloadHandler::execute(RequestGroup* requestGroup)
-{
-  SharedHandle<DiskWriterFactory> dwf(new ByteArrayDiskWriterFactory());
-  requestGroup->setDiskWriterFactory(dwf);
-  requestGroup->setFileAllocationEnabled(false);
-  requestGroup->setPreLocalFileCheckEnabled(false);
-  requestGroup->markInMemoryDownload();
-}
+} // namespace json
 
 } // namespace aria2
+
+#endif // D_VALUE_BASE_JSON_PARSER_H

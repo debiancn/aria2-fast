@@ -164,7 +164,10 @@ bool HttpServerCommand::execute()
         e_->addCommand(this);
         return false;
       }
-      if(!httpServer_->authenticate()) {
+      // CORS preflight request uses OPTIONS method. It is not
+      // restricted by authentication.
+      if(!httpServer_->authenticate() &&
+         httpServer_->getMethod() != "OPTIONS") {
         httpServer_->disableKeepAlive();
         httpServer_->feedResponse
           (401, "WWW-Authenticate: Basic realm=\"aria2\"\r\n");
@@ -213,10 +216,10 @@ bool HttpServerCommand::execute()
         if(e_->getOption()->getAsInt(PREF_RPC_MAX_REQUEST_SIZE) <
            httpServer_->getContentLength()) {
           A2_LOG_INFO
-            (fmt("Request too long. ContentLength=%lld."
+            (fmt("Request too long. ContentLength=%" PRId64 "."
                  " See --rpc-max-request-size option to loose"
                  " this limitation.",
-                 static_cast<long long int>(httpServer_->getContentLength())));
+                 httpServer_->getContentLength()));
           return true;
         }
         Command* command = new HttpServerBodyCommand(getCuid(), httpServer_, e_,
@@ -235,7 +238,7 @@ bool HttpServerCommand::execute()
       }
     }
   } catch(RecoverableException& e) {
-    A2_LOG_INFO_EX(fmt("CUID#%lld - Error occurred while reading HTTP request",
+    A2_LOG_INFO_EX(fmt("CUID#%" PRId64 " - Error occurred while reading HTTP request",
                        getCuid()),
                    e);
     return true;

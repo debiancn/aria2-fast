@@ -48,11 +48,13 @@ class FileEntry;
 class FileAllocationIterator;
 
 class DiskAdaptor:public BinaryStream {
-private:
-  std::vector<SharedHandle<FileEntry> > fileEntries_;
-
-  bool fallocate_;
 public:
+  enum FileAllocationMethod {
+    FILE_ALLOC_ADAPTIVE,
+    FILE_ALLOC_FALLOC,
+    FILE_ALLOC_TRUNC
+  };
+
   DiskAdaptor();
   virtual ~DiskAdaptor();
 
@@ -66,7 +68,7 @@ public:
 
   virtual bool fileExists() = 0;
 
-  virtual off_t size() = 0;
+  virtual int64_t size() = 0;
 
   template<typename InputIterator>
   void setFileEntries(InputIterator first, InputIterator last)
@@ -87,6 +89,8 @@ public:
 
   virtual bool isReadOnlyEnabled() const { return false; }
 
+  virtual void enableMmap() {}
+
   // Assumed each file length is stored in fileEntries or DiskAdaptor knows it.
   // If each actual file's length is larger than that, truncate file to that
   // length.
@@ -98,20 +102,20 @@ public:
   // successfully changed.
   virtual size_t utime(const Time& actime, const Time& modtime) = 0;
 
-  void enableFallocate()
+  void setFileAllocationMethod(FileAllocationMethod method)
   {
-    fallocate_ = true;
+    fileAllocationMethod_ = method;
   }
 
-  void disableFallocate()
+  int getFileAllocationMethod() const
   {
-    fallocate_ = false;
+    return fileAllocationMethod_;
   }
 
-  bool doesFallocate() const
-  {
-    return fallocate_;
-  }
+private:
+  std::vector<SharedHandle<FileEntry> > fileEntries_;
+
+  FileAllocationMethod fileAllocationMethod_;
 };
 
 typedef SharedHandle<DiskAdaptor> DiskAdaptorHandle;

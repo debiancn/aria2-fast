@@ -37,6 +37,7 @@
 #include "AdaptiveFileAllocationIterator.h"
 #include "DiskWriter.h"
 #include "FileEntry.h"
+#include "TruncFileAllocationIterator.h"
 #ifdef HAVE_SOME_FALLOCATE
 # include "FallocFileAllocationIterator.h"
 #endif // HAVE_SOME_FALLOCATE
@@ -69,13 +70,13 @@ void AbstractSingleDiskAdaptor::openExistingFile()
 }
 
 void AbstractSingleDiskAdaptor::writeData
-(const unsigned char* data, size_t len, off_t offset)
+(const unsigned char* data, size_t len, int64_t offset)
 {
   diskWriter_->writeData(data, len, offset);
 }
 
 ssize_t AbstractSingleDiskAdaptor::readData
-(unsigned char* data, size_t len, off_t offset)
+(unsigned char* data, size_t len, int64_t offset)
 {
   return diskWriter_->readData(data, len, offset);
 }
@@ -85,12 +86,12 @@ bool AbstractSingleDiskAdaptor::fileExists()
   return File(getFilePath()).exists();
 }
 
-off_t AbstractSingleDiskAdaptor::size()
+int64_t AbstractSingleDiskAdaptor::size()
 {
   return File(getFilePath()).size();
 }
 
-void AbstractSingleDiskAdaptor::truncate(off_t length)
+void AbstractSingleDiskAdaptor::truncate(int64_t length)
 {
   diskWriter_->truncate(length);
 }
@@ -98,20 +99,28 @@ void AbstractSingleDiskAdaptor::truncate(off_t length)
 SharedHandle<FileAllocationIterator>
 AbstractSingleDiskAdaptor::fileAllocationIterator()
 {
+  switch(getFileAllocationMethod()) {
 #ifdef HAVE_SOME_FALLOCATE
-  if(doesFallocate()) {
+  case(DiskAdaptor::FILE_ALLOC_FALLOC): {
     SharedHandle<FallocFileAllocationIterator> h
       (new FallocFileAllocationIterator
        (diskWriter_.get(), size() ,totalLength_));
     return h;
-  } else
+  }
 #endif // HAVE_SOME_FALLOCATE
-    {
-      SharedHandle<AdaptiveFileAllocationIterator> h
-        (new AdaptiveFileAllocationIterator
-         (diskWriter_.get(), size(), totalLength_));
-      return h;
-    }
+  case(DiskAdaptor::FILE_ALLOC_TRUNC): {
+    SharedHandle<TruncFileAllocationIterator> h
+      (new TruncFileAllocationIterator
+       (diskWriter_.get(), size(), totalLength_));
+    return h;
+  }
+  default: {
+    SharedHandle<AdaptiveFileAllocationIterator> h
+      (new AdaptiveFileAllocationIterator
+       (diskWriter_.get(), size(), totalLength_));
+    return h;
+  }
+  }
 }
 
 void AbstractSingleDiskAdaptor::enableReadOnly()
@@ -124,6 +133,11 @@ void AbstractSingleDiskAdaptor::disableReadOnly()
 {
   diskWriter_->disableReadOnly();
   readOnly_ = false;
+}
+
+void AbstractSingleDiskAdaptor::enableMmap()
+{
+  diskWriter_->enableMmap();
 }
 
 void AbstractSingleDiskAdaptor::cutTrailingGarbage()
@@ -139,7 +153,7 @@ void AbstractSingleDiskAdaptor::setDiskWriter
   diskWriter_ = diskWriter;
 }
 
-void AbstractSingleDiskAdaptor::setTotalLength(const off_t& totalLength)
+void AbstractSingleDiskAdaptor::setTotalLength(int64_t totalLength)
 {
   totalLength_ = totalLength;
 }

@@ -37,6 +37,7 @@ class DefaultPieceStorageTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testCancelPiece);
   CPPUNIT_TEST(testMarkPiecesDone);
   CPPUNIT_TEST(testGetCompletedLength);
+  CPPUNIT_TEST(testGetFilteredCompletedLength);
   CPPUNIT_TEST(testGetNextUsedIndex);
   CPPUNIT_TEST_SUITE_END();
 private:
@@ -71,6 +72,7 @@ public:
   void testCancelPiece();
   void testMarkPiecesDone();
   void testGetCompletedLength();
+  void testGetFilteredCompletedLength();
   void testGetNextUsedIndex();
 };
 
@@ -80,7 +82,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION(DefaultPieceStorageTest);
 void DefaultPieceStorageTest::testGetTotalLength() {
   DefaultPieceStorage pss(dctx_, option_.get());
 
-  CPPUNIT_ASSERT_EQUAL((off_t)384LL, pss.getTotalLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)384LL, pss.getTotalLength());
 }
 
 void DefaultPieceStorageTest::testGetMissingPiece() {
@@ -220,15 +222,15 @@ void DefaultPieceStorageTest::testCompletePiece() {
   CPPUNIT_ASSERT_EQUAL(std::string("piece: index=0, length=128"),
                        piece->toString());
 
-  CPPUNIT_ASSERT_EQUAL((off_t)0LL, pss.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)0LL, pss.getCompletedLength());
 
   pss.completePiece(piece);
 
-  CPPUNIT_ASSERT_EQUAL((off_t)128LL, pss.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)128LL, pss.getCompletedLength());
 
   SharedHandle<Piece> incompletePiece = pss.getMissingPiece(peer, 1);
   incompletePiece->completeBlock(0);
-  CPPUNIT_ASSERT_EQUAL((off_t)256LL, pss.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)256LL, pss.getCompletedLength());
 }
 
 void DefaultPieceStorageTest::testGetPiece() {
@@ -264,7 +266,7 @@ void DefaultPieceStorageTest::testGetPieceCompletedPiece() {
 void DefaultPieceStorageTest::testCancelPiece()
 {
   size_t pieceLength = 256*1024;
-  off_t totalLength = 32*pieceLength; // <-- make the number of piece greater than END_GAME_PIECE_NUM
+  int64_t totalLength = 32*pieceLength; // <-- make the number of piece greater than END_GAME_PIECE_NUM
   std::deque<std::string> uris1;
   uris1.push_back("http://localhost/src/file1.txt");
   SharedHandle<FileEntry> file1(new FileEntry("src/file1.txt", totalLength, 0 /*, uris1*/));
@@ -289,7 +291,7 @@ void DefaultPieceStorageTest::testCancelPiece()
 void DefaultPieceStorageTest::testMarkPiecesDone()
 {
   size_t pieceLength = 256*1024;
-  off_t totalLength = 4*1024*1024;
+  int64_t totalLength = 4*1024*1024;
   SharedHandle<DownloadContext> dctx
     (new DownloadContext(pieceLength, totalLength));
 
@@ -303,7 +305,7 @@ void DefaultPieceStorageTest::testMarkPiecesDone()
   for(size_t i = 10; i < (totalLength+pieceLength-1)/pieceLength; ++i) {
     CPPUNIT_ASSERT(!ps.hasPiece(i));
   }
-  CPPUNIT_ASSERT_EQUAL((off_t)pieceLength*10+16*1024*2, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)pieceLength*10+16*1024*2, ps.getCompletedLength());
 
   ps.markPiecesDone(totalLength);
 
@@ -312,7 +314,7 @@ void DefaultPieceStorageTest::testMarkPiecesDone()
   }
 
   ps.markPiecesDone(0);
-  CPPUNIT_ASSERT_EQUAL((off_t)0, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)0, ps.getCompletedLength());
 }
 
 void DefaultPieceStorageTest::testGetCompletedLength()
@@ -322,10 +324,10 @@ void DefaultPieceStorageTest::testGetCompletedLength()
   
   DefaultPieceStorage ps(dctx, option_.get());
   
-  CPPUNIT_ASSERT_EQUAL((off_t)0, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)0, ps.getCompletedLength());
 
   ps.markPiecesDone(250*1024*1024);
-  CPPUNIT_ASSERT_EQUAL((off_t)250*1024*1024, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)250*1024*1024, ps.getCompletedLength());
 
   std::vector<SharedHandle<Piece> > inFlightPieces;
   for(int i = 0; i < 2; ++i) {
@@ -338,11 +340,41 @@ void DefaultPieceStorageTest::testGetCompletedLength()
   }
   ps.addInFlightPiece(inFlightPieces);
   
-  CPPUNIT_ASSERT_EQUAL((off_t)251*1024*1024, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)251*1024*1024, ps.getCompletedLength());
 
   ps.markPiecesDone(256*1024*1024);
 
-  CPPUNIT_ASSERT_EQUAL((off_t)256*1024*1024, ps.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)256*1024*1024, ps.getCompletedLength());
+}
+
+void DefaultPieceStorageTest::testGetFilteredCompletedLength()
+{
+  const size_t pieceLength = 1024*1024;
+  SharedHandle<DownloadContext> dctx(new DownloadContext());
+  dctx->setPieceLength(pieceLength);
+  SharedHandle<FileEntry> files[] = {
+    SharedHandle<FileEntry>(new FileEntry("foo", 2*pieceLength, 0)),
+    SharedHandle<FileEntry>(new FileEntry("bar", 4*pieceLength, 2*pieceLength))
+  };
+  files[1]->setRequested(false);
+  dctx->setFileEntries(&files[0], &files[2]);
+
+  DefaultPieceStorage ps(dctx, option_.get());
+  std::vector<SharedHandle<Piece> > inflightPieces(2);
+  inflightPieces[0] = SharedHandle<Piece>(new Piece(1, pieceLength));
+  inflightPieces[0]->completeBlock(0);
+  inflightPieces[1] = SharedHandle<Piece>(new Piece(2, pieceLength));
+  inflightPieces[1]->completeBlock(1);
+  inflightPieces[1]->completeBlock(2);
+
+  ps.addInFlightPiece(inflightPieces);
+  ps.setupFileFilter();
+
+  SharedHandle<Piece> piece = ps.getMissingPiece(0, 1);
+  ps.completePiece(piece);
+
+  CPPUNIT_ASSERT_EQUAL((int64_t)pieceLength+16*1024,
+                       ps.getFilteredCompletedLength());
 }
 
 void DefaultPieceStorageTest::testGetNextUsedIndex()

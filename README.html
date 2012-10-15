@@ -523,19 +523,33 @@ $ autoreconf -i
 <p>Also you need <a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a> to build man page.</p>
 <p>If you are building aria2 for Mac OS X, take a look at
 build_osx_release.sh, which builds OSX universal binary DMG.</p>
-<p>The quickest way to build aria2 is just type following commands:</p>
+<p>The quickest way to build aria2 is first run configure script:</p>
 <pre class="literal-block">
 $ ./configure
+</pre>
+<p>To build statically linked aria2, use <tt class="docutils literal">ARIA2_STATIC=yes</tt>
+command-line option:</p>
+<pre class="literal-block">
+$ ./configure ARIA2_STATIC=yes
+</pre>
+<p>After configuration is done, run <tt class="docutils literal">make</tt> to compile the program:</p>
+<pre class="literal-block">
 $ make
 </pre>
+<p>See <a class="reference internal" href="#cross-compiling-windows-binary">Cross-compiling Windows binary</a> to create Windows binary.  See
+<a class="reference internal" href="#cross-compiling-android-binary">Cross-compiling Android binary</a> to create Android binary.</p>
 <p>The configure script checks available libraries and enables the features
 as much as possible because all the features are enabled by default.</p>
 <p>Since 1.1.0, aria2 checks the certificate of HTTPS servers by default.
-If you build with HTTPS support, I recommend to supply the path to the
-CA bundle file. For example, in Debian the path to CA bundle file is
-'/etc/ssl/certs/ca-certificates.crt' (in ca-certificates package). This
-may vary depending on your distribution. You can give it to
-configure script using <tt class="docutils literal"><span class="pre">--with-ca-bundle</span> option</tt>:</p>
+If you build with OpenSSL or the recent version of GnuTLS which has
+<tt class="docutils literal">gnutls_certificate_set_x509_system_trust()</tt> function and the
+library is properly configured to locate the system-wide CA
+certificates store, aria2 will automatically load those certificates
+at the startup. If it is not the case, I recommend to supply the path
+to the CA bundle file. For example, in Debian the path to CA bundle
+file is '/etc/ssl/certs/ca-certificates.crt' (in ca-certificates
+package). This may vary depending on your distribution. You can give
+it to configure script using <tt class="docutils literal"><span class="pre">--with-ca-bundle</span> option</tt>:</p>
 <pre class="literal-block">
 $ ./configure --with-ca-bundle='/etc/ssl/certs/ca-certificates.crt'
 $ make
@@ -555,6 +569,75 @@ option.</p>
 <pre class="literal-block">
 $ make check
 </pre>
+</div>
+<div class="section" id="cross-compiling-windows-binary">
+<h1>Cross-compiling Windows binary</h1>
+<p>In this section, we describe how to build Windows binary using
+mingw-w64 cross-compiler on Debian Linux.</p>
+<p>Basically, after compiling and installing depended libraries, you can
+do cross-compile just passing appropriate <tt class="docutils literal"><span class="pre">--host</span></tt> option and
+specifying <tt class="docutils literal">CPPFLAGS</tt>, <tt class="docutils literal">LDFLAGS</tt> and <tt class="docutils literal">PKG_CONFIG_LIBDIR</tt>
+variables to configure. For convenience and lowering our own
+development cost, we provide easier way to configure the build
+settings.</p>
+<p><tt class="docutils literal"><span class="pre">mingw-config</span></tt> script is a configure script wrapper for mingw-w64.
+We use it to create official Windows build.  This script assumes
+following libraries have been built for cross-compile:</p>
+<ul class="simple">
+<li>c-ares</li>
+<li>openssl</li>
+<li>expat</li>
+<li>sqlite3</li>
+<li>zlib</li>
+<li>cppunit</li>
+</ul>
+<p>Some environment variables can be adjusted to change build settings:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal">HOST</tt></dt>
+<dd>cross-compile to build programs to run on <tt class="docutils literal">HOST</tt>. It defaults to
+<tt class="docutils literal"><span class="pre">i686-w64-mingw32</span></tt>. To build 64bit binary, specify
+<tt class="docutils literal"><span class="pre">x86_64-w64-mingw32</span></tt>.</dd>
+<dt><tt class="docutils literal">PREFIX</tt></dt>
+<dd>Prefix to the directory where dependent libraries are installed.  It
+defaults to <tt class="docutils literal"><span class="pre">/usr/local/$HOST</span></tt>. <tt class="docutils literal"><span class="pre">-I$PREFIX/include</span></tt> will be
+added to <tt class="docutils literal">CPPFLAGS</tt>. <tt class="docutils literal"><span class="pre">-L$PREFIX/lib</span></tt> will be added to
+<tt class="docutils literal">LDFLAGS</tt>. <tt class="docutils literal">$PREFIX/lib/pkgconfig</tt> will be set to
+<tt class="docutils literal">PKG_CONFIG_LIBDIR</tt>.</dd>
+</dl>
+<p>For example, to build 64bit binary do this:</p>
+<pre class="literal-block">
+$ HOST=x86_64-w64-mingw32 ./mingw-config
+</pre>
+</div>
+<div class="section" id="cross-compiling-android-binary">
+<h1>Cross-compiling Android binary</h1>
+<p>In this section, we describe how to build Android binary using Android
+NDK cross-compiler on Debian Linux.</p>
+<p><tt class="docutils literal"><span class="pre">android-config</span></tt> script is a configure script wrapper for Android
+build.  We use it to create official Android build.  This script
+assumes the following libraries have been built for cross-compile:</p>
+<ul class="simple">
+<li>c-ares</li>
+<li>openssl</li>
+<li>expat</li>
+</ul>
+<p>When building the above libraries, make sure that disable shared
+library and enable only static library. We are going to link those
+libraries statically.</p>
+<p>We use zlib which comes with Android NDK, so we don't have to build it
+by ourselves.</p>
+<p><tt class="docutils literal"><span class="pre">android-config</span></tt> assumes following points:</p>
+<ul class="simple">
+<li>Android NDK toolchain is installed under <tt class="docutils literal">$ANDROID_HOME</tt>.  Refer
+to &quot;3/ Invoking the compiler (the easy way):&quot; section in Android NDK
+<tt class="docutils literal"><span class="pre">docs/STANDALONE-TOOLCHAIN.html</span></tt> to install custom toolchain.</li>
+<li>The dependant libraries must be installed under
+<tt class="docutils literal">$ANDROID_HOME/usr/local</tt>.</li>
+</ul>
+<p>Before running <tt class="docutils literal"><span class="pre">android-config</span></tt> and <tt class="docutils literal"><span class="pre">android-make</span></tt>,
+<tt class="docutils literal">$ANDOIRD_HOME</tt> environment variable must be set to point to the
+correct path.</p>
+<p>After <tt class="docutils literal"><span class="pre">android-config</span></tt>, run <tt class="docutils literal"><span class="pre">android-make</span></tt> to compile sources.</p>
 </div>
 <div class="section" id="building-documentation">
 <h1>Building documentation</h1>
@@ -592,9 +675,9 @@ The number of files to open simultaneously can be controlled by
 <div class="section" id="dht">
 <h2>DHT</h2>
 <p>aria2 supports mainline compatible DHT. By default, the routing table
-for IPv4 DHT is saved to $HOME/.aria2/dht.dat and the routing table
-for IPv6 DHT is saved to $HOME/.aria2/dht6.dat. aria2 uses same port
-number to listen on for both IPv4 and IPv6 DHT.</p>
+for IPv4 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht.dat</span></tt> and the routing
+table for IPv6 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht6.dat</span></tt>. aria2 uses
+same port number to listen on for both IPv4 and IPv6 DHT.</p>
 </div>
 <div class="section" id="other-things-should-be-noted">
 <h2>Other things should be noted</h2>
@@ -673,9 +756,29 @@ defined in RFC 6455. The supported protocol version is 13.</p>
 <li><a class="reference external" href="http://aria2.sourceforge.net/">http://aria2.sourceforge.net/</a></li>
 <li><a class="reference external" href="http://sourceforge.net/apps/trac/aria2/wiki">http://sourceforge.net/apps/trac/aria2/wiki</a></li>
 <li><a class="reference external" href="https://github.com/tatsuhiro-t/aria2">https://github.com/tatsuhiro-t/aria2</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc959">RFC 959 FILE TRANSFER PROTOCOL (FTP)</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc1738">RFC 1738 Uniform Resource Locators (URL)</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc2428">RFC 2428 FTP Extensions for IPv6 and NATs</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc2616">RFC 2616 Hypertext Transfer Protocol -- HTTP/1.1</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc3659">RFC 3659 Extensions to FTP</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc3986">RFC 3986 Uniform Resource Identifier (URI): Generic Syntax</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc4038">RFC 4038 Application Aspects of IPv6 Transition</a></li>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc5854">RFC 5854 The Metalink Download Description Format</a></li>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc6249">RFC 6249 Metalink/HTTP: Mirrors and Hashes</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc6265">RFC 6265 HTTP State Management Mechanism</a></li>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc6455">RFC 6455 The WebSocket Protocol</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0003.html">The BitTorrent Protocol Specification</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0005.html">BitTorrent: DHT Protocol</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0006.html">BitTorrent: Fast Extension</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0007.html">BitTorrent: IPv6 Tracker Extension</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0009.html">BitTorrent: Extension for Peers to Send Metadata Files</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0010.html">BitTorrent: Extension Protocol</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0012.html">BitTorrent: Multitracker Metadata Extension</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0019.html">BitTorrent: WebSeed - HTTP/FTP Seeding (GetRight style)</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0027.html">BitTorrent: Private Torrents</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0032.html">BitTorrent: BitTorrent DHT Extensions for IPv6</a></li>
+<li><a class="reference external" href="http://wiki.vuze.com/w/Message_Stream_Encryption">BitTorrent: Message Stream Encryption</a></li>
+<li><a class="reference external" href="http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf">Kademlia: A Peer-to-peer Information System Based on the  XOR Metric</a></li>
 </ul>
 </div>
 </div>
