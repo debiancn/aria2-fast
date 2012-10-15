@@ -50,6 +50,10 @@
 #include "SocketRecvBuffer.h"
 #include "TimeA2.h"
 #include "array_fun.h"
+#include "JsonDiskWriter.h"
+#ifdef ENABLE_XML_RPC
+#  include "XmlRpcDiskWriter.h"
+#endif // ENABLE_XML_RPC
 
 namespace aria2 {
 
@@ -60,7 +64,11 @@ HttpServer::HttpServer
    socketRecvBuffer_(new SocketRecvBuffer(socket_)),
    socketBuffer_(socket),
    e_(e),
-   headerProcessor_(new HttpHeaderProcessor()),
+   headerProcessor_(new HttpHeaderProcessor
+                    (HttpHeaderProcessor::SERVER_PARSER)),
+   lastContentLength_(0),
+   bodyConsumed_(0),
+   reqType_(RPC_TYPE_NONE),
    keepAlive_(true),
    gzip_(false),
    acceptsPersistentConnection_(true),
@@ -129,18 +137,18 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
       throw DL_ABORT_EX(EX_EOF_FROM_PEER);
     }
   }
-  headerProcessor_->update(socketRecvBuffer_->getBuffer(),
-                           socketRecvBuffer_->getBufferLength());
-  if(headerProcessor_->eoh()) {
-    SharedHandle<HttpHeader> header = headerProcessor_->getHttpRequestHeader();
-    size_t putbackDataLength = headerProcessor_->getPutBackDataLength();
+  SharedHandle<HttpHeader> header;
+  if(headerProcessor_->parse(socketRecvBuffer_->getBuffer(),
+                             socketRecvBuffer_->getBufferLength())) {
+    header = headerProcessor_->getResult();
     A2_LOG_INFO(fmt("HTTP Server received request\n%s",
                     headerProcessor_->getHeaderString().c_str()));
-    socketRecvBuffer_->shiftBuffer
-      (socketRecvBuffer_->getBufferLength()-putbackDataLength);
+    socketRecvBuffer_->shiftBuffer(headerProcessor_->getLastBytesProcessed());
     lastRequestHeader_ = header;
-    lastBody_.clear();
-    lastBody_.str("");
+    bodyConsumed_ = 0;
+    if(setupResponseRecv() < 0) {
+      A2_LOG_INFO("Request path is invaild. Ignore the request body.");
+    }
     lastContentLength_ =
       lastRequestHeader_->findAsLLInt(HttpHeader::CONTENT_LENGTH);
     if(lastContentLength_ < 0) {
@@ -175,16 +183,15 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
         break;
       }
     }
-    return header;
   } else {
-    socketRecvBuffer_->clearBuffer();
-    return SharedHandle<HttpHeader>();
+    socketRecvBuffer_->shiftBuffer(headerProcessor_->getLastBytesProcessed());
   }
+  return header;
 }
 
 bool HttpServer::receiveBody()
 {
-  if(lastContentLength_ == 0) {
+  if(lastContentLength_ == bodyConsumed_) {
     return true;
   }
   if(socketRecvBuffer_->bufferEmpty()) {
@@ -195,16 +202,13 @@ bool HttpServer::receiveBody()
   }
   size_t length =
     std::min(socketRecvBuffer_->getBufferLength(),
-             static_cast<size_t>(lastContentLength_-lastBody_.tellg()));
-  lastBody_.write(reinterpret_cast<const char*>(socketRecvBuffer_->getBuffer()),
-                  length);
+             static_cast<size_t>(lastContentLength_ - bodyConsumed_));
+  if(lastBody_) {
+    lastBody_->writeData(socketRecvBuffer_->getBuffer(), length, 0);
+  }
   socketRecvBuffer_->shiftBuffer(length);
-  return lastContentLength_ == lastBody_.tellp();
-}
-
-std::string HttpServer::getBody() const
-{
-  return lastBody_.str();
+  bodyConsumed_ += length;
+  return lastContentLength_ == bodyConsumed_;
 }
 
 const std::string& HttpServer::getMethod() const
@@ -314,6 +318,78 @@ void HttpServer::setUsernamePassword
 {
   username_ = username;
   password_ = password;
+}
+
+int HttpServer::setupResponseRecv()
+{
+  std::string path = createPath();
+  if(getMethod() == "GET") {
+    if(path == "/jsonrpc") {
+      reqType_ = RPC_TYPE_JSONP;
+      lastBody_.reset();
+      return 0;
+    }
+  } else if(getMethod() == "POST") {
+    if(path == "/jsonrpc") {
+      if(reqType_ != RPC_TYPE_JSON) {
+        reqType_ = RPC_TYPE_JSON;
+        lastBody_.reset(new json::JsonDiskWriter());
+      }
+      return 0;
+    }
+#ifdef ENABLE_XML_RPC
+    if(path == "/rpc") {
+      if(reqType_ != RPC_TYPE_XML) {
+        reqType_ = RPC_TYPE_XML;
+        lastBody_.reset(new rpc::XmlRpcDiskWriter());
+      }
+      return 0;
+    }
+#endif // ENABLE_XML_RPC
+  }
+  reqType_ = RPC_TYPE_NONE;
+  lastBody_.reset();
+  return -1;
+}
+
+std::string HttpServer::createPath() const
+{
+  std::string reqPath = getRequestPath();
+  size_t i;
+  size_t len = reqPath.size();
+  for(i = 0; i < len; ++i) {
+    if(reqPath[i] == '#' || reqPath[i] == '?') {
+      break;
+    }
+  }
+  reqPath = reqPath.substr(0, i);
+  if(reqPath.empty()) {
+    reqPath = "/";
+  }
+  return reqPath;
+}
+
+std::string HttpServer::createQuery() const
+{
+  std::string reqPath = getRequestPath();
+  size_t i;
+  size_t len = reqPath.size();
+  for(i = 0; i < len; ++i) {
+    if(reqPath[i] == '#' || reqPath[i] == '?') {
+      break;
+    }
+  }
+  if(i == len || reqPath[i] == '#') {
+    return "";
+  } else {
+    size_t start = i;
+    for(; i < len; ++i) {
+      if(reqPath[i] == '#') {
+        break;
+      }
+    }
+    return reqPath.substr(start, i - start);
+  }
 }
 
 } // namespace aria2

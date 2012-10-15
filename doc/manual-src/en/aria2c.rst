@@ -338,6 +338,14 @@ HTTP Specific Options
   certificates.
   Use :option:`--check-certificate` option to enable verification.
 
+  .. note::
+
+    If you build with OpenSSL or the recent version of GnuTLS which
+    has ``gnutls_certificate_set_x509_system_trust()`` function and
+    the library is properly configured to locate the system-wide CA
+    certificates store, aria2 will automatically load those
+    certificates at the startup.
+
 .. option:: --certificate=<FILE>
 
   Use the client certificate in FILE.
@@ -543,8 +551,8 @@ BitTorrent/Metalink Options
 
 .. option:: -S, --show-files[=true|false]
 
-  Print file listing of .torrent, .meta4 and .metalink file and exit.
-  In case of .torrent file, additional information
+  Print file listing of ".torrent", ".meta4" and ".metalink" file and exit.
+  In case of ".torrent" file, additional information
   (infohash, piece length, etc) is also printed.
 
 BitTorrent Specific Options
@@ -648,9 +656,9 @@ BitTorrent Specific Options
 
 .. option:: --bt-save-metadata[=true|false]
 
-  Save metadata as .torrent file. This option has effect only when
+  Save metadata as ".torrent" file. This option has effect only when
   BitTorrent Magnet URI is used.  The filename is hex encoded info
-  hash with suffix .torrent. The directory to be saved is the same
+  hash with suffix ".torrent". The directory to be saved is the same
   directory where download file is saved. If the same file already
   exists, metadata is not saved. See also :option:`--bt-metadata-only`
   option. Default: ``false``
@@ -824,8 +832,8 @@ BitTorrent Specific Options
 
 .. option:: -T, --torrent-file=<TORRENT_FILE>
 
-  The path to the .torrent file.  You are not required to use this
-  option because you can specify .torrent files without :option:`--torrent-file <-T>`.
+  The path to the ".torrent" file.  You are not required to use this
+  option because you can specify ".torrent" files without :option:`--torrent-file <-T>`.
 
 Metalink Specific Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -847,9 +855,9 @@ Metalink Specific Options
 
 .. option:: -M, --metalink-file=<METALINK_FILE>
 
-  The file path to .meta4 and .metalink file. Reads input from stdin when ``-`` is
+  The file path to ".meta4" and ".metalink" file. Reads input from stdin when ``-`` is
   specified.  You are not required to use this option because you can
-  specify .metalink files without :option:`--metalink-file <-M>`.
+  specify ".metalink" files without :option:`--metalink-file <-M>`.
 
 .. option:: --metalink-language=<LANGUAGE>
 
@@ -1039,6 +1047,13 @@ Advanced Options
   option will be ignored when :option:`--async-dns=false. <--async-dns>`
   Default: ``false``
 
+.. option:: --enable-mmap[=true|false]
+
+   Map files into memory. This option may not work if the file space
+   is not pre-allocated. See :option:`--file-allocation`.
+
+   Default: ``false``
+
 .. option:: --event-poll=<POLL>
 
   Specify the method for polling events.  The possible values are
@@ -1063,7 +1078,11 @@ Advanced Options
   entirely until allocation finishes. ``falloc`` may
   not be available if your system doesn't have
   :manpage:`posix_fallocate(3)` function.
-  Possible Values: ``none``, ``prealloc``, ``falloc``
+  ``trunc`` uses :manpage:`ftruncate(2)` system call or
+  platform-specific counterpart to truncate a file to a specified
+  length.
+
+  Possible Values: ``none``, ``prealloc``, ``trunc``, ``falloc``
   Default: ``prealloc``
 
 .. option:: --hash-check-only[=true|false]
@@ -1465,10 +1484,10 @@ based on the last error encountered.
   If HTTP authorization failed.
 
 25
-  If aria2 could not parse bencoded file(usually .torrent file).
+  If aria2 could not parse bencoded file(usually ".torrent" file).
 
 26
-  If .torrent file was corrupted or missing information that aria2 needed.
+  If ".torrent" file was corrupted or missing information that aria2 needed.
 
 27
   If Magnet URI was bad.
@@ -1530,10 +1549,10 @@ FILES
 aria2.conf
 ~~~~~~~~~~
 
-By default, aria2 parses ``$HOME/.aria2/aria2.conf`` as a configuraiton
-file. You can specify the path to configuration file using
-:option:`--conf-path` option.  If you don't want to use the configuraitonf
-file, use :option:`--no-conf` option.
+By default, aria2 parses ``$HOME/.aria2/aria2.conf`` as a
+configuraiton file. You can specify the path to configuration file
+using :option:`--conf-path` option.  If you don't want to use the
+configuraiton file, use :option:`--no-conf` option.
 
 The configuration file is a text file and has 1 option per each
 line. In each line, you can specify name-value pair in the format:
@@ -1548,6 +1567,12 @@ lines beginning ``#`` are treated as comments::
   max-upload-limit=50K
   ftp-pasv=true
 
+.. note::
+
+  The confidential information such as user/password might be included
+  in the configuration file. It is recommended to change file mode
+  bits of the configuration file (e.g., ``chmod 600 aria2.conf``), so
+  that other user cannot see the contents of the file.
 
 dht.dat
 ~~~~~~~~
@@ -1639,6 +1664,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`bt-metadata-only <--bt-metadata-only>`
   * :option:`bt-min-crypto-level <--bt-min-crypto-level>`
   * :option:`bt-prioritize-piece <--bt-prioritize-piece>`
+  * :option:`bt-remove-unselected-file <--bt-remove-unselected-file>`
   * :option:`bt-request-peer-speed-limit <--bt-request-peer-speed-limit>`
   * :option:`bt-require-crypto <--bt-require-crypto>`
   * :option:`bt-save-metadata <--bt-save-metadata>`
@@ -1648,8 +1674,8 @@ of URIs. These optional lines must start with white space(s).
   * :option:`bt-tracker-connect-timeout <--bt-tracker-connect-timeout>`
   * :option:`bt-tracker-interval <--bt-tracker-interval>`
   * :option:`bt-tracker-timeout <--bt-tracker-timeout>`
-  * :option:`bt-remove-unselected-file <--bt-remove-unselected-file>`
   * :option:`check-integrity <-V>`
+  * :option:`checksum <--checksum>`
   * :option:`conditional-get <--conditional-get>`
   * :option:`connect-timeout <--connect-timeout>`
   * :option:`continue <-c>`
@@ -1658,6 +1684,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`enable-async-dns6 <--enable-async-dns6>`
   * :option:`enable-http-keep-alive <--enable-http-keep-alive>`
   * :option:`enable-http-pipelining <--enable-http-pipelining>`
+  * :option:`enable-mmap <--enable-mmap>`
   * :option:`enable-peer-exchange <--enable-peer-exchange>`
   * :option:`file-allocation <--file-allocation>`
   * :option:`follow-metalink <--follow-metalink>`
@@ -1670,6 +1697,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`ftp-reuse-connection <--ftp-reuse-connection>`
   * :option:`ftp-type <--ftp-type>`
   * :option:`ftp-user <--ftp-user>`
+  * :option:`hash-check-only <--hash-check-only>`
   * :option:`header <--header>`
   * :option:`http-accept-gzip <--http-accept-gzip>`
   * :option:`http-auth-challenge <--http-auth-challenge>`
@@ -1690,6 +1718,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`max-resume-failure-tries <--max-resume-failure-tries>`
   * :option:`max-tries <-m>`
   * :option:`max-upload-limit <-u>`
+  * :option:`metalink-base-uri <--metalink-base-uri>`
   * :option:`metalink-enable-unique-protocol <--metalink-enable-unique-protocol>`
   * :option:`metalink-language <--metalink-language>`
   * :option:`metalink-location <--metalink-location>`
@@ -1702,27 +1731,24 @@ of URIs. These optional lines must start with white space(s).
   * :option:`no-proxy <--no-proxy>`
   * :option:`out <-o>`
   * :option:`parameterized-uri <-P>`
+  * :option:`pause <--pause>`
+  * :option:`piece-length <--piece-length>`
   * :option:`proxy-method <--proxy-method>`
   * :option:`realtime-chunk-checksum <--realtime-chunk-checksum>`
   * :option:`referer <--referer>`
   * :option:`remote-time <-R>`
   * :option:`remove-control-file <--remove-control-file>`
+  * :option:`retry-wait <--retry-wait>`
   * :option:`reuse-uri <--reuse-uri>`
   * :option:`seed-ratio <--seed-ratio>`
   * :option:`seed-time <--seed-time>`
   * :option:`select-file <--select-file>`
   * :option:`split <-s>`
+  * :option:`stream-piece-selector <--stream-piece-selector>`
   * :option:`timeout <-t>`
+  * :option:`uri-selector <--uri-selector>`
   * :option:`use-head <--use-head>`
   * :option:`user-agent <-U>`
-  * :option:`retry-wait <--retry-wait>`
-  * :option:`metalink-base-uri <--metalink-base-uri>`
-  * :option:`pause <--pause>`
-  * :option:`stream-piece-selector <--stream-piece-selector>`
-  * :option:`hash-check-only <--hash-check-only>`
-  * :option:`checksum <--checksum>`
-  * :option:`piece-length <--piece-length>`
-  * :option:`uri-selector <--uri-selector>`
   
 These options have exactly same meaning of the ones in the
 command-line options, but it just applies to the URIs it belongs to.
@@ -1906,10 +1932,10 @@ All code examples come from Python2.7 interpreter.
   
   
   
-  This method adds BitTorrent download by uploading .torrent file.  If
+  This method adds BitTorrent download by uploading ".torrent" file.  If
   you want to add BitTorrent Magnet URI, use :func:`aria2.addUri` method
   instead.  *torrent* is of type base64 which contains Base64-encoded
-  .torrent file.  *uris* is of type array and its element is URI which
+  ".torrent" file.  *uris* is of type array and its element is URI which
   is of type string. *uris* is used for Web-seeding.  For single file
   torrents, URI can be a complete URI pointing to the resource or if URI
   ends with /, name in torrent file is added. For multi-file torrents,
@@ -1961,8 +1987,8 @@ All code examples come from Python2.7 interpreter.
   
   
   
-  This method adds Metalink download by uploading .metalink file.
-  *metalink* is of type base64 which contains Base64-encoded .metalink
+  This method adds Metalink download by uploading ".metalink" file.
+  *metalink* is of type base64 which contains Base64-encoded ".metalink"
   file.  *options* is of type struct and its members are a pair of
   option name and value. See :ref:`rpc_options` below for more details.  If
   *position* is given as an integer starting from 0, the new download is
@@ -2199,7 +2225,7 @@ All code examples come from Python2.7 interpreter.
   ``belongsTo``
     GID of a parent download. Some downloads are a part of another
     download.  For example, if a file in Metalink has BitTorrent
-    resource, the download of .torrent is a part of that file.  If this
+    resource, the download of ".torrent" is a part of that file.  If this
     download has no parent, this key will not be included in the
     response.
   
@@ -2217,7 +2243,7 @@ All code examples come from Python2.7 interpreter.
     file. BitTorrent only. It contains following keys.
   
     ``announceList``
-      List of lists of announce URI. If .torrent file contains announce
+      List of lists of announce URI. If ".torrent" file contains announce
       and no announce-list, announce is converted to announce-list
       format.
   
@@ -3455,6 +3481,56 @@ xmlrpc.client instead) to interact with aria2::
   r = s.aria2.addUri(["http://localhost/aria2.tar.bz2"], {"dir":"/downloads"})
   pprint(r)
 
+MISC
+----
+
+Console Readout
+~~~~~~~~~~~~~~~
+
+While downloading files, aria2 prints the console readout to tell the
+progress of the downloads. The console readout is like this::
+
+    [#1 SIZE:400.0KiB/33.2MiB(1%) CN:1 SPD:115.7KiBs ETA:4m51s]
+
+This section describes what these numbers and strings mean.
+
+``#N``
+  N means GID, which is an unique ID for each download.
+
+``SIZE``
+  Completed length and Total length in bytes. If
+  :option:`--select-file` is used, this is the sum of selected file.
+
+``SEEDING``
+  Share ratio. The client is now seeding. After BitTorrent download
+  finished, ``SIZE`` is replaced with ``SEEDING``.
+
+``CN``
+  The number of connections the client has established.
+
+``SEED``
+  The number of seeders the client has connected to.
+
+``SPD``
+  Download speed.
+
+``UP``
+  Upload speed and the number of uploaded bytes.
+
+``ETA``
+  Expected time to finish.
+
+``TOTAL SPD``
+  The sum of download speed for all parallel downloads.
+
+When aria2 is allocating file space or validating checksum, it
+additionally prints the their progress:
+
+FileAlloc
+  GID, allocated length and total length in bytes.
+
+Checksum
+  GID, validated length and total length in bytes.
 
 EXAMPLE
 -------
@@ -3580,8 +3656,8 @@ Download only selected files using index
 
   The index is printed to the console using -S option.
 
-Download a file using a local .metalink file with user preference
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Download a file using a local metalink file with user preference
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 .. code-block:: console
 
   $ aria2c --metalink-location=jp,us --metalink-version=1.1 --metalink-language=en-US file.metalink
@@ -3863,7 +3939,7 @@ The Metalink Download Description Format: :rfc:`5854`
 
 COPYRIGHT
 ---------
-Copyright (C) 2006, 2011 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

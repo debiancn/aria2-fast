@@ -116,7 +116,8 @@ SRCS =  Socket.h\
 	DownloadHandler.cc DownloadHandler.h\
 	DownloadHandlerConstants.cc DownloadHandlerConstants.h\
 	DownloadHandlerFactory.cc DownloadHandlerFactory.h\
-	MemoryBufferPreDownloadHandler.cc MemoryBufferPreDownloadHandler.h\
+	MemoryPreDownloadHandler.h\
+	MemoryBufferPreDownloadHandler.h\
 	HaveEraseCommand.cc HaveEraseCommand.h\
 	Piece.cc Piece.h\
 	CheckIntegrityMan.h\
@@ -132,7 +133,7 @@ SRCS =  Socket.h\
 	BtRegistry.cc BtRegistry.h\
 	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h\
 	ByteArrayDiskWriter.cc ByteArrayDiskWriter.h\
-	ByteArrayDiskWriterFactory.cc ByteArrayDiskWriterFactory.h\
+	ByteArrayDiskWriterFactory.h\
 	DownloadContext.cc DownloadContext.h\
 	TimedHaltCommand.cc TimedHaltCommand.h\
 	CUIDCounter.cc CUIDCounter.h\
@@ -191,6 +192,7 @@ SRCS =  Socket.h\
 	ContextAttribute.h\
 	TorrentAttribute.cc TorrentAttribute.h\
 	AdaptiveFileAllocationIterator.cc AdaptiveFileAllocationIterator.h\
+	TruncFileAllocationIterator.cc TruncFileAllocationIterator.h\
 	StreamFilter.cc StreamFilter.h\
 	SinkStreamFilter.cc SinkStreamFilter.h\
 	ChunkedDecodingStreamFilter.cc ChunkedDecodingStreamFilter.h\
@@ -199,6 +201,14 @@ SRCS =  Socket.h\
 	Triplet.h\
 	cookie_helper.cc cookie_helper.h\
 	json.cc json.h\
+	JsonParser.cc JsonParser.h\
+	StructParserStateMachine.h\
+	GenericParser.h\
+	ValueBaseJsonParser.h\
+	ValueBaseStructParserState.h\
+	ValueBaseStructParserStateImpl.cc ValueBaseStructParserStateImpl.h\
+	ValueBaseStructParserStateMachine.cc ValueBaseStructParserStateMachine.h\
+	JsonDiskWriter.h\
 	HttpServerBodyCommand.cc HttpServerBodyCommand.h\
 	RpcRequest.cc RpcRequest.h\
 	RpcMethod.cc RpcMethod.h\
@@ -227,7 +237,10 @@ SRCS =  Socket.h\
 	rpc_helper.cc rpc_helper.h\
 	WatchProcessCommand.cc WatchProcessCommand.h\
 	UnknownOptionException.cc UnknownOptionException.h\
-	Notifier.cc Notifier.h
+	Notifier.cc Notifier.h\
+	ValueBaseDiskWriter.h\
+	AnonDiskWriterFactory.h\
+	XmlRpcRequestParserController.cc XmlRpcRequestParserController.h
 
 if MINGW_BUILD
 SRCS += WinConsoleFile.cc WinConsoleFile.h
@@ -246,7 +259,7 @@ endif # !ENABLE_WEBSOCKET
 
 if HAVE_SOME_XMLLIB
 SRCS += XmlAttr.cc XmlAttr.h\
-	XmlParser.h\
+	XmlParser.cc XmlParser.h\
 	ParserStateMachine.h
 endif # HAVE_SOME_XMLLIB
 
@@ -259,10 +272,10 @@ SRCS +=  ExpatXmlParser.cc ExpatXmlParser.h
 endif # HAVE_LIBEXPAT
 
 if ENABLE_XML_RPC
-SRCS += XmlRpcRequestParserController.cc XmlRpcRequestParserController.h\
-	XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
+SRCS += XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
 	XmlRpcRequestParserState.h\
-	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h
+	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h\
+	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h
 
 endif # ENABLE_XML_RPC
 
@@ -500,7 +513,12 @@ SRCS += PeerAbstractCommand.cc PeerAbstractCommand.h\
 	LpdMessage.cc LpdMessage.h\
 	LpdReceiveMessageCommand.cc LpdReceiveMessageCommand.h\
 	LpdDispatchMessageCommand.cc LpdDispatchMessageCommand.h\
-	bencode2.cc bencode2.h
+	bencode2.cc bencode2.h\
+	BencodeParser.cc BencodeParser.h\
+	ValueBaseBencodeParser.h\
+	BencodeDiskWriter.h\
+	BencodeDiskWriterFactory.h\
+	MemoryBencodePreDownloadHandler.h
 endif # ENABLE_BITTORRENT
 
 if ENABLE_METALINK

@@ -36,6 +36,7 @@
 #include "MultiDiskAdaptor.h"
 #include "FileEntry.h"
 #include "AdaptiveFileAllocationIterator.h"
+#include "TruncFileAllocationIterator.h"
 #ifdef HAVE_SOME_FALLOCATE
 # include "FallocFileAllocationIterator.h"
 #endif // HAVE_SOME_FALLOCATE
@@ -67,20 +68,28 @@ void MultiFileAllocationIterator::allocateChunk()
     diskAdaptor_->openIfNot(entry, &DiskWriterEntry::openFile);
     if(entry->needsFileAllocation() && entry->size() < fileEntry->getLength()) {
       // Calling private function of MultiDiskAdaptor.
+      switch(diskAdaptor_->getFileAllocationMethod()) {
 #ifdef HAVE_SOME_FALLOCATE
-      if(diskAdaptor_->doesFallocate()) {
+      case(DiskAdaptor::FILE_ALLOC_FALLOC):
         fileAllocationIterator_.reset
           (new FallocFileAllocationIterator(entry->getDiskWriter().get(),
                                             entry->size(),
                                             fileEntry->getLength()));
-      } else
+        break;
 #endif // HAVE_SOME_FALLOCATE
-        {
-          fileAllocationIterator_.reset
-            (new AdaptiveFileAllocationIterator(entry->getDiskWriter().get(),
-                                                entry->size(),
-                                                fileEntry->getLength()));
-        }
+      case(DiskAdaptor::FILE_ALLOC_TRUNC):
+        fileAllocationIterator_.reset
+          (new TruncFileAllocationIterator(entry->getDiskWriter().get(),
+                                           entry->size(),
+                                           fileEntry->getLength()));
+        break;
+      default:
+        fileAllocationIterator_.reset
+          (new AdaptiveFileAllocationIterator(entry->getDiskWriter().get(),
+                                              entry->size(),
+                                              fileEntry->getLength()));
+        break;
+      }
     }
   }
   if(finished()) {
@@ -95,7 +104,7 @@ bool MultiFileAllocationIterator::finished()
     (!fileAllocationIterator_ || fileAllocationIterator_->finished());
 }
 
-off_t MultiFileAllocationIterator::getCurrentLength()
+int64_t MultiFileAllocationIterator::getCurrentLength()
 {
   if(!fileAllocationIterator_) {
     return 0;
@@ -104,7 +113,7 @@ off_t MultiFileAllocationIterator::getCurrentLength()
   }
 }
 
-off_t MultiFileAllocationIterator::getTotalLength()
+int64_t MultiFileAllocationIterator::getTotalLength()
 {
   if(!fileAllocationIterator_) {
     return 0;

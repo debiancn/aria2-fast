@@ -146,7 +146,7 @@ bool DownloadCommand::executeInternal() {
     size_t bufSize;
     if(sinkFilterOnly_) {
       if(segment->getLength() > 0) {
-        if(static_cast<off_t>(segment->getPosition()+segment->getLength()) <=
+        if(segment->getPosition()+segment->getLength() <=
            getFileEntry()->getLastOffset()) {
           bufSize =
             std::min(static_cast<size_t>(segment->getLength()
@@ -188,7 +188,7 @@ bool DownloadCommand::executeInternal() {
       segmentPartComplete = true;
     }
   } else {
-    off_t loff = getFileEntry()->gtoloff(segment->getPositionToWrite());
+    int64_t loff = getFileEntry()->gtoloff(segment->getPositionToWrite());
     if(getFileEntry()->getLength() > 0 && !sinkFilterOnly_ &&
        ((loff == getRequestEndOffset() && streamFilter_->finished())
         || loff < getRequestEndOffset()) &&
@@ -361,7 +361,7 @@ void DownloadCommand::validatePieceHash(const SharedHandle<Segment>& segment,
   } else {
     A2_LOG_INFO(fmt(EX_INVALID_CHUNK_CHECKSUM,
                     static_cast<unsigned long>(segment->getIndex()),
-                    static_cast<long long int>(segment->getPosition()),
+                    segment->getPosition(),
                     util::toHex(expectedHash).c_str(),
                     util::toHex(actualHash).c_str()));
     segment->clear();

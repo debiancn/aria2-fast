@@ -184,20 +184,35 @@ Also you need `Sphinx <http://sphinx.pocoo.org/>`_ to build man page.
 If you are building aria2 for Mac OS X, take a look at
 build_osx_release.sh, which builds OSX universal binary DMG.
 
-The quickest way to build aria2 is just type following commands::
+The quickest way to build aria2 is first run configure script::
 
     $ ./configure
+
+To build statically linked aria2, use ``ARIA2_STATIC=yes``
+command-line option::
+
+    $ ./configure ARIA2_STATIC=yes
+
+After configuration is done, run ``make`` to compile the program::
+
     $ make
+
+See `Cross-compiling Windows binary`_ to create Windows binary.  See
+`Cross-compiling Android binary`_ to create Android binary.
 
 The configure script checks available libraries and enables the features
 as much as possible because all the features are enabled by default.
 
 Since 1.1.0, aria2 checks the certificate of HTTPS servers by default.
-If you build with HTTPS support, I recommend to supply the path to the
-CA bundle file. For example, in Debian the path to CA bundle file is
-'/etc/ssl/certs/ca-certificates.crt' (in ca-certificates package). This
-may vary depending on your distribution. You can give it to
-configure script using ``--with-ca-bundle option``::
+If you build with OpenSSL or the recent version of GnuTLS which has
+``gnutls_certificate_set_x509_system_trust()`` function and the
+library is properly configured to locate the system-wide CA
+certificates store, aria2 will automatically load those certificates
+at the startup. If it is not the case, I recommend to supply the path
+to the CA bundle file. For example, in Debian the path to CA bundle
+file is '/etc/ssl/certs/ca-certificates.crt' (in ca-certificates
+package). This may vary depending on your distribution. You can give
+it to configure script using ``--with-ca-bundle option``::
 
     $ ./configure --with-ca-bundle='/etc/ssl/certs/ca-certificates.crt'
     $ make
@@ -219,6 +234,83 @@ The executable is 'aria2c' in src directory.
 aria2 uses CppUnit for automated unit testing. To run the unit test::
 
     $ make check
+
+Cross-compiling Windows binary
+------------------------------
+
+In this section, we describe how to build Windows binary using
+mingw-w64 cross-compiler on Debian Linux.
+
+Basically, after compiling and installing depended libraries, you can
+do cross-compile just passing appropriate ``--host`` option and
+specifying ``CPPFLAGS``, ``LDFLAGS`` and ``PKG_CONFIG_LIBDIR``
+variables to configure. For convenience and lowering our own
+development cost, we provide easier way to configure the build
+settings.
+
+``mingw-config`` script is a configure script wrapper for mingw-w64.
+We use it to create official Windows build.  This script assumes
+following libraries have been built for cross-compile:
+
+* c-ares
+* openssl
+* expat
+* sqlite3
+* zlib
+* cppunit
+
+Some environment variables can be adjusted to change build settings:
+
+``HOST``
+  cross-compile to build programs to run on ``HOST``. It defaults to
+  ``i686-w64-mingw32``. To build 64bit binary, specify
+  ``x86_64-w64-mingw32``.
+
+``PREFIX``
+  Prefix to the directory where dependent libraries are installed.  It
+  defaults to ``/usr/local/$HOST``. ``-I$PREFIX/include`` will be
+  added to ``CPPFLAGS``. ``-L$PREFIX/lib`` will be added to
+  ``LDFLAGS``. ``$PREFIX/lib/pkgconfig`` will be set to
+  ``PKG_CONFIG_LIBDIR``.
+
+For example, to build 64bit binary do this::
+
+    $ HOST=x86_64-w64-mingw32 ./mingw-config
+
+Cross-compiling Android binary
+------------------------------
+
+In this section, we describe how to build Android binary using Android
+NDK cross-compiler on Debian Linux.
+
+``android-config`` script is a configure script wrapper for Android
+build.  We use it to create official Android build.  This script
+assumes the following libraries have been built for cross-compile:
+
+* c-ares
+* openssl
+* expat
+
+When building the above libraries, make sure that disable shared
+library and enable only static library. We are going to link those
+libraries statically.
+
+We use zlib which comes with Android NDK, so we don't have to build it
+by ourselves.
+
+``android-config`` assumes following points:
+
+* Android NDK toolchain is installed under ``$ANDROID_HOME``.  Refer
+  to "3/ Invoking the compiler (the easy way):" section in Android NDK
+  ``docs/STANDALONE-TOOLCHAIN.html`` to install custom toolchain.
+* The dependant libraries must be installed under
+  ``$ANDROID_HOME/usr/local``.
+
+Before running ``android-config`` and ``android-make``,
+``$ANDOIRD_HOME`` environment variable must be set to point to the
+correct path.
+
+After ``android-config``, run ``android-make`` to compile sources.
 
 Building documentation
 ----------------------
@@ -260,9 +352,9 @@ DHT
 ~~~
 
 aria2 supports mainline compatible DHT. By default, the routing table
-for IPv4 DHT is saved to $HOME/.aria2/dht.dat and the routing table
-for IPv6 DHT is saved to $HOME/.aria2/dht6.dat. aria2 uses same port
-number to listen on for both IPv4 and IPv6 DHT.
+for IPv4 DHT is saved to ``$HOME/.aria2/dht.dat`` and the routing
+table for IPv6 DHT is saved to ``$HOME/.aria2/dht6.dat``. aria2 uses
+same port number to listen on for both IPv4 and IPv6 DHT.
 
 Other things should be noted
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -348,6 +440,27 @@ References
 * http://aria2.sourceforge.net/
 * http://sourceforge.net/apps/trac/aria2/wiki
 * https://github.com/tatsuhiro-t/aria2
+* `RFC 959 FILE TRANSFER PROTOCOL (FTP) <http://tools.ietf.org/html/rfc959>`_
+* `RFC 1738 Uniform Resource Locators (URL) <http://tools.ietf.org/html/rfc1738>`_
+* `RFC 2428 FTP Extensions for IPv6 and NATs <http://tools.ietf.org/html/rfc2428>`_
+* `RFC 2616 Hypertext Transfer Protocol -- HTTP/1.1 <http://tools.ietf.org/html/rfc2616>`_
+* `RFC 3659 Extensions to FTP <http://tools.ietf.org/html/rfc3659>`_
+* `RFC 3986 Uniform Resource Identifier (URI): Generic Syntax <http://tools.ietf.org/html/rfc3986>`_
+* `RFC 4038 Application Aspects of IPv6 Transition <http://tools.ietf.org/html/rfc4038>`_
 * `RFC 5854 The Metalink Download Description Format <http://tools.ietf.org/html/rfc5854>`_
 * `RFC 6249 Metalink/HTTP: Mirrors and Hashes <http://tools.ietf.org/html/rfc6249>`_
+* `RFC 6265 HTTP State Management Mechanism <http://tools.ietf.org/html/rfc6265>`_
 * `RFC 6455 The WebSocket Protocol <http://tools.ietf.org/html/rfc6455>`_
+
+* `The BitTorrent Protocol Specification <http://www.bittorrent.org/beps/bep_0003.html>`_
+* `BitTorrent: DHT Protocol <http://www.bittorrent.org/beps/bep_0005.html>`_
+* `BitTorrent: Fast Extension <http://www.bittorrent.org/beps/bep_0006.html>`_
+* `BitTorrent: IPv6 Tracker Extension <http://www.bittorrent.org/beps/bep_0007.html>`_
+* `BitTorrent: Extension for Peers to Send Metadata Files <http://www.bittorrent.org/beps/bep_0009.html>`_
+* `BitTorrent: Extension Protocol <http://www.bittorrent.org/beps/bep_0010.html>`_
+* `BitTorrent: Multitracker Metadata Extension <http://www.bittorrent.org/beps/bep_0012.html>`_
+* `BitTorrent: WebSeed - HTTP/FTP Seeding (GetRight style) <http://www.bittorrent.org/beps/bep_0019.html>`_
+* `BitTorrent: Private Torrents <http://www.bittorrent.org/beps/bep_0027.html>`_
+* `BitTorrent: BitTorrent DHT Extensions for IPv6 <http://www.bittorrent.org/beps/bep_0032.html>`_
+* `BitTorrent: Message Stream Encryption <http://wiki.vuze.com/w/Message_Stream_Encryption>`_
+* `Kademlia: A Peer-to-peer Information System Based on the  XOR Metric <http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf>`_

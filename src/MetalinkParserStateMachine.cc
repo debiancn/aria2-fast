@@ -112,6 +112,16 @@ MetalinkParserStateMachine::MetalinkParserStateMachine():
 
 MetalinkParserStateMachine::~MetalinkParserStateMachine() {}
 
+void MetalinkParserStateMachine::reset()
+{
+  ctrl_->reset();
+  errors_.clear();
+  while(!stateStack_.empty()) {
+    stateStack_.pop();
+  }
+  stateStack_.push(initialState_);
+}
+
 void MetalinkParserStateMachine::setMetalinkState()
 {
   stateStack_.push(metalinkState_);
@@ -262,7 +272,7 @@ void MetalinkParserStateMachine::setFileNameOfEntry(const std::string& filename)
   ctrl_->setFileNameOfEntry(filename);
 }
 
-void MetalinkParserStateMachine::setFileLengthOfEntry(off_t length)
+void MetalinkParserStateMachine::setFileLengthOfEntry(int64_t length)
 {
   ctrl_->setFileLengthOfEntry(length);
 }

@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "May 27, 2012" "1.15.1" "aria2"
+.TH "ARIA2C" "1" "September 02, 2012" "1.15.2" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -388,6 +388,13 @@ Use the certificate authorities in FILE to verify the peers.
 The certificate file must be in PEM format and can contain multiple CA
 certificates.
 Use \fI\%--check-certificate\fP option to enable verification.
+.IP Note
+If you build with OpenSSL or the recent version of GnuTLS which
+has \fBgnutls_certificate_set_x509_system_trust()\fP function and
+the library is properly configured to locate the system\-wide CA
+certificates store, aria2 will automatically load those
+certificates at the startup.
+.RE
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -621,8 +628,8 @@ writes the piece to the appropriate files.
 .INDENT 0.0
 .TP
 .B \-S, \-\-show\-files[=true|false]
-Print file listing of .torrent, .meta4 and .metalink file and exit.
-In case of .torrent file, additional information
+Print file listing of ".torrent", ".meta4" and ".metalink" file and exit.
+In case of ".torrent" file, additional information
 (infohash, piece length, etc) is also printed.
 .UNINDENT
 .SS BitTorrent Specific Options
@@ -738,9 +745,9 @@ Default: \fB50K\fP
 .INDENT 0.0
 .TP
 .B \-\-bt\-save\-metadata[=true|false]
-Save metadata as .torrent file. This option has effect only when
+Save metadata as ".torrent" file. This option has effect only when
 BitTorrent Magnet URI is used.  The filename is hex encoded info
-hash with suffix .torrent. The directory to be saved is the same
+hash with suffix ".torrent". The directory to be saved is the same
 directory where download file is saved. If the same file already
 exists, metadata is not saved. See also \fI\%--bt-metadata-only\fP
 option. Default: \fBfalse\fP
@@ -936,8 +943,8 @@ Specifying \fI\%--seed-time=0\fP disables seeding after download completed.
 .INDENT 0.0
 .TP
 .B \-T, \-\-torrent\-file=<TORRENT_FILE>
-The path to the .torrent file.  You are not required to use this
-option because you can specify .torrent files without \fI\%--torrent-file\fP.
+The path to the ".torrent" file.  You are not required to use this
+option because you can specify ".torrent" files without \fI\%--torrent-file\fP.
 .UNINDENT
 .SS Metalink Specific Options
 .INDENT 0.0
@@ -961,9 +968,9 @@ URI points to a directory, URI must end with \fB/\fP.
 .INDENT 0.0
 .TP
 .B \-M, \-\-metalink\-file=<METALINK_FILE>
-The file path to .meta4 and .metalink file. Reads input from stdin when \fB\-\fP is
+The file path to ".meta4" and ".metalink" file. Reads input from stdin when \fB\-\fP is
 specified.  You are not required to use this option because you can
-specify .metalink files without \fI\%--metalink-file\fP.
+specify ".metalink" files without \fI\%--metalink-file\fP.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1179,6 +1186,14 @@ Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-enable\-mmap[=true|false]
+Map files into memory. This option may not work if the file space
+is not pre\-allocated. See \fI\%--file-allocation\fP.
+.sp
+Default: \fBfalse\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-event\-poll=<POLL>
 Specify the method for polling events.  The possible values are
 \fBepoll\fP, \fBkqueue\fP, \fBport\fP, \fBpoll\fP and \fBselect\fP.  For each \fBepoll\fP,
@@ -1203,7 +1218,11 @@ almost same time as \fBprealloc\fP and it blocks aria2
 entirely until allocation finishes. \fBfalloc\fP may
 not be available if your system doesn\(aqt have
 \fIposix_fallocate(3)\fP function.
-Possible Values: \fBnone\fP, \fBprealloc\fP, \fBfalloc\fP
+\fBtrunc\fP uses \fIftruncate(2)\fP system call or
+platform\-specific counterpart to truncate a file to a specified
+length.
+.sp
+Possible Values: \fBnone\fP, \fBprealloc\fP, \fBtrunc\fP, \fBfalloc\fP
 Default: \fBprealloc\fP
 .UNINDENT
 .INDENT 0.0
@@ -1623,10 +1642,10 @@ If too many redirections occurred.
 If HTTP authorization failed.
 .TP
 .B 25
-If aria2 could not parse bencoded file(usually .torrent file).
+If aria2 could not parse bencoded file(usually ".torrent" file).
 .TP
 .B 26
-If .torrent file was corrupted or missing information that aria2 needed.
+If ".torrent" file was corrupted or missing information that aria2 needed.
 .TP
 .B 27
 If Magnet URI was bad.
@@ -1687,10 +1706,10 @@ no\-proxy value in configuration file.  The command\-line option
 .SH FILES
 .SS aria2.conf
 .sp
-By default, aria2 parses \fB$HOME/.aria2/aria2.conf\fP as a configuraiton
-file. You can specify the path to configuration file using
-\fI\%--conf-path\fP option.  If you don\(aqt want to use the configuraitonf
-file, use \fI\%--no-conf\fP option.
+By default, aria2 parses \fB$HOME/.aria2/aria2.conf\fP as a
+configuraiton file. You can specify the path to configuration file
+using \fI\%--conf-path\fP option.  If you don\(aqt want to use the
+configuraiton file, use \fI\%--no-conf\fP option.
 .sp
 The configuration file is a text file and has 1 option per each
 line. In each line, you can specify name\-value pair in the format:
@@ -1708,6 +1727,12 @@ max\-upload\-limit=50K
 ftp\-pasv=true
 .ft P
 .fi
+.IP Note
+The confidential information such as user/password might be included
+in the configuration file. It is recommended to change file mode
+bits of the configuration file (e.g., \fBchmod 600 aria2.conf\fP), so
+that other user cannot see the contents of the file.
+.RE
 .SS dht.dat
 .sp
 By default, the routing table of IPv4 DHT is saved to the path
@@ -1810,6 +1835,8 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%bt-prioritize-piece\fP
 .IP \(bu 2
+\fI\%bt-remove-unselected-file\fP
+.IP \(bu 2
 \fI\%bt-request-peer-speed-limit\fP
 .IP \(bu 2
 \fI\%bt-require-crypto\fP
@@ -1828,9 +1855,9 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%bt-tracker-timeout\fP
 .IP \(bu 2
-\fI\%bt-remove-unselected-file\fP
-.IP \(bu 2
 \fI\%check-integrity\fP
+.IP \(bu 2
+\fI\%checksum\fP
 .IP \(bu 2
 \fI\%conditional-get\fP
 .IP \(bu 2
@@ -1841,14 +1868,16 @@ of URIs. These optional lines must start with white space(s).
 \fI\%dir\fP
 .IP \(bu 2
 \fI\%dry-run\fP
-.IP \(bu 2
-\fI\%enable-async-dns6\fP
 .UNINDENT
 .INDENT 2.0
+.IP \(bu 2
+\fI\%enable-async-dns6\fP
 .IP \(bu 2
 \fI\%enable-http-keep-alive\fP
 .IP \(bu 2
 \fI\%enable-http-pipelining\fP
+.IP \(bu 2
+\fI\%enable-mmap\fP
 .IP \(bu 2
 \fI\%enable-peer-exchange\fP
 .IP \(bu 2
@@ -1873,6 +1902,8 @@ of URIs. These optional lines must start with white space(s).
 \fI\%ftp-type\fP
 .IP \(bu 2
 \fI\%ftp-user\fP
+.IP \(bu 2
+\fI\%hash-check-only\fP
 .IP \(bu 2
 \fI\%header\fP
 .IP \(bu 2
@@ -1907,14 +1938,16 @@ of URIs. These optional lines must start with white space(s).
 \fI\%max-download-limit\fP
 .IP \(bu 2
 \fI\%max-file-not-found\fP
+.UNINDENT
+.INDENT 2.0
 .IP \(bu 2
 \fI\%max-resume-failure-tries\fP
 .IP \(bu 2
 \fI\%max-tries\fP
 .IP \(bu 2
 \fI\%max-upload-limit\fP
-.UNINDENT
-.INDENT 2.0
+.IP \(bu 2
+\fI\%metalink-base-uri\fP
 .IP \(bu 2
 \fI\%metalink-enable-unique-protocol\fP
 .IP \(bu 2
@@ -1940,6 +1973,10 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%parameterized-uri\fP
 .IP \(bu 2
+\fI\%pause\fP
+.IP \(bu 2
+\fI\%piece-length\fP
+.IP \(bu 2
 \fI\%proxy-method\fP
 .IP \(bu 2
 \fI\%realtime-chunk-checksum\fP
@@ -1949,6 +1986,8 @@ of URIs. These optional lines must start with white space(s).
 \fI\%remote-time\fP
 .IP \(bu 2
 \fI\%remove-control-file\fP
+.IP \(bu 2
+\fI\%retry-wait\fP
 .IP \(bu 2
 \fI\%reuse-uri\fP
 .IP \(bu 2
@@ -1960,27 +1999,15 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%split\fP
 .IP \(bu 2
+\fI\%stream-piece-selector\fP
+.IP \(bu 2
 \fI\%timeout\fP
+.IP \(bu 2
+\fI\%uri-selector\fP
 .IP \(bu 2
 \fI\%use-head\fP
 .IP \(bu 2
 \fI\%user-agent\fP
-.IP \(bu 2
-\fI\%retry-wait\fP
-.IP \(bu 2
-\fI\%metalink-base-uri\fP
-.IP \(bu 2
-\fI\%pause\fP
-.IP \(bu 2
-\fI\%stream-piece-selector\fP
-.IP \(bu 2
-\fI\%hash-check-only\fP
-.IP \(bu 2
-\fI\%checksum\fP
-.IP \(bu 2
-\fI\%piece-length\fP
-.IP \(bu 2
-\fI\%uri-selector\fP
 .UNINDENT
 .UNINDENT
 .sp
@@ -2169,10 +2196,10 @@ waiting downloads:
 .INDENT 0.0
 .TP
 .B aria2.addTorrent(torrent[, uris[, options[, position]]])
-This method adds BitTorrent download by uploading .torrent file.  If
+This method adds BitTorrent download by uploading ".torrent" file.  If
 you want to add BitTorrent Magnet URI, use \fI\%aria2.addUri()\fP method
 instead.  \fItorrent\fP is of type base64 which contains Base64\-encoded
-.torrent file.  \fIuris\fP is of type array and its element is URI which
+".torrent" file.  \fIuris\fP is of type array and its element is URI which
 is of type string. \fIuris\fP is used for Web\-seeding.  For single file
 torrents, URI can be a complete URI pointing to the resource or if URI
 ends with /, name in torrent file is added. For multi\-file torrents,
@@ -2224,8 +2251,8 @@ The following example adds local file file.torrent to aria2:
 .INDENT 0.0
 .TP
 .B aria2.addMetalink(metalink[, options[, position]])
-This method adds Metalink download by uploading .metalink file.
-\fImetalink\fP is of type base64 which contains Base64\-encoded .metalink
+This method adds Metalink download by uploading ".metalink" file.
+\fImetalink\fP is of type base64 which contains Base64\-encoded ".metalink"
 file.  \fIoptions\fP is of type struct and its members are a pair of
 option name and value. See \fI\%Options\fP below for more details.  If
 \fIposition\fP is given as an integer starting from 0, the new download is
@@ -2435,7 +2462,7 @@ be included in the response.
 .B \fBbelongsTo\fP
 GID of a parent download. Some downloads are a part of another
 download.  For example, if a file in Metalink has BitTorrent
-resource, the download of .torrent is a part of that file.  If this
+resource, the download of ".torrent" is a part of that file.  If this
 download has no parent, this key will not be included in the
 response.
 .TP
@@ -2453,7 +2480,7 @@ file. BitTorrent only. It contains following keys.
 .INDENT 7.0
 .TP
 .B \fBannounceList\fP
-List of lists of announce URI. If .torrent file contains announce
+List of lists of announce URI. If ".torrent" file contains announce
 and no announce\-list, announce is converted to announce\-list
 format.
 .TP
@@ -3719,6 +3746,61 @@ r = s.aria2.addUri(["http://localhost/aria2.tar.bz2"], {"dir":"/downloads"})
 pprint(r)
 .ft P
 .fi
+.SH MISC
+.SS Console Readout
+.sp
+While downloading files, aria2 prints the console readout to tell the
+progress of the downloads. The console readout is like this:
+.sp
+.nf
+.ft C
+[#1 SIZE:400.0KiB/33.2MiB(1%) CN:1 SPD:115.7KiBs ETA:4m51s]
+.ft P
+.fi
+.sp
+This section describes what these numbers and strings mean.
+.INDENT 0.0
+.TP
+.B \fB#N\fP
+N means GID, which is an unique ID for each download.
+.TP
+.B \fBSIZE\fP
+Completed length and Total length in bytes. If
+\fI\%--select-file\fP is used, this is the sum of selected file.
+.TP
+.B \fBSEEDING\fP
+Share ratio. The client is now seeding. After BitTorrent download
+finished, \fBSIZE\fP is replaced with \fBSEEDING\fP.
+.TP
+.B \fBCN\fP
+The number of connections the client has established.
+.TP
+.B \fBSEED\fP
+The number of seeders the client has connected to.
+.TP
+.B \fBSPD\fP
+Download speed.
+.TP
+.B \fBUP\fP
+Upload speed and the number of uploaded bytes.
+.TP
+.B \fBETA\fP
+Expected time to finish.
+.TP
+.B \fBTOTAL SPD\fP
+The sum of download speed for all parallel downloads.
+.UNINDENT
+.sp
+When aria2 is allocating file space or validating checksum, it
+additionally prints the their progress:
+.INDENT 0.0
+.TP
+.B FileAlloc
+GID, allocated length and total length in bytes.
+.TP
+.B Checksum
+GID, validated length and total length in bytes.
+.UNINDENT
 .SH EXAMPLE
 .SS HTTP/FTP Segmented Download
 .SS Download a file
@@ -3840,7 +3922,7 @@ $ aria2c \-\-select\-file=1\-4,8 file.metalink
 .IP Note
 The index is printed to the console using \-S option.
 .RE
-.SS Download a file using a local .metalink file with user preference
+.SS Download a file using a local metalink file with user preference
 .sp
 .nf
 .ft C
@@ -4118,7 +4200,7 @@ Metalink Homepage: \fI\%http://www.metalinker.org/\fP
 The Metalink Download Description Format: \fI\%RFC 5854\fP
 .SH COPYRIGHT
 .sp
-Copyright (C) 2006, 2011 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
 .sp
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

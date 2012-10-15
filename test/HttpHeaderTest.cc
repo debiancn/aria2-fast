@@ -13,7 +13,6 @@ class HttpHeaderTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testGetRange);
   CPPUNIT_TEST(testFindAll);
   CPPUNIT_TEST(testClearField);
-  CPPUNIT_TEST(testFill);
   CPPUNIT_TEST(testFieldContains);
   CPPUNIT_TEST_SUITE_END();
   
@@ -21,10 +20,8 @@ public:
   void testGetRange();
   void testFindAll();
   void testClearField();
-  void testFill();
   void testFieldContains();
 };
-
 
 CPPUNIT_TEST_SUITE_REGISTRATION( HttpHeaderTest );
 
@@ -37,9 +34,9 @@ void HttpHeaderTest::testGetRange()
     
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775800LL, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775801LL, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775807LL, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -48,9 +45,9 @@ void HttpHeaderTest::testGetRange()
      
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775800LL, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775801LL, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)9223372036854775807LL, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -58,9 +55,9 @@ void HttpHeaderTest::testGetRange()
 
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -68,9 +65,9 @@ void HttpHeaderTest::testGetRange()
 
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -78,9 +75,9 @@ void HttpHeaderTest::testGetRange()
 
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -88,9 +85,9 @@ void HttpHeaderTest::testGetRange()
 
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -98,9 +95,9 @@ void HttpHeaderTest::testGetRange()
 
     SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((off_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
   }
   {
     HttpHeader httpHeader;
@@ -151,30 +148,6 @@ void HttpHeaderTest::testClearField()
   CPPUNIT_ASSERT_EQUAL(std::string(""), h.find("Foo"));
   CPPUNIT_ASSERT_EQUAL(200, h.getStatusCode());
   CPPUNIT_ASSERT_EQUAL(std::string(HttpHeader::HTTP_1_1), h.getVersion());
-}
-
-void HttpHeaderTest::testFill()
-{
-  std::string s =
-    "Host: aria2.sourceforge.net\r\n"
-    "Connection: close \r\n" // trailing white space
-    "Multi-Line: text1\r\n"
-    "  text2\r\n"
-    "  text3\r\n"
-    "Duplicate: foo\r\n"
-    "Duplicate: bar\r\n";
-  HttpHeader h;
-  h.fill(s.begin(), s.end());
-  CPPUNIT_ASSERT_EQUAL(std::string("aria2.sourceforge.net"),
-                       h.find("host"));
-  CPPUNIT_ASSERT_EQUAL(std::string("close"),
-                       h.find("connection"));
-  CPPUNIT_ASSERT_EQUAL(std::string("text1 text2 text3"),
-                       h.find("multi-line"));
-  CPPUNIT_ASSERT_EQUAL(std::string("foo"),
-                       h.findAll("duplicate")[0]);
-  CPPUNIT_ASSERT_EQUAL(std::string("bar"),
-                       h.findAll("duplicate")[1]);
 }
 
 void HttpHeaderTest::testFieldContains()

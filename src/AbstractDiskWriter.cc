@@ -35,6 +35,9 @@
 #include "AbstractDiskWriter.h"
 
 #include <unistd.h>
+#ifdef HAVE_MMAP
+#  include <sys/mman.h>
+#endif // HAVE_MMAP
 
 #include <cerrno>
 #include <cstring>
@@ -48,13 +51,17 @@
 #include "fmt.h"
 #include "DownloadFailureException.h"
 #include "error_code.h"
+#include "LogFactory.h"
 
 namespace aria2 {
 
 AbstractDiskWriter::AbstractDiskWriter(const std::string& filename)
   : filename_(filename),
     fd_(-1),
-    readOnly_(false)
+    readOnly_(false),
+    enableMmap_(false),
+    mapaddr_(0),
+    maplen_(0)
 {}
 
 AbstractDiskWriter::~AbstractDiskWriter()
@@ -62,7 +69,7 @@ AbstractDiskWriter::~AbstractDiskWriter()
   closeFile();
 }
 
-void AbstractDiskWriter::openFile(off_t totalLength)
+void AbstractDiskWriter::openFile(int64_t totalLength)
 {
   try {
     openExistingFile(totalLength);
@@ -77,13 +84,27 @@ void AbstractDiskWriter::openFile(off_t totalLength)
 
 void AbstractDiskWriter::closeFile()
 {
+#ifdef HAVE_MMAP
+  if(mapaddr_) {
+    int rv = munmap(mapaddr_, maplen_);
+    if(rv == -1) {
+      int errNum = errno;
+      A2_LOG_ERROR(fmt("munmap for file %s failed: %s",
+                       filename_.c_str(), strerror(errNum)));
+    } else {
+      A2_LOG_INFO(fmt("munmap for file %s succeeded", filename_.c_str()));
+    }
+    mapaddr_ = 0;
+    maplen_ = 0;
+  }
+#endif // HAVE_MMAP
   if(fd_ != -1) {
     close(fd_);
     fd_ = -1;
   }
 }
 
-void AbstractDiskWriter::openExistingFile(off_t totalLength)
+void AbstractDiskWriter::openExistingFile(int64_t totalLength)
 {
   int flags = O_BINARY;
   if(readOnly_) {
@@ -124,28 +145,49 @@ void AbstractDiskWriter::createFile(int addFlags)
   }  
 }
 
-ssize_t AbstractDiskWriter::writeDataInternal(const unsigned char* data, size_t len)
+ssize_t AbstractDiskWriter::writeDataInternal(const unsigned char* data,
+                                              size_t len, int64_t offset)
 {
-  ssize_t writtenLength = 0;
-  while((size_t)writtenLength < len) {
-    ssize_t ret = 0;
-    while((ret = write(fd_, data+writtenLength, len-writtenLength)) == -1 && errno == EINTR);
-    if(ret == -1) {
-      return -1;
+  if(mapaddr_) {
+    memcpy(mapaddr_ + offset, data, len);
+    return len;
+  } else {
+    ssize_t writtenLength = 0;
+    seek(offset);
+    while((size_t)writtenLength < len) {
+      ssize_t ret = 0;
+      while((ret = write(fd_, data+writtenLength, len-writtenLength)) == -1 &&
+            errno == EINTR);
+      if(ret == -1) {
+        return -1;
+      }
+      writtenLength += ret;
     }
-    writtenLength += ret;
+    return writtenLength;
   }
-  return writtenLength;
 }
 
-ssize_t AbstractDiskWriter::readDataInternal(unsigned char* data, size_t len)
+ssize_t AbstractDiskWriter::readDataInternal(unsigned char* data, size_t len,
+                                             int64_t offset)
 {
-  ssize_t ret = 0;
-  while((ret = read(fd_, data, len)) == -1 && errno == EINTR);
-  return ret;
+  if(mapaddr_) {
+    ssize_t readlen;
+    if(offset > maplen_) {
+      readlen = 0;
+    } else {
+      readlen = std::min(static_cast<size_t>(maplen_ - offset), len);
+    }
+    memcpy(data, mapaddr_ + offset, readlen);
+    return readlen;
+  } else {
+    ssize_t ret = 0;
+    seek(offset);
+    while((ret = read(fd_, data, len)) == -1 && errno == EINTR);
+    return ret;
+  }
 }
 
-void AbstractDiskWriter::seek(off_t offset)
+void AbstractDiskWriter::seek(int64_t offset)
 {
   if(a2lseek(fd_, offset, SEEK_SET) == (off_t)-1) {
     int errNum = errno;
@@ -156,10 +198,43 @@ void AbstractDiskWriter::seek(off_t offset)
   }
 }
 
-void AbstractDiskWriter::writeData(const unsigned char* data, size_t len, off_t offset)
+void AbstractDiskWriter::ensureMmapWrite(size_t len, int64_t offset)
 {
-  seek(offset);
-  if(writeDataInternal(data, len) < 0) {
+#ifdef HAVE_MMAP
+  if(enableMmap_) {
+    if(mapaddr_) {
+      if(static_cast<int64_t>(len + offset) > maplen_) {
+        munmap(mapaddr_, maplen_);
+        mapaddr_ = 0;
+        maplen_ = 0;
+        enableMmap_ = false;
+      }
+    } else {
+      int64_t filesize = size();
+      if(static_cast<int64_t>(len + offset) <= filesize) {
+        mapaddr_ = reinterpret_cast<unsigned char*>
+          (mmap(0, size(), PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0));
+        if(mapaddr_) {
+          A2_LOG_DEBUG(fmt("mmap for file %s succeeded, length=%" PRId64 "",
+                           filename_.c_str(),
+                           static_cast<uint64_t>(filesize)));
+          maplen_ = filesize;
+        } else {
+          int errNum = errno;
+          A2_LOG_INFO(fmt("mmap for file %s failed: %s",
+                          filename_.c_str(), strerror(errNum)));
+          enableMmap_ = false;
+        }
+      }
+    }
+  }
+#endif // HAVE_MMAP
+}
+
+void AbstractDiskWriter::writeData(const unsigned char* data, size_t len, int64_t offset)
+{
+  ensureMmapWrite(len, offset);
+  if(writeDataInternal(data, len, offset) < 0) {
     int errNum = errno;
     // If errno is ENOSPC(not enough space in device), throw
     // DownloadFailureException and abort download instantly.
@@ -181,11 +256,10 @@ void AbstractDiskWriter::writeData(const unsigned char* data, size_t len, off_t 
   }
 }
 
-ssize_t AbstractDiskWriter::readData(unsigned char* data, size_t len, off_t offset)
+ssize_t AbstractDiskWriter::readData(unsigned char* data, size_t len, int64_t offset)
 {
   ssize_t ret;
-  seek(offset);
-  if((ret = readDataInternal(data, len)) < 0) {
+  if((ret = readDataInternal(data, len, offset)) < 0) {
     int errNum = errno;
     throw DL_ABORT_EX3
       (errNum,
@@ -197,7 +271,7 @@ ssize_t AbstractDiskWriter::readData(unsigned char* data, size_t len, off_t offs
   return ret;
 }
 
-void AbstractDiskWriter::truncate(off_t length)
+void AbstractDiskWriter::truncate(int64_t length)
 {
   if(fd_ == -1) {
     throw DL_ABORT_EX("File not opened.");
@@ -223,7 +297,7 @@ void AbstractDiskWriter::truncate(off_t length)
 #endif
 }
 
-void AbstractDiskWriter::allocate(off_t offset, off_t length)
+void AbstractDiskWriter::allocate(int64_t offset, int64_t length)
 {
 #ifdef  HAVE_SOME_FALLOCATE
   if(fd_ == -1) {
@@ -272,7 +346,7 @@ void AbstractDiskWriter::allocate(off_t offset, off_t length)
 #endif // HAVE_SOME_FALLOCATE
 }
 
-off_t AbstractDiskWriter::size()
+int64_t AbstractDiskWriter::size()
 {
   return File(filename_).size();
 }
@@ -285,6 +359,11 @@ void AbstractDiskWriter::enableReadOnly()
 void AbstractDiskWriter::disableReadOnly()
 {
   readOnly_ = false;
+}
+
+void AbstractDiskWriter::enableMmap()
+{
+  enableMmap_ = true;
 }
 
 } // namespace aria2

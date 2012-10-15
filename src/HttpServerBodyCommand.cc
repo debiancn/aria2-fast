@@ -57,8 +57,11 @@
 #include "RpcRequest.h"
 #include "RpcResponse.h"
 #include "rpc_helper.h"
+#include "JsonDiskWriter.h"
+#include "ValueBaseJsonParser.h"
 #ifdef ENABLE_XML_RPC
-# include "XmlRpcRequestParserStateMachine.h"
+#  include "XmlRpcRequestParserStateMachine.h"
+#  include "XmlRpcDiskWriter.h"
 #endif // ENABLE_XML_RPC
 
 namespace aria2 {
@@ -159,18 +162,50 @@ bool HttpServerBodyCommand::execute()
         std::string query(std::find(reqPath.begin(), reqPath.end(), '?'),
                           reqPath.end());
         reqPath.erase(reqPath.size()-query.size(), query.size());
+
+        if(httpServer_->getMethod() == "OPTIONS") {
+          // Response to Preflight Request.
+          // See http://www.w3.org/TR/cors/
+          const SharedHandle<HttpHeader>& header =
+            httpServer_->getRequestHeader();
+          std::string accessControlHeaders;
+          if(!header->find("origin").empty() &&
+             !header->find("access-control-request-method").empty() &&
+             !httpServer_->getAllowOrigin().empty()) {
+            accessControlHeaders +=
+              "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
+              "Access-Control-Max-Age: 1728000\r\n";
+            const std::string& accReqHeaders =
+              header->find("access-control-request-headers");
+            if(!accReqHeaders.empty()) {
+              // We allow all headers requested.
+              accessControlHeaders += "Access-Control-Allow-Headers: ";
+              accessControlHeaders += accReqHeaders;
+              accessControlHeaders += "\r\n";
+            }
+          }
+          httpServer_->feedResponse(200, accessControlHeaders);
+          addHttpServerResponseCommand();
+          return true;
+        }
+
         // Do something for requestpath and body
-        if(reqPath == "/rpc") {
+        switch(httpServer_->getRequestType()) {
+        case RPC_TYPE_XML: {
 #ifdef ENABLE_XML_RPC
-          std::string body = httpServer_->getBody();
+          SharedHandle<rpc::XmlRpcDiskWriter> dw =
+            static_pointer_cast<rpc::XmlRpcDiskWriter>(httpServer_->getBody());
+          int error;
+          error = dw->finalize();
           rpc::RpcRequest req;
-          try {
-            req = rpc::xmlParseMemory(body.c_str(), body.size());
-          } catch(RecoverableException& e) {
-            A2_LOG_INFO_EX
-              (fmt("CUID#%lld - Failed to parse XML-RPC request",
-                   getCuid()),
-               e);
+          if(error == 0) {
+            req = dw->getResult();
+          }
+          dw->reset();
+          if(error < 0) {
+            A2_LOG_INFO
+              (fmt("CUID#%" PRId64 " - Failed to parse XML-RPC request",
+                   getCuid()));
             httpServer_->feedResponse(400);
             addHttpServerResponseCommand();
             return true;
@@ -188,22 +223,33 @@ bool HttpServerBodyCommand::execute()
           addHttpServerResponseCommand();
 #endif // !ENABLE_XML_RPC
           return true;
-        } else if(reqPath == "/jsonrpc") {
+        }
+        case RPC_TYPE_JSON:
+        case RPC_TYPE_JSONP: {
           std::string callback;
           SharedHandle<ValueBase> json;
-          try {
-            if(httpServer_->getMethod() == "GET") {
-              json::JsonGetParam param = json::decodeGetParams(query);
-              callback = param.callback;
-              json = json::decode(param.request);
-            } else {
-              json = json::decode(httpServer_->getBody());
+          ssize_t error = 0;
+          if(httpServer_->getRequestType() == RPC_TYPE_JSONP) {
+            json::JsonGetParam param = json::decodeGetParams(query);
+            callback = param.callback;
+            ssize_t error = 0;
+            json = json::ValueBaseJsonParser().parseFinal
+              (param.request.c_str(),
+               param.request.size(),
+               error);
+          } else {
+            SharedHandle<json::JsonDiskWriter> dw =
+              static_pointer_cast<json::JsonDiskWriter>(httpServer_->getBody());
+            error = dw->finalize();
+            if(error == 0) {
+              json = dw->getResult();
             }
-          } catch(RecoverableException& e) {
-            A2_LOG_INFO_EX
-              (fmt("CUID#%lld - Failed to parse JSON-RPC request",
-                   getCuid()),
-               e);
+            dw->reset();
+          }
+          if(error < 0) {
+            A2_LOG_INFO
+              (fmt("CUID#%" PRId64 " - Failed to parse JSON-RPC request",
+                   getCuid()));
             rpc::RpcResponse res
               (rpc::createJsonRpcErrorResponse(-32700, "Parse error.",
                                                Null::g()));
@@ -223,7 +269,8 @@ bool HttpServerBodyCommand::execute()
                     eoi = jsonlist->end(); i != eoi; ++i) {
                 const Dict* jsondict = downcast<Dict>(*i);
                 if(jsondict) {
-                  rpc::RpcResponse r = rpc::processJsonRpcRequest(jsondict, e_);
+                  rpc::RpcResponse r =
+                    rpc::processJsonRpcRequest(jsondict, e_);
                   results.push_back(r);
                 }
               }
@@ -236,7 +283,8 @@ bool HttpServerBodyCommand::execute()
             }
           }
           return true;
-        } else {
+        }
+        default:
           httpServer_->feedResponse(404);
           addHttpServerResponseCommand();
           return true;
@@ -256,7 +304,7 @@ bool HttpServerBodyCommand::execute()
     }
   } catch(RecoverableException& e) {
     A2_LOG_INFO_EX
-      (fmt("CUID#%lld - Error occurred while reading HTTP request body",
+      (fmt("CUID#%" PRId64 " - Error occurred while reading HTTP request body",
            getCuid()),
        e);
     return true;

@@ -63,6 +63,11 @@ MetalinkParserController::MetalinkParserController():
 
 MetalinkParserController::~MetalinkParserController() {}
 
+void MetalinkParserController::reset()
+{
+  metalinker_.reset(new Metalinker());
+}
+
 void MetalinkParserController::newEntryTransaction()
 {
   tEntry_.reset(new MetalinkEntry());
@@ -87,7 +92,7 @@ void MetalinkParserController::setFileNameOfEntry(const std::string& filename)
   }
 }
 
-void MetalinkParserController::setFileLengthOfEntry(off_t length)
+void MetalinkParserController::setFileLengthOfEntry(int64_t length)
 {
   if(!tEntry_) {
     return;

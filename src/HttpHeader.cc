@@ -142,7 +142,7 @@ RangeHandle HttpHeader::getRange() const
         throw DL_ABORT_EX("Content-Length must be positive");
       } else if(contentLength > std::numeric_limits<off_t>::max()) {
         throw DOWNLOAD_FAILURE_EXCEPTION
-          (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(contentLength)));
+          (fmt(EX_TOO_LARGE_FILE, contentLength));
       } else if(contentLength == 0) {
         return SharedHandle<Range>(new Range());
       } else {
@@ -187,16 +187,13 @@ RangeHandle HttpHeader::getRange() const
     throw DL_ABORT_EX("byte-range-spec must be positive");
   }
   if(startByte > std::numeric_limits<off_t>::max()) {
-    throw DOWNLOAD_FAILURE_EXCEPTION
-      (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(startByte)));
+    throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, startByte));
   }
   if(endByte > std::numeric_limits<off_t>::max()) {
-    throw DOWNLOAD_FAILURE_EXCEPTION
-      (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(endByte)));
+    throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, endByte));
   }
   if(entityLength > std::numeric_limits<off_t>::max()) {
-    throw DOWNLOAD_FAILURE_EXCEPTION
-      (fmt(EX_TOO_LARGE_FILE, static_cast<long long int>(entityLength)));
+    throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, entityLength));
   }
   return SharedHandle<Range>(new Range(startByte, endByte, entityLength));
 }
@@ -214,53 +211,6 @@ void HttpHeader::setMethod(const std::string& method)
 void HttpHeader::setRequestPath(const std::string& requestPath)
 {
   requestPath_ = requestPath;
-}
-
-void HttpHeader::fill
-(std::string::const_iterator first,
- std::string::const_iterator last)
-{
-  std::string name;
-  std::string value;
-  while(first != last) {
-    std::string::const_iterator j = first;
-    while(j != last && *j != '\r' && *j != '\n') {
-      ++j;
-    }
-    if(first != j) {
-      std::string::const_iterator sep = std::find(first, j, ':');
-      if(sep == j) {
-        // multiline header?
-        if(*first == ' ' || *first == '\t') {
-          std::pair<std::string::const_iterator,
-                    std::string::const_iterator> p = util::stripIter(first, j);
-          if(!name.empty() && p.first != p.second) {
-            if(!value.empty()) {
-              value += " ";
-            }
-            value.append(p.first, p.second);
-          }
-        }
-      } else {
-        if(!name.empty()) {
-          put(name, value);
-        }
-        std::pair<std::string::const_iterator,
-                  std::string::const_iterator> p = util::stripIter(first, sep);
-        name.assign(p.first, p.second);
-        util::lowercase(name);
-        p = util::stripIter(sep+1, j);
-        value.assign(p.first, p.second);
-      }
-    }
-    while(j != last && (*j == '\r' || *j == '\n')) {
-      ++j;
-    }
-    first = j;
-  }
-  if(!name.empty()) {
-    put(name, value);
-  }
 }
 
 void HttpHeader::clearField()
@@ -291,6 +241,16 @@ const std::string& HttpHeader::getMethod() const
 const std::string& HttpHeader::getRequestPath() const
 {
   return requestPath_;
+}
+
+const std::string& HttpHeader::getReasonPhrase() const
+{
+  return reasonPhrase_;
+}
+
+void HttpHeader::setReasonPhrase(const std::string& reasonPhrase)
+{
+  reasonPhrase_ = reasonPhrase;
 }
 
 bool HttpHeader::fieldContains(const std::string& name,

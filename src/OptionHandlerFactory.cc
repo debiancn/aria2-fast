@@ -94,7 +94,11 @@ OptionHandlerFactory::createOptionHandlers()
     SharedHandle<OptionHandler> op(new BooleanOptionHandler
                                    (PREF_ASYNC_DNS,
                                     TEXT_ASYNC_DNS,
+#if defined(__ANDROID__) || defined(ANDROID)
+                                    A2_V_FALSE,
+#else // !__ANDROID__ && !ANDROID
                                     A2_V_TRUE,
+#endif // !__ANDROID__ && !ANDROID
                                     OptionHandler::OPT_ARG));
     op->addTag(TAG_ADVANCED);
     op->setInitialOption(true);
@@ -292,6 +296,21 @@ OptionHandlerFactory::createOptionHandlers()
     op->addTag(TAG_FILE);
     handlers.push_back(op);
   }
+#ifdef HAVE_MMAP
+  {
+    SharedHandle<OptionHandler> op(new BooleanOptionHandler
+                                   (PREF_ENABLE_MMAP,
+                                    TEXT_ENABLE_MMAP,
+                                    A2_V_FALSE,
+                                    OptionHandler::OPT_ARG));
+    op->addTag(TAG_ADVANCED);
+    op->addTag(TAG_EXPERIMENTAL);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+#endif // HAVE_MMAP
   {
     SharedHandle<OptionHandler> op(new BooleanOptionHandler
                                    (PREF_ENABLE_RPC,
@@ -335,14 +354,17 @@ OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    const std::string params[] = { V_NONE, V_PREALLOC, V_TRUNC,
+#ifdef HAVE_SOME_FALLOCATE
+                                   V_FALLOC
+#endif // HAVE_SOME_FALLOCATE
+    };
     SharedHandle<OptionHandler> op(new ParameterOptionHandler
                                    (PREF_FILE_ALLOCATION,
                                     TEXT_FILE_ALLOCATION,
                                     V_PREALLOC,
-                                    V_NONE, V_PREALLOC,
-#ifdef HAVE_SOME_FALLOCATE
-                                    V_FALLOC,
-#endif // HAVE_SOME_FALLOCATE
+                                    std::vector<std::string>
+                                    (vbegin(params), vend(params)),
                                     'a'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FILE);
@@ -1983,10 +2005,14 @@ OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    int major, minor, micro;
+    sscanf(PACKAGE_VERSION, "%d.%d.%d", &major, &minor, &micro);
+    char prefix[21];
+    snprintf(prefix, sizeof(prefix), "A2-%d-%d-%d-", major, minor, micro);
     SharedHandle<OptionHandler> op(new DefaultOptionHandler
                                    (PREF_PEER_ID_PREFIX,
                                     TEXT_PEER_ID_PREFIX,
-                                    "aria2/"PACKAGE_VERSION"-"));
+                                    prefix));
     op->addTag(TAG_BITTORRENT);
     handlers.push_back(op);
   }

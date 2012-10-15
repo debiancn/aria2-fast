@@ -74,6 +74,7 @@ aria2c_SOURCES = AllTest.cc\
 	TripletTest.cc\
 	CookieHelperTest.cc\
 	JsonTest.cc\
+	ValueBaseJsonParserTest.cc\
 	RpcResponseTest.cc\
 	RpcMethodTest.cc\
 	BufferedFileTest.cc\
@@ -205,7 +206,8 @@ aria2c_SOURCES += BtAllowedFastMessageTest.cc\
 	LpdMessageDispatcherTest.cc\
 	LpdMessageReceiverTest.cc\
 	Bencode2Test.cc\
-	PeerConnectionTest.cc
+	PeerConnectionTest.cc\
+	ValueBaseBencodeParserTest.cc
 endif # ENABLE_BITTORRENT
 
 if ENABLE_METALINK
@@ -221,6 +223,10 @@ endif # ENABLE_METALINK
 if ENABLE_ASYNC_DNS
 aria2c_SOURCES += AsyncNameResolverTest.cc
 endif # ENABLE_ASYNC_DNS
+
+if !HAVE_TIMEGM
+aria2c_SOURCES += TimegmTest.cc
+endif # !HAVE_TIMEGM
 
 aria2c_LDADD = ../src/libaria2c.a @LIBINTL@ @CPPUNIT_LIBS@
 AM_CPPFLAGS =  -Wall\

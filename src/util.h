@@ -293,7 +293,7 @@ void parsePrioritizePieceRange
 (std::vector<size_t>& result, const std::string& src,
  const std::vector<SharedHandle<FileEntry> >& fileEntries,
  size_t pieceLength,
- off_t defaultSize = 1048576 /* 1MiB */);
+ int64_t defaultSize = 1048576 /* 1MiB */);
 
 // Converts ISO/IEC 8859-1 string src to utf-8.
 std::string iso8859ToUtf8(const std::string& src);
@@ -369,6 +369,10 @@ bool isDigit(const char c);
 bool isHexDigit(const char c);
 
 bool isHexDigit(const std::string& s);
+
+bool isLws(const char c);
+
+bool isCRLF(const char c);
 
 template<typename InputIterator>
 bool isLowercase(InputIterator first, InputIterator last)

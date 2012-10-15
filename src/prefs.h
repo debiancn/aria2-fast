@@ -75,6 +75,7 @@ extern const std::string A2_V_FULL;
 extern const std::string A2_V_GEOM;
 extern const std::string V_PREALLOC;
 extern const std::string V_FALLOC;
+extern const std::string V_TRUNC;
 extern const std::string V_DEBUG;
 extern const std::string V_INFO;
 extern const std::string V_NOTICE;
@@ -264,6 +265,12 @@ extern const Pref* PREF_PAUSE;
 extern const Pref* PREF_DOWNLOAD_RESULT;
 // value: true | false
 extern const Pref* PREF_HASH_CHECK_ONLY;
+// values: hashType=digest
+extern const Pref* PREF_CHECKSUM;
+// value: pid
+extern const Pref* PREF_STOP_WITH_PROCESS;
+// value: true | false
+extern const Pref* PREF_ENABLE_MMAP;
 
 /**
  * FTP related preferences
@@ -276,10 +283,6 @@ extern const Pref* PREF_FTP_TYPE;
 extern const Pref* PREF_FTP_PASV;
 // values: true | false
 extern const Pref* PREF_FTP_REUSE_CONNECTION;
-// values: hashType=digest
-extern const Pref* PREF_CHECKSUM;
-// value: pid
-extern const Pref* PREF_STOP_WITH_PROCESS;
 
 /**
  * HTTP related preferences

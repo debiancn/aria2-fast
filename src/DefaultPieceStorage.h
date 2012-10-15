@@ -110,8 +110,11 @@ private:
   void deleteUsedPiece(const SharedHandle<Piece>& piece);
   SharedHandle<Piece> findUsedPiece(size_t index) const;
 
-  size_t getInFlightPieceCompletedLength() const;
-
+  // Returns the sum of completed length of in-flight pieces
+  int64_t getInFlightPieceCompletedLength() const;
+  // Returns the sum of completed length of in-flight pieces
+  // intersecting filter ranges.
+  int64_t getInFlightPieceFilteredCompletedLength() const;
 public:
   // Setting randomPieceStatsOrdering to true means a piece is chosen in
   // random when more than 2 pieces has the same rarity.
@@ -192,13 +195,13 @@ public:
 
   virtual bool isPieceUsed(size_t index);
 
-  virtual off_t getTotalLength();
+  virtual int64_t getTotalLength();
 
-  virtual off_t getFilteredTotalLength();
+  virtual int64_t getFilteredTotalLength();
 
-  virtual off_t getCompletedLength();
+  virtual int64_t getCompletedLength();
 
-  virtual off_t getFilteredCompletedLength();
+  virtual int64_t getFilteredCompletedLength();
 
   virtual void initStorage();
 
@@ -251,7 +254,7 @@ public:
 
   virtual void markAllPiecesDone();
 
-  virtual void markPiecesDone(off_t length);
+  virtual void markPiecesDone(int64_t length);
 
   virtual void markPieceMissing(size_t index);
 

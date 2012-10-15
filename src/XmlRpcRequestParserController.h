@@ -57,6 +57,12 @@ private:
     {
       return value_ && !name_.empty();
     }
+
+    void reset()
+    {
+      value_.reset();
+      name_.clear();
+    }
   };
 
   std::stack<StateFrame> frameStack_;
@@ -87,6 +93,8 @@ public:
   }
 
   const std::string& getMethodName() const { return methodName_; }
+
+  void reset();
 };
 
 } // namespace rpc

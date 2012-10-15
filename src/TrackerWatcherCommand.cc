@@ -112,7 +112,12 @@ bool TrackerWatcherCommand::execute() {
         A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
       }
     }
-  } else if(trackerRequestGroup_->downloadFinished()){
+  } else if(trackerRequestGroup_->getNumCommand() == 0 &&
+            trackerRequestGroup_->downloadFinished()){
+    // We really want to make sure that tracker request has finished
+    // by checking getNumCommand() == 0. Because we reset
+    // trackerRequestGroup_, if it is still used in other Command, we
+    // will get Segmentation fault.
     try {
       std::string trackerResponse = getTrackerResponse(trackerRequestGroup_);
 
@@ -120,7 +125,7 @@ bool TrackerWatcherCommand::execute() {
       btAnnounce_->announceSuccess();
       btAnnounce_->resetAnnounce();
     } catch(RecoverableException& ex) {
-      A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);      
+      A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
       btAnnounce_->announceFailure();
       if(btAnnounce_->isAllAnnounceFailed()) {
         btAnnounce_->resetAnnounce();
@@ -175,7 +180,7 @@ void TrackerWatcherCommand::processTrackerResponse
     command->setPeerStorage(peerStorage_);
     command->setPieceStorage(pieceStorage_);
     e_->addCommand(command);
-    A2_LOG_DEBUG(fmt("CUID#%lld - Adding new command CUID#%lld",
+    A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - Adding new command CUID#%" PRId64 "",
                      getCuid(), peer->usedBy()));
   }
 }
@@ -245,8 +250,12 @@ TrackerWatcherCommand::createRequestGroup(const std::string& uri)
   rg->setDiskWriterFactory(dwf);
   rg->setFileAllocationEnabled(false);
   rg->setPreLocalFileCheckEnabled(false);
+  // Clearing pre- and post handler is not needed because the
+  // RequestGroup is not handled by RequestGroupMan.
+  rg->clearPreDownloadHandler();
+  rg->clearPostDownloadHandler();
   util::removeMetalinkContentTypes(rg);
-  A2_LOG_INFO(fmt("Creating tracker request group GID#%lld", rg->getGID()));
+  A2_LOG_INFO(fmt("Creating tracker request group GID#%" PRId64 "", rg->getGID()));
   return rg;
 }
 
