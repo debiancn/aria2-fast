@@ -1,8 +1,8 @@
-aria2 (1.15.2-1) UNRELEASED; urgency=low
+aria2 (1.15.2-1) unstable; urgency=low
 
   * New upstream release.
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 15 Oct 2012 14:15:24 +0530
+ -- Kartik Mistry <kartik@debian.org>  Mon, 15 Oct 2012 15:14:32 +0530
 
 aria2 (1.15.1-1) unstable; urgency=low
 
