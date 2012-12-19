@@ -1,4 +1,4 @@
-aria2 (1.16.0-1) UNRELEASED; urgency=low
+aria2 (1.16.0-1) unstable; urgency=low
 
   * New upstream release.
   * debian/control:
