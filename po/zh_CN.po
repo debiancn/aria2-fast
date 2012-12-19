@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
 "PO-Revision-Date: 2012-02-26 11:18+0000\n"
 "Last-Translator: multiSnow <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2012-02-27 12:28+0000\n"
-"X-Generator: Launchpad (build 14868)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -39,42 +39,47 @@ msgstr ""
 "如果发生任何错误，请参阅日志文件。要了解详细信息，请在help/man页面中参阅'-"
 "l'选项。"
 
-#: src/MultiUrlRequestInfo.cc:253
+#: src/MultiUrlRequestInfo.cc:273
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
+#: src/MultiUrlRequestInfo.cc:276
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:442
-#, fuzzy, c-format
-msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "GID为 %lld 的下载未完成： %s"
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:445
+#, c-format
+msgid "Download GID#%<PRId64> not complete: %s"
+msgstr ""
+
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "下载结果："
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "状态标识："
 
-#: src/RequestGroupMan.cc:773
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
 msgstr "(OK)：完成下载。"
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr "(ERR)：发生错误。"
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr "(INPR)：下载中断。"
 
-#: src/RequestGroupMan.cc:782
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
 msgstr "(RM)：已删除下载。"
 
@@ -305,7 +310,6 @@ msgstr ""
 "                              --max-overall-download-limit"
 
 #: src/usage_text.h:126
-#, fuzzy
 msgid ""
 " --file-allocation=METHOD     Specify file allocation method.\n"
 "                              'none' doesn't pre-allocate file space. "
@@ -334,19 +338,6 @@ msgid ""
 "file\n"
 "                              to a specified length."
 msgstr ""
-" --file-allocation=METHOD 指定文件在磁盘上的分配方式。\n"
-"                              'none' 不预先分配文件。'prealloc'\n"
-"                              在下载开始之前预先分配文件。可能消\n"
-"                              耗一定的时间，这取决于文件的大小。\n"
-"                              如你使用较新的文件系统，如ext4\n"
-"                              (支持extents)、btrfs、xft或NTFS\n"
-"                              (仅MinGW编译)，'falloc'是最好的选择。\n"
-"                              这几乎能够立刻分配很大(上GiB)的文件。\n"
-"                              不要在传统的文件系统，如ext3和FAT32\n"
-"                              上使用'falloc'，因为这将使用与'peralloc'\n"
-"                              几乎相同的时间，并且在分配结束aria2将\n"
-"                              会锁死。如果系统没有posix_fallocate()\n"
-"                              函数，'falloc'将不可用。"
 
 #: src/usage_text.h:145
 msgid ""
@@ -1875,7 +1866,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:874
-#, fuzzy
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -1885,15 +1875,61 @@ msgid ""
 "                              because it will actually remove files from\n"
 "                              your disk."
 msgstr ""
-" --bt-hash-check-seed[=true|false] 如果选择true，在使用--check-integrityer\n"
-"                              选项进行哈希检查后，且文件完整时，\n"
-"                              继续提供文件种子。如果您仅仅想检查并下\n"
-"                              载文件，当文件被损坏或不完整时，\n"
-"                              请设置此选项为false。\n"
-"                              此设置仅对BT下载有效。"
 
 #: src/usage_text.h:882
 msgid " --enable-mmap[=true|false]   Map files into memory."
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
 msgstr ""
 
 #: src/version_usage.cc:57
@@ -1945,37 +1981,37 @@ msgstr ""
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr ""
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr ""
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr ""
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:137
+#: src/version_usage.cc:138
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -1983,7 +2019,7 @@ msgid ""
 " URIs must point to the same file or downloading will fail."
 msgstr ""
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -1991,7 +2027,7 @@ msgid ""
 " treated as a separate download."
 msgstr ""
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2006,14 +2042,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2026,7 +2062,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr ""
@@ -2089,12 +2125,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -2104,18 +2140,18 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
+#: src/RequestGroup.cc:680
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""

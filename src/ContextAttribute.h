@@ -43,6 +43,17 @@ struct ContextAttribute {
   virtual ~ContextAttribute() {}
 };
 
+enum ContextAttributeType {
+  // For BitTorrent
+  CTX_ATTR_BT,
+  // Max value of attribute type to use allocate vector to hold
+  // attributes.
+  MAX_CTX_ATTR
+};
+
+// Returns human readable string representation of type |key|
+const char* strContextAttributeType(ContextAttributeType key);
+
 } // namespace aria2
 
 #endif // D_CONTEXT_ATTRIBUTE_H

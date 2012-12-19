@@ -64,14 +64,17 @@ namespace aria2 {
 HttpServerCommand::HttpServerCommand
 (cuid_t cuid,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket)
+ const SharedHandle<SocketCore>& socket,
+ bool secure)
   : Command(cuid),
     e_(e),
     socket_(socket),
-    httpServer_(new HttpServer(socket, e))
+    httpServer_(new HttpServer(socket, e)),
+    writeCheck_(false)
 {
   setStatus(Command::STATUS_ONESHOT_REALTIME);
   e_->addSocketForReadCheck(socket_, this);
+  httpServer_->setSecure(secure);
   httpServer_->setUsernamePassword(e_->getOption()->get(PREF_RPC_USER),
                                    e_->getOption()->get(PREF_RPC_PASSWD));
   if(e_->getOption()->getAsBool(PREF_RPC_ALLOW_ORIGIN_ALL)) {
@@ -93,7 +96,8 @@ HttpServerCommand::HttpServerCommand
   : Command(cuid),
     e_(e),
     socket_(socket),
-    httpServer_(httpServer)
+    httpServer_(httpServer),
+    writeCheck_(false)
 {
   e_->addSocketForReadCheck(socket_, this);
   checkSocketRecvBuffer();
@@ -102,6 +106,9 @@ HttpServerCommand::HttpServerCommand
 HttpServerCommand::~HttpServerCommand()
 {
   e_->deleteSocketForReadCheck(socket_, this);
+  if(writeCheck_) {
+    e_->deleteSocketForWriteCheck(socket_, this);
+  }
 }
 
 void HttpServerCommand::checkSocketRecvBuffer()
@@ -133,9 +140,9 @@ namespace {
 int websocketHandshake(const SharedHandle<HttpHeader>& header)
 {
   if(header->getMethod() != "GET" ||
-     header->find("sec-websocket-key").empty()) {
+     header->find(HttpHeader::SEC_WEBSOCKET_KEY).empty()) {
     return 400;
-  } else if(header->find("sec-websocket-version") != "13") {
+  } else if(header->find(HttpHeader::SEC_WEBSOCKET_VERSION) != "13") {
     return 426;
   } else if(header->getRequestPath() != "/jsonrpc") {
     return 404;
@@ -147,6 +154,19 @@ int websocketHandshake(const SharedHandle<HttpHeader>& header)
 
 #endif // ENABLE_WEBSOCKET
 
+void HttpServerCommand::updateWriteCheck()
+{
+  if(httpServer_->wantWrite()) {
+    if(!writeCheck_) {
+      writeCheck_ = true;
+      e_->addSocketForWriteCheck(socket_, this);
+    }
+  } else if(writeCheck_) {
+    writeCheck_ = false;
+    e_->deleteSocketForWriteCheck(socket_, this);
+  }
+}
+
 bool HttpServerCommand::execute()
 {
   if(e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
@@ -154,13 +174,26 @@ bool HttpServerCommand::execute()
   }
   try {
     if(socket_->isReadable(0) ||
+       (writeCheck_ && socket_->isWritable(0)) ||
        !httpServer_->getSocketRecvBuffer()->bufferEmpty()) {
       timeoutTimer_ = global::wallclock();
+
+#ifdef ENABLE_SSL
+      if(httpServer_->getSecure()) {
+        // tlsAccept() just returns true if handshake has already
+        // finished.
+        if(!socket_->tlsAccept()) {
+          updateWriteCheck();
+          e_->addCommand(this);
+          return false;
+        }
+      }
+#endif // ENABLE_SSL
+
       SharedHandle<HttpHeader> header;
-
       header = httpServer_->receiveRequest();
-
       if(!header) {
+        updateWriteCheck();
         e_->addCommand(this);
         return false;
       }
@@ -177,18 +210,18 @@ bool HttpServerCommand::execute()
         e_->setNoWait(true);
         return true;
       }
-      if(header->fieldContains("upgrade", "websocket") &&
-         header->fieldContains("connection", "upgrade")) {
+      if(header->fieldContains(HttpHeader::UPGRADE, "websocket") &&
+         header->fieldContains(HttpHeader::CONNECTION, "upgrade")) {
 #ifdef ENABLE_WEBSOCKET
         int status = websocketHandshake(header);
         Command* command;
         if(status == 101) {
           std::string serverKey =
-            createWebSocketServerKey(header->find("sec-websocket-key"));
+            createWebSocketServerKey
+            (header->find(HttpHeader::SEC_WEBSOCKET_KEY));
           httpServer_->feedUpgradeResponse("websocket",
                                            fmt("Sec-WebSocket-Accept: %s\r\n",
                                                serverKey.c_str()));
-          httpServer_->getSocket()->setTcpNodelay(true);
           command = new rpc::WebSocketResponseCommand(getCuid(), httpServer_,
                                                       e_, socket_);
         } else {

@@ -80,9 +80,9 @@ private:
   bool gzip_;
   std::string username_;
   std::string password_;
-  bool acceptsPersistentConnection_;
   bool acceptsGZip_;
   std::string allowOrigin_;
+  bool secure_;
 public:
   HttpServer(const SharedHandle<SocketCore>& socket, DownloadEngine* e);
 
@@ -138,10 +138,7 @@ public:
 
   bool sendBufferIsEmpty() const;
 
-  bool supportsPersistentConnection() const
-  {
-    return keepAlive_ && acceptsPersistentConnection_;
-  }
+  bool supportsPersistentConnection() const;
 
   bool supportsGZip() const
   {
@@ -182,6 +179,19 @@ public:
   {
     return lastRequestHeader_;
   }
+
+  void setSecure(bool f)
+  {
+    secure_ = f;
+  }
+
+  bool getSecure() const
+  {
+    return secure_;
+  }
+
+  bool wantRead() const;
+  bool wantWrite() const;
 };
 
 } // namespace aria2

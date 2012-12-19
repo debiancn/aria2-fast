@@ -132,7 +132,7 @@ void BtRequestMessageTest::testCreate() {
   bittorrent::setIntParam(&msg[5], 12345);
   bittorrent::setIntParam(&msg[9], 256);
   bittorrent::setIntParam(&msg[13], 1024);
-  SharedHandle<BtRequestMessage> pm = BtRequestMessage::create(&msg[4], 13);
+  SharedHandle<BtRequestMessage> pm(BtRequestMessage::create(&msg[4], 13));
   CPPUNIT_ASSERT_EQUAL((uint8_t)6, pm->getId());
   CPPUNIT_ASSERT_EQUAL((size_t)12345, pm->getIndex());
   CPPUNIT_ASSERT_EQUAL(256, pm->getBegin());
@@ -174,7 +174,7 @@ void BtRequestMessageTest::testCreateMessage() {
 void BtRequestMessageTest::testDoReceivedAction_hasPieceAndAmNotChoking() {
   peer_->amChoking(false);
   msg->doReceivedAction();
-  
+
   CPPUNIT_ASSERT_EQUAL((size_t)1, dispatcher_->messageQueue.size());
   SharedHandle<MockBtMessage2> pieceMsg =
     dynamic_pointer_cast<MockBtMessage2>(dispatcher_->messageQueue.front());
@@ -188,7 +188,7 @@ void BtRequestMessageTest::testDoReceivedAction_hasPieceAndAmChokingAndFastExten
   peer_->amChoking(true);
   peer_->setFastExtensionEnabled(true);
   msg->doReceivedAction();
-  
+
   CPPUNIT_ASSERT_EQUAL((size_t)1, dispatcher_->messageQueue.size());
   SharedHandle<MockBtMessage2> pieceMsg =
     dynamic_pointer_cast<MockBtMessage2>(dispatcher_->messageQueue.front());
@@ -201,7 +201,7 @@ void BtRequestMessageTest::testDoReceivedAction_hasPieceAndAmChokingAndFastExten
 void BtRequestMessageTest::testDoReceivedAction_hasPieceAndAmChokingAndFastExtensionDisabled() {
   peer_->amChoking(true);
   msg->doReceivedAction();
-  
+
   CPPUNIT_ASSERT_EQUAL((size_t)0, dispatcher_->messageQueue.size());
 }
 
@@ -210,7 +210,7 @@ void BtRequestMessageTest::testDoReceivedAction_doesntHavePieceAndFastExtensionE
   peer_->amChoking(false);
   peer_->setFastExtensionEnabled(true);
   msg->doReceivedAction();
-  
+
   CPPUNIT_ASSERT_EQUAL((size_t)1, dispatcher_->messageQueue.size());
   SharedHandle<MockBtMessage2> pieceMsg =
     dynamic_pointer_cast<MockBtMessage2>(dispatcher_->messageQueue.front());
@@ -224,7 +224,7 @@ void BtRequestMessageTest::testDoReceivedAction_doesntHavePieceAndFastExtensionD
   msg->setIndex(2);
   peer_->amChoking(false);
   msg->doReceivedAction();
-  
+
   CPPUNIT_ASSERT_EQUAL((size_t)0, dispatcher_->messageQueue.size());
 }
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
 "PO-Revision-Date: 2009-03-05 06:58+0000\n"
 "Last-Translator: pepoluan <Unknown>\n"
 "Language-Team: Indonesian <id@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-03-13 14:08+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -40,46 +40,49 @@ msgstr ""
 "Jika terjadi error, silakan lihat berkas log. Lihat opsi '-l' pada laman "
 "help/man untuk keterangan lebih lanjut."
 
-#: src/MultiUrlRequestInfo.cc:253
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:273
+#, c-format
 msgid "Serialized session to '%s' successfully."
-msgstr "Berkas ServerStat %s sukses tersimpan."
+msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:276
+#, c-format
 msgid "Failed to serialize session to '%s'."
-msgstr "Gagal menulis ServerStat ke %s."
+msgstr ""
 
-#: src/RequestGroupMan.cc:442
-#, fuzzy, c-format
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
+
+#: src/RequestGroupMan.cc:445
+#, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "Unduhan selesai: %s"
+msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "Hasil pengunduhan:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "Legenda Status:"
 
-#: src/RequestGroupMan.cc:773
-#, fuzzy
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
-msgstr "Unduh telah selesai."
+msgstr ""
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:782
-#, fuzzy
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
-msgstr "Unduh dibatalkan."
+msgstr ""
 
 #: src/OptionHandler.cc:38
 msgid "                              Default: "
@@ -100,13 +103,10 @@ msgstr ""
 " -d, --dir=DIR                Direktori untuk menyimpan berkas yang diunduh."
 
 #: src/usage_text.h:39
-#, fuzzy
 msgid ""
 " -o, --out=FILE               The file name of the downloaded file. When -Z\n"
 "                              option is used, this option is ignored."
 msgstr ""
-" -l, --log=LOG                Nama berkas dari berkas log. Jika\n"
-"                              diisi dengan '-', log ditulis ke stdout."
 
 #: src/usage_text.h:42
 msgid ""
@@ -117,7 +117,6 @@ msgstr ""
 "                              diisi dengan '-', log ditulis ke stdout."
 
 #: src/usage_text.h:45
-#, fuzzy
 msgid ""
 " -D, --daemon[=true|false]    Run as daemon. The current working directory "
 "will\n"
@@ -127,17 +126,8 @@ msgid ""
 "to\n"
 "                              \"/dev/null\"."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:50
-#, fuzzy
 msgid ""
 " -s, --split=N                Download a file using N connections. If more\n"
 "                              than N URLs are given, first N URLs are used "
@@ -153,32 +143,14 @@ msgid ""
 "                              --max-connection-per-server option. See also\n"
 "                              --min-split-size option."
 msgstr ""
-" -s, --split=N                Unduh berkas menggunakan N koneksi. Jika "
-"lebih\n"
-"                              dari N URL diberikan, N URL pertama yang "
-"digunakan\n"
-"                              dan sisanya dipakai sebagai cadangan. Jika "
-"kurang dari\n"
-"                              N URL diberikan, URL tersebut digunakan lebih "
-"dari\n"
-"                              sekali sehingga total N koneksi yang dibuat "
-"secara\n"
-"                              simultan. Silakan lihat juga opsi -j.\n"
-"                              Perlu dicatat bahwa dalam pengunduhan "
-"Metalink, opsi\n"
-"                              ini tidak berakibat apapun sehingga gunakan "
-"opsi -C."
 
 #: src/usage_text.h:60
-#, fuzzy
 msgid ""
 " --retry-wait=SEC             Set the seconds to wait between retries. \n"
 "                              With SEC > 0, aria2 will retry download when "
 "the\n"
 "                              HTTP server returns 503 response."
 msgstr ""
-" --retry-wait=DET             Atur detik tunggu sebelum mencoba kembali\n"
-"                              setelah error terjadi."
 
 #: src/usage_text.h:64
 msgid " -t, --timeout=SEC            Set timeout in seconds."
@@ -190,31 +162,22 @@ msgstr ""
 " -m, --max-tries=N            Atur jumlah percobaan. 0 berarti tak terbatas."
 
 #: src/usage_text.h:68
-#, fuzzy
 msgid ""
 " --http-proxy=PROXY           Use this proxy server for HTTP. To erase\n"
 "                              previously defined proxy, use \"\".\n"
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --http-proxy=PROXY           Gunakan server proxy ini untuk HTTP.\n"
-"                              Lihat pula opsi  --all-proxy.\n"
-"                              Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:73
-#, fuzzy
 msgid ""
 " --https-proxy=PROXY          Use this proxy server for HTTPS. To erase\n"
 "                              previously defined proxy, use \"\".\n"
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --https-proxy=PROXY          Gunakan server proxy ini untuk HTTPS.\n"
-"                              Lihat pula opsi  --all-proxy.\n"
-"                              Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:78
-#, fuzzy
 msgid ""
 " --ftp-proxy=PROXY            Use this proxy server for FTP. To erase "
 "previously\n"
@@ -222,12 +185,8 @@ msgid ""
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --ftp-proxy=PROXY            Gunakan server proxy ini untuk FTP.\n"
-"                              Lihat pula opsi  --all-proxy.\n"
-"                              Ini mempengaruhi semua URLs."
 
 #: src/usage_text.h:83
-#, fuzzy
 msgid ""
 " --all-proxy=PROXY            Use this proxy server for all protocols. To "
 "erase\n"
@@ -238,14 +197,6 @@ msgid ""
 "                              options.\n"
 "                              This affects all URLs."
 msgstr ""
-" --all-proxy=PROXY            Gunakan server proxy untuk semua protokol.\n"
-"                              Anda dapat melewatkan pengaturan ini dan "
-"menentukan\n"
-"                              server proxy untuk protokol tertentu "
-"menggunakan\n"
-"                              opsi --http-proxy, --https-proxy dan --ftp-"
-"proxy\n"
-"                              Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:91
 msgid " --http-user=USER             Set HTTP user. This affects all URLs."
@@ -314,7 +265,6 @@ msgstr ""
 "                              Opsi ini tidak mempengaruhi unduhan BitTorrent."
 
 #: src/usage_text.h:114
-#, fuzzy
 msgid ""
 " --max-overall-download-limit=SPEED Set max overall download speed in bytes/"
 "sec.\n"
@@ -323,14 +273,8 @@ msgid ""
 "                              To limit the download speed per download, use\n"
 "                              --max-download-limit option."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:120
-#, fuzzy
 msgid ""
 " --max-download-limit=SPEED   Set max download speed per each download in\n"
 "                              bytes/sec. 0 means unrestricted.\n"
@@ -338,11 +282,6 @@ msgid ""
 "                              To limit the overall download speed, use\n"
 "                              --max-overall-download-limit option."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:126
 msgid ""
@@ -399,24 +338,14 @@ msgstr ""
 "                              Matikan jika anda mengalami error"
 
 #: src/usage_text.h:153
-#, fuzzy
 msgid ""
 " --allow-overwrite[=true|false] Restart download from scratch if the\n"
 "                              corresponding control file doesn't exist.  "
 "See\n"
 "                              also --auto-file-renaming option."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:157
-#, fuzzy
 msgid ""
 " --allow-piece-length-change[=true|false] If false is given, aria2 aborts\n"
 "                              download when a piece length is different "
@@ -426,14 +355,6 @@ msgid ""
 "                              proceed but some download progress will be "
 "lost."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:162
 msgid ""
@@ -556,21 +477,14 @@ msgstr ""
 "                              BitTorrent."
 
 #: src/usage_text.h:209
-#, fuzzy
 msgid ""
 " --realtime-chunk-checksum[=true|false]  Validate chunk of data by "
 "calculating\n"
 "                              checksum while downloading a file if chunk\n"
 "                              checksums are provided."
 msgstr ""
-" --realtime-chunk-checksum=true|false  Validasi bagian data dengan "
-"menghitung\n"
-"                              checksum ketika mengunduh berkas jika checksum "
-"per\n"
-"                              bagian disediakan."
 
 #: src/usage_text.h:213
-#, fuzzy
 msgid ""
 " -c, --continue[=true|false]  Continue downloading a partially downloaded\n"
 "                              file. Use this option to resume a download\n"
@@ -579,16 +493,6 @@ msgid ""
 "                              beginning. Currently this option is only\n"
 "                              applicable to http(s)/ftp downloads."
 msgstr ""
-" -c, --continue               Lanjutkan mengunduh berkas yang telah "
-"terunduh\n"
-"                              sebagian. Gunakan opsi ini untuk melanjutkan "
-"unduhan\n"
-"                              yang dimulai oleh peramban web atau program "
-"lain\n"
-"                              yang mengunduh berkas dari awal. Saat ini "
-"opsi\n"
-"                              ini hanya dapat diterapkan pada unduhan\n"
-"                              http(s)/ftp."
 
 #: src/usage_text.h:220
 msgid " -U, --user-agent=USER_AGENT  Set user agent for http(s) downloads."
@@ -596,12 +500,10 @@ msgstr ""
 " -U, --user-agent=AGEN_PENGGUNA  Atur agen pengguna untuk unduhan http(s)."
 
 #: src/usage_text.h:222
-#, fuzzy
 msgid " -n, --no-netrc[=true|false]  Disables netrc support."
-msgstr " -n, --no-netrc               Matikan dukungan netrc."
+msgstr ""
 
 #: src/usage_text.h:224
-#, fuzzy
 msgid ""
 " -i, --input-file=FILE        Downloads URIs found in FILE. You can specify\n"
 "                              multiple URIs for a single entity: separate\n"
@@ -618,22 +520,8 @@ msgid ""
 "page\n"
 "                              for details. See also --deferred-input option."
 msgstr ""
-" -i, --input-file=BERKAS        Mengunduh semua URI dalam BERKAS. Anda bisa "
-"menentukan\n"
-"                              lebih dari satu URI untuk satu entitas: "
-"pisahkan\n"
-"                              semua URI dalam satu baris dengan karakter "
-"TAB.\n"
-"                              Membaca masukan dari stdin kalau diberikan "
-"'-'\n"
-"                              Opsi out dan dir dapat diberikan setelah\n"
-"                              setiap baris URI. Baris optional ini\n"
-"                              harus dimulai dengan white space. Lihat bagian "
-"INPUT\n"
-"                              dan FILE dari laman man untuk detilnya."
 
 #: src/usage_text.h:234
-#, fuzzy
 msgid ""
 " -j, --max-concurrent-downloads=N Set maximum number of parallel downloads "
 "for\n"
@@ -641,11 +529,6 @@ msgid ""
 "metalink.\n"
 "                              See also --split option."
 msgstr ""
-" -j, --max-concurrent-downloads=N Atur jumlah maksimum unduhan bersamaan "
-"untuk\n"
-"                              tiap URL (HTTP/FTP), torrent dan metalink "
-"statis.\n"
-"                              Lihat pula opsi -s dan -C."
 
 #: src/usage_text.h:238
 msgid ""
@@ -669,17 +552,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:246
-#, fuzzy
 msgid ""
 " -S, --show-files[=true|false] Print file listing of .torrent, .meta4 and\n"
 "                              .metalink file and exit. More detailed\n"
 "                              information will be listed in case of torrent\n"
 "                              file."
 msgstr ""
-" -S, --show-files             Cetak senarai berkas .torrent atau .metalink\n"
-"                              lalu keluar. Informasi lebih detail akan "
-"disenaraikan\n"
-"                              untuk berkas torrent."
 
 #: src/usage_text.h:251
 msgid ""
@@ -761,7 +639,6 @@ msgstr ""
 "                              '-' dapat digunakan bersamaan."
 
 #: src/usage_text.h:278
-#, fuzzy
 msgid ""
 " --max-overall-upload-limit=SPEED Set max overall upload speed in bytes/"
 "sec.\n"
@@ -770,11 +647,6 @@ msgid ""
 "                              To limit the upload speed per torrent, use\n"
 "                              --max-upload-limit option."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:284
 msgid ""
@@ -826,12 +698,10 @@ msgid " --enable-peer-exchange[=true|false] Enable Peer Exchange extension."
 msgstr ""
 
 #: src/usage_text.h:310
-#, fuzzy
 msgid " --enable-dht[=true|false]    Enable IPv4 DHT functionality."
-msgstr " --enable-dht[=true|false]    Aktifkan fungsionalitas DHT."
+msgstr ""
 
 #: src/usage_text.h:312
-#, fuzzy
 msgid ""
 " --dht-listen-port=PORT...    Set UDP listening port for both IPv4 and IPv6\n"
 "                              DHT. Multiple ports can be specified by using\n"
@@ -840,32 +710,18 @@ msgid ""
 "','\n"
 "                              and '-' can be used together."
 msgstr ""
-" --listen-port=PORT...        Menentukan nomor port untuk unduhan "
-"BitTorrent.\n"
-"                              Beberapa port bisa ditentukan menggunakan "
-"',',\n"
-"                              contoh: \"6881,6885\". Anda juga bisa "
-"menggunakan\n"
-"                              '-' untuk menetapkan jangkauan: \"6881-6999\". "
-"',' dan\n"
-"                              '-' dapat digunakan bersamaan."
 
 #: src/usage_text.h:318
-#, fuzzy
 msgid ""
 " --dht-entry-point=HOST:PORT  Set host and port as an entry point to IPv4 "
 "DHT\n"
 "                              network."
 msgstr ""
-" --retry-wait=DET             Atur detik tunggu sebelum mencoba kembali\n"
-"                              setelah error terjadi."
 
 #: src/usage_text.h:321
-#, fuzzy
 msgid ""
 " --dht-file-path=PATH         Change the IPv4 DHT routing table file to PATH."
 msgstr ""
-" --conf-path=ALAMAT             Ubah alamat berkas konfigurasi ke ALAMAT."
 
 #: src/usage_text.h:323
 msgid ""
@@ -878,7 +734,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:328
-#, fuzzy
 msgid ""
 " --bt-require-crypto[=true|false] If true is given, aria2 doesn't accept "
 "and\n"
@@ -886,14 +741,6 @@ msgid ""
 "                              handshake. Thus aria2 always uses Obfuscation\n"
 "                              handshake."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:333
 msgid ""
@@ -930,14 +777,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:351
-#, fuzzy
 msgid ""
 " -M, --metalink-file=METALINK_FILE The file path to the .meta4 and ."
 "metalink\n"
 "                              file. Reads input from stdin when '-' is\n"
 "                              specified."
 msgstr ""
-" -M, --metalink-file=BERKAS_METALINK Alamat berkas ke berkas .metalink."
 
 #: src/usage_text.h:355
 msgid ""
@@ -982,7 +827,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:377
-#, fuzzy
 msgid ""
 " --follow-metalink=true|false|mem If true or mem is specified, when a file\n"
 "                              whose suffix is .meta4 or .metalink, or "
@@ -999,21 +843,8 @@ msgid ""
 "above\n"
 "                              is not taken."
 msgstr ""
-" --follow-torrent=true|false|mem Jika true atau mem diberikan, saat "
-"mengunduh sebuah\n"
-"                              berkas berakhiran .torrent atau jenis konten "
-"application/x-bittorent,\n"
-"                              aria2 akan memeriksa berkas itu sebagai berkas "
-"torrent dan\n"
-"                              mengunduh berkas-berkas di dalamnya.\n"
-"                              Kalau mem diberikan, berkas torrent itu tidak "
-"ditulis ke disk,\n"
-"                              tetapi disimpan di memory saja.\n"
-"                              Jika false diberikan, tindakan di atas tidak "
-"dilakukan."
 
 #: src/usage_text.h:388
-#, fuzzy
 msgid ""
 " --metalink-enable-unique-protocol[=true|false] If true is given and "
 "several\n"
@@ -1023,21 +854,12 @@ msgid ""
 "                              Use --metalink-preferred-protocol option to\n"
 "                              specify the preference of protocol."
 msgstr ""
-" --auto-file-renaming[=true|false] Namai ulang nama berkas jika berkas yang "
-"sama\n"
-"                              telah ada. Opsi ini hanya bekerja dalam "
-"unduhan\n"
-"                              http(s)/ftp.\n"
-"                              Nama berkas baru memiliki titik dan nomor"
-"(1..9999)\n"
-"                              yang ditambahkan."
 
 #: src/usage_text.h:394
 msgid " -v, --version                Print the version number and exit."
 msgstr " -v, --version                Cetak nomor versi lalu keluar."
 
 #: src/usage_text.h:396
-#, fuzzy
 msgid ""
 " -h, --help[=TAG|KEYWORD]     Print usage and exit.\n"
 "                              The help messages are classified with tags. A "
@@ -1049,23 +871,10 @@ msgid ""
 "usage\n"
 "                              for the options whose name includes that word."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Jika diberi nilai 'true', setelah "
-"memeriksa\n"
-"                              hash menggunakan opsi --check-integrity dan "
-"berkas\n"
-"                              sudah lengkap, lanjutkan men-seed berkas. Jika "
-"Anda\n"
-"                              ingin memeriksa berkas dan mengunduh hanya "
-"saat\n"
-"                              berkas rusak atau tidak lengkap, beri nilai "
-"'false'.\n"
-"                              Opsi ini hanya berpengaruh pada unduhan\n"
-"                              BitTorrent."
 
 #: src/usage_text.h:403
-#, fuzzy
 msgid " --no-conf[=true|false]       Disable loading aria2.conf file."
-msgstr " --no-conf                    Nonaktifkan memuat berkas aria2.conf."
+msgstr ""
 
 #: src/usage_text.h:405
 msgid ""
@@ -1296,7 +1105,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:520
-#, fuzzy
 msgid ""
 " -O, --index-out=INDEX=PATH   Set file path for file with index=INDEX. You "
 "can\n"
@@ -1308,17 +1116,8 @@ msgid ""
 "multiple\n"
 "                              times."
 msgstr ""
-" --file-allocation=METODE     Tentukan metode pengalokasian berkas.\n"
-"                              'none' tidak melakukan pre-alokasi ruang "
-"berkas. 'prealloc'\n"
-"                              melakukan pre-alokasi ruang berkas sebelum "
-"mengunduh.\n"
-"                              Ini mungkin memakan waktu tergantung ukuran "
-"dari\n"
-"                              berkas ini."
 
 #: src/usage_text.h:526
-#, fuzzy
 msgid ""
 " --dry-run[=true|false]       If true is given, aria2 just checks whether "
 "the\n"
@@ -1328,17 +1127,8 @@ msgid ""
 "                              BitTorrent downloads are canceled if true is\n"
 "                              specified."
 msgstr ""
-" --auto-file-renaming[=true|false] Namai ulang nama berkas jika berkas yang "
-"sama\n"
-"                              telah ada. Opsi ini hanya bekerja dalam "
-"unduhan\n"
-"                              http(s)/ftp.\n"
-"                              Nama berkas baru memiliki titik dan nomor"
-"(1..9999)\n"
-"                              yang ditambahkan."
 
 #: src/usage_text.h:532
-#, fuzzy
 msgid ""
 " --bt-tracker-interval=SEC    Set the interval in seconds between tracker\n"
 "                              requests. This completely overrides interval "
@@ -1353,21 +1143,8 @@ msgid ""
 "download\n"
 "                              progress."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Jika diberi nilai 'true', setelah "
-"memeriksa\n"
-"                              hash menggunakan opsi --check-integrity dan "
-"berkas\n"
-"                              sudah lengkap, lanjutkan men-seed berkas. Jika "
-"Anda\n"
-"                              ingin memeriksa berkas dan mengunduh hanya "
-"saat\n"
-"                              berkas rusak atau tidak lengkap, beri nilai "
-"'false'.\n"
-"                              Opsi ini hanya berpengaruh pada unduhan\n"
-"                              BitTorrent."
 
 #: src/usage_text.h:540
-#, fuzzy
 msgid ""
 " --on-download-complete=COMMAND Set the command to be executed after "
 "download\n"
@@ -1376,14 +1153,8 @@ msgid ""
 "                              requirement of COMMAND.\n"
 "                              See also --on-download-stop option."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:546
-#, fuzzy
 msgid ""
 " --on-download-start=COMMAND  Set the command to be executed after download\n"
 "                              got started. aria2 passes 3 arguments to "
@@ -1392,28 +1163,16 @@ msgid ""
 "Event\n"
 "                              Hook in man page for more details."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:551
-#, fuzzy
 msgid ""
 " --on-download-pause=COMMAND  Set the command to be executed after download\n"
 "                              was paused.\n"
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:556
-#, fuzzy
 msgid ""
 " --on-download-error=COMMAND  Set the command to be executed after download\n"
 "                              aborted due to error.\n"
@@ -1421,14 +1180,8 @@ msgid ""
 "                              requirement of COMMAND.\n"
 "                              See also --on-download-stop option."
 msgstr ""
-" --max-download-limit=KECEPATAN   Atur kecepatan unduh maksimal dalam byte "
-"per detik.\n"
-"                              0 berarti tidak dibatasi.\n"
-"                              Anda dapat menggunakan K atau M(1K = 1024, 1M "
-"= 1024K)."
 
 #: src/usage_text.h:562
-#, fuzzy
 msgid ""
 " --on-download-stop=COMMAND   Set the command to be executed after download\n"
 "                              stopped. You can override the command to be\n"
@@ -1440,18 +1193,6 @@ msgid ""
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --follow-torrent=true|false|mem Jika true atau mem diberikan, saat "
-"mengunduh sebuah\n"
-"                              berkas berakhiran .torrent atau jenis konten "
-"application/x-bittorent,\n"
-"                              aria2 akan memeriksa berkas itu sebagai berkas "
-"torrent dan\n"
-"                              mengunduh berkas-berkas di dalamnya.\n"
-"                              Kalau mem diberikan, berkas torrent itu tidak "
-"ditulis ke disk,\n"
-"                              tetapi disimpan di memory saja.\n"
-"                              Jika false diberikan, tindakan di atas tidak "
-"dilakukan."
 
 #: src/usage_text.h:571
 msgid ""
@@ -1495,7 +1236,6 @@ msgid " --disable-ipv6[=true|false]  Disable IPv6."
 msgstr ""
 
 #: src/usage_text.h:592
-#, fuzzy
 msgid ""
 " --bt-save-metadata[=true|false] Save metadata as .torrent file. This option "
 "has\n"
@@ -1511,18 +1251,6 @@ msgid ""
 "saved.\n"
 "                              See also --bt-metadata-only option."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Jika diberi nilai 'true', setelah "
-"memeriksa\n"
-"                              hash menggunakan opsi --check-integrity dan "
-"berkas\n"
-"                              sudah lengkap, lanjutkan men-seed berkas. Jika "
-"Anda\n"
-"                              ingin memeriksa berkas dan mengunduh hanya "
-"saat\n"
-"                              berkas rusak atau tidak lengkap, beri nilai "
-"'false'.\n"
-"                              Opsi ini hanya berpengaruh pada unduhan\n"
-"                              BitTorrent."
 
 #: src/usage_text.h:600
 msgid ""
@@ -1537,7 +1265,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:606
-#, fuzzy
 msgid ""
 " --bt-metadata-only[=true|false] Download metadata only. The file(s) "
 "described\n"
@@ -1546,14 +1273,6 @@ msgid ""
 "                              has effect only when BitTorrent Magnet URI is\n"
 "                              used. See also --bt-save-metadata option."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:611
 msgid ""
@@ -1563,12 +1282,10 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:614
-#, fuzzy
 msgid " --bt-enable-lpd[=true|false] Enable Local Peer Discovery."
-msgstr " --enable-dht[=true|false]    Aktifkan fungsionalitas DHT."
+msgstr ""
 
 #: src/usage_text.h:616
-#, fuzzy
 msgid ""
 " --bt-lpd-interface=INTERFACE Use given interface for Local Peer Discovery. "
 "If\n"
@@ -1577,14 +1294,6 @@ msgid ""
 "interface\n"
 "                              name and IP address."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:621
 msgid ""
@@ -1593,17 +1302,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:624
-#, fuzzy
 msgid " --all-proxy-user=USER        Set user for --all-proxy option."
 msgstr ""
-" --ftp-user=PENGGUNA              Atur pengguna FTP. Ini mempengaruhi semua "
-"URL."
 
 #: src/usage_text.h:626
-#, fuzzy
 msgid " --all-proxy-passwd=PASSWD    Set password for --all-proxy option."
 msgstr ""
-" --ftp-passwd=SANDI          Atur sandi FTP. Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:628
 msgid " --http-proxy-user=USER       Set user for --http-proxy option."
@@ -1626,13 +1330,10 @@ msgid " --ftp-proxy-user=USER        Set user for --ftp-proxy option."
 msgstr ""
 
 #: src/usage_text.h:638
-#, fuzzy
 msgid " --ftp-proxy-passwd=PASSWD    Set password for --ftp-proxy option."
 msgstr ""
-" --ftp-passwd=SANDI          Atur sandi FTP. Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:640
-#, fuzzy
 msgid ""
 " --remove-control-file[=true|false] Remove control file before download. "
 "Using\n"
@@ -1641,17 +1342,8 @@ msgid ""
 "                              users behind proxy server which disables "
 "resume."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:645
-#, fuzzy
 msgid ""
 " --always-resume[=true|false] Always resume download. If true is given, "
 "aria2\n"
@@ -1667,18 +1359,6 @@ msgid ""
 "                              downloads file from scratch.\n"
 "                              See --max-resume-failure-tries option."
 msgstr ""
-" --follow-torrent=true|false|mem Jika true atau mem diberikan, saat "
-"mengunduh sebuah\n"
-"                              berkas berakhiran .torrent atau jenis konten "
-"application/x-bittorent,\n"
-"                              aria2 akan memeriksa berkas itu sebagai berkas "
-"torrent dan\n"
-"                              mengunduh berkas-berkas di dalamnya.\n"
-"                              Kalau mem diberikan, berkas torrent itu tidak "
-"ditulis ke disk,\n"
-"                              tetapi disimpan di memory saja.\n"
-"                              Jika false diberikan, tindakan di atas tidak "
-"dilakukan."
 
 #: src/usage_text.h:655
 msgid ""
@@ -1694,12 +1374,10 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:662
-#, fuzzy
 msgid " --bt-tracker-timeout=SEC     Set timeout in seconds."
-msgstr " -t, --timeout=DET            Atur tenggang waktu dalam detik."
+msgstr ""
 
 #: src/usage_text.h:664
-#, fuzzy
 msgid ""
 " --bt-tracker-connect-timeout=SEC Set the connect timeout in seconds to\n"
 "                              establish connection to tracker. After the\n"
@@ -1709,19 +1387,10 @@ msgid ""
 "used\n"
 "                              instead."
 msgstr ""
-" --file-allocation=METODE     Tentukan metode pengalokasian berkas.\n"
-"                              'none' tidak melakukan pre-alokasi ruang "
-"berkas. 'prealloc'\n"
-"                              melakukan pre-alokasi ruang berkas sebelum "
-"mengunduh.\n"
-"                              Ini mungkin memakan waktu tergantung ukuran "
-"dari\n"
-"                              berkas ini."
 
 #: src/usage_text.h:670
-#, fuzzy
 msgid " --dht-message-timeout=SEC    Set timeout in seconds."
-msgstr " -t, --timeout=DET            Atur tenggang waktu dalam detik."
+msgstr ""
 
 #: src/usage_text.h:672
 msgid ""
@@ -1734,7 +1403,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:677
-#, fuzzy
 msgid ""
 " --save-session=FILE          Save error/unfinished downloads to FILE on "
 "exit.\n"
@@ -1751,14 +1419,6 @@ msgid ""
 "not\n"
 "                              be saved."
 msgstr ""
-" --file-allocation=METODE     Tentukan metode pengalokasian berkas.\n"
-"                              'none' tidak melakukan pre-alokasi ruang "
-"berkas. 'prealloc'\n"
-"                              melakukan pre-alokasi ruang berkas sebelum "
-"mengunduh.\n"
-"                              Ini mungkin memakan waktu tergantung ukuran "
-"dari\n"
-"                              berkas ini."
 
 #: src/usage_text.h:686
 msgid ""
@@ -1785,7 +1445,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:698
-#, fuzzy
 msgid ""
 " --conditional-get[=true|false] Download file only when the local file is "
 "older\n"
@@ -1793,17 +1452,8 @@ msgid ""
 "has\n"
 "                              many limitations. See man page for details."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:702
-#, fuzzy
 msgid ""
 " --on-bt-download-complete=COMMAND For BitTorrent, a command specified in\n"
 "                              --on-download-complete is called after "
@@ -1816,21 +1466,8 @@ msgid ""
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --follow-torrent=true|false|mem Jika true atau mem diberikan, saat "
-"mengunduh sebuah\n"
-"                              berkas berakhiran .torrent atau jenis konten "
-"application/x-bittorent,\n"
-"                              aria2 akan memeriksa berkas itu sebagai berkas "
-"torrent dan\n"
-"                              mengunduh berkas-berkas di dalamnya.\n"
-"                              Kalau mem diberikan, berkas torrent itu tidak "
-"ditulis ke disk,\n"
-"                              tetapi disimpan di memory saja.\n"
-"                              Jika false diberikan, tindakan di atas tidak "
-"dilakukan."
 
 #: src/usage_text.h:710
-#, fuzzy
 msgid ""
 " --enable-async-dns6[=true|false] Enable IPv6 name resolution in "
 "asynchronous\n"
@@ -1838,13 +1475,8 @@ msgid ""
 "when\n"
 "                              --async-dns=false."
 msgstr ""
-" --enable-direct-io[=true|false] Aktifkan directI/O, yang meminimalkan "
-"penggunaan\n"
-"                              cpu ketika mengalokasi berkas.\n"
-"                              Matikan jika anda mengalami error"
 
 #: src/usage_text.h:714
-#, fuzzy
 msgid ""
 " --enable-dht6[=true|false]   Enable IPv6 DHT functionality.\n"
 "                              Use --dht-listen-port option to specify port\n"
@@ -1852,14 +1484,6 @@ msgid ""
 "addr6\n"
 "                              option."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:719
 msgid ""
@@ -1877,14 +1501,11 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:726
-#, fuzzy
 msgid ""
 " --dht-file-path6=PATH        Change the IPv6 DHT routing table file to PATH."
 msgstr ""
-" --conf-path=ALAMAT             Ubah alamat berkas konfigurasi ke ALAMAT."
 
 #: src/usage_text.h:728
-#, fuzzy
 msgid ""
 " --bt-tracker=URI[,...]       Comma separated list of additional BitTorrent\n"
 "                              tracker's announce URI. These URIs are not\n"
@@ -1894,14 +1515,6 @@ msgid ""
 "tracker\n"
 "                              option are removed."
 msgstr ""
-" --file-allocation=METODE     Tentukan metode pengalokasian berkas.\n"
-"                              'none' tidak melakukan pre-alokasi ruang "
-"berkas. 'prealloc'\n"
-"                              melakukan pre-alokasi ruang berkas sebelum "
-"mengunduh.\n"
-"                              Ini mungkin memakan waktu tergantung ukuran "
-"dari\n"
-"                              berkas ini."
 
 #: src/usage_text.h:734
 msgid ""
@@ -1957,7 +1570,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:764
-#, fuzzy
 msgid ""
 " --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"
 "                              It is strongly recommended to set username "
@@ -1965,14 +1577,6 @@ msgid ""
 "                              password using --rpc-user and --rpc-passwd\n"
 "                              option. See also --rpc-listen-port option."
 msgstr ""
-" --allow-piece-length-change=true|false Jika false yang diberikan, aria2 "
-"akan\n"
-"                              membatalkan unduhan ketika satu bagian berbeda "
-"dengan\n"
-"                              yang ada di berkas kendali. Jika true yang "
-"diberikan, anda\n"
-"                              dapat melanjutkan tapi beberapa proses unduhan "
-"akan hilang."
 
 #: src/usage_text.h:769
 msgid ""
@@ -1984,20 +1588,14 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:773
-#, fuzzy
 msgid " --rpc-user=USER              Set JSON-RPC/XML-RPC user."
 msgstr ""
-" --ftp-user=PENGGUNA              Atur pengguna FTP. Ini mempengaruhi semua "
-"URL."
 
 #: src/usage_text.h:775
-#, fuzzy
 msgid " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password."
 msgstr ""
-" --ftp-passwd=SANDI          Atur sandi FTP. Ini mempengaruhi semua URL."
 
 #: src/usage_text.h:777
-#, fuzzy
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -2005,11 +1603,6 @@ msgid ""
 "only\n"
 "                              on local loopback interface."
 msgstr ""
-" -Z, --force-sequential[=true|false] Ambil URI dalam baris perintah secara "
-"berurutan\n"
-"                              dan unduh tiap URI dalam sesi terpisah, "
-"seperti\n"
-"                              utilitas unduhan baris perintah biasa."
 
 #: src/usage_text.h:781
 msgid ""
@@ -2023,7 +1616,6 @@ msgid " --show-console-readout[=true|false] Show console readout."
 msgstr ""
 
 #: src/usage_text.h:786
-#, fuzzy
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -2032,10 +1624,6 @@ msgid ""
 "points\n"
 "                              to a directory, URI must end with '/'."
 msgstr ""
-" -S, --show-files             Cetak senarai berkas .torrent atau .metalink\n"
-"                              lalu keluar. Informasi lebih detail akan "
-"disenaraikan\n"
-"                              untuk berkas torrent."
 
 #: src/usage_text.h:791
 msgid ""
@@ -2082,14 +1670,10 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:821
-#, fuzzy
 msgid ""
 " --pause[=true|false]         Pause download after added. This option is\n"
 "                              effective only when --enable-rpc=true is given."
 msgstr ""
-" -p, --ftp-pasv[=true|false]  Gunakan mode pasif di FTP. Jika false yang "
-"diberikan,\n"
-"                              maka mode aktif yang digunakan."
 
 #: src/usage_text.h:824
 msgid ""
@@ -2118,18 +1702,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:839
-#, fuzzy
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
 "whether\n"
 "                              or not download is complete."
 msgstr ""
-" --realtime-chunk-checksum=true|false  Validasi bagian data dengan "
-"menghitung\n"
-"                              checksum ketika mengunduh berkas jika checksum "
-"per\n"
-"                              bagian disediakan."
 
 #: src/usage_text.h:843
 msgid ""
@@ -2172,7 +1750,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:866
-#, fuzzy
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -2185,21 +1762,8 @@ msgid ""
 "                              If false is given, aria2 reads all URIs and\n"
 "                              options at startup."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Jika diberi nilai 'true', setelah "
-"memeriksa\n"
-"                              hash menggunakan opsi --check-integrity dan "
-"berkas\n"
-"                              sudah lengkap, lanjutkan men-seed berkas. Jika "
-"Anda\n"
-"                              ingin memeriksa berkas dan mengunduh hanya "
-"saat\n"
-"                              berkas rusak atau tidak lengkap, beri nilai "
-"'false'.\n"
-"                              Opsi ini hanya berpengaruh pada unduhan\n"
-"                              BitTorrent."
 
 #: src/usage_text.h:874
-#, fuzzy
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -2209,23 +1773,62 @@ msgid ""
 "                              because it will actually remove files from\n"
 "                              your disk."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Jika diberi nilai 'true', setelah "
-"memeriksa\n"
-"                              hash menggunakan opsi --check-integrity dan "
-"berkas\n"
-"                              sudah lengkap, lanjutkan men-seed berkas. Jika "
-"Anda\n"
-"                              ingin memeriksa berkas dan mengunduh hanya "
-"saat\n"
-"                              berkas rusak atau tidak lengkap, beri nilai "
-"'false'.\n"
-"                              Opsi ini hanya berpengaruh pada unduhan\n"
-"                              BitTorrent."
 
 #: src/usage_text.h:882
-#, fuzzy
 msgid " --enable-mmap[=true|false]   Map files into memory."
-msgstr " --enable-dht[=true|false]    Aktifkan fungsionalitas DHT."
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
+msgstr ""
 
 #: src/version_usage.cc:57
 msgid " version "
@@ -2266,47 +1869,47 @@ msgid "Visit"
 msgstr ""
 
 #: src/version_usage.cc:87
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
-msgstr "Penggunaan: %s [OPSI] [URL | BERKAS_TORRENT | BERKAS_METALINK]..."
+msgstr ""
 
 #: src/version_usage.cc:92
 #, c-format
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr "Cetak semua opsi."
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "Opsi:"
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr ""
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:137
+#: src/version_usage.cc:138
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2314,7 +1917,7 @@ msgid ""
 " URIs must point to the same file or downloading will fail."
 msgstr ""
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2322,7 +1925,7 @@ msgid ""
 " treated as a separate download."
 msgstr ""
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2337,14 +1940,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2357,7 +1960,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Baca halaman man untuk informasi selanjutnya."
@@ -2420,12 +2023,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -2435,18 +2038,18 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
+#: src/RequestGroup.cc:680
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -2458,9 +2061,9 @@ msgid ""
 msgstr ""
 
 #: src/message.h:57
-#, fuzzy, c-format
+#, c-format
 msgid "GID#%<PRId64> - Download has already completed: %s"
-msgstr "#%d - Unduh telah selesai: %s"
+msgstr ""
 
 #: src/message.h:106
 #, c-format
@@ -2679,9 +2282,9 @@ msgid "Windows socket library initialization failed"
 msgstr "Inisialisasi pustaka soket Windows gagal"
 
 #: src/message.h:154
-#, fuzzy, c-format
+#, c-format
 msgid "%ld second(s) has passed. Stopping application."
-msgstr "%d detik telah berlalu. Menghentikan aplikasi."
+msgstr ""
 
 #: src/message.h:155
 #, c-format
@@ -2737,9 +2340,9 @@ msgid "Network problem has occurred. cause:%s"
 msgstr "Masalah jaringan telah terjadi. penyebab:%s"
 
 #: src/message.h:173
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
-msgstr "Gagal memuat sertifikat CA yang dipercaya dari %s. Penyebab: %s"
+msgstr ""
 
 #: src/message.h:175
 #, c-format
@@ -2747,13 +2350,11 @@ msgid "Failed to load trusted CA certificates from %s. Cause: %s"
 msgstr "Gagal memuat sertifikat CA yang dipercaya dari %s. Penyebab: %s"
 
 #: src/message.h:177
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Certificate verification failed. Cause: %s See --ca-certificate and --check-"
 "certificate option."
 msgstr ""
-"Anda mungkin menghadapi galat verifikasi sertifikat dengan server HTTPS. "
-"Lihat opsi --ca-certificate dan --check-certificate."
 
 #: src/message.h:179
 msgid "No certificate found."
@@ -2790,9 +2391,9 @@ msgid "Is '%s' a file?"
 msgstr ""
 
 #: src/message.h:192
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to find given interface %s, cause: %s"
-msgstr "Gagal membuka berkas %s, penyebab: %s"
+msgstr ""
 
 #: src/message.h:194
 #, c-format
@@ -2800,9 +2401,9 @@ msgid "Saved metadata as %s."
 msgstr ""
 
 #: src/message.h:195
-#, fuzzy, c-format
+#, c-format
 msgid "Saving metadata as %s failed. Maybe file already exists."
-msgstr "Gagal menyimpan tanda tangan sebagai %s. Mungkin berkas telah ada."
+msgstr ""
 
 #: src/message.h:197
 #, c-format
@@ -3082,13 +2683,11 @@ msgid "Flooding detected."
 msgstr "Banjir terdeteksi."
 
 #: src/message.h:268
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Drop connection because no request/piece messages were exchanged in a "
 "certain period(%ld seconds)."
 msgstr ""
-"Koneksi jatuh karena tak ada pesan permintaan/bagian yang ditukar dalam "
-"periode tertentu (%d detik)."
 
 #: src/message.h:270
 msgid "The infoHash in torrent file doesn't match to one in .aria2 file."
@@ -3133,202 +2732,3 @@ msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""
 "Panjang berkas tidak sah. Tak dapat melanjutkan unduh %s: lokal %s, jarak "
 "jauh %s"
-
-#, fuzzy
-#~ msgid "%ld seconds to allocate %s byte(s)"
-#~ msgstr "%d detik untuk alokasi %s bita"
-
-#~ msgid "Too large file size. size=%s"
-#~ msgstr "Ukuran berkas terlalu besar. ukuran=%s"
-
-#~ msgid "Size mismatch Expected:%s Actual:%s"
-#~ msgstr "Ukuran tak cocok Diharapkan: %s Sebenarnya: %s"
-
-#~ msgid "Invalid range header. Request: %s-%s/%s, Response: %s-%s/%s"
-#~ msgstr "Rentang tajuk tidak sah. Permintaan: %s-%s/%s, Respon: %s-%s/%s"
-
-#~ msgid ""
-#~ " -V, --check-integrity[=true|false] Check file integrity by validating "
-#~ "piece\n"
-#~ "                              hashes. This option has effect only in "
-#~ "BitTorrent\n"
-#~ "                              and Metalink downloads with chunk "
-#~ "checksums.\n"
-#~ "                              Use this option to re-download a damaged "
-#~ "portion\n"
-#~ "                              of a file. See also --bt-hash-check-seed "
-#~ "option."
-#~ msgstr ""
-#~ " -V, --check-integrity[=true|false] Periksa integritas berkas dengan mem-"
-#~ "validasi\n"
-#~ "                              hash per bagian. Opsi ini hanya berpengaruh "
-#~ "untuk unduhan\n"
-#~ "                              BitTorrent dan Metalink dengan checksum "
-#~ "bagian.\n"
-#~ "                              Gunakan opsi ini untuk mengunduh-ulang "
-#~ "bagian berkas yang\n"
-#~ "                              rusak. Lihat juga opsi --bt-hash-check-seed"
-
-#, fuzzy
-#~ msgid " --enable-xml-rpc[=true|false] Deprecated. Use --enable-rpc instead."
-#~ msgstr " --enable-dht[=true|false]    Aktifkan fungsionalitas DHT."
-
-#, fuzzy
-#~ msgid " --xml-rpc-user=USER          Deprecated. Use --rpc-user instead."
-#~ msgstr ""
-#~ " --ftp-user=PENGGUNA              Atur pengguna FTP. Ini mempengaruhi "
-#~ "semua URL."
-
-#, fuzzy
-#~ msgid " --xml-rpc-passwd=PASSWD      Deprecated. Use --rpc-passwd instead."
-#~ msgstr ""
-#~ " --ftp-passwd=SANDI          Atur sandi FTP. Ini mempengaruhi semua URL."
-
-#~ msgid "must be either 'true' or 'false'."
-#~ msgstr "harus diisi 'true' atau 'false'."
-
-#~ msgid "must be between %s and %s."
-#~ msgstr "harus diantara %s dan %s."
-
-#~ msgid "must be smaller than or equal to %s."
-#~ msgstr "harus lebih kecil atau sama dengan %s."
-
-#~ msgid "must be greater than or equal to %s."
-#~ msgstr "harus lebih besar atau sama dengan %s."
-
-#~ msgid "must be a number."
-#~ msgstr "harus sebuah angka."
-
-#~ msgid "must be smaller than or equal to %.1f."
-#~ msgstr "harus lebih kecil atau sama dengan %.1f."
-
-#~ msgid "must be between %.1f and %.1f."
-#~ msgstr "harus diantara %.1f dan %.1f."
-
-#~ msgid "must be greater than or equal to %.1f."
-#~ msgstr "harus lebih besar atau sama dengan %.1f"
-
-#~ msgid "must be one of the following:"
-#~ msgstr "harus berisi salah satu dari:"
-
-#, fuzzy
-#~ msgid "Unrecognized format"
-#~ msgstr "format proxy tidak dikenali"
-
-#~ msgid "unrecognized proxy format"
-#~ msgstr "format proxy tidak dikenali"
-
-#~ msgid "Failed to open the segment file %s, cause: %s"
-#~ msgstr "Gagal membuka segmen berkas %s, penyebab: %s"
-
-#~ msgid "Failed to write into the segment file %s, cause: %s"
-#~ msgstr "Gagal menulis ke segmen berkas %s, penyebab: %s"
-
-#~ msgid "Failed to read from the segment file %s, cause: %s"
-#~ msgstr "Gagal membaca dari segmen berkas %s, penyebab: %s"
-
-#~ msgid "Certificate verification failed. Cause: %s"
-#~ msgstr "Verifikasi sertifikat gagal. Menyebabkan: %s"
-
-#~ msgid "CUID#%d - The download for one segment completed successfully."
-#~ msgstr "CUID#%d - Unduh satu bagian telah berhasil diselesaikan."
-
-#~ msgid "CUID#%d - No segment available."
-#~ msgstr "CUID#%d - Tidak ada bagian yang tersedia."
-
-#~ msgid "CUID#%d - Connecting to %s:%d"
-#~ msgstr "CUID#%d - Menghubungi %s:%d"
-
-#~ msgid ""
-#~ "CUID#%d - The segment changed. We send the request again with new Range "
-#~ "header."
-#~ msgstr ""
-#~ "CUID#%d - Bagian berubah. Kita kirim permintaan lagi dengan header Range "
-#~ "yang baru."
-
-#~ msgid "CUID#%d - Redirecting to %s"
-#~ msgstr "CUID#%d - Dialihkan ke %s"
-
-#~ msgid ""
-#~ "CUID#%d - Requesting:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - Meminta:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "CUID#%d - Response received:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - Jawaban yang diterima:\n"
-#~ "%s"
-
-#~ msgid "CUID#%d - Download aborted. URI=%s"
-#~ msgstr "CUID#%d - Unduh dibatalkan. URI=%s"
-
-#~ msgid "CUID#%d - Restarting the download. URI=%s"
-#~ msgstr "CUID#%d - Memulai kembali proses unduh. URI=%s"
-
-#~ msgid "CUID#%d - Download aborted."
-#~ msgstr "CUID#%d - Unduh dibatalkan."
-
-#~ msgid "CUID#%d - %d times attempted, but no success. Download aborted."
-#~ msgstr "CUID#%d - %d kali dicoba, tapi tidak berhasil. Unduh dibatalkan."
-
-#~ msgid "CUID#%d - we got new piece. index=%d"
-#~ msgstr "CUID#%d - kita dapatkan potongan baru. index=%d"
-
-#~ msgid "CUID#%d - we got wrong piece. index=%d"
-#~ msgstr "CUID#%d - kita dapatkan potongan yang salah. index=%d"
-
-#~ msgid "CUID#%d - Download not complete: %s"
-#~ msgstr "CUID#%d - Unduh tidak selesai: %s"
-
-#~ msgid "CUID#%d - Good checksum: %s"
-#~ msgstr "CUID#%d - Checksum benar: %s"
-
-#~ msgid "CUID#%d - Bad checksum: %s"
-#~ msgstr "CUID#%d - Checksum salah: %s"
-
-#~ msgid "CUID#%d - Resolving hostname %s"
-#~ msgstr "CUID#%d - Mencari nama host %s"
-
-#~ msgid "CUID#%d - Name resolution complete: %s -> %s"
-#~ msgstr "CUID#%d - Pencarian nama selesai: %s -> %s"
-
-#~ msgid "CUID#%d - Name resolution for %s failed:%s"
-#~ msgstr "CUID#%d - Pencarian nama untuk %s gagal:%s"
-
-#~ msgid "CUID#%d - Abort requested."
-#~ msgstr "CUID#%d - Permintaan pembatalan diterima."
-
-#~ msgid " -o, --out=FILE               The file name of the downloaded file."
-#~ msgstr ""
-#~ " -o, --out=BERKAS               Nama berkas dari berkas yang diunduh."
-
-#~ msgid ""
-#~ " --http-auth-scheme=SCHEME    Set HTTP authentication scheme. Currently, "
-#~ "basic\n"
-#~ "                              is the only supported scheme."
-#~ msgstr ""
-#~ " --http-auth-scheme=SKEMA    Atur skema otentikasi HTTP. Saat ini, basic\n"
-#~ "                              adalah satu-satunya skema yang didukung."
-
-#~ msgid " -D, --daemon                 Run as daemon."
-#~ msgstr " -D, --daemon                 Jalankan sebagai daemon."
-
-#~ msgid "Files:"
-#~ msgstr "Berkas:"
-
-#~ msgid ""
-#~ " --allow-overwrite=true|false If false, aria2 doesn't download a file "
-#~ "which\n"
-#~ "                              already exists but the corresponding .aria2 "
-#~ "file\n"
-#~ "                              doesn't exist."
-#~ msgstr ""
-#~ " --allow-overwrite=true|false Jika false, aria2 tidak mengunduh berkas "
-#~ "yang\n"
-#~ "                              telah ada tapi tidak memiliki berkas ."
-#~ "aria2\n"
-#~ "                              yang berkaitan."

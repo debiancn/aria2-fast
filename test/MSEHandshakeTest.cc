@@ -7,7 +7,7 @@
 #include "Exception.h"
 #include "util.h"
 #include "prefs.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "Option.h"
 #include "DownloadContext.h"
 #include "FileEntry.h"
@@ -35,7 +35,7 @@ public:
     memset(infoHash, 0, sizeof(infoHash));
     SharedHandle<TorrentAttribute> torrentAttrs(new TorrentAttribute());
     torrentAttrs->infoHash = std::string(vbegin(infoHash), vend(infoHash));
-    dctx_->setAttribute(bittorrent::BITTORRENT, torrentAttrs);
+    dctx_->setAttribute(CTX_ATTR_BT, torrentAttrs);
   }
 
   void testHandshake();
@@ -53,6 +53,7 @@ createSocketPair()
   SocketCore receiverServerSock;
   receiverServerSock.bind(0);
   receiverServerSock.beginListen();
+  receiverServerSock.setBlockingMode();
 
   std::pair<std::string, uint16_t> receiverAddrInfo;
   receiverServerSock.getAddrInfo(receiverAddrInfo);

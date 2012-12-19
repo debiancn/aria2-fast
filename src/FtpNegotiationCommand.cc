@@ -58,7 +58,7 @@
 #include "DefaultBtProgressInfoFile.h"
 #include "RequestGroupMan.h"
 #include "DownloadFailureException.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "fmt.h"
 #include "DiskAdaptor.h"
 #include "SegmentMan.h"
@@ -86,7 +86,7 @@ FtpNegotiationCommand::FtpNegotiationCommand
  const SharedHandle<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SocketHandle& socket,
+ const SharedHandle<SocketCore>& socket,
  Seq seq,
  const std::string& baseWorkingDir):
   AbstractCommand(cuid, req, fileEntry, requestGroup, e, socket),
@@ -273,7 +273,7 @@ bool FtpNegotiationCommand::recvPwd()
 
 bool FtpNegotiationCommand::sendCwdPrep()
 {
-  // Calling setReadCheckSocket() is needed when the socket is reused, 
+  // Calling setReadCheckSocket() is needed when the socket is reused,
   setReadCheckSocket(getSocket());
   cwdDirs_.push_front(ftp_->getBaseWorkingDir());
   util::split(getRequest()->getDir().begin(), getRequest()->getDir().end(),
@@ -354,7 +354,7 @@ bool FtpNegotiationCommand::recvMdtm()
                     getCuid()));
   }
   sequence_ = SEQ_SEND_SIZE;
-  return true;  
+  return true;
 }
 
 bool FtpNegotiationCommand::sendSize() {
@@ -702,7 +702,7 @@ bool FtpNegotiationCommand::resolveProxy()
   A2_LOG_INFO(fmt(MSG_CONNECTING_TO_SERVER,
                   getCuid(),
                   proxyAddr_.c_str(), proxyReq->getPort()));
-  dataSocket_.reset(new SocketCore());                  
+  dataSocket_.reset(new SocketCore());
   dataSocket_->establishConnection(proxyAddr_, proxyReq->getPort());
   disableReadCheckSocket();
   setWriteCheckSocket(dataSocket_);
@@ -742,7 +742,7 @@ bool FtpNegotiationCommand::sendTunnelRequest()
           return false;
         }
       }
-    }      
+    }
     SharedHandle<HttpRequest> httpRequest(new HttpRequest());
     httpRequest->setUserAgent(getOption()->get(PREF_USER_AGENT));
     SharedHandle<Request> req(new Request());
@@ -866,8 +866,7 @@ bool FtpNegotiationCommand::waitConnection()
 {
   disableReadCheckSocket();
   setReadCheckSocket(getSocket());
-  dataSocket_.reset(serverSocket_->acceptConnection());
-  dataSocket_->setNonBlockingMode();
+  dataSocket_ = serverSocket_->acceptConnection();
   sequence_ = SEQ_NEGOTIATION_COMPLETED;
   return false;
 }
@@ -959,10 +958,10 @@ bool FtpNegotiationCommand::processSequence
 void FtpNegotiationCommand::poolConnection() const
 {
   if(getOption()->getAsBool(PREF_FTP_REUSE_CONNECTION)) {
-    std::map<std::string, std::string> options;
-    options["baseWorkingDir"] = ftp_->getBaseWorkingDir();
+    // Store ftp_->getBaseWorkingDir() as options
     getDownloadEngine()->poolSocket(getRequest(), ftp_->getUser(),
-                                    createProxyRequest(), getSocket(), options);
+                                    createProxyRequest(), getSocket(),
+                                    ftp_->getBaseWorkingDir());
   }
 }
 

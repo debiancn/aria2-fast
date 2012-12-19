@@ -77,7 +77,7 @@ void Peer::allocateSessionResource(int32_t pieceLength, int64_t totalLength)
 {
   delete res_;
   res_ = new PeerSessionResource(pieceLength, totalLength);
-  res_->getPeerStat().downloadStart();
+  res_->getNetStat().downloadStart();
   updateSeeder();
 }
 
@@ -152,7 +152,7 @@ void Peer::peerInterested(bool b)
   assert(res_);
   res_->peerInterested(b);
 }
-  
+
 // this peer should be choked
 bool Peer::chokingRequired() const
 {
@@ -219,13 +219,13 @@ void Peer::updateBitfield(size_t index, int operation) {
 int Peer::calculateUploadSpeed()
 {
   assert(res_);
-  return res_->getPeerStat().calculateUploadSpeed();
+  return res_->getNetStat().calculateUploadSpeed();
 }
 
 int Peer::calculateDownloadSpeed()
 {
   assert(res_);
-  return res_->getPeerStat().calculateDownloadSpeed();
+  return res_->getNetStat().calculateDownloadSpeed();
 }
 
 int64_t Peer::getSessionUploadLength() const
@@ -334,22 +334,22 @@ bool Peer::isGood() const
     difference(global::wallclock()) >= BAD_CONDITION_INTERVAL;
 }
 
-uint8_t Peer::getExtensionMessageID(const std::string& name) const
+uint8_t Peer::getExtensionMessageID(int key) const
 {
   assert(res_);
-  return res_->getExtensionMessageID(name);
+  return res_->getExtensionMessageID(key);
 }
 
-std::string Peer::getExtensionName(uint8_t id) const
+const char* Peer::getExtensionName(uint8_t id) const
 {
   assert(res_);
   return res_->getExtensionName(id);
 }
 
-void Peer::setExtension(const std::string& name, uint8_t id)
+void Peer::setExtension(int key, uint8_t id)
 {
   assert(res_);
-  res_->addExtension(name, id);
+  res_->addExtension(key, id);
 }
 
 void Peer::setExtendedMessagingEnabled(bool enabled)

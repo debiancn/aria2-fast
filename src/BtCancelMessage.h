@@ -39,20 +39,15 @@
 
 namespace aria2 {
 
-class BtCancelMessage;
-
-typedef SharedHandle<BtCancelMessage> BtCancelMessageHandle;
-
 class BtCancelMessage : public RangeBtMessage {
 public:
   BtCancelMessage(size_t index = 0, int32_t begin = 0, int32_t length = 0);
 
   static const int8_t ID = 8;
 
-  static const std::string NAME;
+  static const char NAME[];
 
-  static BtCancelMessageHandle create
-  (const unsigned char* data, size_t dataLength);
+  static BtCancelMessage* create(const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();
 };

@@ -46,13 +46,14 @@
 #include "A2STR.h"
 #include "ValueBase.h"
 #include "SegList.h"
+#include "ContextAttribute.h"
+#include "NetStat.h"
 
 namespace aria2 {
 
 class RequestGroup;
 class Signature;
 class FileEntry;
-struct ContextAttribute;
 
 class DownloadContext
 {
@@ -76,17 +77,17 @@ private:
   bool knowsTotalLength_;
 
   RequestGroup* ownerRequestGroup_;
-  
-  std::map<std::string, SharedHandle<ContextAttribute> > attrs_;
 
-  Timer downloadStartTime_;
+  std::vector<SharedHandle<ContextAttribute> > attrs_;
+
+  NetStat netStat_;
 
   Timer downloadStopTime_;
 
   SharedHandle<Signature> signature_;
-  // This member variable is required to avoid to parse Metalink/HTTP
-  // Link header fields multiple times.
-  bool metalinkServerContacted_;
+  // This member variable is required to avoid to use parse Metalink
+  // (including both Metalink XML and Metalink/HTTP) twice.
+  bool acceptMetalink_;
 public:
   DownloadContext();
 
@@ -99,7 +100,7 @@ public:
   ~DownloadContext();
 
   const std::string& getPieceHash(size_t index) const;
-  
+
   const std::vector<std::string>& getPieceHashes() const
   {
     return pieceHashes_;
@@ -203,11 +204,11 @@ public:
   }
 
   void setAttribute
-  (const std::string& key, const SharedHandle<ContextAttribute>& value);
+  (ContextAttributeType key, const SharedHandle<ContextAttribute>& value);
 
-  const SharedHandle<ContextAttribute>& getAttribute(const std::string& key);
+  const SharedHandle<ContextAttribute>& getAttribute(ContextAttributeType key);
 
-  bool hasAttribute(const std::string& key) const;
+  bool hasAttribute(ContextAttributeType key) const;
 
   void resetDownloadStartTime();
 
@@ -219,21 +220,34 @@ public:
   }
 
   int64_t calculateSessionTime() const;
-  
+
   // Returns FileEntry at given offset. SharedHandle<FileEntry>() is
   // returned if no such FileEntry is found.
   SharedHandle<FileEntry> findFileEntryByOffset(int64_t offset) const;
 
   void releaseRuntimeResource();
 
-  void setMetalinkServerContacted(bool f)
+  void setAcceptMetalink(bool f)
   {
-    metalinkServerContacted_ = f;
+    acceptMetalink_ = f;
   }
-  bool getMetalinkServerContacted() const
+  bool getAcceptMetalink() const
   {
-    return metalinkServerContacted_;
+    return acceptMetalink_;
   }
+
+  NetStat& getNetStat()
+  {
+    return netStat_;
+  }
+
+  // This method also updates global download length held by
+  // RequestGroupMan via getOwnerRequestGroup().
+  void updateDownloadLength(size_t bytes);
+
+  // This method also updates global upload length held by
+  // RequestGroupMan via getOwnerRequestGroup().
+  void updateUploadLength(size_t bytes);
 };
 
 } // namespace aria2

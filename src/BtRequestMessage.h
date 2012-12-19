@@ -39,10 +39,6 @@
 
 namespace aria2 {
 
-class BtRequestMessage;
-
-typedef SharedHandle<BtRequestMessage> BtRequestMessageHandle;
-
 class BtRequestMessage : public RangeBtMessage {
 private:
   size_t blockIndex_;
@@ -54,12 +50,12 @@ public:
 
   static const uint8_t ID = 6;
 
-  static const std::string NAME;
+  static const char NAME[];
 
   size_t getBlockIndex() const { return blockIndex_; }
   void setBlockIndex(size_t blockIndex) { blockIndex_ = blockIndex; }
 
-  static SharedHandle<BtRequestMessage> create
+  static BtRequestMessage* create
   (const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();

@@ -37,9 +37,9 @@
 
 #include "ExtensionMessage.h"
 
-#include <map>
-
 #include "BtConstants.h"
+#include "ExtensionMessageRegistry.h"
+#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -54,7 +54,7 @@ private:
 
   size_t metadataSize_;
 
-  std::map<std::string, uint8_t> extensions_;
+  ExtensionMessageRegistry extreg_;
 
   SharedHandle<DownloadContext> dctx_;
 
@@ -70,13 +70,13 @@ public:
   {
     return 0;
   }
-  
-  virtual const std::string& getExtensionName() const
+
+  virtual const char* getExtensionName() const
   {
     return EXTENSION_NAME;
   }
 
-  static const std::string EXTENSION_NAME;
+  static const char EXTENSION_NAME[];
 
   virtual std::string toString() const;
 
@@ -117,25 +117,17 @@ public:
     dctx_ = dctx;
   }
 
-  void setExtension(const std::string& name, uint8_t id)
-  {
-    extensions_[name] = id;
-  }
+  void setExtension(int key, uint8_t id);
 
-  void setExtensions(const Extensions& extensions)
-  {
-    extensions_ = extensions;
-  }
+  void setExtensions(const Extensions& extensions);
 
-  uint8_t getExtensionMessageID(const std::string& name) const;
+  uint8_t getExtensionMessageID(int key) const;
 
   void setPeer(const SharedHandle<Peer>& peer);
 
-  static SharedHandle<HandshakeExtensionMessage>
+  static HandshakeExtensionMessage*
   create(const unsigned char* data, size_t dataLength);
 };
-
-typedef SharedHandle<HandshakeExtensionMessage> HandshakeExtensionMessageHandle;
 
 } // namespace aria2
 

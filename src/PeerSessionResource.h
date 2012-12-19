@@ -41,8 +41,9 @@
 #include <set>
 
 #include "BtConstants.h"
-#include "PeerStat.h"
+#include "NetStat.h"
 #include "TimerA2.h"
+#include "ExtensionMessageRegistry.h"
 
 namespace aria2 {
 
@@ -51,6 +52,20 @@ class BtMessageDispatcher;
 
 class PeerSessionResource {
 private:
+  BitfieldMan* bitfieldMan_;
+  // fast index set which a peer has sent to localhost.
+  std::set<size_t> peerAllowedIndexSet_;
+  // fast index set which localhost has sent to a peer.
+  std::set<size_t> amAllowedIndexSet_;
+  ExtensionMessageRegistry extreg_;
+  NetStat netStat_;
+
+  Timer lastDownloadUpdate_;
+
+  Timer lastAmUnchoking_;
+
+  BtMessageDispatcher* dispatcher_;
+
   // localhost is choking this peer
   bool amChoking_;
   // localhost is interested in this peer
@@ -65,23 +80,9 @@ private:
   bool optUnchoking_;
   // this peer is snubbing.
   bool snubbing_;
-
-  BitfieldMan* bitfieldMan_;
   bool fastExtensionEnabled_;
-  // fast index set which a peer has sent to localhost.
-  std::set<size_t> peerAllowedIndexSet_;
-  // fast index set which localhost has sent to a peer.
-  std::set<size_t> amAllowedIndexSet_;
   bool extendedMessagingEnabled_;
-  Extensions extensions_;
   bool dhtEnabled_;
-  PeerStat peerStat_;
-
-  Timer lastDownloadUpdate_;
-
-  Timer lastAmUnchoking_;
-
-  BtMessageDispatcher* dispatcher_;
 public:
   PeerSessionResource(int32_t pieceLength, int64_t totalLength);
 
@@ -118,7 +119,7 @@ public:
   }
 
   void peerInterested(bool b);
-  
+
   // this peer should be choked
   bool chokingRequired() const
   {
@@ -148,7 +149,7 @@ public:
   bool hasAllPieces() const;
 
   void updateBitfield(size_t index, int operation);
-  
+
   void setBitfield(const unsigned char* bitfield, size_t bitfieldLength);
 
   const unsigned char* getBitfield() const;
@@ -192,11 +193,11 @@ public:
 
   void extendedMessagingEnabled(bool b);
 
-  uint8_t getExtensionMessageID(const std::string& name) const;
+  uint8_t getExtensionMessageID(int key) const;
 
-  std::string getExtensionName(uint8_t id) const;
+  const char* getExtensionName(uint8_t id) const;
 
-  void addExtension(const std::string& name, uint8_t id);
+  void addExtension(int key, uint8_t id);
 
   bool dhtEnabled() const
   {
@@ -205,9 +206,9 @@ public:
 
   void dhtEnabled(bool b);
 
-  PeerStat& getPeerStat()
+  NetStat& getNetStat()
   {
-    return peerStat_;
+    return netStat_;
   }
 
   int64_t uploadLength() const;

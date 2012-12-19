@@ -39,19 +39,15 @@
 
 namespace aria2 {
 
-class BtHaveAllMessage;
-
-typedef SharedHandle<BtHaveAllMessage> BtHaveAllMessageHandle;
-
 class BtHaveAllMessage : public ZeroBtMessage {
 public:
   BtHaveAllMessage();
 
   static const uint8_t ID = 14;
 
-  static const std::string NAME;
+  static const char NAME[];
 
-  static SharedHandle<BtHaveAllMessage> create
+  static BtHaveAllMessage* create
   (const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();

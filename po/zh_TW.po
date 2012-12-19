@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
 "PO-Revision-Date: 2008-10-08 08:24+0000\n"
 "Last-Translator: snufkinto <Unknown>\n"
 "Language-Team: Traditional Chinese <zh_TW@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2008-10-14 11:24+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:40+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -38,46 +38,49 @@ msgid ""
 msgstr ""
 "如有錯誤，請查看日誌記錄檔案。詳細資訊請參考幫助/man page內的 '-l' 選項。"
 
-#: src/MultiUrlRequestInfo.cc:253
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:273
+#, c-format
 msgid "Serialized session to '%s' successfully."
-msgstr "ServerStat檔案 %s 儲存成功。"
+msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:276
+#, c-format
 msgid "Failed to serialize session to '%s'."
-msgstr "寫入ServerStat至 %s 失敗。"
+msgstr ""
 
-#: src/RequestGroupMan.cc:442
-#, fuzzy, c-format
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
+
+#: src/RequestGroupMan.cc:445
+#, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "下載完畢：%s"
+msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "下載結果："
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "狀態說明："
 
-#: src/RequestGroupMan.cc:773
-#, fuzzy
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
-msgstr "下載完畢。"
+msgstr ""
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:782
-#, fuzzy
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
-msgstr "下載已中斷。"
+msgstr ""
 
 #: src/OptionHandler.cc:38
 msgid "                              Default: "
@@ -97,11 +100,10 @@ msgid ""
 msgstr " -d, --dir=DIR 指定儲存下載檔案的目錄。"
 
 #: src/usage_text.h:39
-#, fuzzy
 msgid ""
 " -o, --out=FILE               The file name of the downloaded file. When -Z\n"
 "                              option is used, this option is ignored."
-msgstr " -o, --out=FILE 指定儲存下載檔案的名稱。"
+msgstr ""
 
 #: src/usage_text.h:42
 msgid ""
@@ -199,9 +201,8 @@ msgid " --http-passwd=PASSWD         Set HTTP password. This affects all URLs."
 msgstr " --http-passwd=PASSWD 設定HTTP密碼（對所有URL有效）。"
 
 #: src/usage_text.h:95
-#, fuzzy
 msgid " --proxy-method=METHOD        Set the method to use in proxy request."
-msgstr " --http-proxy-method=METHOD 設定代理請求所使用的方法。"
+msgstr ""
 
 #: src/usage_text.h:97
 msgid " --referer=REFERER            Set Referer. This affects all URLs."
@@ -428,9 +429,8 @@ msgid " -U, --user-agent=USER_AGENT  Set user agent for http(s) downloads."
 msgstr " -U, --user-agent=USER_AGENT 為http(s)下載設定使用者識別字串。"
 
 #: src/usage_text.h:222
-#, fuzzy
 msgid " -n, --no-netrc[=true|false]  Disables netrc support."
-msgstr " -n, --no-netrc 停用netrc支援。"
+msgstr ""
 
 #: src/usage_text.h:224
 msgid ""
@@ -587,9 +587,8 @@ msgid " --enable-peer-exchange[=true|false] Enable Peer Exchange extension."
 msgstr " --enable-peer-exchange[=true|false] 使用Peer Exchange擴充套件。"
 
 #: src/usage_text.h:310
-#, fuzzy
 msgid " --enable-dht[=true|false]    Enable IPv4 DHT functionality."
-msgstr " --enable-dht[=true|false] 使用DHT功能。"
+msgstr ""
 
 #: src/usage_text.h:312
 msgid ""
@@ -609,10 +608,9 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:321
-#, fuzzy
 msgid ""
 " --dht-file-path=PATH         Change the IPv4 DHT routing table file to PATH."
-msgstr " --conf-path=PATH 更改設定檔案路徑至PATH。"
+msgstr ""
 
 #: src/usage_text.h:323
 msgid ""
@@ -668,13 +666,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:351
-#, fuzzy
 msgid ""
 " -M, --metalink-file=METALINK_FILE The file path to the .meta4 and ."
 "metalink\n"
 "                              file. Reads input from stdin when '-' is\n"
 "                              specified."
-msgstr " -M, --metalink-file=METALINK_FILE .metalink檔案路徑。"
+msgstr ""
 
 #: src/usage_text.h:355
 msgid ""
@@ -764,9 +761,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:403
-#, fuzzy
 msgid " --no-conf[=true|false]       Disable loading aria2.conf file."
-msgstr " --no-conf 停止載入aria2.conf設定檔。"
+msgstr ""
 
 #: src/usage_text.h:405
 msgid ""
@@ -793,9 +789,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:416
-#, fuzzy
 msgid " -q, --quiet[=true|false]     Make aria2 quiet(no console output)."
-msgstr " -q, --quiet[=true|false] 使用aria2安靜模式（無終端輸出）。"
+msgstr ""
 
 #: src/usage_text.h:418
 msgid " --async-dns[=true|false]     Enable asynchronous DNS."
@@ -1174,9 +1169,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:614
-#, fuzzy
 msgid " --bt-enable-lpd[=true|false] Enable Local Peer Discovery."
-msgstr " --enable-dht[=true|false] 使用DHT功能。"
+msgstr ""
 
 #: src/usage_text.h:616
 msgid ""
@@ -1195,44 +1189,36 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:624
-#, fuzzy
 msgid " --all-proxy-user=USER        Set user for --all-proxy option."
-msgstr " --http-proxy-user=USER 設定HTTP代理伺服器用戶（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:626
-#, fuzzy
 msgid " --all-proxy-passwd=PASSWD    Set password for --all-proxy option."
-msgstr " --http-proxy-passwd=PASSWD 設定HTTP代理伺服器密碼（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:628
-#, fuzzy
 msgid " --http-proxy-user=USER       Set user for --http-proxy option."
-msgstr " --http-proxy-user=USER 設定HTTP代理伺服器用戶（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:630
-#, fuzzy
 msgid " --http-proxy-passwd=PASSWD   Set password for --http-proxy option."
-msgstr " --http-proxy-passwd=PASSWD 設定HTTP代理伺服器密碼（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:632
-#, fuzzy
 msgid " --https-proxy-user=USER      Set user for --https-proxy option."
-msgstr " --http-proxy-user=USER 設定HTTP代理伺服器用戶（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:634
-#, fuzzy
 msgid " --https-proxy-passwd=PASSWD  Set password for --https-proxy option."
-msgstr " --http-proxy-passwd=PASSWD 設定HTTP代理伺服器密碼（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:636
-#, fuzzy
 msgid " --ftp-proxy-user=USER        Set user for --ftp-proxy option."
-msgstr " --http-proxy-user=USER 設定HTTP代理伺服器用戶（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:638
-#, fuzzy
 msgid " --ftp-proxy-passwd=PASSWD    Set password for --ftp-proxy option."
-msgstr " --http-proxy-passwd=PASSWD 設定HTTP代理伺服器密碼（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:640
 msgid ""
@@ -1275,9 +1261,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:662
-#, fuzzy
 msgid " --bt-tracker-timeout=SEC     Set timeout in seconds."
-msgstr " -t, --timeout=SEC 設定超時（秒）。"
+msgstr ""
 
 #: src/usage_text.h:664
 msgid ""
@@ -1291,9 +1276,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:670
-#, fuzzy
 msgid " --dht-message-timeout=SEC    Set timeout in seconds."
-msgstr " -t, --timeout=SEC 設定超時（秒）。"
+msgstr ""
 
 #: src/usage_text.h:672
 msgid ""
@@ -1404,10 +1388,9 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:726
-#, fuzzy
 msgid ""
 " --dht-file-path6=PATH        Change the IPv6 DHT routing table file to PATH."
-msgstr " --conf-path=PATH 更改設定檔案路徑至PATH。"
+msgstr ""
 
 #: src/usage_text.h:728
 msgid ""
@@ -1492,14 +1475,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:773
-#, fuzzy
 msgid " --rpc-user=USER              Set JSON-RPC/XML-RPC user."
-msgstr " --ftp-user=USER 設定FTP用戶（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:775
-#, fuzzy
 msgid " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password."
-msgstr " --ftp-passwd=PASSWD 設定FTP密碼（對所有URL有效）。"
+msgstr ""
 
 #: src/usage_text.h:777
 msgid ""
@@ -1681,9 +1662,60 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:882
-#, fuzzy
 msgid " --enable-mmap[=true|false]   Map files into memory."
-msgstr " --enable-dht[=true|false] 使用DHT功能。"
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
+msgstr ""
 
 #: src/version_usage.cc:57
 msgid " version "
@@ -1724,57 +1756,55 @@ msgid "Visit"
 msgstr ""
 
 #: src/version_usage.cc:87
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
-msgstr "用法: %s [OPTIONS] [URL | TORRENT_FILE | METALINK_FILE]..."
+msgstr ""
 
 #: src/version_usage.cc:92
 #, c-format
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr "列出所有選項。"
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "列出附有標籤'%s'的選項。"
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "選項："
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "列出包含'%s'的選項。"
 
-#: src/version_usage.cc:129
-#, fuzzy, c-format
+#: src/version_usage.cc:130
+#, c-format
 msgid "No option matching with '%s'."
-msgstr "沒有幫助分類或選項名稱符合'%s'。"
+msgstr ""
 
-#: src/version_usage.cc:137
-#, fuzzy, c-format
+#: src/version_usage.cc:138
+#, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
 "all\n"
 " URIs must point to the same file or downloading will fail."
 msgstr ""
-" 你可指定多個URL。除非使用了 -Z 選項，所有URL所指向的須為同一檔案，\n"
-" 否則將下載失敗。"
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -1782,7 +1812,7 @@ msgid ""
 " treated as a separate download."
 msgstr ""
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -1797,14 +1827,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -1817,7 +1847,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "參考man page以獲取更多資訊。"
@@ -1880,12 +1910,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -1895,18 +1925,18 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
+#: src/RequestGroup.cc:680
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -1918,9 +1948,9 @@ msgid ""
 msgstr ""
 
 #: src/message.h:57
-#, fuzzy, c-format
+#, c-format
 msgid "GID#%<PRId64> - Download has already completed: %s"
-msgstr "#%d - 下載已完成：%s"
+msgstr ""
 
 #: src/message.h:106
 #, c-format
@@ -2142,9 +2172,9 @@ msgid "Windows socket library initialization failed"
 msgstr "Windows socket library初始化失敗"
 
 #: src/message.h:154
-#, fuzzy, c-format
+#, c-format
 msgid "%ld second(s) has passed. Stopping application."
-msgstr "已過%d 秒，正在終止程式。"
+msgstr ""
 
 #: src/message.h:155
 #, c-format
@@ -2198,14 +2228,14 @@ msgid "Network problem has occurred. cause:%s"
 msgstr "發生網絡問題，原因： %s"
 
 #: src/message.h:173
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
-msgstr "讀取檔案 %s 失敗，原因：%s"
+msgstr ""
 
 #: src/message.h:175
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from %s. Cause: %s"
-msgstr "讀取檔案 %s 失敗，原因：%s"
+msgstr ""
 
 #: src/message.h:177
 #, c-format
@@ -2215,9 +2245,8 @@ msgid ""
 msgstr ""
 
 #: src/message.h:179
-#, fuzzy
 msgid "No certificate found."
-msgstr "找不到header。"
+msgstr ""
 
 #: src/message.h:180
 msgid "Hostname not match."
@@ -2234,9 +2263,9 @@ msgid ""
 msgstr ""
 
 #: src/message.h:185
-#, fuzzy, c-format
+#, c-format
 msgid "Printing the contents of file '%s'..."
-msgstr "列出包含'%s'的選項。"
+msgstr ""
 
 #: src/message.h:186
 msgid "This file is neither Torrent nor Metalink file. Skipping."
@@ -2248,9 +2277,9 @@ msgid "Is '%s' a file?"
 msgstr ""
 
 #: src/message.h:192
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to find given interface %s, cause: %s"
-msgstr "開啟檔案 %s 失敗，原因：%s"
+msgstr ""
 
 #: src/message.h:194
 #, c-format
@@ -2258,9 +2287,9 @@ msgid "Saved metadata as %s."
 msgstr ""
 
 #: src/message.h:195
-#, fuzzy, c-format
+#, c-format
 msgid "Saving metadata as %s failed. Maybe file already exists."
-msgstr "儲存簽名 %s 失敗，檔案可能已存在。"
+msgstr ""
 
 #: src/message.h:197
 #, c-format
@@ -2583,217 +2612,3 @@ msgstr ""
 #, c-format
 msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr "無效的檔案長度，無法繼續下載 %s: local %s, remote %s"
-
-#~ msgid "See -h option to know other command-line options(%s)."
-#~ msgstr "參考 -h 選項以了解其他指令行選項（%s）。"
-
-#~ msgid "Too large file size. size=%s"
-#~ msgstr "檔案大小太大。size=%s"
-
-#~ msgid "Size mismatch Expected:%s Actual:%s"
-#~ msgstr "大小不相符 期望：%s 真實：%s"
-
-#, fuzzy
-#~ msgid ""
-#~ "Chunk checksum validation failed. checksumIndex=%lu, offset=%s, "
-#~ "expectedHash=%s, actualHash=%s"
-#~ msgstr ""
-#~ "區塊checksum驗證失敗。checksumIndex=%d, offset=%s, expectedHash=%s, "
-#~ "actualHash=%s"
-
-#, fuzzy
-#~ msgid " --enable-xml-rpc[=true|false] Deprecated. Use --enable-rpc instead."
-#~ msgstr " --enable-dht[=true|false] 使用DHT功能。"
-
-#, fuzzy
-#~ msgid " --xml-rpc-user=USER          Deprecated. Use --rpc-user instead."
-#~ msgstr " --ftp-user=USER 設定FTP用戶（對所有URL有效）。"
-
-#, fuzzy
-#~ msgid " --xml-rpc-passwd=PASSWD      Deprecated. Use --rpc-passwd instead."
-#~ msgstr " --ftp-passwd=PASSWD 設定FTP密碼（對所有URL有效）。"
-
-#~ msgid "must be either 'true' or 'false'."
-#~ msgstr "必須為'true'或'false'。"
-
-#~ msgid "must be between %s and %s."
-#~ msgstr "必須在%s和%s之間。"
-
-#~ msgid "must be smaller than or equal to %s."
-#~ msgstr "必須小於或等於%s。"
-
-#~ msgid "must be greater than or equal to %s."
-#~ msgstr "必須大於或等於%s。"
-
-#~ msgid "must be a number."
-#~ msgstr "必須是一個數字。"
-
-#~ msgid "must be smaller than or equal to %.1f."
-#~ msgstr "必須小於或等於%.1f。"
-
-#~ msgid "must be between %.1f and %.1f."
-#~ msgstr "必須在%.1f和%.1f之間。"
-
-#~ msgid "must be greater than or equal to %.1f."
-#~ msgstr "必須大於或等於%.1f。"
-
-#~ msgid "must be one of the following:"
-#~ msgstr "必須為以下其中之一："
-
-#, fuzzy
-#~ msgid "Unrecognized format"
-#~ msgstr "無法識別的代理伺服器格式"
-
-#~ msgid "unrecognized proxy format"
-#~ msgstr "無法識別的代理伺服器格式"
-
-#~ msgid "Failed to open the segment file %s, cause: %s"
-#~ msgstr "開啟分塊檔案 %s 失敗，原因：%s"
-
-#~ msgid "Failed to write into the segment file %s, cause: %s"
-#~ msgstr "寫入分塊檔案 %s 失敗，原因：%s"
-
-#~ msgid "Failed to read from the segment file %s, cause: %s"
-#~ msgstr "讀取分塊檔案 %s 失敗，原因：%s"
-
-#~ msgid "CUID#%d - The download for one segment completed successfully."
-#~ msgstr "CUID#%d - 一個分塊已成功下載完畢。"
-
-#~ msgid "CUID#%d - No segment available."
-#~ msgstr "CUID#%d - 已經沒有多餘的分塊。"
-
-#~ msgid "CUID#%d - Connecting to %s:%d"
-#~ msgstr "CUID#%d - 連接到 %s:%d"
-
-#~ msgid ""
-#~ "CUID#%d - The segment changed. We send the request again with new Range "
-#~ "header."
-#~ msgstr "CUID#%d - 分塊發生變化。將以新的Range header再次發送請求。"
-
-#~ msgid "CUID#%d - Redirecting to %s"
-#~ msgstr "CUID#%d - 重新定向到 %s"
-
-#~ msgid ""
-#~ "CUID#%d - Requesting:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - 正在請求：\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "CUID#%d - Response received:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - 收到回應：\n"
-#~ "%s"
-
-#~ msgid "CUID#%d - Download aborted. URI=%s"
-#~ msgstr "CUID#%d - 下載中斷。 URI=%s"
-
-#~ msgid "CUID#%d - Restarting the download. URI=%s"
-#~ msgstr "CUID#%d - 重新開始下載。 URI=%s"
-
-#~ msgid "CUID#%d - Download aborted."
-#~ msgstr "CUID#%d - 下載中斷。"
-
-#~ msgid "CUID#%d - %d times attempted, but no success. Download aborted."
-#~ msgstr "CUID#%d - %d 次嘗試均失敗，下載中斷。"
-
-#~ msgid "CUID#%d - we got new piece. index=%d"
-#~ msgstr "CUID#%d - 獲得新的分片，index=%d"
-
-#~ msgid "CUID#%d - we got wrong piece. index=%d"
-#~ msgstr "CUID#%d - 獲得錯誤的分片，index=%d"
-
-#~ msgid "CUID#%d - Download not complete: %s"
-#~ msgstr "CUID#%d - 下載未完成：%s"
-
-#~ msgid "CUID#%d - Good checksum: %s"
-#~ msgstr "CUID#%d - 正確的checksum：%s"
-
-#~ msgid "CUID#%d - Bad checksum: %s"
-#~ msgstr "CUID#%d - 錯誤的checksum：%s"
-
-#~ msgid "CUID#%d - Resolving hostname %s"
-#~ msgstr "CUID#%d - 正在解析主機名稱 %s"
-
-#~ msgid "CUID#%d - Name resolution complete: %s -> %s"
-#~ msgstr "CUID#%d - 解析名稱完成：%s -> %s"
-
-#~ msgid "CUID#%d - Name resolution for %s failed:%s"
-#~ msgstr "CUID#%d - %s的名稱解析失敗，原因：%s"
-
-#~ msgid "CUID#%d - DNS cache hit: %s -> %s"
-#~ msgstr "CUID#%d - DNS快取命中： %s -> %s"
-
-#~ msgid "CUID#%d - Abort requested."
-#~ msgstr "CUID#%d - 已請求中斷。"
-
-#~ msgid "CUID#%d - Connecting to the peer %s"
-#~ msgstr "CUID#%d - 連接到peer %s"
-
-#~ msgid ""
-#~ "CUID#%d - Piece received. index=%d, begin=%d, length=%d, offset=%llu, "
-#~ "blockIndex=%d"
-#~ msgstr ""
-#~ "CUID#%d - 已收到分片。 index=%d, begin=%d, length=%d, offset=%llu, "
-#~ "blockIndex=%d"
-
-#~ msgid "CUID#%d - Piece bitfield %s"
-#~ msgstr "CUID#%d - 分片 bitfield %s"
-
-#~ msgid "CUID#%d - Exception caught while validating file integrity."
-#~ msgstr "CUID#%d - 驗證檔案完整性時出現錯誤。"
-
-#~ msgid "CUID#%d - Fast extension enabled."
-#~ msgstr "CUID#%d - 已啟用Fast extension。"
-
-#~ msgid "CUID#%d - Extended Messaging enabled."
-#~ msgstr "CUID#%d - 已啟用Extended Messaging。"
-
-#~ msgid "CUID#%d - Exception caught while allocating file space."
-#~ msgstr "CUID#%d - 分配檔案空間時出現錯誤。"
-
-#~ msgid "CUID#%d - Content-Disposition detected. Use %s as filename"
-#~ msgstr "CUID#%d - 偵測到Content-Disposition。使用 %s 作為檔案名稱"
-
-#~ msgid "CUID#%d - Peer %s:%d banned."
-#~ msgstr "CUID#%d - Peer %s:%d 已被禁止。"
-
-#~ msgid "CUID#%d - Using port %d for accepting new connections"
-#~ msgstr "CUID#%d - 新連接將使用連接埠 %d"
-
-#~ msgid "CUID#%d - An error occurred while binding port=%d"
-#~ msgstr "CUID#%d - 嘗試使用連接埠 %d 時發生錯誤"
-
-#~ msgid "CUID#%d - Error in accepting connection"
-#~ msgstr "CUID#%d - 接受連接時發生錯誤"
-
-#~ msgid "CUID#%d - Error occurred while processing tracker response."
-#~ msgstr "CUID#%d - 處理tracker回應時發生錯誤。"
-
-#~ msgid "CUID#%d - Cannot create tracker request."
-#~ msgstr "CUID#%d - 無法建立tracker請求。"
-
-#~ msgid "CUID#%d - Creating new tracker request command #%d"
-#~ msgstr "CUID#%d - 建立新tracker請求命令 #%d"
-
-#~ msgid " -D, --daemon                 Run as daemon."
-#~ msgstr " -D, --daemon 背景運行。"
-
-#~ msgid "CUID#%d - Unregistering cuid from segmentManager."
-#~ msgstr "CUID#%d - 正在從segmentManager中鉒銷cuid。"
-
-#~ msgid "Files:"
-#~ msgstr "檔案："
-
-#~ msgid ""
-#~ " --http-proxy=HOST:PORT       Use HTTP proxy server. This affects all "
-#~ "URLs."
-#~ msgstr " --http-proxy=HOST:PORT 使用HTTP代理伺服器（對所有URL有效）。"
-
-#~ msgid " -p, --ftp-pasv               Use passive mode in FTP."
-#~ msgstr " -p, --ftp-pasv 使用FTP passive模式。"
-
-#~ msgid " --ftp-via-http-proxy=METHOD  Use HTTP proxy in FTP."
-#~ msgstr " --ftp-via-http-proxy=METHOD 在FTP中使用HTTP代理伺服器。"

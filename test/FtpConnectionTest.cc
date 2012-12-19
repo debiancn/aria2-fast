@@ -52,6 +52,7 @@ public:
     SharedHandle<SocketCore> listenSocket(new SocketCore());
     listenSocket->bind(0);
     listenSocket->beginListen();
+    listenSocket->setBlockingMode();
     std::pair<std::string, uint16_t> addrinfo;
     listenSocket->getAddrInfo(addrinfo);
     listenPort_ = addrinfo.second;
@@ -64,7 +65,8 @@ public:
 
     while(!clientSocket_->isWritable(0));
 
-    serverSocket_.reset(listenSocket->acceptConnection());
+    serverSocket_ = listenSocket->acceptConnection();
+    serverSocket_->setBlockingMode();
     ftp_.reset(new FtpConnection(1, clientSocket_, req_,
                                  authConfigFactory_->createAuthConfig
                                  (req_, option_.get()),

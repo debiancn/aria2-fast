@@ -15,7 +15,7 @@ class HttpHeaderTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testClearField);
   CPPUNIT_TEST(testFieldContains);
   CPPUNIT_TEST_SUITE_END();
-  
+
 public:
   void testGetRange();
   void testFindAll();
@@ -29,79 +29,79 @@ void HttpHeaderTest::testGetRange()
 {
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range",
+    httpHeader.put(HttpHeader::CONTENT_RANGE,
                    "9223372036854775800-9223372036854775801/9223372036854775807");
-    
-    SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range->getEntityLength());
+    Range range = httpHeader.getRange();
+
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range",
+    httpHeader.put(HttpHeader::CONTENT_RANGE,
                    "9223372036854775800-9223372036854775801/9223372036854775807");
-     
-    SharedHandle<Range> range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range->getEntityLength());
+    Range range = httpHeader.getRange();
+
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775800LL, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775801LL, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)9223372036854775807LL, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes */1024");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes */1024");
 
-    SharedHandle<Range> range = httpHeader.getRange();
+    Range range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes 0-9/*");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes 0-9/*");
 
-    SharedHandle<Range> range = httpHeader.getRange();
+    Range range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes */*");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes */*");
 
-    SharedHandle<Range> range = httpHeader.getRange();
+    Range range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes 0");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes 0");
 
-    SharedHandle<Range> range = httpHeader.getRange();
+    Range range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes 0/");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes 0/");
 
-    SharedHandle<Range> range = httpHeader.getRange();
+    Range range = httpHeader.getRange();
 
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getStartByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEndByte());
-    CPPUNIT_ASSERT_EQUAL((int64_t)0, range->getEntityLength());
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.startByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.endByte);
+    CPPUNIT_ASSERT_EQUAL((int64_t)0, range.entityLength);
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes 0-/3");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes 0-/3");
     try {
       httpHeader.getRange();
       CPPUNIT_FAIL("Exception must be thrown");
@@ -111,7 +111,7 @@ void HttpHeaderTest::testGetRange()
   }
   {
     HttpHeader httpHeader;
-    httpHeader.put("content-range", "bytes -0/3");
+    httpHeader.put(HttpHeader::CONTENT_RANGE, "bytes -0/3");
     try {
       httpHeader.getRange();
       CPPUNIT_FAIL("Exception must be thrown");
@@ -124,11 +124,11 @@ void HttpHeaderTest::testGetRange()
 void HttpHeaderTest::testFindAll()
 {
   HttpHeader h;
-  h.put("A", "100");
-  h.put("A", "101");
-  h.put("B", "200");
-  
-  std::vector<std::string> r(h.findAll("A"));
+  h.put(HttpHeader::LINK, "100");
+  h.put(HttpHeader::LINK, "101");
+  h.put(HttpHeader::CONNECTION, "200");
+
+  std::vector<std::string> r(h.findAll(HttpHeader::LINK));
   CPPUNIT_ASSERT_EQUAL((size_t)2, r.size());
   CPPUNIT_ASSERT_EQUAL(std::string("100"), r[0]);
   CPPUNIT_ASSERT_EQUAL(std::string("101"), r[1]);
@@ -138,33 +138,33 @@ void HttpHeaderTest::testClearField()
 {
   HttpHeader h;
   h.setStatusCode(200);
-  h.setVersion(HttpHeader::HTTP_1_1);
-  h.put("Foo", "Bar");
-  
-  CPPUNIT_ASSERT_EQUAL(std::string("Bar"), h.find("Foo"));
+  h.setVersion("HTTP/1.1");
+  h.put(HttpHeader::LINK, "Bar");
+
+  CPPUNIT_ASSERT_EQUAL(std::string("Bar"), h.find(HttpHeader::LINK));
 
   h.clearField();
 
-  CPPUNIT_ASSERT_EQUAL(std::string(""), h.find("Foo"));
+  CPPUNIT_ASSERT_EQUAL(std::string(""), h.find(HttpHeader::LINK));
   CPPUNIT_ASSERT_EQUAL(200, h.getStatusCode());
-  CPPUNIT_ASSERT_EQUAL(std::string(HttpHeader::HTTP_1_1), h.getVersion());
+  CPPUNIT_ASSERT_EQUAL(std::string("HTTP/1.1"), h.getVersion());
 }
 
 void HttpHeaderTest::testFieldContains()
 {
   HttpHeader h;
-  h.put("connection", "Keep-Alive, Upgrade");
-  h.put("upgrade", "WebSocket");
-  h.put("sec-websocket-version", "13");
-  h.put("sec-websocket-version", "8, 7");
-  CPPUNIT_ASSERT(h.fieldContains("connection", "upgrade"));
-  CPPUNIT_ASSERT(h.fieldContains("connection", "keep-alive"));
-  CPPUNIT_ASSERT(!h.fieldContains("connection", "close"));
-  CPPUNIT_ASSERT(h.fieldContains("upgrade", "websocket"));
-  CPPUNIT_ASSERT(!h.fieldContains("upgrade", "spdy"));
-  CPPUNIT_ASSERT(h.fieldContains("sec-websocket-version", "13"));
-  CPPUNIT_ASSERT(h.fieldContains("sec-websocket-version", "8"));
-  CPPUNIT_ASSERT(!h.fieldContains("sec-websocket-version", "6"));
+  h.put(HttpHeader::CONNECTION, "Keep-Alive, Upgrade");
+  h.put(HttpHeader::UPGRADE, "WebSocket");
+  h.put(HttpHeader::SEC_WEBSOCKET_VERSION, "13");
+  h.put(HttpHeader::SEC_WEBSOCKET_VERSION, "8, 7");
+  CPPUNIT_ASSERT(h.fieldContains(HttpHeader::CONNECTION, "upgrade"));
+  CPPUNIT_ASSERT(h.fieldContains(HttpHeader::CONNECTION, "keep-alive"));
+  CPPUNIT_ASSERT(!h.fieldContains(HttpHeader::CONNECTION, "close"));
+  CPPUNIT_ASSERT(h.fieldContains(HttpHeader::UPGRADE, "websocket"));
+  CPPUNIT_ASSERT(!h.fieldContains(HttpHeader::UPGRADE, "spdy"));
+  CPPUNIT_ASSERT(h.fieldContains(HttpHeader::SEC_WEBSOCKET_VERSION, "13"));
+  CPPUNIT_ASSERT(h.fieldContains(HttpHeader::SEC_WEBSOCKET_VERSION, "8"));
+  CPPUNIT_ASSERT(!h.fieldContains(HttpHeader::SEC_WEBSOCKET_VERSION, "6"));
 }
 
 } // namespace aria2

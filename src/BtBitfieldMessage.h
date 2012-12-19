@@ -39,10 +39,6 @@
 
 namespace aria2 {
 
-class BtBitfieldMessage;
-
-typedef SharedHandle<BtBitfieldMessage> BtBitfieldMessageHandle;
-
 class BtBitfieldMessage : public SimpleBtMessage {
 private:
   unsigned char* bitfield_;
@@ -56,7 +52,7 @@ public:
 
   static const uint8_t ID = 5;
 
-  static const std::string NAME;
+  static const char NAME[];
 
   void setBitfield(const unsigned char* bitfield, size_t bitfieldLength);
 
@@ -64,7 +60,7 @@ public:
 
   size_t getBitfieldLength() const { return bitfieldLength_; }
 
-  static BtBitfieldMessageHandle create
+  static BtBitfieldMessage* create
   (const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();

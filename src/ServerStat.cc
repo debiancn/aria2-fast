@@ -46,10 +46,12 @@
 
 namespace aria2 {
 
-const std::string ServerStat::STATUS_STRING[] = {
+namespace {
+const char* STATUS_STRING[] = {
   "OK",
   "ERROR"
 };
+} // namespace
 
 ServerStat::ServerStat(const std::string& hostname, const std::string& protocol)
   : hostname_(hostname),
@@ -94,7 +96,7 @@ void ServerStat::updateSingleConnectionAvgSpeed(int downloadSpeed)
     return;
   if(counter_ < 5) {
     avgDownloadSpeed =
-      ((((float)counter_-1)/(float)counter_)*(float)singleConnectionAvgSpeed_)+ 
+      ((((float)counter_-1)/(float)counter_)*(float)singleConnectionAvgSpeed_)+
       ((1.0/(float)counter_)*(float)downloadSpeed);
   }
   else {
@@ -128,7 +130,7 @@ void ServerStat::updateMultiConnectionAvgSpeed(int downloadSpeed)
     return;
   if(counter_ < 5) {
     avgDownloadSpeed =
-      ((((float)counter_-1)/(float)counter_)*(float)multiConnectionAvgSpeed_) + 
+      ((((float)counter_-1)/(float)counter_)*(float)multiConnectionAvgSpeed_) +
       ((1.0/(float)counter_)*(float)downloadSpeed);
   }
   else {
@@ -161,18 +163,18 @@ void ServerStat::setStatus(STATUS status)
 
 void ServerStat::setStatus(const std::string& status)
 {
-  const std::string* p = std::find(vbegin(STATUS_STRING), vend(STATUS_STRING),
-                                   status);
-  if(p != vend(STATUS_STRING)) {
-    status_ = static_cast<STATUS>(ServerStat::OK+
-                                  std::distance(vbegin(STATUS_STRING), p));
+  for(int i = 0; i < MAX_STATUS; ++i) {
+    if(strcmp(status.c_str(), STATUS_STRING[i]) == 0) {
+      status_ = static_cast<STATUS>(i);
+      break;
+    }
   }
 }
 
 void ServerStat::setStatusInternal(STATUS status)
 {
   A2_LOG_DEBUG(fmt("ServerStat: set status %s for %s (%s)",
-                   STATUS_STRING[status].c_str(),
+                   STATUS_STRING[status],
                    hostname_.c_str(),
                    protocol_.c_str()));
   status_ = status;
@@ -211,7 +213,7 @@ std::string ServerStat::toString() const
              getMultiConnectionAvgSpeed(),
              getLastUpdated().getTime(),
              getCounter(),
-             ServerStat::STATUS_STRING[getStatus()].c_str());
+             STATUS_STRING[getStatus()]);
 }
 
 } // namespace aria2

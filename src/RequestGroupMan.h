@@ -46,6 +46,7 @@
 #include "DownloadResult.h"
 #include "TransferStat.h"
 #include "RequestGroup.h"
+#include "NetStat.h"
 
 namespace aria2 {
 
@@ -75,6 +76,8 @@ private:
 
   int maxOverallUploadSpeedLimit_;
 
+  NetStat netStat_;
+
   // true if JSON-RPC/XML-RPC is enabled.
   bool rpc_;
 
@@ -94,12 +97,12 @@ private:
 
   void formatDownloadResultFull
   (OutputFile& out,
-   const std::string& status,
-   const DownloadResultHandle& downloadResult) const;
+   const char* status,
+   const SharedHandle<DownloadResult>& downloadResult) const;
 
   std::string formatDownloadResult
-  (const std::string& status,
-   const DownloadResultHandle& downloadResult) const;
+  (const char* status,
+   const SharedHandle<DownloadResult>& downloadResult) const;
 
   void configureRequestGroup
   (const SharedHandle<RequestGroup>& requestGroup) const;
@@ -333,9 +336,12 @@ public:
   }
 
   void setUriListParser(const SharedHandle<UriListParser>& uriListParser);
-};
 
-typedef SharedHandle<RequestGroupMan> RequestGroupManHandle;
+  NetStat& getNetStat()
+  {
+    return netStat_;
+  }
+};
 
 } // namespace aria2
 

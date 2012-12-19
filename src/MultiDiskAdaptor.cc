@@ -119,8 +119,7 @@ bool DiskWriterEntry::operator<(const DiskWriterEntry& entry) const
 MultiDiskAdaptor::MultiDiskAdaptor()
   : pieceLength_(0),
     maxOpenFiles_(DEFAULT_MAX_OPEN_FILES),
-    readOnly_(false),
-    enableMmap_(false)
+    readOnly_(false)
 {}
 
 MultiDiskAdaptor::~MultiDiskAdaptor() {}
@@ -133,7 +132,7 @@ SharedHandle<DiskWriterEntry> createDiskWriterEntry
   SharedHandle<DiskWriterEntry> entry(new DiskWriterEntry(fileEntry));
   entry->needsFileAllocation(needsFileAllocation);
   return entry;
-} 
+}
 } // namespace
 
 void MultiDiskAdaptor::resetDiskWriterEntries()
@@ -230,9 +229,8 @@ void MultiDiskAdaptor::resetDiskWriterEntries()
       if(readOnly_) {
         (*i)->getDiskWriter()->enableReadOnly();
       }
-      if(enableMmap_) {
-        (*i)->getDiskWriter()->enableMmap();
-      }
+      // TODO mmap is not enabled at this moment. Call enableMmap()
+      // after this function call.
     }
   }
 }
@@ -243,11 +241,11 @@ void MultiDiskAdaptor::openIfNot
   if(!entry->isOpen()) {
     //     A2_LOG_DEBUG(fmt("DiskWriterEntry: Cache MISS. offset=%s",
     //            util::itos(entry->getFileEntry()->getOffset()).c_str()));
- 
+
     int numOpened = openedDiskWriterEntries_.size();
     (entry.get()->*open)();
     if(numOpened >= maxOpenFiles_) {
-      // Cache is full. 
+      // Cache is full.
       // Choose one DiskWriterEntry randomly and close it.
       size_t index =
         SimpleRandomizer::getInstance()->getRandomNumber(numOpened);
@@ -258,7 +256,7 @@ void MultiDiskAdaptor::openIfNot
       (*i) = entry;
     } else {
       openedDiskWriterEntries_.push_back(entry);
-    } 
+    }
   } else {
     //     A2_LOG_DEBUG(fmt("DiskWriterEntry: Cache HIT. offset=%s",
     //            util::itos(entry->getFileEntry()->getOffset()).c_str()));
@@ -305,7 +303,7 @@ void MultiDiskAdaptor::closeFile()
 }
 
 namespace {
-bool isInRange(const DiskWriterEntryHandle entry, int64_t offset)
+bool isInRange(const SharedHandle<DiskWriterEntry> entry, int64_t offset)
 {
   return entry->getFileEntry()->getOffset() <= offset &&
     offset < entry->getFileEntry()->getLastOffset();
@@ -313,7 +311,7 @@ bool isInRange(const DiskWriterEntryHandle entry, int64_t offset)
 } // namespace
 
 namespace {
-ssize_t calculateLength(const DiskWriterEntryHandle entry,
+ssize_t calculateLength(const SharedHandle<DiskWriterEntry> entry,
                         int64_t fileOffset, ssize_t rem)
 {
   if(entry->getFileEntry()->getLength() < fileOffset+rem) {
@@ -360,7 +358,7 @@ void throwOnDiskWriterNotOpened(const SharedHandle<DiskWriterEntry>& e,
   throw DL_ABORT_EX
     (fmt("DiskWriter for offset=%" PRId64 ", filename=%s is not opened.",
          static_cast<int64_t>(offset),
-         e->getFilePath().c_str()));  
+         e->getFilePath().c_str()));
 }
 } // namespace
 
@@ -456,7 +454,14 @@ void MultiDiskAdaptor::disableReadOnly()
 
 void MultiDiskAdaptor::enableMmap()
 {
-  enableMmap_ = true;
+  for(std::vector<SharedHandle<DiskWriterEntry> >::const_iterator i =
+        diskWriterEntries_.begin(), eoi = diskWriterEntries_.end();
+      i != eoi; ++i) {
+    const SharedHandle<DiskWriter>& dw = (*i)->getDiskWriter();
+    if(dw) {
+      dw->enableMmap();
+    }
+  }
 }
 
 void MultiDiskAdaptor::cutTrailingGarbage()

@@ -110,7 +110,7 @@ void BtPieceMessageTest::testCreate() {
   bittorrent::setIntParam(&msg[5], 12345);
   bittorrent::setIntParam(&msg[9], 256);
   memcpy(&msg[13], data, sizeof(data));
-  SharedHandle<BtPieceMessage> pm = BtPieceMessage::create(&msg[4], 11);
+  SharedHandle<BtPieceMessage> pm(BtPieceMessage::create(&msg[4], 11));
   CPPUNIT_ASSERT_EQUAL((uint8_t)7, pm->getId());
   CPPUNIT_ASSERT_EQUAL((size_t)12345, pm->getIndex());
   CPPUNIT_ASSERT_EQUAL(256, pm->getBegin());
@@ -170,7 +170,7 @@ void BtPieceMessageTest::testChokingEvent_allowedFastEnabled() {
 
   msg->onChokingEvent(BtChokingEvent());
 
-  CPPUNIT_ASSERT(msg->isInvalidate());  
+  CPPUNIT_ASSERT(msg->isInvalidate());
   CPPUNIT_ASSERT_EQUAL((size_t)1, btMessageDispatcher->messageQueue.size());
   SharedHandle<MockBtMessage2> rej =
     dynamic_pointer_cast<MockBtMessage2>
@@ -191,7 +191,7 @@ void BtPieceMessageTest::testChokingEvent_inAmAllowedIndexSet() {
 
   msg->onChokingEvent(BtChokingEvent());
 
-  CPPUNIT_ASSERT(!msg->isInvalidate());  
+  CPPUNIT_ASSERT(!msg->isInvalidate());
   CPPUNIT_ASSERT_EQUAL((size_t)0, btMessageDispatcher->messageQueue.size());
 }
 
@@ -204,7 +204,7 @@ void BtPieceMessageTest::testChokingEvent_invalidate() {
 
   msg->onChokingEvent(BtChokingEvent());
 
-  CPPUNIT_ASSERT(msg->isInvalidate());  
+  CPPUNIT_ASSERT(msg->isInvalidate());
   CPPUNIT_ASSERT_EQUAL((size_t)0, btMessageDispatcher->messageQueue.size());
 }
 
@@ -217,7 +217,7 @@ void BtPieceMessageTest::testChokingEvent_sendingInProgress() {
 
   msg->onChokingEvent(BtChokingEvent());
 
-  CPPUNIT_ASSERT(!msg->isInvalidate());  
+  CPPUNIT_ASSERT(!msg->isInvalidate());
   CPPUNIT_ASSERT_EQUAL((size_t)0, btMessageDispatcher->messageQueue.size());
 }
 
@@ -239,7 +239,7 @@ void BtPieceMessageTest::testCancelSendingPieceEvent_noMatch() {
   msg->onCancelSendingPieceEvent(BtCancelSendingPieceEvent(0, 1024, 16*1024));
 
   CPPUNIT_ASSERT(!msg->isInvalidate());
-  
+
   msg->onCancelSendingPieceEvent(BtCancelSendingPieceEvent(1, 0, 16*1024));
 
   CPPUNIT_ASSERT(!msg->isInvalidate());

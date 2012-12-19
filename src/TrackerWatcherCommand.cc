@@ -112,32 +112,33 @@ bool TrackerWatcherCommand::execute() {
         A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
       }
     }
-  } else if(trackerRequestGroup_->getNumCommand() == 0 &&
-            trackerRequestGroup_->downloadFinished()){
+  } else if(trackerRequestGroup_->getNumCommand() == 0) {
     // We really want to make sure that tracker request has finished
     // by checking getNumCommand() == 0. Because we reset
     // trackerRequestGroup_, if it is still used in other Command, we
     // will get Segmentation fault.
-    try {
-      std::string trackerResponse = getTrackerResponse(trackerRequestGroup_);
+    if(trackerRequestGroup_->downloadFinished()) {
+      try {
+        std::string trackerResponse = getTrackerResponse(trackerRequestGroup_);
 
-      processTrackerResponse(trackerResponse);
-      btAnnounce_->announceSuccess();
-      btAnnounce_->resetAnnounce();
-    } catch(RecoverableException& ex) {
-      A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
-      btAnnounce_->announceFailure();
+        processTrackerResponse(trackerResponse);
+        btAnnounce_->announceSuccess();
+        btAnnounce_->resetAnnounce();
+      } catch(RecoverableException& ex) {
+        A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
+        btAnnounce_->announceFailure();
+        if(btAnnounce_->isAllAnnounceFailed()) {
+          btAnnounce_->resetAnnounce();
+        }
+      }
+      trackerRequestGroup_.reset();
+    } else {
+      // handle errors here
+      btAnnounce_->announceFailure(); // inside it, trackers = 0.
+      trackerRequestGroup_.reset();
       if(btAnnounce_->isAllAnnounceFailed()) {
         btAnnounce_->resetAnnounce();
       }
-    }
-    trackerRequestGroup_.reset();
-  } else if(trackerRequestGroup_->getNumCommand() == 0){
-    // handle errors here
-    btAnnounce_->announceFailure(); // inside it, trackers = 0.
-    trackerRequestGroup_.reset();
-    if(btAnnounce_->isAllAnnounceFailed()) {
-      btAnnounce_->resetAnnounce();
     }
   }
   e_->addCommand(this);
@@ -239,11 +240,10 @@ TrackerWatcherCommand::createRequestGroup(const std::string& uri)
               option->get(PREF_BT_TRACKER_CONNECT_TIMEOUT));
   option->put(PREF_REUSE_URI, A2_V_FALSE);
   option->put(PREF_SELECT_LEAST_USED_HOST, A2_V_FALSE);
-  static const std::string TRACKER_ANNOUNCE_FILE("[tracker.announce]");
   SharedHandle<DownloadContext> dctx
     (new DownloadContext(option->getAsInt(PREF_PIECE_LENGTH),
                          0,
-                         TRACKER_ANNOUNCE_FILE));
+                         "[tracker.announce]"));
   dctx->getFileEntries().front()->setUris(uris);
   rg->setDownloadContext(dctx);
   SharedHandle<DiskWriterFactory> dwf(new ByteArrayDiskWriterFactory());
@@ -254,7 +254,7 @@ TrackerWatcherCommand::createRequestGroup(const std::string& uri)
   // RequestGroup is not handled by RequestGroupMan.
   rg->clearPreDownloadHandler();
   rg->clearPostDownloadHandler();
-  util::removeMetalinkContentTypes(rg);
+  dctx->setAcceptMetalink(false);
   A2_LOG_INFO(fmt("Creating tracker request group GID#%" PRId64 "", rg->getGID()));
   return rg;
 }

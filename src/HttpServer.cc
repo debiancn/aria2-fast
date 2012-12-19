@@ -71,8 +71,8 @@ HttpServer::HttpServer
    reqType_(RPC_TYPE_NONE),
    keepAlive_(true),
    gzip_(false),
-   acceptsPersistentConnection_(true),
-   acceptsGZip_(false)
+   acceptsGZip_(false),
+   secure_(false)
 {}
 
 HttpServer::~HttpServer() {}
@@ -149,25 +149,18 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
     if(setupResponseRecv() < 0) {
       A2_LOG_INFO("Request path is invaild. Ignore the request body.");
     }
-    lastContentLength_ =
-      lastRequestHeader_->findAsLLInt(HttpHeader::CONTENT_LENGTH);
-    if(lastContentLength_ < 0) {
-      throw DL_ABORT_EX("Content-Length must be positive.");
+    const std::string& contentLengthHdr = lastRequestHeader_->
+      find(HttpHeader::CONTENT_LENGTH);
+    if(!contentLengthHdr.empty()) {
+      if(!util::parseLLIntNoThrow(lastContentLength_, contentLengthHdr) ||
+         lastContentLength_ < 0) {
+        throw DL_ABORT_EX(fmt("Invalid Content-Length=%s",
+                              contentLengthHdr.c_str()));
+      }
+    } else {
+      lastContentLength_ = 0;
     }
     headerProcessor_->clear();
-
-    const std::string& connection =
-      lastRequestHeader_->find(HttpHeader::CONNECTION);
-    acceptsPersistentConnection_ =
-      util::strifind(connection.begin(),
-                     connection.end(),
-                     HttpHeader::CLOSE.begin(),
-                     HttpHeader::CLOSE.end()) == connection.end() &&
-      (lastRequestHeader_->getVersion() == HttpHeader::HTTP_1_1 ||
-       util::strifind(connection.begin(),
-                      connection.end(),
-                      HttpHeader::KEEP_ALIVE.begin(),
-                      HttpHeader::KEEP_ALIVE.end()) != connection.end());
 
     std::vector<Scip> acceptEncodings;
     const std::string& acceptEnc =
@@ -177,8 +170,7 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
     acceptsGZip_ = false;
     for(std::vector<Scip>::const_iterator i = acceptEncodings.begin(),
           eoi = acceptEncodings.end(); i != eoi; ++i) {
-      if(util::strieq((*i).first, (*i).second,
-                      HttpHeader::GZIP.begin(), HttpHeader::GZIP.end())) {
+      if(util::strieq((*i).first, (*i).second, "gzip")) {
         acceptsGZip_ = true;
         break;
       }
@@ -390,6 +382,22 @@ std::string HttpServer::createQuery() const
     }
     return reqPath.substr(start, i - start);
   }
+}
+
+bool HttpServer::supportsPersistentConnection() const
+{
+  return keepAlive_ &&
+    lastRequestHeader_ && lastRequestHeader_->isKeepAlive();
+}
+
+bool HttpServer::wantRead() const
+{
+  return socket_->wantRead();
+}
+
+bool HttpServer::wantWrite() const
+{
+  return socket_->wantWrite();
 }
 
 } // namespace aria2

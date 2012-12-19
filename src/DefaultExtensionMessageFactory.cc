@@ -33,6 +33,9 @@
  */
 /* copyright --> */
 #include "DefaultExtensionMessageFactory.h"
+
+#include <cstring>
+
 #include "Peer.h"
 #include "DlAbortEx.h"
 #include "HandshakeExtensionMessage.h"
@@ -64,36 +67,38 @@ DefaultExtensionMessageFactory::DefaultExtensionMessageFactory
 (const SharedHandle<Peer>& peer,
  const SharedHandle<ExtensionMessageRegistry>& registry)
   : peer_(peer),
-    registry_(registry)
+    registry_(registry),
+    messageFactory_(0),
+    dispatcher_(0),
+    tracker_(0)
 {}
 
 DefaultExtensionMessageFactory::~DefaultExtensionMessageFactory() {}
 
-ExtensionMessageHandle
+SharedHandle<ExtensionMessage>
 DefaultExtensionMessageFactory::createMessage(const unsigned char* data, size_t length)
 {
   uint8_t extensionMessageID = *data;
   if(extensionMessageID == 0) {
     // handshake
-    HandshakeExtensionMessageHandle m =
+    HandshakeExtensionMessage* m =
       HandshakeExtensionMessage::create(data, length);
     m->setPeer(peer_);
     m->setDownloadContext(dctx_);
-    return m;
+    return SharedHandle<ExtensionMessage>(m);
   } else {
-    std::string extensionName = registry_->getExtensionName(extensionMessageID);
-    if(extensionName.empty()) {
+    const char* extensionName = registry_->getExtensionName(extensionMessageID);
+    if(!extensionName) {
       throw DL_ABORT_EX
         (fmt("No extension registered for extended message ID %u",
              extensionMessageID));
     }
-    if(extensionName == "ut_pex") {
+    if(strcmp(extensionName, "ut_pex") == 0) {
       // uTorrent compatible Peer-Exchange
-      UTPexExtensionMessageHandle m =
-        UTPexExtensionMessage::create(data, length);
+      UTPexExtensionMessage* m = UTPexExtensionMessage::create(data, length);
       m->setPeerStorage(peerStorage_);
-      return m;
-    } else if(extensionName == "ut_metadata") {
+      return SharedHandle<ExtensionMessage>(m);
+    } else if(strcmp(extensionName, "ut_metadata") == 0) {
       if(length == 0) {
         throw DL_ABORT_EX
           (fmt(MSG_TOO_SMALL_PAYLOAD_SIZE,
@@ -117,14 +122,14 @@ DefaultExtensionMessageFactory::createMessage(const unsigned char* data, size_t 
       }
       switch(msgType->i()) {
       case 0: {
-        SharedHandle<UTMetadataRequestExtensionMessage> m
+        UTMetadataRequestExtensionMessage* m
           (new UTMetadataRequestExtensionMessage(extensionMessageID));
         m->setIndex(index->i());
         m->setDownloadContext(dctx_);
         m->setPeer(peer_);
         m->setBtMessageFactory(messageFactory_);
         m->setBtMessageDispatcher(dispatcher_);
-        return m;
+        return SharedHandle<ExtensionMessage>(m);
       }
       case 1: {
         if(end == length) {
@@ -134,7 +139,7 @@ DefaultExtensionMessageFactory::createMessage(const unsigned char* data, size_t 
         if(!totalSize) {
           throw DL_ABORT_EX("Bad ut_metadata data: total_size not found");
         }
-        SharedHandle<UTMetadataDataExtensionMessage> m
+        UTMetadataDataExtensionMessage* m
           (new UTMetadataDataExtensionMessage(extensionMessageID));
         m->setIndex(index->i());
         m->setTotalSize(totalSize->i());
@@ -142,14 +147,14 @@ DefaultExtensionMessageFactory::createMessage(const unsigned char* data, size_t 
         m->setUTMetadataRequestTracker(tracker_);
         m->setPieceStorage(dctx_->getOwnerRequestGroup()->getPieceStorage());
         m->setDownloadContext(dctx_);
-        return m;
+        return SharedHandle<ExtensionMessage>(m);
       }
       case 2: {
-        SharedHandle<UTMetadataRejectExtensionMessage> m
+        UTMetadataRejectExtensionMessage* m
           (new UTMetadataRejectExtensionMessage(extensionMessageID));
         m->setIndex(index->i());
         // No need to inject tracker because peer will be disconnected.
-        return m;
+        return SharedHandle<ExtensionMessage>(m);
       }
       default:
         throw DL_ABORT_EX
@@ -160,7 +165,7 @@ DefaultExtensionMessageFactory::createMessage(const unsigned char* data, size_t 
       throw DL_ABORT_EX
         (fmt("Unsupported extension message received."
              " extensionMessageID=%u, extensionName=%s",
-             extensionMessageID, extensionName.c_str()));
+             extensionMessageID, extensionName));
     }
   }
 }

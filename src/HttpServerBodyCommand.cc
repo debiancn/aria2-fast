@@ -74,7 +74,8 @@ HttpServerBodyCommand::HttpServerBodyCommand
   : Command(cuid),
     e_(e),
     socket_(socket),
-    httpServer_(httpServer)
+    httpServer_(httpServer),
+    writeCheck_(false)
 {
   // To handle Content-Length == 0 case
   setStatus(Command::STATUS_ONESHOT_REALTIME);
@@ -87,6 +88,9 @@ HttpServerBodyCommand::HttpServerBodyCommand
 HttpServerBodyCommand::~HttpServerBodyCommand()
 {
   e_->deleteSocketForReadCheck(socket_, this);
+  if(writeCheck_) {
+    e_->deleteSocketForWriteCheck(socket_, this);
+  }
 }
 
 namespace {
@@ -144,6 +148,19 @@ void HttpServerBodyCommand::addHttpServerResponseCommand()
   e_->setNoWait(true);
 }
 
+void HttpServerBodyCommand::updateWriteCheck()
+{
+  if(httpServer_->wantWrite()) {
+    if(!writeCheck_) {
+      writeCheck_ = true;
+      e_->addSocketForWriteCheck(socket_, this);
+    }
+  } else if(writeCheck_) {
+    writeCheck_ = false;
+    e_->deleteSocketForWriteCheck(socket_, this);
+  }
+}
+
 bool HttpServerBodyCommand::execute()
 {
   if(e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
@@ -151,6 +168,7 @@ bool HttpServerBodyCommand::execute()
   }
   try {
     if(socket_->isReadable(0) ||
+       (writeCheck_ && socket_->isWritable(0)) ||
        !httpServer_->getSocketRecvBuffer()->bufferEmpty() ||
        httpServer_->getContentLength() == 0) {
       timeoutTimer_ = global::wallclock();
@@ -169,14 +187,14 @@ bool HttpServerBodyCommand::execute()
           const SharedHandle<HttpHeader>& header =
             httpServer_->getRequestHeader();
           std::string accessControlHeaders;
-          if(!header->find("origin").empty() &&
-             !header->find("access-control-request-method").empty() &&
-             !httpServer_->getAllowOrigin().empty()) {
+          if(!header->find(HttpHeader::ORIGIN).empty() &&
+             !header->find(HttpHeader::ACCESS_CONTROL_REQUEST_METHOD).empty()
+             && !httpServer_->getAllowOrigin().empty()) {
             accessControlHeaders +=
               "Access-Control-Allow-Methods: POST, GET, OPTIONS\r\n"
               "Access-Control-Max-Age: 1728000\r\n";
             const std::string& accReqHeaders =
-              header->find("access-control-request-headers");
+              header->find(HttpHeader::ACCESS_CONTROL_REQUEST_HEADERS);
             if(!accReqHeaders.empty()) {
               // We allow all headers requested.
               accessControlHeaders += "Access-Control-Allow-Headers: ";
@@ -290,9 +308,10 @@ bool HttpServerBodyCommand::execute()
           return true;
         }
       } else {
+        updateWriteCheck();
         e_->addCommand(this);
         return false;
-      } 
+      }
     } else {
       if(timeoutTimer_.difference(global::wallclock()) >= 30) {
         A2_LOG_INFO("HTTP request body timeout.");

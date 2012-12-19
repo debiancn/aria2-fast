@@ -88,20 +88,11 @@ public:
    * Otherwise returns false.
    */
   virtual bool isPeerAvailable() = 0;
-  
+
   /**
    * Returns the list of peers which are currently connected from localhost.
    */
   virtual void getActivePeers(std::vector<SharedHandle<Peer> >& peers) = 0;
-
-  /**
-   * Calculates current download/upload statistics.
-   */
-  virtual TransferStat calculateStat() = 0;
-
-  virtual void updateTransferStatFor(const SharedHandle<Peer>& peer) = 0;
-
-  virtual TransferStat getTransferStatFor(const SharedHandle<Peer>& peer) = 0;
 
   /**
    * Returns true if peer with ipaddr should be ignored because, for
@@ -123,8 +114,6 @@ public:
 
   virtual void executeChoke() = 0;
 };
-
-typedef SharedHandle<PeerStorage> PeerStorageHandle;
 
 } // namespace aria2
 

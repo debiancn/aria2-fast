@@ -54,7 +54,7 @@
 #include "File.h"
 #include "Option.h"
 #include "Logger.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "message.h"
 #include "prefs.h"
 #include "fmt.h"
@@ -137,9 +137,9 @@ HttpResponseCommand::HttpResponseCommand
  const SharedHandle<Request>& req,
  const SharedHandle<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const HttpConnectionHandle& httpConnection,
+ const SharedHandle<HttpConnection>& httpConnection,
  DownloadEngine* e,
- const SocketHandle& s)
+ const SharedHandle<SocketCore>& s)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e, s,
                     httpConnection->getSocketRecvBuffer()),
     httpConnection_(httpConnection)
@@ -197,9 +197,9 @@ bool HttpResponseCommand::executeInternal()
   }
   if(!getPieceStorage()) {
     // Metalink/HTTP
-    if(!getDownloadContext()->getMetalinkServerContacted()) {
+    if(getDownloadContext()->getAcceptMetalink()) {
       if(httpHeader->defined(HttpHeader::LINK)) {
-        getDownloadContext()->setMetalinkServerContacted(true);
+        getDownloadContext()->setAcceptMetalink(false);
         std::vector<MetalinkHttpEntry> entries;
         httpResponse->getMetalinKHttpEntries(entries, getOption());
         for(std::vector<MetalinkHttpEntry>::iterator i = entries.begin(),
@@ -239,13 +239,15 @@ bool HttpResponseCommand::executeInternal()
   if(getFileEntry()->isUniqueProtocol()) {
     // Redirection should be considered here. We need to parse
     // original URI to get hostname.
-    uri::UriStruct us;
-    if(uri::parse(us, getRequest()->getUri())) {
-      getFileEntry()->removeURIWhoseHostnameIs(us.host);
+    const std::string& uri = getRequest()->getUri();
+    uri_split_result us;
+    if(uri_split(&us, uri.c_str()) == 0) {
+      std::string host = uri::getFieldString(us, USR_HOST, uri.c_str());
+      getFileEntry()->removeURIWhoseHostnameIs(host);
     }
   }
   if(!getPieceStorage()) {
-    util::removeMetalinkContentTypes(getRequestGroup());
+    getDownloadContext()->setAcceptMetalink(false);
     int64_t totalLength = httpResponse->getEntityLength();
     getFileEntry()->setLength(totalLength);
     if(getFileEntry()->getPath().empty()) {
@@ -558,7 +560,7 @@ HttpDownloadCommand* HttpResponseCommand::createHttpDownloadCommand
   command->installStreamFilter(filter);
   if(getRequestGroup()->isFileAllocationEnabled() &&
      !decideFileAllocation(filter)) {
-    getRequestGroup()->setFileAllocationEnabled(false);    
+    getRequestGroup()->setFileAllocationEnabled(false);
   }
   getRequestGroup()->getURISelector()->tuneDownloadCommand
     (getFileEntry()->getRemainingUris(), command);

@@ -36,6 +36,7 @@
 #define D_DEFAULT_BT_PROGRESS_INFO_FILE_H
 
 #include "BtProgressInfoFile.h"
+#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -57,9 +58,6 @@ private:
   std::string filename_;
 
   bool isTorrentDownload();
-
-  static const std::string V0000;
-  static const std::string V0001;
 public:
   DefaultBtProgressInfoFile(const SharedHandle<DownloadContext>& btContext,
                             const SharedHandle<PieceStorage>& pieceStorage,
@@ -68,7 +66,7 @@ public:
   virtual ~DefaultBtProgressInfoFile();
 
   virtual std::string getFilename() { return filename_; }
-  
+
   virtual bool exists();
 
   virtual void save();

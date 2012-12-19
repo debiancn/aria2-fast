@@ -46,6 +46,10 @@ namespace aria2 {
 
 PeerSessionResource::PeerSessionResource(int32_t pieceLength, int64_t totalLength)
   :
+  bitfieldMan_(new BitfieldMan(pieceLength, totalLength)),
+  lastDownloadUpdate_(0),
+  lastAmUnchoking_(0),
+  dispatcher_(0),
   amChoking_(true),
   amInterested_(false),
   peerChoking_(true),
@@ -53,13 +57,9 @@ PeerSessionResource::PeerSessionResource(int32_t pieceLength, int64_t totalLengt
   chokingRequired_(true),
   optUnchoking_(false),
   snubbing_(false),
-  bitfieldMan_(new BitfieldMan(pieceLength, totalLength)),
   fastExtensionEnabled_(false),
   extendedMessagingEnabled_(false),
-  dhtEnabled_(false),
-  lastDownloadUpdate_(0),
-  lastAmUnchoking_(0),
-  dispatcher_(0)
+  dhtEnabled_(false)
 {}
 
 PeerSessionResource::~PeerSessionResource()
@@ -89,7 +89,7 @@ void PeerSessionResource::peerInterested(bool b)
 {
   peerInterested_ = b;
 }
-  
+
 void PeerSessionResource::chokingRequired(bool b)
 {
   chokingRequired_ = b;
@@ -192,32 +192,19 @@ void PeerSessionResource::extendedMessagingEnabled(bool b)
   extendedMessagingEnabled_ = b;
 }
 
-uint8_t
-PeerSessionResource::getExtensionMessageID(const std::string& name) const
+uint8_t PeerSessionResource::getExtensionMessageID(int key) const
 {
-  Extensions::const_iterator itr = extensions_.find(name);
-  if(itr == extensions_.end()) {
-    return 0;
-  } else {
-    return (*itr).second;
-  }
+  return extreg_.getExtensionMessageID(key);
 }
 
-std::string PeerSessionResource::getExtensionName(uint8_t id) const
+const char* PeerSessionResource::getExtensionName(uint8_t id) const
 {
-  for(Extensions::const_iterator itr = extensions_.begin(),
-        eoi = extensions_.end(); itr != eoi; ++itr) {
-    const Extensions::value_type& p = *itr;
-    if(p.second == id) {
-      return p.first;
-    }
-  }
-  return A2STR::NIL;
+  return extreg_.getExtensionName(id);
 }
 
-void PeerSessionResource::addExtension(const std::string& name, uint8_t id)
+void PeerSessionResource::addExtension(int key, uint8_t id)
 {
-  extensions_[name] = id;
+  extreg_.setExtensionMessageID(key, id);
 }
 
 void PeerSessionResource::dhtEnabled(bool b)
@@ -227,23 +214,22 @@ void PeerSessionResource::dhtEnabled(bool b)
 
 int64_t PeerSessionResource::uploadLength() const
 {
-  return peerStat_.getSessionUploadLength();
+  return netStat_.getSessionUploadLength();
 }
 
 void PeerSessionResource::updateUploadLength(int32_t bytes)
 {
-  peerStat_.updateUploadLength(bytes);
+  netStat_.updateUploadLength(bytes);
 }
 
 int64_t PeerSessionResource::downloadLength() const
 {
-  return peerStat_.getSessionDownloadLength();
+  return netStat_.getSessionDownloadLength();
 }
 
 void PeerSessionResource::updateDownloadLength(int32_t bytes)
 {
-  peerStat_.updateDownloadLength(bytes);
-
+  netStat_.updateDownloadLength(bytes);
   lastDownloadUpdate_ = global::wallclock();
 }
 

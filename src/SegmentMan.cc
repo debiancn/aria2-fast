@@ -65,12 +65,10 @@ SegmentEntry::~SegmentEntry() {}
 SegmentMan::SegmentMan
 (const Option* option,
  const SharedHandle<DownloadContext>& downloadContext,
- const PieceStorageHandle& pieceStorage)
+ const SharedHandle<PieceStorage>& pieceStorage)
   : option_(option),
     downloadContext_(downloadContext),
     pieceStorage_(pieceStorage),
-    lastPeerStatDlspdMapUpdated_(0),
-    cachedDlspd_(0),
     ignoreBitfield_(downloadContext->getPieceLength(),
                     downloadContext->getTotalLength())
 {
@@ -103,7 +101,7 @@ int64_t SegmentMan::getTotalLength() const
   }
 }
 
-void SegmentMan::setPieceStorage(const PieceStorageHandle& pieceStorage)
+void SegmentMan::setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
@@ -130,7 +128,7 @@ SharedHandle<Segment> SegmentMan::checkoutSegment
   } else {
     segment.reset(new PiecedSegment(downloadContext_->getPieceLength(), piece));
   }
-  SegmentEntryHandle entry(new SegmentEntry(cuid, segment));
+  SharedHandle<SegmentEntry> entry(new SegmentEntry(cuid, segment));
   usedSegmentEntries_.push_back(entry);
   A2_LOG_DEBUG(fmt("index=%lu, length=%d, segmentLength=%d,"
                    " writtenLength=%d",
@@ -162,7 +160,7 @@ void SegmentMan::getInFlightSegment
 {
   for(SegmentEntries::const_iterator itr = usedSegmentEntries_.begin(),
         eoi = usedSegmentEntries_.end(); itr != eoi; ++itr) {
-    const SegmentEntryHandle& segmentEntry = *itr;
+    const SharedHandle<SegmentEntry>& segmentEntry = *itr;
     if(segmentEntry->cuid == cuid) {
       segments.push_back(segmentEntry->segment);
     }
@@ -239,7 +237,7 @@ SharedHandle<Segment> SegmentMan::getCleanSegmentIfOwnerIsIdle
       }
       cuid_t owner = segmentEntry->cuid;
       SharedHandle<PeerStat> ps = getPeerStat(owner);
-      if(!ps || ps->getStatus() == PeerStat::IDLE) {
+      if(!ps || ps->getStatus() == NetStat::IDLE) {
         cancelSegment(owner);
         return getSegmentWithIndex(cuid, index);
       } else {
@@ -314,7 +312,7 @@ private:
 public:
   FindSegmentEntry(const SharedHandle<Segment>& segment):segment_(segment) {}
 
-  bool operator()(const SegmentEntryHandle& segmentEntry) const
+  bool operator()(const SharedHandle<SegmentEntry>& segmentEntry) const
   {
     return segmentEntry->segment->getIndex() == segment_->getIndex();
   }
@@ -350,13 +348,6 @@ int64_t SegmentMan::getDownloadLength() const {
 
 void SegmentMan::registerPeerStat(const SharedHandle<PeerStat>& peerStat)
 {
-  for(std::vector<SharedHandle<PeerStat> >::iterator i = peerStats_.begin(),
-        eoi = peerStats_.end(); i != eoi; ++i) {
-    if((*i)->getStatus() == PeerStat::IDLE) {
-      *i = peerStat;
-      return;
-    }
-  }
   peerStats_.push_back(peerStat);
 }
 
@@ -402,57 +393,6 @@ void SegmentMan::updateFastestPeerStat(const SharedHandle<PeerStat>& peerStat)
     // peerStat's SessionDownloadLength must be added to *i
     (*i)->addSessionDownloadLength(peerStat->getSessionDownloadLength());
   }
-}
-
-int SegmentMan::calculateDownloadSpeed()
-{
-  int speed = 0;
-  if(lastPeerStatDlspdMapUpdated_.differenceInMillis(global::wallclock())+
-     A2_DELTA_MILLIS >= 250){
-    lastPeerStatDlspdMapUpdated_ = global::wallclock();
-    peerStatDlspdMap_.clear();
-    for(std::vector<SharedHandle<PeerStat> >::const_iterator i =
-          peerStats_.begin(), eoi = peerStats_.end(); i != eoi; ++i) {
-      if((*i)->getStatus() == PeerStat::ACTIVE) {
-        int s = (*i)->calculateDownloadSpeed();
-        peerStatDlspdMap_[(*i)->getCuid()] = s;
-        speed += s;
-      }
-    }
-    cachedDlspd_ = speed;
-  } else {
-    speed = cachedDlspd_;
-  }
-  return speed;
-}
-
-void SegmentMan::updateDownloadSpeedFor(const SharedHandle<PeerStat>& pstat)
-{
-  int newspd = pstat->calculateDownloadSpeed();
-  int oldSpd = peerStatDlspdMap_[pstat->getCuid()];
-  if(cachedDlspd_ > oldSpd) {
-    cachedDlspd_ -= oldSpd;
-    cachedDlspd_ += newspd;
-  } else {
-    cachedDlspd_ = newspd;
-  }
-  peerStatDlspdMap_[pstat->getCuid()] = newspd;
-}
-
-namespace {
-class PeerStatDownloadLengthOperator {
-public:
-  int64_t operator()(int64_t total, const SharedHandle<PeerStat>& ps)
-  {
-    return ps->getSessionDownloadLength()+total;
-  }
-};
-} // namespace
-
-int64_t SegmentMan::calculateSessionDownloadLength() const
-{
-  return std::accumulate(fastestPeerStats_.begin(), fastestPeerStats_.end(),
-                         0LL, PeerStatDownloadLengthOperator());
 }
 
 size_t SegmentMan::countFreePieceFrom(size_t index) const

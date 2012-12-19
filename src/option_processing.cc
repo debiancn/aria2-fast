@@ -141,7 +141,7 @@ void showCandidates
   std::vector<std::pair<int, const Pref*> > cands;
   for(int i = 1, len = option::countOption(); i < len; ++i) {
     const Pref* pref = option::i2p(i);
-    const SharedHandle<OptionHandler>& h = parser->find(pref);
+    const OptionHandler* h = parser->find(pref);
     if(!h || h->isHidden()) {
       continue;
     }
@@ -160,8 +160,8 @@ void showCandidates
   }
   std::sort(cands.begin(), cands.end());
   int threshold = cands[0].first;
-  // threshold value 7 is borrowed from git, help.c.
-  if(threshold >= 7) {
+  // threshold value 12 is a magic value.
+  if(threshold > 12) {
     return;
   }
   global::cerr()->printf("\n");
@@ -198,7 +198,7 @@ void option_processing(Option& op, std::vector<std::string>& uris,
       if(op.defined(PREF_HELP)) {
         std::string keyword;
         if(op.get(PREF_HELP).empty()) {
-          keyword = TAG_BASIC;
+          keyword = strHelpTag(TAG_BASIC);
         } else {
           keyword = op.get(PREF_HELP);
           if(util::startsWith(keyword, "--")) {
@@ -217,14 +217,14 @@ void option_processing(Option& op, std::vector<std::string>& uris,
     oparser->parseDefaultValues(op);
 
     if(!noConf) {
-      std::string cfname = 
+      std::string cfname =
         ucfname.empty() ?
         oparser->find(PREF_CONF_PATH)->getDefaultValue() : ucfname;
 
       if(File(cfname).isFile()) {
         std::stringstream ss;
         {
-          BufferedFile fp(cfname, BufferedFile::READ);
+          BufferedFile fp(cfname.c_str(), BufferedFile::READ);
           if(fp) {
             fp.transfer(ss);
           }
@@ -234,7 +234,7 @@ void option_processing(Option& op, std::vector<std::string>& uris,
         } catch(OptionHandlerException& e) {
           global::cerr()->printf(_("Parse error in %s"), cfname.c_str());
           global::cerr()->printf("\n%s", e.stackTrace().c_str());
-          const SharedHandle<OptionHandler>& h = oparser->find(e.getPref());
+          const OptionHandler* h = oparser->find(e.getPref());
           if(h) {
             global::cerr()->printf(_("Usage:"));
             global::cerr()->printf("\n%s\n", h->getDescription());
@@ -249,7 +249,7 @@ void option_processing(Option& op, std::vector<std::string>& uris,
         global::cerr()->printf(_("Configuration file %s is not found."),
                                cfname.c_str());
         global::cerr()->printf("\n");
-        showUsage(TAG_HELP, oparser, global::cerr());
+        showUsage(strHelpTag(TAG_HELP), oparser, global::cerr());
         exit(error_code::UNKNOWN_ERROR);
       }
     }
@@ -275,7 +275,7 @@ void option_processing(Option& op, std::vector<std::string>& uris,
 #endif // __MINGW32__
   } catch(OptionHandlerException& e) {
     global::cerr()->printf("%s", e.stackTrace().c_str());
-    const SharedHandle<OptionHandler>& h = oparser->find(e.getPref());
+    const OptionHandler* h = oparser->find(e.getPref());
     if(h) {
       global::cerr()->printf(_("Usage:"));
       global::cerr()->printf("\n");

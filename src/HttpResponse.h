@@ -60,7 +60,7 @@ private:
   SharedHandle<HttpHeader> httpHeader_;
 public:
   HttpResponse();
-  
+
   ~HttpResponse();
 
   void validateResponse() const;
@@ -123,10 +123,6 @@ public:
   {
     cuid_ = cuid;
   }
-
-  bool hasRetryAfter() const;
-
-  time_t getRetryAfter() const;
 
   Time getLastModifiedTime() const;
 

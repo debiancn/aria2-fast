@@ -49,7 +49,7 @@ class Range;
 
 class HttpHeader {
 private:
-  std::multimap<std::string, std::string> table_;
+  std::multimap<int, std::string> table_;
 
   // HTTP status code, e.g. 200
   int statusCode_;
@@ -69,18 +69,46 @@ public:
   HttpHeader();
   ~HttpHeader();
 
-  // For all methods, use lowercased header field name.
-  void put(const std::string& name, const std::string& value);
-  bool defined(const std::string& name) const;
-  const std::string& find(const std::string& name) const;
-  std::vector<std::string> findAll(const std::string& name) const;
-  std::pair<std::multimap<std::string, std::string>::const_iterator,
-            std::multimap<std::string, std::string>::const_iterator>
-  equalRange(const std::string& name) const;
-  int32_t findAsInt(const std::string& name) const;
-  int64_t findAsLLInt(const std::string& name) const;
+  // The list of headers we are interested in. Only those header
+  // values are stored in table_. When updating this list, also update
+  // INTERESTING_HEADER_NAMES in HttpHeader.cc
+  enum InterestingHeader {
+    ACCEPT_ENCODING,
+    ACCESS_CONTROL_REQUEST_HEADERS,
+    ACCESS_CONTROL_REQUEST_METHOD,
+    AUTHORIZATION,
+    CONNECTION,
+    CONTENT_DISPOSITION,
+    CONTENT_ENCODING,
+    CONTENT_LENGTH,
+    CONTENT_RANGE,
+    CONTENT_TYPE,
+    DIGEST,
+    INFOHASH, // Used for BitTorrent LPD
+    LAST_MODIFIED,
+    LINK,
+    LOCATION,
+    ORIGIN,
+    PORT, // Used for BitTorrent LPD
+    RETRY_AFTER,
+    SEC_WEBSOCKET_KEY,
+    SEC_WEBSOCKET_VERSION,
+    SET_COOKIE,
+    TRANSFER_ENCODING,
+    UPGRADE,
+    MAX_INTERESTING_HEADER
+  };
 
-  SharedHandle<Range> getRange() const;
+  // For all methods, use lowercased header field name.
+  void put(int hdKey, const std::string& value);
+  bool defined(int hdKey) const;
+  const std::string& find(int hdKey) const;
+  std::vector<std::string> findAll(int hdKey) const;
+  std::pair<std::multimap<int, std::string>::const_iterator,
+            std::multimap<int, std::string>::const_iterator>
+  equalRange(int hdKey) const;
+
+  Range getRange() const;
 
   int getStatusCode() const;
 
@@ -125,35 +153,15 @@ public:
 
   // Returns true if heder field |name| contains |value|. This method
   // assumes the values of the header field is delimited by ','.
-  bool fieldContains(const std::string& name, const std::string& value);
+  bool fieldContains(int hdKey, const char* value);
 
-  static const std::string LOCATION;
-  static const std::string TRANSFER_ENCODING;
-  static const std::string CONTENT_ENCODING;
-  static const std::string CONTENT_DISPOSITION;
-  static const std::string SET_COOKIE;
-  static const std::string CONTENT_TYPE;
-  static const std::string RETRY_AFTER;
-  static const std::string CONNECTION;
-  static const std::string CONTENT_LENGTH;
-  static const std::string CONTENT_RANGE;
-  static const std::string LAST_MODIFIED;
-  static const std::string ACCEPT_ENCODING;
-  static const std::string LINK;
-  static const std::string DIGEST;
-  static const std::string AUTHORIZATION;
-  static const std::string PROXY_CONNECTION;
-
-  static const std::string HTTP_1_1;
-  static const std::string CLOSE;
-  static const std::string KEEP_ALIVE;
-  static const std::string CHUNKED;
-  static const std::string GZIP;
-  static const std::string DEFLATE;
+  // Returns true if the headers indicate that the remote endpoint
+  // keeps connection open.
+  bool isKeepAlive() const;
 };
 
-typedef SharedHandle<HttpHeader> HttpHeaderHandle;
+int idInterestingHeader(const char* hdName);
 
-} // namespace std;
+} // namespace
 
 #endif // D_HTTP_HEADER_H

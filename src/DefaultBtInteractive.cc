@@ -79,7 +79,8 @@ namespace aria2 {
 DefaultBtInteractive::DefaultBtInteractive
 (const SharedHandle<DownloadContext>& downloadContext,
  const SharedHandle<Peer>& peer)
-  : downloadContext_(downloadContext),
+  : cuid_(0),
+    downloadContext_(downloadContext),
     peer_(peer),
     metadataGetMode_(false),
     localNode_(0),
@@ -95,7 +96,8 @@ DefaultBtInteractive::DefaultBtInteractive
     dhtEnabled_(false),
     numReceivedMessage_(0),
     maxOutstandingRequest_(DEFAULT_MAX_OUTSTANDING_REQUEST),
-    requestGroupMan_(0)
+    requestGroupMan_(0),
+    tcpPort_(0)
 {}
 
 DefaultBtInteractive::~DefaultBtInteractive() {}
@@ -108,7 +110,7 @@ void DefaultBtInteractive::initiateHandshake() {
   dispatcher_->sendMessages();
 }
 
-BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
+SharedHandle<BtMessage> DefaultBtInteractive::receiveHandshake(bool quickReply) {
   SharedHandle<BtHandshakeMessage> message =
     btMessageReceiver_->receiveHandshake(quickReply);
   if(!message) {
@@ -132,7 +134,7 @@ BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
   }
 
   peer_->setPeerId(message->getPeerId());
-    
+
   if(message->isFastExtensionSupported()) {
     peer_->setFastExtensionEnabled(true);
     A2_LOG_INFO(fmt(MSG_FAST_EXTENSION_ENABLED, cuid_));
@@ -140,7 +142,8 @@ BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
   if(message->isExtendedMessagingEnabled()) {
     peer_->setExtendedMessagingEnabled(true);
     if(!utPexEnabled_) {
-      extensionMessageRegistry_->removeExtension("ut_pex");
+      extensionMessageRegistry_->removeExtension
+        (ExtensionMessageRegistry::UT_PEX);
     }
     A2_LOG_INFO(fmt(MSG_EXTENDED_MESSAGING_ENABLED, cuid_));
   }
@@ -154,7 +157,7 @@ BtMessageHandle DefaultBtInteractive::receiveHandshake(bool quickReply) {
   return message;
 }
 
-BtMessageHandle DefaultBtInteractive::receiveAndSendHandshake() {
+SharedHandle<BtMessage> DefaultBtInteractive::receiveAndSendHandshake() {
   return receiveHandshake(true);
 }
 
@@ -187,9 +190,8 @@ void DefaultBtInteractive::addPortMessageToQueue()
 
 void DefaultBtInteractive::addHandshakeExtendedMessageToQueue()
 {
-  static const std::string CLIENT_ARIA2("aria2/"PACKAGE_VERSION);
-  HandshakeExtensionMessageHandle m(new HandshakeExtensionMessage());
-  m->setClientVersion(CLIENT_ARIA2);
+  SharedHandle<HandshakeExtensionMessage> m(new HandshakeExtensionMessage());
+  m->setClientVersion("aria2/" PACKAGE_VERSION);
   m->setTCPPort(tcpPort_);
   m->setExtensions(extensionMessageRegistry_->getExtensions());
   SharedHandle<TorrentAttribute> attrs =
@@ -279,7 +281,7 @@ size_t DefaultBtInteractive::receiveMessages() {
        downloadContext_->getOwnerRequestGroup()->doesDownloadSpeedExceed()) {
       break;
     }
-    BtMessageHandle message = btMessageReceiver_->receiveMessage();
+    SharedHandle<BtMessage> message = btMessageReceiver_->receiveMessage();
     if(!message) {
       break;
     }
@@ -305,8 +307,6 @@ size_t DefaultBtInteractive::receiveMessages() {
       }
       break;
     case BtPieceMessage::ID:
-      peerStorage_->updateTransferStatFor(peer_);
-      // pass through
     case BtRequestMessage::ID:
       inactiveTimer_ = global::wallclock();
       break;
@@ -367,7 +367,7 @@ void DefaultBtInteractive::fillPiece(size_t maxMissingBlock) {
         btRequestFactory_->getTargetPieceIndexes(excludedIndexes);
         pieceStorage_->getMissingPiece
           (pieces, diffMissingBlock, peer_, excludedIndexes, cuid_);
-      } else {        
+      } else {
         pieces.reserve(diffMissingBlock);
         pieceStorage_->getMissingPiece(pieces, diffMissingBlock, peer_, cuid_);
       }
@@ -472,8 +472,9 @@ void DefaultBtInteractive::addPeerExchangeMessage()
 {
   if(pexTimer_.
      difference(global::wallclock()) >= UTPexExtensionMessage::DEFAULT_INTERVAL) {
-    UTPexExtensionMessageHandle m
-      (new UTPexExtensionMessage(peer_->getExtensionMessageID("ut_pex")));
+    SharedHandle<UTPexExtensionMessage> m
+      (new UTPexExtensionMessage(peer_->getExtensionMessageID
+                                 (ExtensionMessageRegistry::UT_PEX)));
 
     std::vector<SharedHandle<Peer> > activePeers;
     peerStorage_->getActivePeers(activePeers);
@@ -495,7 +496,7 @@ void DefaultBtInteractive::addPeerExchangeMessage()
       }
     }
 
-    BtMessageHandle msg = messageFactory_->createBtExtendedMessage(m);
+    SharedHandle<BtMessage> msg = messageFactory_->createBtExtendedMessage(m);
     dispatcher_->addMessageToQueue(msg);
     pexTimer_ = global::wallclock();
   }
@@ -509,7 +510,7 @@ void DefaultBtInteractive::doInteractionProcessing() {
     // HandshakeExtensionMessage::doReceivedAction().
     pieceStorage_ =
       downloadContext_->getOwnerRequestGroup()->getPieceStorage();
-    if(peer_->getExtensionMessageID("ut_metadata") &&
+    if(peer_->getExtensionMessageID(ExtensionMessageRegistry::UT_METADATA) &&
        downloadContext_->getTotalLength() > 0) {
       size_t num = utMetadataRequestTracker_->avail();
       if(num > 0) {
@@ -550,7 +551,8 @@ void DefaultBtInteractive::doInteractionProcessing() {
       addRequests();
     }
   }
-  if(peer_->getExtensionMessageID("ut_pex") && utPexEnabled_) {
+  if(peer_->getExtensionMessageID(ExtensionMessageRegistry::UT_PEX) &&
+     utPexEnabled_) {
     addPeerExchangeMessage();
   }
 
@@ -566,7 +568,7 @@ size_t DefaultBtInteractive::countPendingMessage()
 {
   return dispatcher_->countMessageInQueue();
 }
-  
+
 bool DefaultBtInteractive::isSendingMessageInProgress()
 {
   return dispatcher_->isSendingInProgress();

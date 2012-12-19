@@ -50,7 +50,7 @@
 
 namespace aria2 {
 
-const std::string BtPortMessage::NAME("port");
+const char BtPortMessage::NAME[] = "port";
 
 BtPortMessage::BtPortMessage(uint16_t port)
   : SimpleBtMessage(ID, NAME),
@@ -61,13 +61,13 @@ BtPortMessage::BtPortMessage(uint16_t port)
     taskFactory_(0)
 {}
 
-SharedHandle<BtPortMessage> BtPortMessage::create
+BtPortMessage* BtPortMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   bittorrent::assertPayloadLengthEqual(3, dataLength, NAME);
   bittorrent::assertID(ID, data, NAME);
   uint16_t port = bittorrent::getShortIntParam(data, 1);
-  SharedHandle<BtPortMessage> message(new BtPortMessage(port));
+  BtPortMessage* message(new BtPortMessage(port));
   return message;
 }
 
@@ -118,7 +118,7 @@ size_t BtPortMessage::getMessageLength() {
 }
 
 std::string BtPortMessage::toString() const {
-  return fmt("%s port=%u", NAME.c_str(), port_);
+  return fmt("%s port=%u", NAME, port_);
 }
 
 void BtPortMessage::setLocalNode(DHTNode* localNode)

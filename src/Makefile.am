@@ -2,8 +2,7 @@ bin_PROGRAMS = aria2c
 aria2c_SOURCES = main.cc\
 	option_processing.cc\
 	version_usage.cc
-SRCS =  Socket.h\
-	SocketCore.cc SocketCore.h\
+SRCS =  SocketCore.cc SocketCore.h\
 	BinaryStream.h\
 	Command.cc Command.h\
 	AbstractCommand.cc AbstractCommand.h\
@@ -53,11 +52,12 @@ SRCS =  Socket.h\
 	LogFactory.cc LogFactory.h\
 	TimerA2.cc TimerA2.h\
 	TimeA2.cc TimeA2.h\
-	SharedHandle.h\
+	SharedHandle.cc SharedHandle.h\
 	FeatureConfig.cc FeatureConfig.h\
 	DownloadEngineFactory.cc DownloadEngineFactory.h\
 	SpeedCalc.cc SpeedCalc.h\
 	PeerStat.cc PeerStat.h\
+	NetStat.cc NetStat.h\
 	BitfieldMan.cc BitfieldMan.h\
 	Randomizer.h\
 	SimpleRandomizer.cc SimpleRandomizer.h\
@@ -149,7 +149,7 @@ SRCS =  Socket.h\
 	a2netcompat.h\
 	a2time.h\
 	array_fun.h\
-	help_tags.h\
+	help_tags.cc help_tags.h\
 	prefs.cc prefs.h\
 	usage_text.h\
 	ProtocolDetector.cc ProtocolDetector.h\
@@ -159,7 +159,6 @@ SRCS =  Socket.h\
 	FtpFinishDownloadCommand.cc FtpFinishDownloadCommand.h\
 	A2STR.cc A2STR.h\
 	RarestPieceSelector.cc RarestPieceSelector.h\
-	Decoder.h\
 	Signature.cc Signature.h\
 	ServerStat.cc ServerStat.h\
 	ServerStatMan.cc ServerStatMan.h\
@@ -189,7 +188,7 @@ SRCS =  Socket.h\
 	Event.h\
 	timespec.h\
 	ValueBase.cc ValueBase.h\
-	ContextAttribute.h\
+	ContextAttribute.cc ContextAttribute.h\
 	TorrentAttribute.cc TorrentAttribute.h\
 	AdaptiveFileAllocationIterator.cc AdaptiveFileAllocationIterator.h\
 	TruncFileAllocationIterator.cc TruncFileAllocationIterator.h\
@@ -198,6 +197,7 @@ SRCS =  Socket.h\
 	ChunkedDecodingStreamFilter.cc ChunkedDecodingStreamFilter.h\
 	NullSinkStreamFilter.cc NullSinkStreamFilter.h\
 	uri.cc uri.h\
+	uri_split.c uri_split.h\
 	Triplet.h\
 	cookie_helper.cc cookie_helper.h\
 	json.cc json.h\
@@ -319,8 +319,7 @@ SRCS += LibsslTLSContext.cc LibsslTLSContext.h\
 endif # HAVE_OPENSSL
 
 if HAVE_ZLIB
-SRCS += GZipDecoder.cc GZipDecoder.h\
-	GZipEncoder.cc GZipEncoder.h\
+SRCS += GZipEncoder.cc GZipEncoder.h\
 	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h
 endif # HAVE_ZLIB
 

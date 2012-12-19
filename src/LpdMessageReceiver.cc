@@ -60,7 +60,7 @@ bool LpdMessageReceiver::init(const std::string& localAddr)
     // Binding multicast address fails under Windows.
     socket_->bindWithFamily(multicastPort_, AF_INET);
 #else // !__MINGW32__
-    socket_->bind(multicastAddress_, multicastPort_, AF_INET);
+    socket_->bind(multicastAddress_.c_str(), multicastPort_, AF_INET);
 #endif // !__MINGW32__
     A2_LOG_DEBUG(fmt("Joining multicast group. %s:%u, localAddr=%s",
                      multicastAddress_.c_str(), multicastPort_,
@@ -80,23 +80,37 @@ bool LpdMessageReceiver::init(const std::string& localAddr)
 SharedHandle<LpdMessage> LpdMessageReceiver::receiveMessage()
 {
   SharedHandle<LpdMessage> msg;
-  try {
+  while(1) {
     unsigned char buf[200];
     std::pair<std::string, uint16_t> peerAddr;
-    ssize_t length = socket_->readDataFrom(buf, sizeof(buf), peerAddr);
-    if(length == 0) {
+    ssize_t length;
+    try {
+      length = socket_->readDataFrom(buf, sizeof(buf), peerAddr);
+      if(length == 0) {
+        return msg;
+      }
+    } catch(RecoverableException& e) {
+      A2_LOG_INFO_EX("Failed to receive LPD message.", e);
       return msg;
     }
     HttpHeaderProcessor proc(HttpHeaderProcessor::SERVER_PARSER);
-    if(!proc.parse(buf, length)) {
-      msg.reset(new LpdMessage());
-      return msg;
+    try {
+      if(!proc.parse(buf, length)) {
+        // UDP packet must contain whole HTTP header block.
+        continue;
+      }
+    } catch(RecoverableException& e) {
+      A2_LOG_INFO_EX("Failed to parse LPD message.", e);
+      continue;
     }
     const SharedHandle<HttpHeader>& header = proc.getResult();
-    static const std::string A2_INFOHASH = "infohash";
-    static const std::string A2_PORT = "port";
-    const std::string& infoHashString = header->find(A2_INFOHASH);
-    uint16_t port = header->findAsInt(A2_PORT);
+    const std::string& infoHashString = header->find(HttpHeader::INFOHASH);
+    uint32_t port = 0;
+    if(!util::parseUIntNoThrow(port, header->find(HttpHeader::PORT)) ||
+       port > UINT16_MAX || port == 0) {
+      A2_LOG_INFO(fmt("Bad LPD port=%u", port));
+      continue;
+    }
     A2_LOG_INFO(fmt("LPD message received infohash=%s, port=%u from %s",
                     infoHashString.c_str(),
                     port,
@@ -104,21 +118,16 @@ SharedHandle<LpdMessage> LpdMessageReceiver::receiveMessage()
     std::string infoHash;
     if(infoHashString.size() != 40 ||
        (infoHash = util::fromHex(infoHashString.begin(),
-                                 infoHashString.end())).empty() ||
-       port == 0) {
-      A2_LOG_INFO(fmt("LPD bad request. infohash=%s", infoHashString.c_str()));
-      msg.reset(new LpdMessage());
-      return msg;
+                                 infoHashString.end())).empty()) {
+      A2_LOG_INFO(fmt("LPD bad request. infohash=%s",
+                      infoHashString.c_str()));
+      continue;
     }
     SharedHandle<Peer> peer(new Peer(peerAddr.first, port, false));
     if(util::inPrivateAddress(peerAddr.first)) {
       peer->setLocalPeer(true);
     }
     msg.reset(new LpdMessage(peer, infoHash));
-    return msg;
-  } catch(RecoverableException& e) {
-    A2_LOG_INFO_EX("Failed to receive LPD message.", e);
-    msg.reset(new LpdMessage());
     return msg;
   }
 }

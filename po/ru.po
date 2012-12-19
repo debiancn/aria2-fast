@@ -10,16 +10,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
-"PO-Revision-Date: 2012-06-30 20:19+0000\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
+"PO-Revision-Date: 2012-11-28 16:19+0000\n"
 "Last-Translator: ITriskTI <Unknown>\n"
 "Language-Team: <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2012-09-02 12:20+0000\n"
-"X-Generator: Launchpad (build 15890)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -44,42 +44,47 @@ msgstr ""
 "Если возникли какие-либо ошибки, проверьте log-файл. Для более подробной "
 "информации смотрите описание параметра '-l'."
 
-#: src/MultiUrlRequestInfo.cc:253
+#: src/MultiUrlRequestInfo.cc:273
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "Удачное преобразование сессии '%s'."
 
-#: src/MultiUrlRequestInfo.cc:256
+#: src/MultiUrlRequestInfo.cc:276
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "Неудачное преобразование сессии '%s'."
 
-#: src/RequestGroupMan.cc:442
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr "Загрузка GID#%<PRId64> приостановлена"
+
+#: src/RequestGroupMan.cc:445
 #, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
 msgstr "Загрузка GID#%<PRId64> не завершена: %s"
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "Результаты загрузки:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "Использованные обозначения:"
 
-#: src/RequestGroupMan.cc:773
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
 msgstr "(OK): загрузка завершена."
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr "(ERR): произошла ошибка."
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr "(INPR): загрузка в процессе."
 
-#: src/RequestGroupMan.cc:782
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
 msgstr "(RM): загрузка удаленна."
 
@@ -353,7 +358,6 @@ msgstr ""
 "                              параметр  --max-overall-download-limit."
 
 #: src/usage_text.h:126
-#, fuzzy
 msgid ""
 " --file-allocation=METHOD     Specify file allocation method.\n"
 "                              'none' doesn't pre-allocate file space. "
@@ -382,29 +386,34 @@ msgid ""
 "file\n"
 "                              to a specified length."
 msgstr ""
-" --file-allocation=METHOD     Указать метод резервирования\n"
-"                              места для файла.  'none' не происходит\n"
-"                              предварительное резервирование места для\n"
-"                              файла.  'prealloc' - предварительное\n"
-"                              резервирование места для файла перед\n"
-"                              началом загрузки. Это может продолжаться\n"
-"                              некоторое время, в зависимости от размера\n"
-"                              файла. Если вы используете новые файловые\n"
-"                              системы, наподобие ext4 (с поддержкой\n"
-"                              экстентов), btrfs, xfs или NTFS (только\n"
-"                              сборка MinGW) тогда лучше выбрать 'falloc'.\n"
-"                              Так как они резервируют место под большие\n"
-"                              (на несколько Гигабайт) файлы почти\n"
+" --file-allocation=METHOD     Указать метод резервирования места для файла.\n"
+"                              'none' не происходит предварительное\n"
+"                              резервирование места для файла.\n"
+"                              'prealloc' - предварительное резервирование\n"
+"                              места для файла перед началом загрузки. Это\n"
+"                              может продолжаться некоторое время, в\n"
+"                              зависимости от размера файла. Если вы "
+"используете\n"
+"                              новые файловые системы, наподобие ext4\n"
+"                              (с поддержкой экстентов), btrfs, xfs или NTFS\n"
+"                              (только MinGW-сборка) тогда лучше выбрать\n"
+"                              'falloc'. Так как они резервируют место под\n"
+"                              большие (на несколько Гигабайт) файлы почти\n"
 "                              мгновенно. Не используйте 'falloc' вместе с\n"
 "                              наследными файловыми системами, такими\n"
 "                              как ext3 и FAT32, потому что это будет\n"
 "                              продолжаться почти столько же времени, как\n"
-"                              и 'prealloc', а также полностью\n"
-"                              заблокирует aria2, пока не закончится\n"
-"                              резервирование места.  'falloc' может быть\n"
-"                              недоступным, если ваша система не содержит "
-"функцию\n"
-"                              posix_fallocate()."
+"                              и 'prealloc', а также полностью заблокирует "
+"aria2,\n"
+"                              пока не закончится резервирование места. "
+"'falloc'\n"
+"                              может быть недоступным, если ваша система не\n"
+"                              содержит функцию posix_fallocate().\n"
+"                              'trunc' использует системный вызов ftruncate() "
+"или\n"
+"                              специфичный для конкретной платформы "
+"эквивалент,\n"
+"                              чтобы усечь файл до указанной длины."
 
 #: src/usage_text.h:145
 msgid ""
@@ -2618,6 +2627,99 @@ msgstr ""
 msgid " --enable-mmap[=true|false]   Map files into memory."
 msgstr " --enable-mmap[=true|false]   Отображение файлов в память."
 
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+" --rpc-certificate=FILE       Использовать сертификат в FILE для\n"
+"                              RPC-сервера. Сертификат должен быть\n"
+"                              в PEM-формате. Используйте параметр\n"
+"                              --rpc-private-key, чтобы указать закрытый\n"
+"                              ключ. Используйте параметр --rpc-secure\n"
+"                              для включения шифрования."
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+" --rpc-private-key=FILE       Использовать закрытый ключ в FILE для\n"
+"                              RPC-сервера. Закрытый ключ должен\n"
+"                              быть дешифрованным и в PEM-формате.\n"
+"                              Используйте параметр --rpc-secure для\n"
+"                              включения шифрования. Смотрите также\n"
+"                              параметр --rpc-certificate."
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+" --rpc-secure[=true|false]    RPC-транспорт будет зашифрован с\n"
+"                              использованием SSL/TLS. RPC-клиенты должны\n"
+"                              использовать https-схему для доступа к "
+"серверу.\n"
+"                              Для WebSocket-клиента, использовать wss-"
+"схему.\n"
+"                              Используйте параметры --rpc-certificate и\n"
+"                              --rpc-private-key для указания сертификата "
+"севера\n"
+"                              и закрытого ключа."
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+" --rpc-save-upload-metadata[=true|false] Сохранить загруженные\n"
+"                              метаданные torrent или metalink в каталоге,\n"
+"                              заданном параметром --dir. Имя файла\n"
+"                              содержит шестнадцатеричную строку\n"
+"                              SHA-1-хэша метаданных плюс расширение.\n"
+"                              Для torrent расширение '.torrent'. Для\n"
+"                              metalink - это '.meta4'. Если параметр задан\n"
+"                              как false, то загрузки, добавленные с\n"
+"                              помощью aria2.addTorrent или aria2."
+"addMetalink,\n"
+"                              не будут сохраняться при помощи параметра\n"
+"                              --save-session."
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
+msgstr ""
+" --force-save[=true|false] Сохранить загрузку с параметром --save-session,\n"
+"                              даже если загрузка будет завершена или "
+"удалена.\n"
+"                              Это может быть полезно, чтобы сохранить\n"
+"                              BitTorrent-сидирование, у которого будет "
+"распознано\n"
+"                              состояние как завершенное."
+
 #: src/version_usage.cc:57
 msgid " version "
 msgstr " версия "
@@ -2682,37 +2784,37 @@ msgstr ""
 msgid "See 'aria2c -h'."
 msgstr "Смотрите 'aria2c -h'."
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr "Вывод всех параметров"
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "Вывод параметра с меткой '%s'."
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr "Смотрите 'aria2c -h#help', чтобы узнать о всех доступных метках."
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "Параметры:"
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "Вывод параметров, имя которых содержит '%s'."
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr "Нет подходящего параметра к '%s'."
 
-#: src/version_usage.cc:137
+#: src/version_usage.cc:138
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2724,7 +2826,7 @@ msgstr ""
 " все URI должны указывать на один и тот же файл, в ином случае загрузка\n"
 " завершится неудачей."
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2735,7 +2837,7 @@ msgstr ""
 " файлов torrent/metalink, хранящихся на диске. Учитывайте, что они всегда\n"
 " рассматриваются как отдельные загрузки."
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2758,7 +2860,7 @@ msgstr ""
 " файлами, 'name' (имя) и 'path' (путь) в torrent-файле будут добавлены из\n"
 " URI для каждого файла."
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
@@ -2769,7 +2871,7 @@ msgstr ""
 " он содержит \"&\" или любое другой символ считающийся специальным в\n"
 " интерпретаторе команд."
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2791,7 +2893,7 @@ msgstr ""
 " aria2 работать, как 1.9.x.\n"
 "\n"
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Обратитесь к странице man для более подробной информации"
@@ -2858,13 +2960,13 @@ msgstr ""
 "Снизить lowest-speed-limit, так как мы не имеем никакого представления о "
 "возможной скорости (сейчас: %d была: %d)"
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 "GID#%<PRId64> Остановка загрузки торрента из-за параметра --bt-stop-timeout."
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr "IPv%d DHT: прослушивание %u порта"
@@ -2874,12 +2976,12 @@ msgstr "IPv%d DHT: прослушивание %u порта"
 msgid "IPv%d RPC: listening to port %u"
 msgstr "IPv%d RPC: прослушивание %u порта"
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr "IPv%d BitTorrent: прослушивание %u порта"
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
@@ -2887,7 +2989,7 @@ msgstr ""
 "Для BitTorrent Magnet URI включение DHT строго рекомендуется. Смотрите "
 "параметр --enable-dht."
 
-#: src/RequestGroup.cc:683
+#: src/RequestGroup.cc:680
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -3188,10 +3290,9 @@ msgid "Network problem has occurred. cause:%s"
 msgstr "Ошибка сети, причина: %s"
 
 #: src/message.h:173
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
-msgstr ""
-"Ошибка во время загрузки проверенных CA сертификатов из %s. Причина: %s"
+msgstr "Не удалось загрузить доверенные CA-сертификаты из системы. Причина: %s"
 
 #: src/message.h:175
 #, c-format

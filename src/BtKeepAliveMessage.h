@@ -39,10 +39,6 @@
 
 namespace aria2 {
 
-class BtKeepAliveMessage;
-
-typedef SharedHandle<BtKeepAliveMessage> BtKeepAliveMessageHandle;
-
 class BtKeepAliveMessage : public SimpleBtMessage {
 private:
   static const size_t MESSAGE_LENGTH = 4;
@@ -51,7 +47,7 @@ public:
 
   static const uint8_t ID = 99;
 
-  static const std::string NAME;
+  static const char NAME[];
 
   virtual void doReceivedAction() {}
 

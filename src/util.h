@@ -111,21 +111,19 @@ std::string nativeToUtf8(const std::string& src);
 
 namespace util {
 
-extern const std::string DEFAULT_STRIP_CHARSET;
+extern const char DEFAULT_STRIP_CHARSET[];
 
 template<typename InputIterator>
 std::pair<InputIterator, InputIterator> stripIter
 (InputIterator first, InputIterator last,
- const std::string& chars = DEFAULT_STRIP_CHARSET)
+ const char* chars = DEFAULT_STRIP_CHARSET)
 {
-  for(; first != last &&
-        std::find(chars.begin(), chars.end(), *first) != chars.end(); ++first);
+  for(; first != last && strchr(chars, *first) != 0; ++first);
   if(first == last) {
     return std::make_pair(first, last);
   }
   InputIterator left = last-1;
-  for(; left != first &&
-        std::find(chars.begin(), chars.end(), *left) != chars.end(); --left);
+  for(; left != first && strchr(chars, *left) != 0; --left);
   return std::make_pair(first, left+1);
 }
 
@@ -137,12 +135,11 @@ InputIterator lstripIter
   return first;
 }
 
-template<typename InputIterator, typename InputIterator2>
+template<typename InputIterator>
 InputIterator lstripIter
-(InputIterator first, InputIterator last,
- InputIterator2 cfirst, InputIterator2 clast)
+(InputIterator first, InputIterator last, const char* chars)
 {
-  for(; first != last && std::find(cfirst, clast, *first) != clast; ++first);
+  for(; first != last && strchr(chars, *first) != 0; ++first);
   return first;
 }
 
@@ -150,12 +147,11 @@ template<typename InputIterator>
 InputIterator lstripIter
 (InputIterator first, InputIterator last)
 {
-  return lstripIter(first, last,
-                    DEFAULT_STRIP_CHARSET.begin(), DEFAULT_STRIP_CHARSET.end());
+  return lstripIter(first, last, DEFAULT_STRIP_CHARSET);
 }
 
 std::string strip
-(const std::string& str, const std::string& chars = DEFAULT_STRIP_CHARSET);
+(const std::string& str, const char* chars = DEFAULT_STRIP_CHARSET);
 
 template<typename InputIterator>
 void divide
@@ -219,6 +215,15 @@ bool inRFC3986ReservedChars(const char c);
 
 bool inRFC3986UnreservedChars(const char c);
 
+bool inRFC2978MIMECharset(const char c);
+
+bool inRFC2616HttpToken(const char c);
+
+bool inRFC5987AttrChar(const char c);
+
+// Returns true if |c| is in ISO/IEC 8859-1 character set.
+bool isIso8859p1(unsigned char c);
+
 bool isUtf8(const std::string& str);
 
 std::string percentDecode
@@ -259,21 +264,14 @@ std::string fromHex(InputIterator first, InputIterator last)
   return dest;
 }
 
-FILE* openFile(const std::string& filename, const std::string& mode);
-
-bool isPowerOf(int num, int base);
-
 std::string secfmt(time_t sec);
 
 bool parseIntNoThrow(int32_t& res, const std::string& s, int base = 10);
-int32_t parseInt(const std::string& s, int base = 10);
 
 // Valid range: [0, INT32_MAX]
 bool parseUIntNoThrow(uint32_t& res, const std::string& s, int base = 10);
-uint32_t parseUInt(const std::string& s, int base = 10);
 
 bool parseLLIntNoThrow(int64_t& res, const std::string& s, int base = 10);
-int64_t parseLLInt(const std::string& s, int base = 10);
 
 void parseIntSegments(SegList<int>& sgl, const std::string& src);
 
@@ -296,13 +294,30 @@ void parsePrioritizePieceRange
  int64_t defaultSize = 1048576 /* 1MiB */);
 
 // Converts ISO/IEC 8859-1 string src to utf-8.
-std::string iso8859ToUtf8(const std::string& src);
+std::string iso8859p1ToUtf8(const char* src, size_t len);
+std::string iso8859p1ToUtf8(const std::string& src);
+
+// Parses Content-Disposition header field value |in| with its length
+// |len| in a manner conforming to RFC 6266 and extracts filename
+// value and copies it to the region pointed by |dest|. The |destlen|
+// specifies the capacity of the |dest|. This function does not store
+// NUL character after filename in |dest|. This function does not
+// support RFC 2231 Continuation. If the function sees RFC 2231/5987
+// encoding and charset, it stores its first pointer to |*charsetp|
+// and its length in |*charsetlenp|. Otherwise, they are NULL and 0
+// respectively.  In RFC 2231/5987 encoding, percent-encoded string
+// will be decoded to original form and stored in |dest|.
+//
+// This function returns the number of written bytes in |dest| if it
+// succeeds, or -1. If there is enough room to store filename in
+// |dest|, this function returns -1. If this function returns -1, the
+// |dest|, |*charsetp| and |*charsetlenp| are undefined.
+ssize_t parse_content_disposition(char *dest, size_t destlen,
+                                  const char **charsetp, size_t *charsetlenp,
+                                  const char *in, size_t len);
 
 std::string getContentDispositionFilename(const std::string& header);
 
-std::string randomAlpha(size_t length,
-                        const SharedHandle<Randomizer>& randomizer);
-  
 std::string toUpper(const std::string& src);
 
 std::string toLower(const std::string& src);
@@ -401,15 +416,6 @@ bool isUppercase(InputIterator first, InputIterator last)
   }
   return true;
 }
-
-/**
- * Converts alphabets to unsigned int, assuming alphabets as a base 26
- * integer and 'a' or 'A' is 0.
- * This function assumes alphabets includes only a-z.
- * Upper case are allowed but all letters must be upper case.
- * If overflow occurs, returns 0.
- */
-unsigned int alphaToNum(const std::string& alphabets);
 
 void mkdirs(const std::string& dirpath);
 
@@ -625,6 +631,9 @@ bool strieq(InputIterator first, InputIterator last, const char* b)
   return first == last && *b == '\0';
 }
 
+bool strieq(const std::string& a, const char* b);
+bool strieq(const std::string& a, const std::string& b);
+
 template<typename InputIterator1, typename InputIterator2>
 bool startsWith
 (InputIterator1 first1,
@@ -711,6 +720,9 @@ bool iendsWith
 bool iendsWith(const std::string& a, const char* b);
 bool iendsWith(const std::string& a, const std::string& b);
 
+// Returns true if strcmp(a, b) < 0
+bool strless(const char* a, const char *b);
+
 void generateRandomData(unsigned char* data, size_t length);
 
 // Saves data to file whose name is filename. If overwrite is true,
@@ -761,9 +773,6 @@ std::string escapePath(const std::string& s);
 // length of binary representation of the address*8.
 bool inSameCidrBlock
 (const std::string& ip1, const std::string& ip2, size_t bits);
-
-void removeMetalinkContentTypes(const SharedHandle<RequestGroup>& group);
-void removeMetalinkContentTypes(RequestGroup* group);
 
 // No throw
 void executeHookByOptName

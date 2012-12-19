@@ -56,7 +56,7 @@ class AuthConfig;
 
 class HttpRequest {
 private:
-  
+
   static const std::string USER_AGENT;
 
   SharedHandle<Request> request_;
@@ -71,7 +71,8 @@ private:
 
   std::vector<std::string> headers_;
 
-  std::vector<std::string> acceptTypes_;
+  // If true, metalink content types are sent in Accept header field.
+  bool acceptMetalink_;
 
   SharedHandle<CookieStorage> cookieStorage_;
 
@@ -116,7 +117,7 @@ public:
   const std::string& getProtocol() const;
 
   const std::string& getCurrentURI() const;
-  
+
   const std::string& getDir() const;
 
   const std::string& getFile() const;
@@ -127,13 +128,13 @@ public:
 
   std::string getURIHost() const;
 
-  SharedHandle<Range> getRange() const;
+  Range getRange() const;
 
   /**
    * Inspects whether the specified response range is satisfiable
    * with request range.
    */
-  bool isRangeSatisfied(const SharedHandle<Range>& range) const;
+  bool isRangeSatisfied(const Range& range) const;
 
   const SharedHandle<Request>& getRequest() const
   {
@@ -164,7 +165,7 @@ public:
   void disableContentEncoding();
 
   void setUserAgent(const std::string& userAgent);
-  
+
   // accepts multiline headers, delimited by LF
   void addHeader(const std::string& headers);
 
@@ -172,10 +173,9 @@ public:
 
   void addAcceptType(const std::string& type);
 
-  template<typename InputIterator>
-  void addAcceptType(InputIterator first, InputIterator last)
+  void setAcceptMetalink(bool f)
   {
-    acceptTypes_.insert(acceptTypes_.end(), first, last);
+    acceptMetalink_ = f;
   }
 
   void setCookieStorage(const SharedHandle<CookieStorage>& cookieStorage);
@@ -193,7 +193,7 @@ public:
    * object.
    */
   void setProxyRequest(const SharedHandle<Request>& proxyRequest);
-  
+
   /*
    * Returns true if non-Null proxy request is set by setProxyRequest().
    * Otherwise, returns false.

@@ -41,14 +41,14 @@
 
 namespace aria2 {
 
-const std::string BtRequestMessage::NAME("request");
+const char BtRequestMessage::NAME[] = "request";
 
 BtRequestMessage::BtRequestMessage
 (size_t index, int32_t begin, int32_t length, size_t blockIndex):
   RangeBtMessage(ID, NAME, index, begin, length),
   blockIndex_(blockIndex) {}
 
-SharedHandle<BtRequestMessage> BtRequestMessage::create
+BtRequestMessage* BtRequestMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return RangeBtMessage::create<BtRequestMessage>(data, dataLength);
@@ -63,13 +63,13 @@ void BtRequestMessage::doReceivedAction()
      (!getPeer()->amChoking() ||
       (getPeer()->amChoking() &&
        getPeer()->isInAmAllowedIndexSet(getIndex())))) {
-    BtMessageHandle msg =
+    SharedHandle<BtMessage> msg =
       getBtMessageFactory()->createPieceMessage
       (getIndex(), getBegin(), getLength());
     getBtMessageDispatcher()->addMessageToQueue(msg);
   } else {
     if(getPeer()->isFastExtensionEnabled()) {
-      BtMessageHandle msg =
+      SharedHandle<BtMessage> msg =
         getBtMessageFactory()->createRejectMessage
         (getIndex(), getBegin(), getLength());
       getBtMessageDispatcher()->addMessageToQueue(msg);

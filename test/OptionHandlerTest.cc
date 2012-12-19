@@ -5,6 +5,7 @@
 #include "Option.h"
 #include "prefs.h"
 #include "Exception.h"
+#include "help_tags.h"
 
 namespace aria2 {
 
@@ -28,7 +29,7 @@ class OptionHandlerTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testHttpProxyOptionHandler);
   CPPUNIT_TEST(testDeprecatedOptionHandler);
   CPPUNIT_TEST_SUITE_END();
-  
+
 public:
   void testBooleanOptionHandler();
   void testNumberOptionHandler();
@@ -207,13 +208,13 @@ void OptionHandlerTest::testDefaultOptionHandler()
   CPPUNIT_ASSERT_EQUAL(std::string(""), option.get(PREF_TIMEOUT));
   CPPUNIT_ASSERT_EQUAL(std::string(""), handler.createPossibleValuesString());
 
-  handler.addTag("apple");
-  CPPUNIT_ASSERT_EQUAL(std::string("apple"), handler.toTagString());
-  handler.addTag("orange");
-  CPPUNIT_ASSERT_EQUAL(std::string("apple, orange"), handler.toTagString());
-  CPPUNIT_ASSERT(handler.hasTag("apple"));
-  CPPUNIT_ASSERT(handler.hasTag("orange"));
-  CPPUNIT_ASSERT(!handler.hasTag("pineapple"));
+  handler.addTag(TAG_ADVANCED);
+  CPPUNIT_ASSERT_EQUAL(std::string("#advanced"), handler.toTagString());
+  handler.addTag(TAG_BASIC);
+  CPPUNIT_ASSERT_EQUAL(std::string("#basic, #advanced"), handler.toTagString());
+  CPPUNIT_ASSERT(handler.hasTag(TAG_ADVANCED));
+  CPPUNIT_ASSERT(handler.hasTag(TAG_BASIC));
+  CPPUNIT_ASSERT(!handler.hasTag(TAG_HTTP));
 }
 
 void OptionHandlerTest::testFloatNumberOptionHandler()
@@ -309,16 +310,15 @@ void OptionHandlerTest::testHttpProxyOptionHandler()
 void OptionHandlerTest::testDeprecatedOptionHandler()
 {
   {
-    DeprecatedOptionHandler handler
-      (SharedHandle<OptionHandler>(new DefaultOptionHandler(PREF_TIMEOUT)));
+    DeprecatedOptionHandler handler(new DefaultOptionHandler(PREF_TIMEOUT));
     Option option;
     handler.parse(option, "foo");
     CPPUNIT_ASSERT(!option.defined(PREF_TIMEOUT));
   }
   {
-    DeprecatedOptionHandler handler
-      (SharedHandle<OptionHandler>(new DefaultOptionHandler(PREF_TIMEOUT)),
-       SharedHandle<OptionHandler>(new DefaultOptionHandler(PREF_DIR)));
+    DefaultOptionHandler dir(PREF_DIR);
+    DeprecatedOptionHandler handler(new DefaultOptionHandler(PREF_TIMEOUT),
+                                    &dir);
     Option option;
     handler.parse(option, "foo");
     CPPUNIT_ASSERT(!option.defined(PREF_TIMEOUT));

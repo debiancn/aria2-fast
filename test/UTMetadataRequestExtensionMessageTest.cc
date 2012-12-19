@@ -16,6 +16,7 @@
 #include "PieceStorage.h"
 #include "extension_message_test_helper.h"
 #include "DlAbortEx.h"
+#include "ExtensionMessageRegistry.h"
 
 namespace aria2 {
 
@@ -41,10 +42,10 @@ public:
     dispatcher_.reset(new MockBtMessageDispatcher());
     dctx_.reset(new DownloadContext());
     SharedHandle<TorrentAttribute> attrs(new TorrentAttribute());
-    dctx_->setAttribute(bittorrent::BITTORRENT, attrs);
+    dctx_->setAttribute(CTX_ATTR_BT, attrs);
     peer_.reset(new Peer("host", 6880));
     peer_->allocateSessionResource(0, 0);
-    peer_->setExtension("ut_metadata", 1);
+    peer_->setExtension(ExtensionMessageRegistry::UT_METADATA, 1);
   }
 
   template<typename T>
@@ -53,7 +54,7 @@ public:
     SharedHandle<WrapExtBtMessage> wrapmsg =
       dynamic_pointer_cast<WrapExtBtMessage>
       (dispatcher_->messageQueue.front());
-    
+
     SharedHandle<T> msg = dynamic_pointer_cast<T>(wrapmsg->m_);
     return msg;
   }
@@ -78,7 +79,8 @@ void UTMetadataRequestExtensionMessageTest::testGetExtensionMessageID()
 void UTMetadataRequestExtensionMessageTest::testGetExtensionName()
 {
   UTMetadataRequestExtensionMessage msg(1);
-  CPPUNIT_ASSERT_EQUAL(std::string("ut_metadata"), msg.getExtensionName());
+  CPPUNIT_ASSERT_EQUAL(std::string("ut_metadata"),
+                       std::string(msg.getExtensionName()));
 }
 
 void UTMetadataRequestExtensionMessageTest::testGetBencodedData()

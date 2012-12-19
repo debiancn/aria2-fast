@@ -37,7 +37,7 @@ class UriTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testSwap);
   CPPUNIT_TEST(testJoinUri);
   CPPUNIT_TEST_SUITE_END();
-  
+
 public:
   void testSetUri1();
   void testSetUri2();
@@ -207,7 +207,7 @@ void UriTest::testSetUri12()
 {
   UriStruct us;
   bool v = parse(us, "http://host?query");
-  
+
   CPPUNIT_ASSERT(v);
   CPPUNIT_ASSERT_EQUAL(std::string("http"), us.protocol);
   CPPUNIT_ASSERT_EQUAL(std::string("host"), us.host);
@@ -220,7 +220,7 @@ void UriTest::testSetUri13()
 {
   UriStruct us;
   bool v = parse(us, "http://host/?query");
-  
+
   CPPUNIT_ASSERT(v);
   CPPUNIT_ASSERT_EQUAL(std::string("http"), us.protocol);
   CPPUNIT_ASSERT_EQUAL(std::string("host"), us.host);
@@ -233,7 +233,7 @@ void UriTest::testSetUri14()
 {
   UriStruct us;
   bool v = parse(us, "http://host:8080/abc?query");
-  
+
   CPPUNIT_ASSERT(v);
   CPPUNIT_ASSERT_EQUAL(std::string("http"), us.protocol);
   CPPUNIT_ASSERT_EQUAL(std::string("host"), us.host);
@@ -298,38 +298,16 @@ void UriTest::testSetUri20()
   v = parse(us, "http://localhost:-80");
   CPPUNIT_ASSERT(!v);
 }
-  
+
 void UriTest::testSetUri_zeroUsername()
 {
   UriStruct us;
-  CPPUNIT_ASSERT(parse(us, "ftp://@localhost/download/aria2-1.0.0.tar.bz2"));
-  CPPUNIT_ASSERT_EQUAL(std::string("ftp"), us.protocol);
-  CPPUNIT_ASSERT_EQUAL((uint16_t)21, us.port);
-  CPPUNIT_ASSERT_EQUAL(std::string("localhost"), us.host);
-  CPPUNIT_ASSERT_EQUAL(std::string("/download/"), us.dir);
-  CPPUNIT_ASSERT_EQUAL(std::string("aria2-1.0.0.tar.bz2"), us.file);
-  CPPUNIT_ASSERT_EQUAL(std::string(""), us.username);
-  CPPUNIT_ASSERT_EQUAL(std::string(""), us.password);
+  CPPUNIT_ASSERT(!parse(us, "ftp://@localhost/download/aria2-1.0.0.tar.bz2"));
 
-  CPPUNIT_ASSERT(parse(us, "ftp://:@localhost/download/aria2-1.0.0.tar.bz2"));
-  CPPUNIT_ASSERT_EQUAL(std::string("ftp"), us.protocol);
-  CPPUNIT_ASSERT_EQUAL((uint16_t)21, us.port);
-  CPPUNIT_ASSERT_EQUAL(std::string("localhost"), us.host);
-  CPPUNIT_ASSERT_EQUAL(std::string("/download/"), us.dir);
-  CPPUNIT_ASSERT_EQUAL(std::string("aria2-1.0.0.tar.bz2"), us.file);
-  CPPUNIT_ASSERT_EQUAL(std::string(""), us.username);
-  CPPUNIT_ASSERT_EQUAL(std::string(""), us.password);
+  CPPUNIT_ASSERT(!parse(us, "ftp://:@localhost/download/aria2-1.0.0.tar.bz2"));
 
-  CPPUNIT_ASSERT(parse(us,
-                       "ftp://:pass@localhost/download/aria2-1.0.0.tar.bz2"));
-  CPPUNIT_ASSERT_EQUAL(std::string("ftp"), us.protocol);
-  CPPUNIT_ASSERT_EQUAL((uint16_t)21, us.port);
-  CPPUNIT_ASSERT_EQUAL(std::string("localhost"), us.host);
-  CPPUNIT_ASSERT_EQUAL(std::string("/download/"), us.dir);
-  CPPUNIT_ASSERT_EQUAL(std::string("aria2-1.0.0.tar.bz2"), us.file);
-  CPPUNIT_ASSERT_EQUAL(std::string(""), us.username);
-  CPPUNIT_ASSERT_EQUAL(std::string("pass"), us.password);
-
+  CPPUNIT_ASSERT(!parse(us,
+                        "ftp://:pass@localhost/download/aria2-1.0.0.tar.bz2"));
 }
 
 void UriTest::testSetUri_username()
@@ -354,11 +332,11 @@ void UriTest::testSetUri_usernamePassword()
                        "aria2-1.0.0.tar.bz2"));
   CPPUNIT_ASSERT_EQUAL(std::string("ftp"), us.protocol);
   CPPUNIT_ASSERT_EQUAL((uint16_t)21, us.port);
-  CPPUNIT_ASSERT_EQUAL(std::string("localhost"), us.host);
+  CPPUNIT_ASSERT_EQUAL(std::string("pass%40@localhost"), us.host);
   CPPUNIT_ASSERT_EQUAL(std::string("/download/"), us.dir);
   CPPUNIT_ASSERT_EQUAL(std::string("aria2-1.0.0.tar.bz2"), us.file);
   CPPUNIT_ASSERT_EQUAL(std::string("aria2@user@"), us.username);
-  CPPUNIT_ASSERT_EQUAL(std::string("aria2@pass@"), us.password);
+  CPPUNIT_ASSERT_EQUAL(std::string("aria2"), us.password);
 
   // make sure that after new uri is set, username and password are updated.
   CPPUNIT_ASSERT(parse(us, "ftp://localhost/download/aria2-1.0.0.tar.bz2"));

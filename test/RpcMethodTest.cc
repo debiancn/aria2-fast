@@ -224,7 +224,7 @@ void RpcMethodTest::testAddUri_withPosition()
   req1.params->append(urisParam1);
   RpcResponse res1 = m.execute(req1, e_.get());
   CPPUNIT_ASSERT_EQUAL(0, res1.code);
-  
+
   RpcRequest req2(AddUriRpcMethod::getMethodName(), List::g());
   SharedHandle<List> urisParam2 = List::g();
   urisParam2->append("http://uri2");
@@ -265,12 +265,22 @@ void RpcMethodTest::testAddTorrent()
   uris->append("http://localhost/aria2-0.8.2.tar.bz2");
   req.params->append(uris);
   {
+    // Saving upload metadata is disabled by option.
+    RpcResponse res = m.execute(req, e_.get());
+    CPPUNIT_ASSERT
+      (!File(e_->getOption()->get(PREF_DIR)+
+             "/0a3893293e27ac0490424c06de4d09242215f0a6.torrent").exists());
+    CPPUNIT_ASSERT_EQUAL(0, res.code);
+    CPPUNIT_ASSERT_EQUAL(std::string("1"), downcast<String>(res.param)->s());
+  }
+  e_->getOption()->put(PREF_RPC_SAVE_UPLOAD_METADATA, A2_V_TRUE);
+  {
     RpcResponse res = m.execute(req, e_.get());
     CPPUNIT_ASSERT
       (File(e_->getOption()->get(PREF_DIR)+
             "/0a3893293e27ac0490424c06de4d09242215f0a6.torrent").exists());
     CPPUNIT_ASSERT_EQUAL(0, res.code);
-    CPPUNIT_ASSERT_EQUAL(std::string("1"), downcast<String>(res.param)->s());
+    CPPUNIT_ASSERT_EQUAL(std::string("2"), downcast<String>(res.param)->s());
 
     SharedHandle<RequestGroup> group =
       e_->getRequestGroupMan()->findReservedGroup(1);
@@ -296,7 +306,7 @@ void RpcMethodTest::testAddTorrent()
     CPPUNIT_ASSERT_EQUAL(0, res.code);
     CPPUNIT_ASSERT_EQUAL
       (dir+"/aria2-0.8.2.tar.bz2",
-       e_->getRequestGroupMan()->findReservedGroup(2)->getFirstFilePath());
+       e_->getRequestGroupMan()->findReservedGroup(3)->getFirstFilePath());
     CPPUNIT_ASSERT
       (File(dir+"/0a3893293e27ac0490424c06de4d09242215f0a6.torrent").exists());
   }
@@ -352,12 +362,25 @@ void RpcMethodTest::testAddMetalink()
   RpcRequest req(AddMetalinkRpcMethod::getMethodName(), List::g());
   req.params->append(readFile(A2_TEST_DIR"/2files.metalink"));
   {
+    // Saving upload metadata is disabled by option.
     RpcResponse res = m.execute(req, e_.get());
     CPPUNIT_ASSERT_EQUAL(0, res.code);
     const List* resParams = downcast<List>(res.param);
     CPPUNIT_ASSERT_EQUAL((size_t)2, resParams->size());
     CPPUNIT_ASSERT_EQUAL(std::string("1"), downcast<String>(resParams->get(0))->s());
     CPPUNIT_ASSERT_EQUAL(std::string("2"), downcast<String>(resParams->get(1))->s());
+    CPPUNIT_ASSERT
+      (!File(e_->getOption()->get(PREF_DIR)+
+             "/c908634fbc257fd56f0114912c2772aeeb4064f4.meta4").exists());
+  }
+  e_->getOption()->put(PREF_RPC_SAVE_UPLOAD_METADATA, A2_V_TRUE);
+  {
+    RpcResponse res = m.execute(req, e_.get());
+    CPPUNIT_ASSERT_EQUAL(0, res.code);
+    const List* resParams = downcast<List>(res.param);
+    CPPUNIT_ASSERT_EQUAL((size_t)2, resParams->size());
+    CPPUNIT_ASSERT_EQUAL(std::string("3"), downcast<String>(resParams->get(0))->s());
+    CPPUNIT_ASSERT_EQUAL(std::string("4"), downcast<String>(resParams->get(1))->s());
 #ifdef ENABLE_MESSAGE_DIGEST
     CPPUNIT_ASSERT
       (File(e_->getOption()->get(PREF_DIR)+
@@ -386,7 +409,7 @@ void RpcMethodTest::testAddMetalink()
     RpcResponse res = m.execute(req, e_.get());
     CPPUNIT_ASSERT_EQUAL(0, res.code);
     CPPUNIT_ASSERT_EQUAL(dir+"/aria2-5.0.0.tar.bz2",
-                         e_->getRequestGroupMan()->findReservedGroup(3)->
+                         e_->getRequestGroupMan()->findReservedGroup(5)->
                          getFirstFilePath());
 #ifdef ENABLE_MESSAGE_DIGEST
     CPPUNIT_ASSERT
@@ -638,7 +661,7 @@ void RpcMethodTest::testTellWaiting()
                        getString(downcast<Dict>(resParams->get(0)), "gid"));
   CPPUNIT_ASSERT_EQUAL(std::string("3"),
                        getString(downcast<Dict>(resParams->get(1)), "gid"));
-  // waiting.size() == offset+num 
+  // waiting.size() == offset+num
   req = RpcRequest(TellWaitingRpcMethod::getMethodName(), List::g());
   req.params->append(Integer::g(1));
   req.params->append(Integer::g(3));
@@ -646,7 +669,7 @@ void RpcMethodTest::testTellWaiting()
   CPPUNIT_ASSERT_EQUAL(0, res.code);
   resParams = downcast<List>(res.param);
   CPPUNIT_ASSERT_EQUAL((size_t)3, resParams->size());
-  // waiting.size() < offset+num 
+  // waiting.size() < offset+num
   req = RpcRequest(TellWaitingRpcMethod::getMethodName(), List::g());
   req.params->append(Integer::g(1));
   req.params->append(Integer::g(4));
@@ -741,9 +764,7 @@ void RpcMethodTest::testGetVersion()
     features += s->s();
     features += ", ";
   }
-  
-  CPPUNIT_ASSERT_EQUAL(FeatureConfig::getInstance()->featureSummary()+", ",
-                       features);
+  CPPUNIT_ASSERT_EQUAL(featureSummary()+", ", features);
 }
 
 void RpcMethodTest::testGatherStoppedDownload()
@@ -797,7 +818,7 @@ void RpcMethodTest::testGatherProgressCommon()
   SharedHandle<Dict> entry = Dict::g();
   std::vector<std::string> keys;
   gatherProgressCommon(entry, group, keys);
-  
+
   const List* followedByRes = downcast<List>(entry->get("followedBy"));
   CPPUNIT_ASSERT_EQUAL(util::itos(followedBy[0]->getGID()),
                        downcast<String>(followedByRes->get(0))->s());
@@ -825,7 +846,7 @@ void RpcMethodTest::testGatherProgressCommon()
 
   CPPUNIT_ASSERT_EQUAL((size_t)1, entry->size());
   CPPUNIT_ASSERT(entry->containsKey("gid"));
-  
+
 }
 
 #ifdef ENABLE_BITTORRENT
@@ -1008,30 +1029,30 @@ void RpcMethodTest::testChangeUri_fail()
 
   req.params->set(1, Integer::g(1));
   req.params->set(0, String::g("2"));
-  res = m.execute(req, e_.get());  
+  res = m.execute(req, e_.get());
   // RPC request fails because GID#2 does not exist.
   CPPUNIT_ASSERT_EQUAL(1, res.code);
 
   req.params->set(0, String::g("1"));
   req.params->set(1, Integer::g(4));
-  res = m.execute(req, e_.get());  
+  res = m.execute(req, e_.get());
   // RPC request fails because FileEntry#3 does not exist.
   CPPUNIT_ASSERT_EQUAL(1, res.code);
 
   req.params->set(1, String::g("0"));
-  res = m.execute(req, e_.get());  
+  res = m.execute(req, e_.get());
   // RPC request fails because index of FileEntry is string.
   CPPUNIT_ASSERT_EQUAL(1, res.code);
 
   req.params->set(1, Integer::g(1));
   req.params->set(2, String::g("http://url"));
-  res = m.execute(req, e_.get());  
+  res = m.execute(req, e_.get());
   // RPC request fails because 3rd param is not list.
   CPPUNIT_ASSERT_EQUAL(1, res.code);
 
   req.params->set(2, List::g());
   req.params->set(3, String::g("http://url"));
-  res = m.execute(req, e_.get());  
+  res = m.execute(req, e_.get());
   // RPC request fails because 4th param is not list.
   CPPUNIT_ASSERT_EQUAL(1, res.code);
 }
@@ -1057,7 +1078,7 @@ void RpcMethodTest::testPause()
   option_->put(PREF_FORCE_SEQUENTIAL, A2_V_TRUE);
   std::vector<SharedHandle<RequestGroup> > groups;
   createRequestGroupForUri(groups, option_, uris);
-  CPPUNIT_ASSERT_EQUAL((size_t)3, groups.size());  
+  CPPUNIT_ASSERT_EQUAL((size_t)3, groups.size());
   e_->getRequestGroupMan()->addReservedGroup(groups);
   {
     PauseRpcMethod m;

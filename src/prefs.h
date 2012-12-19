@@ -213,6 +213,14 @@ extern const Pref* PREF_RPC_MAX_REQUEST_SIZE;
 extern const Pref* PREF_RPC_LISTEN_ALL;
 // value: true | false
 extern const Pref* PREF_RPC_ALLOW_ORIGIN_ALL;
+// value: string that your file system recognizes as a file name.
+extern const Pref* PREF_RPC_CERTIFICATE;
+// value: string that your file system recognizes as a file name.
+extern const Pref* PREF_RPC_PRIVATE_KEY;
+// value: true | false
+extern const Pref* PREF_RPC_SECURE;
+// value: true | false
+extern const Pref* PREF_RPC_SAVE_UPLOAD_METADATA;
 // value: true | false
 extern const Pref* PREF_DRY_RUN;
 // value: true | false
@@ -271,6 +279,8 @@ extern const Pref* PREF_CHECKSUM;
 extern const Pref* PREF_STOP_WITH_PROCESS;
 // value: true | false
 extern const Pref* PREF_ENABLE_MMAP;
+// value: true | false
+extern const Pref* PREF_FORCE_SAVE;
 
 /**
  * FTP related preferences

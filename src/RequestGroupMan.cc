@@ -54,7 +54,6 @@
 #include "DownloadContext.h"
 #include "ServerStatMan.h"
 #include "ServerStat.h"
-#include "PeerStat.h"
 #include "SegmentMan.h"
 #include "FeedbackURISelector.h"
 #include "InorderURISelector.h"
@@ -78,6 +77,7 @@
 #include "UriListParser.h"
 #include "SingletonHolder.h"
 #include "Notifier.h"
+#include "PeerStat.h"
 #ifdef ENABLE_BITTORRENT
 #  include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
@@ -394,9 +394,12 @@ public:
       }
       try {
         group->closeFile();
-        if(group->downloadFinished() &&
+        if(group->isPauseRequested()) {
+          A2_LOG_NOTICE
+            (fmt(_("Download GID#%" PRId64 " paused"), group->getGID()));
+          group->saveControlFile();
+        } else if(group->downloadFinished() &&
            !group->getDownloadContext()->isChecksumVerificationNeeded()) {
-          group->setPauseRequested(false);
           group->applyLastModifiedTimeToLocalFiles();
           group->reportDownloadFinished();
           if(group->allDownloadFinished()) {
@@ -420,7 +423,7 @@ public:
           // we don't remove it.
           if(group->getOption()->getAsBool(PREF_BT_REMOVE_UNSELECTED_FILE) &&
              !group->inMemoryDownload() &&
-             dctx->hasAttribute(bittorrent::BITTORRENT)) {
+             dctx->hasAttribute(CTX_ATTR_BT)) {
             A2_LOG_INFO(fmt(MSG_REMOVING_UNSELECTED_FILE, group->getGID()));
             const std::vector<SharedHandle<FileEntry> >& files =
               dctx->getFileEntries();
@@ -710,11 +713,6 @@ RequestGroupMan::DownloadStat RequestGroupMan::getDownloadStat() const
 
 void RequestGroupMan::showDownloadResults(OutputFile& o, bool full) const
 {
-  static const std::string MARK_OK("OK");
-  static const std::string MARK_ERR("ERR");
-  static const std::string MARK_INPR("INPR");
-  static const std::string MARK_RM("RM");
-
 #ifdef __MINGW32__
   int pathRowSize = 58;
 #else // !__MINGW32__
@@ -746,18 +744,18 @@ void RequestGroupMan::showDownloadResults(OutputFile& o, bool full) const
     if((*itr)->belongsTo != 0) {
       continue;
     }
-    std::string status;
+    const char* status;
     if((*itr)->result == error_code::FINISHED) {
-      status = MARK_OK;
+      status = "OK";
       ++ok;
     } else if((*itr)->result == error_code::IN_PROGRESS) {
-      status = MARK_INPR;
+      status = "INPR";
       ++inpr;
     } else if((*itr)->result == error_code::REMOVED) {
-      status = MARK_RM;
+      status = "RM";
       ++rm;
     } else {
-      status = MARK_ERR;
+      status = "ERR";
       ++err;
     }
     if(full) {
@@ -788,8 +786,8 @@ void RequestGroupMan::showDownloadResults(OutputFile& o, bool full) const
 namespace {
 void formatDownloadResultCommon
 (std::ostream& o,
- const std::string& status,
- const DownloadResultHandle& downloadResult)
+ const char* status,
+ const SharedHandle<DownloadResult>& downloadResult)
 {
   o << std::setw(3) << downloadResult->gid << "|"
     << std::setw(4) << status << "|"
@@ -807,8 +805,8 @@ void formatDownloadResultCommon
 
 void RequestGroupMan::formatDownloadResultFull
 (OutputFile& out,
- const std::string& status,
- const DownloadResultHandle& downloadResult) const
+ const char* status,
+ const SharedHandle<DownloadResult>& downloadResult) const
 {
   BitfieldMan bt(downloadResult->pieceLength, downloadResult->totalLength);
   bt.setBitfield(reinterpret_cast<const unsigned char*>
@@ -849,8 +847,8 @@ void RequestGroupMan::formatDownloadResultFull
 }
 
 std::string RequestGroupMan::formatDownloadResult
-(const std::string& status,
- const DownloadResultHandle& downloadResult) const
+(const char* status,
+ const SharedHandle<DownloadResult>& downloadResult) const
 {
   std::stringstream o;
   formatDownloadResultCommon(o, status, downloadResult);
@@ -920,12 +918,8 @@ void RequestGroupMan::forceHalt()
 
 TransferStat RequestGroupMan::calculateStat()
 {
-  TransferStat s;
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator i =
-        requestGroups_.begin(), eoi = requestGroups_.end(); i != eoi; ++i) {
-    s += (*i)->calculateStat();
-  }
-  return s;
+  // TODO Currently, all time upload length is not set.
+  return netStat_.toTransferStat();
 }
 
 SharedHandle<DownloadResult>
@@ -1035,13 +1029,13 @@ void RequestGroupMan::removeStaleServerStat(time_t timeout)
 bool RequestGroupMan::doesOverallDownloadSpeedExceed()
 {
   return maxOverallDownloadSpeedLimit_ > 0 &&
-    maxOverallDownloadSpeedLimit_ < calculateStat().getDownloadSpeed();
+    maxOverallDownloadSpeedLimit_ < netStat_.calculateDownloadSpeed();
 }
 
 bool RequestGroupMan::doesOverallUploadSpeedExceed()
 {
   return maxOverallUploadSpeedLimit_ > 0 &&
-    maxOverallUploadSpeedLimit_ < calculateStat().getUploadSpeed();
+    maxOverallUploadSpeedLimit_ < netStat_.calculateUploadSpeed();
 }
 
 void RequestGroupMan::getUsedHosts
@@ -1058,22 +1052,26 @@ void RequestGroupMan::getUsedHosts
       (*i)->getDownloadContext()->getFirstFileEntry()->getInFlightRequests();
     for(FileEntry::InFlightRequestSet::iterator j =
           inFlightReqs.begin(), eoj = inFlightReqs.end(); j != eoj; ++j) {
-      uri::UriStruct us;
-      if(uri::parse(us, (*j)->getUri())) {
+      uri_split_result us;
+      if(uri_split(&us, (*j)->getUri().c_str()) == 0) {
         std::vector<Triplet<size_t, int, std::string> >::iterator k;
         std::vector<Triplet<size_t, int, std::string> >::iterator eok =
           tempHosts.end();
+        std::string host = uri::getFieldString(us, USR_HOST,
+                                               (*j)->getUri().c_str());
         for(k =  tempHosts.begin(); k != eok; ++k) {
-          if((*k).third == us.host) {
+          if((*k).third == host) {
             ++(*k).first;
             break;
           }
         }
         if(k == eok) {
-          SharedHandle<ServerStat> ss = findServerStat(us.host, us.protocol);
+          std::string protocol = uri::getFieldString(us, USR_SCHEME,
+                                                     (*j)->getUri().c_str());
+          SharedHandle<ServerStat> ss = findServerStat(host, protocol);
           int invDlSpeed = (ss && ss->isOK()) ?
             -(static_cast<int>(ss->getDownloadSpeed())) : 0;
-          tempHosts.push_back(makeTriplet(1, invDlSpeed, us.host));
+          tempHosts.push_back(makeTriplet(1, invDlSpeed, host));
         }
       }
     }

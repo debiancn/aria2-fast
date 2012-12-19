@@ -63,9 +63,6 @@
 
 namespace aria2 {
 
-const std::string DefaultBtProgressInfoFile::V0000("0000");
-const std::string DefaultBtProgressInfoFile::V0001("0001");
-
 namespace {
 std::string createFilename
 (const SharedHandle<DownloadContext>& dctx, const std::string& suffix)
@@ -78,7 +75,7 @@ std::string createFilename
 
 DefaultBtProgressInfoFile::DefaultBtProgressInfoFile
 (const SharedHandle<DownloadContext>& dctx,
- const PieceStorageHandle& pieceStorage,
+ const SharedHandle<PieceStorage>& pieceStorage,
  const Option* option)
   : dctx_(dctx),
     pieceStorage_(pieceStorage),
@@ -114,7 +111,7 @@ void DefaultBtProgressInfoFile::save()
   std::string filenameTemp = filename_;
   filenameTemp += "__temp";
   {
-    BufferedFile fp(filenameTemp, BufferedFile::WRITE);
+    BufferedFile fp(filenameTemp.c_str(), BufferedFile::WRITE);
     if(!fp) {
       throw DL_ABORT_EX(fmt(EX_SEGMENT_FILE_WRITE, filename_.c_str()));
     }
@@ -162,8 +159,8 @@ void DefaultBtProgressInfoFile::save()
     uint64_t uploadLengthNL = 0;
 #ifdef ENABLE_BITTORRENT
     if(torrentDownload) {
-      TransferStat stat = peerStorage_->calculateStat();
-      uploadLengthNL = hton64(stat.getAllTimeUploadLength());
+      uploadLengthNL = hton64(btRuntime_->getUploadLengthAtStartup()+
+                              dctx_->getNetStat().getSessionUploadLength());
     }
 #endif // ENABLE_BITTORRENT
     WRITE_CHECK(fp, &uploadLengthNL, sizeof(uploadLengthNL));
@@ -209,10 +206,10 @@ void DefaultBtProgressInfoFile::save()
 // It is assumed that integers are saved as:
 // 1) host byte order if version == 0000
 // 2) network byte order if version == 0001
-void DefaultBtProgressInfoFile::load() 
+void DefaultBtProgressInfoFile::load()
 {
   A2_LOG_INFO(fmt(MSG_LOADING_SEGMENT_FILE, filename_.c_str()));
-  BufferedFile fp(filename_, BufferedFile::READ);
+  BufferedFile fp(filename_.c_str(), BufferedFile::READ);
   if(!fp) {
     throw DL_ABORT_EX(fmt(EX_SEGMENT_FILE_READ, filename_.c_str()));
   }
@@ -220,9 +217,9 @@ void DefaultBtProgressInfoFile::load()
   READ_CHECK(fp, versionBuf, sizeof(versionBuf));
   std::string versionHex = util::toHex(versionBuf, sizeof(versionBuf));
   int version;
-  if(DefaultBtProgressInfoFile::V0000 == versionHex) {
+  if("0000" == versionHex) {
     version = 0;
-  } else if(DefaultBtProgressInfoFile::V0001 == versionHex) {
+  } else if("0001" == versionHex) {
     version = 1;
   } else {
     throw DL_ABORT_EX
@@ -359,7 +356,7 @@ void DefaultBtProgressInfoFile::load()
       piece->setHashType(dctx_->getPieceHashType());
 
 #endif // ENABLE_MESSAGE_DIGEST
-        
+
       inFlightPieces.push_back(piece);
     }
     pieceStorage_->addInFlightPiece(inFlightPieces);

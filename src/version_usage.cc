@@ -70,7 +70,7 @@ void showVersion() {
             << "\n"
             << _("** Configuration **") << "\n"
             << _("Enabled Features") << ": "
-            << FeatureConfig::getInstance()->featureSummary() << "\n"
+            << featureSummary() << "\n"
 #ifdef ENABLE_MESSAGE_DIGEST
             << _("Hash Algorithms") << ": "
             << MessageDigest::getSupportedHashTypeString() << "\n"
@@ -93,9 +93,10 @@ void showUsage
     out->printf("\n");
     return;
   } else if(keyword[0] == '#') {
-    std::vector<SharedHandle<OptionHandler> > handlers =
-      keyword == TAG_ALL ? oparser->findAll() : oparser->findByTag(keyword);
-    if(keyword == TAG_ALL) {
+    std::vector<const OptionHandler*> handlers =
+      keyword == STR_TAG_ALL ? oparser->findAll() :
+      oparser->findByTag(idHelpTag(keyword.c_str()));
+    if(keyword == STR_TAG_ALL) {
       out->printf(_("Printing all options."));
     } else {
       out->printf(_("Printing options tagged with '%s'."),
@@ -106,13 +107,13 @@ void showUsage
     out->printf("\n");
     out->printf(_("Options:"));
     out->printf("\n");
-    for(std::vector<SharedHandle<OptionHandler> >::const_iterator i =
+    for(std::vector<const OptionHandler*>::const_iterator i =
           handlers.begin(), eoi = handlers.end(); i != eoi; ++i) {
       write(out, *(*i));
       out->printf("\n");
     }
-  } else {    
-    std::vector<SharedHandle<OptionHandler> > handlers =
+  } else {
+    std::vector<const OptionHandler*> handlers =
       oparser->findByNameSubstring(keyword);
     if(!handlers.empty()) {
       out->printf(_("Printing options whose name includes '%s'."),
@@ -120,7 +121,7 @@ void showUsage
       out->printf("\n");
       out->printf(_("Options:"));
       out->printf("\n");
-      for(std::vector<SharedHandle<OptionHandler> >::const_iterator i =
+      for(std::vector<const OptionHandler*>::const_iterator i =
             handlers.begin(), eoi = handlers.end(); i != eoi; ++i) {
         write(out, *(*i));
         out->printf("\n");
@@ -132,7 +133,7 @@ void showUsage
       write(out, *oparser->find(PREF_HELP));
     }
   }
-  if(keyword == TAG_BASIC) {
+  if(keyword == strHelpTag(TAG_BASIC)) {
     out->printf("URI, MAGNET, TORRENT_FILE, METALINK_FILE:\n");
     out->printf(_(" You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, all\n"
                   " URIs must point to the same file or downloading will fail."));

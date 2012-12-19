@@ -68,8 +68,7 @@ struct SegmentEntry {
   SegmentEntry& operator=(const SegmentEntry&);
 };
 
-typedef SharedHandle<SegmentEntry> SegmentEntryHandle;
-typedef std::deque<SegmentEntryHandle> SegmentEntries;
+typedef std::deque<SharedHandle<SegmentEntry> > SegmentEntries;
 
 /**
  * This class holds the download progress of the one download entry.
@@ -93,13 +92,6 @@ private:
 
   // Keep track of fastest PeerStat for each server
   std::vector<SharedHandle<PeerStat> > fastestPeerStats_;
-
-  // key: PeerStat's cuid, value: its download speed
-  std::map<cuid_t, int> peerStatDlspdMap_;
-
-  Timer lastPeerStatDlspdMapUpdated_;
-
-  int cachedDlspd_;
 
   BitfieldMan ignoreBitfield_;
 
@@ -151,7 +143,7 @@ public:
                   size_t maxSegments);
 
   /**
-   * Returns a segment whose index is index. 
+   * Returns a segment whose index is index.
    * If it has already assigned
    * to another cuid or has been downloaded, then returns a segment instance
    * whose isNull call is true.
@@ -227,18 +219,6 @@ public:
   {
     return fastestPeerStats_;
   }
-
-  /**
-   * Returns current download speed in bytes per sec. 
-   */
-  int calculateDownloadSpeed();
-
-  void updateDownloadSpeedFor(const SharedHandle<PeerStat>& pstat);
-
-  /**
-   * Returns the downloaded bytes in this session.
-   */
-  int64_t calculateSessionDownloadLength() const;
 
   size_t countFreePieceFrom(size_t index) const;
 
