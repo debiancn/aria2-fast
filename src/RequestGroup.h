@@ -138,8 +138,6 @@ private:
 
   std::vector<SharedHandle<PostDownloadHandler> > postDownloadHandlers_;
 
-  std::vector<std::string> acceptTypes_;
-
   SharedHandle<URISelector> uriSelector_;
 
   Time lastModifiedTime_;
@@ -227,7 +225,7 @@ public:
 
   void createNextCommand(std::vector<Command*>& commands,
                          DownloadEngine* e, int numCommand);
-  
+
   void createNextCommand(std::vector<Command*>& commands, DownloadEngine* e);
 
   bool downloadFinished() const;
@@ -410,26 +408,6 @@ public:
 
   void reportDownloadFinished();
 
-  const std::vector<std::string>& getAcceptTypes() const
-  {
-    return acceptTypes_;
-  }
-
-  void addAcceptType(const std::string& type);
-
-  template<typename InputIterator>
-  void addAcceptType(InputIterator first, InputIterator last)
-  {
-    for(; first != last; ++first) {
-      if(std::find(acceptTypes_.begin(), acceptTypes_.end(), *first) ==
-	 acceptTypes_.end()) {
-	acceptTypes_.push_back(*first);
-      }
-    }
-  }
-
-  void removeAcceptType(const std::string& type);
-
   void setURISelector(const SharedHandle<URISelector>& uriSelector);
 
   const SharedHandle<URISelector>& getURISelector() const
@@ -534,6 +512,11 @@ public:
   void setRequestGroupMan(RequestGroupMan* requestGroupMan)
   {
     requestGroupMan_ = requestGroupMan;
+  }
+
+  RequestGroupMan* getRequestGroupMan()
+  {
+    return requestGroupMan_;
   }
 
   int getResumeFailureCount() const

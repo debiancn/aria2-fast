@@ -379,10 +379,10 @@ HTTP Specific Options
 
 .. option:: --http-no-cache[=true|false]
 
-   Send Cache-Control: no-cache and Pragma: no-cache header to avoid
+   Send ``Cache-Control: no-cache`` and ``Pragma: no-cache`` header to avoid
    cached content.  If ``false`` is given, these headers are not sent
    and you can add Cache-Control header with a directive you like
-   using :option:`--header` option. Default: ``true``
+   using :option:`--header` option. Default: ``false``
 
 .. option:: --http-user=<USER>
 
@@ -913,6 +913,12 @@ RPC Options
   RPC response.
   Default: ``false``
 
+.. option:: --rpc-certificate=<FILE>
+
+  Use the certificate in FILE for RPC server. The certificate must be
+  in PEM format. Use :option:`--rpc-private-key` option to specify the
+  private key. Use :option:`--rpc-secure` option to enable encryption.
+
 .. option:: --rpc-listen-all[=true|false]
 
   Listen incoming JSON-RPC/XML-RPC requests on all network interfaces. If false
@@ -931,6 +937,30 @@ RPC Options
 .. option:: --rpc-passwd=<PASSWD>
 
   Set JSON-RPC/XML-RPC password.
+
+.. option:: --rpc-private-key=<FILE>
+
+  Use the private key in FILE for RPC server.  The private key must be
+  decrypted and in PEM format. Use :option:`--rpc-secure` option to
+  enable encryption. See also :option:`--rpc-certificate` option.
+
+.. option:: --rpc-save-upload-metadata[=true|false]
+
+  Save the uploaded torrent or metalink metadata in the directory
+  specified by :option:`--dir` option. The filename consists of SHA-1
+  hash hex string of metadata plus extension. For torrent, the
+  extension is '.torrent'. For metalink, it is '.meta4'.  If false is
+  given to this option, the downloads added by
+  :func:`aria2.addTorrent` or :func:`aria2.addMetalink` will not be
+  saved by :option:`--save-session` option. Default: ``false``
+
+.. option:: --rpc-secure[=true|false]
+
+  RPC transport will be encrypted by SSL/TLS.  The RPC clients must
+  use https scheme to access the server. For WebSocket client, use wss
+  scheme. Use :option:`--rpc-certificate` and
+  :option:`--rpc-private-key` options to specify the server
+  certificate and private key.
 
 .. option:: --rpc-user=<USER>
 
@@ -1084,6 +1114,14 @@ Advanced Options
 
   Possible Values: ``none``, ``prealloc``, ``trunc``, ``falloc``
   Default: ``prealloc``
+
+
+.. option:: --force-save[=true|false]
+
+  Save download with :option:`--save-session <--save-session>` option
+  even if the download is completed or removed. This may be useful to
+  save BitTorrent seeding which is recognized as completed state.
+  Default: ``false``
 
 .. option:: --hash-check-only[=true|false]
 
@@ -1689,6 +1727,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`file-allocation <--file-allocation>`
   * :option:`follow-metalink <--follow-metalink>`
   * :option:`follow-torrent <--follow-torrent>`
+  * :option:`force-save <--force-save>`
   * :option:`ftp-passwd <--ftp-passwd>`
   * :option:`ftp-pasv <-p>`
   * :option:`ftp-proxy <--ftp-proxy>`
@@ -1740,6 +1779,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`remove-control-file <--remove-control-file>`
   * :option:`retry-wait <--retry-wait>`
   * :option:`reuse-uri <--reuse-uri>`
+  * :option:`rpc-save-upload-metadata <--rpc-save-upload-metadata>`
   * :option:`seed-ratio <--seed-ratio>`
   * :option:`seed-time <--seed-time>`
   * :option:`select-file <--select-file>`
@@ -1837,7 +1877,8 @@ WebSocket) is ``/jsonrpc``.  The request path of XML-RPC interface is
 ``/rpc``.
 
 The WebSocket URI for JSON-RPC over WebSocket is
-``ws://HOST:PORT/jsonrpc``.
+``ws://HOST:PORT/jsonrpc``. If you enabled SSL/TLS encryption, use
+``wss://HOST:PORT/jsonrpc`` instead.
 
 The implemented JSON-RPC is based on
 JSON-RPC 2.0 <http://jsonrpc.org/specification>, and
@@ -1932,26 +1973,28 @@ All code examples come from Python2.7 interpreter.
   
   
   
-  This method adds BitTorrent download by uploading ".torrent" file.  If
-  you want to add BitTorrent Magnet URI, use :func:`aria2.addUri` method
-  instead.  *torrent* is of type base64 which contains Base64-encoded
-  ".torrent" file.  *uris* is of type array and its element is URI which
-  is of type string. *uris* is used for Web-seeding.  For single file
-  torrents, URI can be a complete URI pointing to the resource or if URI
-  ends with /, name in torrent file is added. For multi-file torrents,
-  name and path in torrent are added to form a URI for each file.
-  *options* is of type struct and its members are a pair of option name
-  and value. See :ref:`rpc_options` below for more details.  If *position* is
-  given as an integer starting from 0, the new download is inserted at
+  This method adds BitTorrent download by uploading ".torrent" file.
+  If you want to add BitTorrent Magnet URI, use :func:`aria2.addUri`
+  method instead.  *torrent* is of type base64 which contains
+  Base64-encoded ".torrent" file.  *uris* is of type array and its
+  element is URI which is of type string. *uris* is used for
+  Web-seeding.  For single file torrents, URI can be a complete URI
+  pointing to the resource or if URI ends with /, name in torrent file
+  is added. For multi-file torrents, name and path in torrent are
+  added to form a URI for each file.  *options* is of type struct and
+  its members are a pair of option name and value. See
+  :ref:`rpc_options` below for more details.  If *position* is given
+  as an integer starting from 0, the new download is inserted at
   *position* in the waiting queue. If *position* is not given or
-  *position* is larger than the size of the queue, it is appended at the
-  end of the queue.  This method returns GID of registered download.
-  The uploaded data is saved as a file named hex string of SHA-1 hash of data
-  plus ".torrent" in the directory specified by :option:`--dir <-d>`
-  option.
-  The example of filename is 0a3893293e27ac0490424c06de4d09242215f0a6.torrent.
-  If same file already exists, it is overwritten.
-  If the file cannot be saved successfully,
+  *position* is larger than the size of the queue, it is appended at
+  the end of the queue.  This method returns GID of registered
+  download. If :option:`--rpc-save-upload-metadata` is ``true``, the
+  uploaded data is saved as a file named hex string of SHA-1 hash of
+  data plus ".torrent" in the directory specified by :option:`--dir
+  <-d>` option.  The example of filename is
+  ``0a3893293e27ac0490424c06de4d09242215f0a6.torrent``.  If same file
+  already exists, it is overwritten.  If the file cannot be saved
+  successfully or :option:`--rpc-save-upload-metadata` is ``false``,
   the downloads added by this method are not saved by
   :option:`--save-session`.
   
@@ -1988,20 +2031,21 @@ All code examples come from Python2.7 interpreter.
   
   
   This method adds Metalink download by uploading ".metalink" file.
-  *metalink* is of type base64 which contains Base64-encoded ".metalink"
-  file.  *options* is of type struct and its members are a pair of
-  option name and value. See :ref:`rpc_options` below for more details.  If
-  *position* is given as an integer starting from 0, the new download is
-  inserted at *position* in the waiting queue. If *position* is not
-  given or *position* is larger than the size of the queue, it is
-  appended at the end of the queue.  This method returns array of GID of
-  registered download.
-  The uploaded data is saved as a file named hex string of SHA-1 hash of data
-  plus ".metalink" in the directory specified by :option:`--dir <-d>`
-  option.
-  The example of filename is 0a3893293e27ac0490424c06de4d09242215f0a6.metalink.
-  If same file already exists, it is overwritten.
-  If the file cannot be saved successfully,
+  *metalink* is of type base64 which contains Base64-encoded
+  ".metalink" file.  *options* is of type struct and its members are a
+  pair of option name and value. See :ref:`rpc_options` below for more
+  details.  If *position* is given as an integer starting from 0, the
+  new download is inserted at *position* in the waiting queue. If
+  *position* is not given or *position* is larger than the size of the
+  queue, it is appended at the end of the queue.  This method returns
+  array of GID of registered download.  If
+  :option:`--rpc-save-upload-metadata` is ``true``, the uploaded data
+  is saved as a file named hex string of SHA-1 hash of data plus
+  ".metalink" in the directory specified by :option:`--dir <-d>`
+  option.  The example of filename is
+  ``0a3893293e27ac0490424c06de4d09242215f0a6.metalink``.  If same file
+  already exists, it is overwritten.  If the file cannot be saved
+  successfully or :option:`--rpc-save-upload-metadata` is ``false``,
   the downloads added by this method are not saved by
   :option:`--save-session`.
   
@@ -2866,6 +2910,7 @@ All code examples come from Python2.7 interpreter.
   * :option:`bt-max-peers <--bt-max-peers>`
   * :option:`bt-request-peer-speed-limit <--bt-request-peer-speed-limit>`
   * :option:`bt-remove-unselected-file <--bt-remove-unselected-file>`
+  * :option:`force-save <--force-save>`
   * :option:`max-download-limit <--max-download-limit>`
   * :option:`max-upload-limit <-u>`
   
@@ -2875,8 +2920,9 @@ All code examples come from Python2.7 interpreter.
   :option:`dry-run <--dry-run>`,
   :option:`metalink-base-uri <--metalink-base-uri>`,
   :option:`parameterized-uri <-P>`,
-  :option:`pause <--pause>` and
-  :option:`piece-length <--piece-length>`.
+  :option:`pause <--pause>`,
+  :option:`piece-length <--piece-length>` and
+  :option:`rpc-save-upload-metadata <--rpc-save-upload-metadata>` option.
   This method returns ``"OK"`` for success.
   
   **JSON-RPC Example**
@@ -3849,6 +3895,17 @@ Verify peer in SSL/TLS using given CA certificates
 
   $ aria2c --ca-certificate=/path/to/ca-certificates.crt --check-certificate https://host/file
 
+RPC
+~~~
+
+Encrypt RPC transport by SSL/TLS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Specify server certificate file and private key file as follows:
+
+.. code-block:: console
+
+  $ aria2c --enable-rpc --rpc-certificate=/path/to/server.crt --rpc-private-key=/path/to/server.key --rpc-secure
 
 And more advanced features
 ~~~~~~~~~~~~~~~~~~~~~~~~~~

@@ -40,17 +40,15 @@
 namespace aria2 {
 
 class Piece;
-class BtPieceMessage;
 class DownloadContext;
 class PeerStorage;
-
-typedef SharedHandle<BtPieceMessage> BtPieceMessageHandle;
 
 class BtPieceMessage : public AbstractBtMessage {
 private:
   size_t index_;
   int32_t begin_;
   int32_t blockLength_;
+  size_t msgHdrLen_;
   const unsigned char* data_;
   SharedHandle<DownloadContext> downloadContext_;
   SharedHandle<PeerStorage> peerStorage_;
@@ -73,7 +71,7 @@ public:
 
   static const uint8_t ID = 7;
 
-  static const std::string NAME;
+  static const char NAME[];
 
   size_t getIndex() const { return index_; }
 
@@ -97,8 +95,7 @@ public:
 
   void setPeerStorage(const SharedHandle<PeerStorage>& peerStorage);
 
-  static BtPieceMessageHandle create
-  (const unsigned char* data, size_t dataLength);
+  static BtPieceMessage* create(const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();
 
@@ -111,7 +108,7 @@ public:
   virtual std::string toString() const;
 
   virtual void onChokingEvent(const BtChokingEvent& event);
-  
+
   virtual void onCancelSendingPieceEvent
   (const BtCancelSendingPieceEvent& event);
 };

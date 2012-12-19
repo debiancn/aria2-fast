@@ -45,7 +45,7 @@
 #include "SegmentMan.h"
 #include "Segment.h"
 #include "Option.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "prefs.h"
 #include "a2functional.h"
 #include "util.h"
@@ -67,9 +67,9 @@ HttpRequestCommand::HttpRequestCommand
  const SharedHandle<Request>& req,
  const SharedHandle<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const HttpConnectionHandle& httpConnection,
+ const SharedHandle<HttpConnection>& httpConnection,
  DownloadEngine* e,
- const SocketHandle& s)
+ const SharedHandle<SocketCore>& s)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e, s,
                     httpConnection->getSocketRecvBuffer()),
     httpConnection_(httpConnection)
@@ -103,8 +103,8 @@ createHttpRequest(const SharedHandle<Request>& req,
   httpRequest->setCookieStorage(cookieStorage);
   httpRequest->setAuthConfigFactory(authConfigFactory, option.get());
   httpRequest->setProxyRequest(proxyRequest);
-  httpRequest->addAcceptType(rg->getAcceptTypes().begin(),
-                             rg->getAcceptTypes().end());
+  httpRequest->setAcceptMetalink(rg->getDownloadContext()->
+                                 getAcceptMetalink());
   if(option->getAsBool(PREF_HTTP_ACCEPT_GZIP)) {
     httpRequest->enableAcceptGZip();
   } else {
@@ -122,22 +122,22 @@ createHttpRequest(const SharedHandle<Request>& req,
 
 bool HttpRequestCommand::executeInternal() {
   //socket->setBlockingMode();
-  if(getRequest()->getProtocol() == Request::PROTO_HTTPS) {
-    getSocket()->prepareSecureConnection();
-    if(!getSocket()->initiateSecureConnection(getRequest()->getHost())) {
-      setReadCheckSocketIf(getSocket(), getSocket()->wantRead());
-      setWriteCheckSocketIf(getSocket(), getSocket()->wantWrite());
-      getDownloadEngine()->addCommand(this);
-      return false;
-    }
-  }
   if(httpConnection_->sendBufferIsEmpty()) {
     if(!checkIfConnectionEstablished
        (getSocket(), getRequest()->getConnectedHostname(),
         getRequest()->getConnectedAddr(), getRequest()->getConnectedPort())) {
       return true;
     }
-
+#ifdef ENABLE_SSL
+    if(getRequest()->getProtocol() == "https") {
+      if(!getSocket()->tlsConnect(getRequest()->getHost())) {
+        setReadCheckSocketIf(getSocket(), getSocket()->wantRead());
+        setWriteCheckSocketIf(getSocket(), getSocket()->wantWrite());
+        getDownloadEngine()->addCommand(this);
+        return false;
+      }
+    }
+#endif // ENABLE_SSL
     if(getSegments().empty()) {
       SharedHandle<HttpRequest> httpRequest
         (createHttpRequest(getRequest(),
@@ -150,8 +150,8 @@ bool HttpRequestCommand::executeInternal() {
                            getDownloadEngine()->getAuthConfigFactory(),
                            proxyRequest_));
       if(getOption()->getAsBool(PREF_CONDITIONAL_GET) &&
-         (getRequest()->getProtocol() == Request::PROTO_HTTP ||
-          getRequest()->getProtocol() == Request::PROTO_HTTPS)) {
+         (getRequest()->getProtocol() == "http" ||
+          getRequest()->getProtocol() == "https")) {
         if(getFileEntry()->getPath().empty() &&
            getRequest()->getFile().empty()) {
           A2_LOG_DEBUG("Conditional-Get is disabled because file name"

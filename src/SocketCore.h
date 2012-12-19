@@ -85,7 +85,10 @@ private:
   bool wantWrite_;
 
 #if ENABLE_SSL
-  static SharedHandle<TLSContext> tlsContext_;
+  // TLS context for client side
+  static SharedHandle<TLSContext> clTlsContext_;
+  // TLS context for server side
+  static SharedHandle<TLSContext> svTlsContext_;
 #endif // ENABLE_SSL
 
 #ifdef HAVE_OPENSSL
@@ -106,6 +109,16 @@ private:
 
   void setSockOpt(int level, int optname, void* optval, socklen_t optlen);
 
+#ifdef ENABLE_SSL
+  /**
+   * Makes this socket secure. The connection must be established
+   * before calling this method.
+   *
+   * If you are going to verify peer's certificate, hostname must be supplied.
+   */
+  bool tlsHandshake(TLSContext* tlsctx, const std::string& hostname);
+#endif // ENABLE_SSL
+
   SocketCore(sock_t sockfd, int sockType);
 public:
   SocketCore(int sockType = SOCK_STREAM);
@@ -124,7 +137,7 @@ public:
   void joinMulticastGroup
   (const std::string& multicastAddr, uint16_t multicastPort,
    const std::string& localAddr);
-  
+
   // Enables TCP_NODELAY socket option if f == true.
   void setTcpNodelay(bool f);
 
@@ -141,7 +154,7 @@ public:
   void bind(uint16_t port, int flags = AI_PASSIVE);
 
   void bind
-  (const std::string& addr, uint16_t port, int family, int flags = AI_PASSIVE);
+  (const char* addrp, uint16_t port, int family, int flags = AI_PASSIVE);
 
   /**
    * Listens form connection on it.
@@ -183,9 +196,9 @@ public:
   /**
    * Accepts incoming connection on this socket.
    * You must call beginListen() before calling this method.
-   * @return accepted socket. The caller must delete it after using it.
+   * @return accepted socket.
    */
-  SocketCore* acceptConnection() const;
+  SharedHandle<SocketCore> acceptConnection() const;
 
   /**
    * Connects to the server named host and the destination port is port.
@@ -293,16 +306,18 @@ public:
     return readDataFrom(reinterpret_cast<char*>(data), len, sender);
   }
 
-  /**
-   * Makes this socket secure.
-   * If the system has not OpenSSL, then this method do nothing.
-   * connection must be established  before calling this method.
-   *
-   * If you are going to verify peer's certificate, hostname must be supplied.
-   */
-  bool initiateSecureConnection(const std::string& hostname="");
+#ifdef ENABLE_SSL
+  // Performs TLS server side handshake. If handshake is completed,
+  // returns true. If handshake has not been done yet, returns false.
+  bool tlsAccept();
 
-  void prepareSecureConnection();
+  // Performs TLS client side handshake. If handshake is completed,
+  // returns true. If handshake has not been done yet, returns false.
+  //
+  // If you are going to verify peer's certificate, hostname must be
+  // supplied.
+  bool tlsConnect(const std::string& hostname);
+#endif // ENABLE_SSL
 
   bool operator==(const SocketCore& s) {
     return sockfd_ == s.sockfd_;
@@ -332,7 +347,8 @@ public:
   bool wantWrite() const;
 
 #ifdef ENABLE_SSL
-  static void setTLSContext(const SharedHandle<TLSContext>& tlsContext);
+  static void setClientTLSContext(const SharedHandle<TLSContext>& tlsContext);
+  static void setServerTLSContext(const SharedHandle<TLSContext>& tlsContext);
 #endif // ENABLE_SSL
 
   static void setProtocolFamily(int protocolFamily)

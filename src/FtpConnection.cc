@@ -50,7 +50,7 @@
 #include "AuthConfig.h"
 #include "DlRetryEx.h"
 #include "DlAbortEx.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "A2STR.h"
 #include "fmt.h"
 #include "AuthConfig.h"
@@ -62,7 +62,7 @@ namespace aria2 {
 
 FtpConnection::FtpConnection
 (cuid_t cuid,
- const SocketHandle& socket,
+ const SharedHandle<SocketCore>& socket,
  const SharedHandle<Request>& req,
  const SharedHandle<AuthConfig>& authConfig,
  const Option* op)
@@ -204,9 +204,8 @@ SharedHandle<SocketCore> FtpConnection::createServerSocket()
   std::pair<std::string, uint16_t> addrinfo;
   socket_->getAddrInfo(addrinfo);
   SharedHandle<SocketCore> serverSocket(new SocketCore());
-  serverSocket->bind(addrinfo.first, 0, AF_UNSPEC);
+  serverSocket->bind(addrinfo.first.c_str(), 0, AF_UNSPEC);
   serverSocket->beginListen();
-  serverSocket->setNonBlockingMode();
   return serverSocket;
 }
 
@@ -314,7 +313,7 @@ FtpConnection::findEndOfResponse
     if(p == std::string::npos) {
       return std::string::npos;
     }
-    p = buf.find(A2STR::CRLF, p+6);
+    p = buf.find("\r\n", p+6);
     if(p == std::string::npos) {
       return std::string::npos;
     } else {
@@ -322,7 +321,7 @@ FtpConnection::findEndOfResponse
     }
   } else {
     // single line response
-    std::string::size_type p = buf.find(A2STR::CRLF);    
+    std::string::size_type p = buf.find("\r\n");
     if(p == std::string::npos) {
       return std::string::npos;
     } else {
@@ -333,7 +332,7 @@ FtpConnection::findEndOfResponse
 
 bool FtpConnection::bulkReceiveResponse(std::pair<int, std::string>& response)
 {
-  char buf[1024];  
+  char buf[1024];
   while(1) {
     size_t size = sizeof(buf);
     socket_->readData(buf, size);
@@ -406,9 +405,10 @@ int FtpConnection::receiveSizeResponse(int64_t& size)
     if(response.first == 213) {
       std::pair<Sip, Sip> rp;
       util::divide(rp, response.second.begin(), response.second.end(), ' ');
-      size = util::parseLLInt(std::string(rp.second.first, rp.second.second));
-      if(size < 0) {
-        throw DL_ABORT_EX("Size must be positive");
+      if(!util::parseLLIntNoThrow(size, std::string(rp.second.first,
+                                                    rp.second.second)) ||
+         size < 0) {
+        throw DL_ABORT_EX("Size must be positive integer");
       }
     }
     return response.first;
@@ -416,6 +416,25 @@ int FtpConnection::receiveSizeResponse(int64_t& size)
     return 0;
   }
 }
+
+namespace {
+template<typename T>
+bool getInteger(T* dest, const char* first, const char* last)
+{
+  int res = 0;
+  // We assume *dest won't overflow.
+  for(; first != last; ++first) {
+    if(util::isDigit(*first)) {
+      res *= 10;
+      res += (*first)-'0';
+    } else {
+      return false;
+    }
+  }
+  *dest = res;
+  return true;
+}
+} // namespace
 
 int FtpConnection::receiveMdtmResponse(Time& time)
 {
@@ -430,13 +449,18 @@ int FtpConnection::receiveMdtmResponse(Time& time)
         // and included strptime doesn't parse data for this format.
         struct tm tm;
         memset(&tm, 0, sizeof(tm));
-        tm.tm_sec = util::parseInt(std::string(&buf[12], &buf[14]));
-        tm.tm_min = util::parseInt(std::string(&buf[10], &buf[12]));
-        tm.tm_hour = util::parseInt(std::string(&buf[8], &buf[10]));
-        tm.tm_mday = util::parseInt(std::string(&buf[6], &buf[8]));
-        tm.tm_mon = util::parseInt(std::string(&buf[4], &buf[6]))-1;
-        tm.tm_year = util::parseInt(std::string(&buf[0], &buf[4]))-1900;
-        time = Time(timegm(&tm));
+        if(getInteger(&tm.tm_sec, &buf[12], &buf[14]) &&
+           getInteger(&tm.tm_min, &buf[10], &buf[12]) &&
+           getInteger(&tm.tm_hour, &buf[8], &buf[10]) &&
+           getInteger(&tm.tm_mday, &buf[6], &buf[8]) &&
+           getInteger(&tm.tm_mon, &buf[4], &buf[6]) &&
+           getInteger(&tm.tm_year, &buf[0], &buf[4])) {
+          tm.tm_mon -= 1;
+          tm.tm_year -= 1900;
+          time = Time(timegm(&tm));
+        } else {
+          time = Time::null();
+        }
       } else {
         time = Time::null();
       }

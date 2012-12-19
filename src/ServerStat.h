@@ -52,10 +52,9 @@ class ServerStat {
 public:
   enum STATUS {
     OK = 0,
-    A2_ERROR
+    A2_ERROR,
+    MAX_STATUS
   };
-  
-  static const std::string STATUS_STRING[];
 
   ServerStat(const std::string& hostname, const std::string& protocol);
 
@@ -150,13 +149,13 @@ public:
   std::string toString() const;
 private:
   std::string hostname_;
-  
+
   std::string protocol_;
 
   int downloadSpeed_;
-  
+
   int singleConnectionAvgSpeed_;
-  
+
   int multiConnectionAvgSpeed_;
 
   int counter_;

@@ -80,7 +80,7 @@ void DHTRoutingTableSerializer::serialize(const std::string& filename)
   A2_LOG_INFO(fmt("Saving DHT routing table to %s.", filename.c_str()));
   std::string filenameTemp = filename;
   filenameTemp += "__temp";
-  BufferedFile fp(filenameTemp, BufferedFile::WRITE);
+  BufferedFile fp(filenameTemp.c_str(), BufferedFile::WRITE);
   if(!fp) {
     throw DL_ABORT_EX(fmt("Failed to save DHT routing table to %s.",
                           filename.c_str()));
@@ -95,7 +95,7 @@ void DHTRoutingTableSerializer::serialize(const std::string& filename)
   // version
   header[6] = 0;
   header[7] = 0x03u;
-  
+
   char zero[18];
   memset(zero, 0, sizeof(zero));
 

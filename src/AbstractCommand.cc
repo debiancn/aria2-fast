@@ -51,7 +51,7 @@
 #include "SleepCommand.h"
 #include "StreamCheckIntegrityEntry.h"
 #include "PieceStorage.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "message.h"
 #include "prefs.h"
 #include "fmt.h"
@@ -82,7 +82,7 @@ AbstractCommand::AbstractCommand
  const SharedHandle<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SocketHandle& s,
+ const SharedHandle<SocketCore>& s,
  const SharedHandle<SocketRecvBuffer>& socketRecvBuffer,
  bool incNumConnection)
   : Command(cuid), checkPoint_(global::wallclock()),
@@ -431,7 +431,7 @@ void AbstractCommand::onAbort() {
     // limitation of current implementation.
     if(!getOption()->getAsBool(PREF_ALWAYS_RESUME) &&
        fileEntry_ &&
-       getSegmentMan()->calculateSessionDownloadLength() == 0 &&
+       getDownloadContext()->getNetStat().getSessionDownloadLength() == 0 &&
        !requestGroup_->p2pInvolved() &&
        getDownloadContext()->getFileEntries().size() == 1) {
       const int maxTries = getOption()->getAsInt(PREF_MAX_RESUME_FAILURE_TRIES);
@@ -475,10 +475,11 @@ void AbstractCommand::disableReadCheckSocket() {
     e_->deleteSocketForReadCheck(readCheckTarget_, this);
     checkSocketIsReadable_ = false;
     readCheckTarget_.reset();
-  }  
+  }
 }
 
-void AbstractCommand::setReadCheckSocket(const SocketHandle& socket) {
+void AbstractCommand::setReadCheckSocket
+(const SharedHandle<SocketCore>& socket) {
   if(!socket->isOpen()) {
     disableReadCheckSocket();
   } else {
@@ -514,7 +515,8 @@ void AbstractCommand::disableWriteCheckSocket() {
   }
 }
 
-void AbstractCommand::setWriteCheckSocket(const SocketHandle& socket) {
+void AbstractCommand::setWriteCheckSocket
+(const SharedHandle<SocketCore>& socket) {
   if(!socket->isOpen()) {
     disableWriteCheckSocket();
   } else {
@@ -590,17 +592,17 @@ std::string getProxyOptionFor
 std::string getProxyUri
 (const std::string& protocol, const Option* option)
 {
-  if(protocol == Request::PROTO_HTTP) {
+  if(protocol == "http") {
     return getProxyOptionFor(PREF_HTTP_PROXY,
                              PREF_HTTP_PROXY_USER,
                              PREF_HTTP_PROXY_PASSWD,
                              option);
-  } else if(protocol == Request::PROTO_HTTPS) {
+  } else if(protocol == "https") {
     return getProxyOptionFor(PREF_HTTPS_PROXY,
                              PREF_HTTPS_PROXY_USER,
                              PREF_HTTPS_PROXY_PASSWD,
                              option);
-  } else if(protocol == Request::PROTO_FTP) {
+  } else if(protocol == "ftp") {
     return getProxyOptionFor(PREF_FTP_PROXY,
                              PREF_FTP_PROXY_USER,
                              PREF_FTP_PROXY_PASSWD,
@@ -831,32 +833,30 @@ bool AbstractCommand::checkIfConnectionEstablished
  const std::string& connectedAddr,
  uint16_t connectedPort)
 {
-  if(socket->isReadable(0)) {
-    std::string error = socket->getSocketError();
-    if(!error.empty()) {
-      // See also InitiateConnectionCommand::executeInternal()
-      e_->markBadIPAddress(connectedHostname, connectedAddr, connectedPort);
-      if(!e_->findCachedIPAddress(connectedHostname, connectedPort).empty()) {
-        A2_LOG_INFO(fmt(MSG_CONNECT_FAILED_AND_RETRY,
-                        getCuid(),
-                        connectedAddr.c_str(), connectedPort));
-        Command* command =
-          InitiateConnectionCommandFactory::createInitiateConnectionCommand
-          (getCuid(), req_, fileEntry_, requestGroup_, e_);
-        e_->setNoWait(true);
-        e_->addCommand(command);
-        return false;
-      }
-      e_->removeCachedIPAddress(connectedHostname, connectedPort);
-      // Don't set error if proxy server is used and its method is GET.
-      if(resolveProxyMethod(req_->getProtocol()) != V_GET ||
-         !isProxyRequest(req_->getProtocol(), getOption())) {
-        e_->getRequestGroupMan()->getOrCreateServerStat
-          (req_->getHost(), req_->getProtocol())->setError();
-      }
-      throw DL_RETRY_EX
-        (fmt(MSG_ESTABLISHING_CONNECTION_FAILED, error.c_str()));
+  std::string error = socket->getSocketError();
+  if(!error.empty()) {
+    // See also InitiateConnectionCommand::executeInternal()
+    e_->markBadIPAddress(connectedHostname, connectedAddr, connectedPort);
+    if(!e_->findCachedIPAddress(connectedHostname, connectedPort).empty()) {
+      A2_LOG_INFO(fmt(MSG_CONNECT_FAILED_AND_RETRY,
+                      getCuid(),
+                      connectedAddr.c_str(), connectedPort));
+      Command* command =
+        InitiateConnectionCommandFactory::createInitiateConnectionCommand
+        (getCuid(), req_, fileEntry_, requestGroup_, e_);
+      e_->setNoWait(true);
+      e_->addCommand(command);
+      return false;
     }
+    e_->removeCachedIPAddress(connectedHostname, connectedPort);
+    // Don't set error if proxy server is used and its method is GET.
+    if(resolveProxyMethod(req_->getProtocol()) != V_GET ||
+       !isProxyRequest(req_->getProtocol(), getOption())) {
+      e_->getRequestGroupMan()->getOrCreateServerStat
+        (req_->getHost(), req_->getProtocol())->setError();
+    }
+    throw DL_RETRY_EX
+      (fmt(MSG_ESTABLISHING_CONNECTION_FAILED, error.c_str()));
   }
   return true;
 }
@@ -865,7 +865,7 @@ const std::string& AbstractCommand::resolveProxyMethod
 (const std::string& protocol) const
 {
   if(getOption()->get(PREF_PROXY_METHOD) == V_TUNNEL ||
-     Request::PROTO_HTTPS == protocol) {
+     protocol == "https") {
     return V_TUNNEL;
   } else {
     return V_GET;

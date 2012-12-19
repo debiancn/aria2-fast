@@ -42,7 +42,7 @@
 #include "LogFactory.h"
 #include "Logger.h"
 #include "BtHandshakeMessage.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "a2netcompat.h"
 #include "DHKeyExchange.h"
 #include "ARC4Encryptor.h"
@@ -72,7 +72,7 @@ const unsigned char* GENERATOR = reinterpret_cast<const unsigned char*>("2");
 
 MSEHandshake::MSEHandshake
 (cuid_t cuid,
- const SocketHandle& socket,
+ const SharedHandle<SocketCore>& socket,
  const Option* op)
   : cuid_(cuid),
     socket_(socket),
@@ -190,7 +190,7 @@ void MSEHandshake::initCipher(const unsigned char* infoHash)
   memcpy(s, initiator_?"keyA":"keyB", 4);
   memcpy(s+4, secret_, KEY_LENGTH);
   memcpy(s+4+KEY_LENGTH, infoHash, INFO_HASH_LENGTH);
-  
+
   unsigned char localCipherKey[20];
   sha1_->reset();
   message_digest::digest(localCipherKey, sizeof(localCipherKey),
@@ -252,7 +252,7 @@ void MSEHandshake::createReq23Hash(unsigned char* md, const unsigned char* infoH
   unsigned char yh[20];
   sha1_->reset();
   message_digest::digest(yh, sizeof(yh), sha1_, y, sizeof(y));
-  
+
   for(size_t i = 0; i < 20; ++i) {
     md[i] = xh[i]^yh[i];
   }

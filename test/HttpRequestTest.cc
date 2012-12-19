@@ -35,7 +35,7 @@ class HttpRequestTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testIsRangeSatisfied);
   CPPUNIT_TEST(testUserAgent);
   CPPUNIT_TEST(testAddHeader);
-  CPPUNIT_TEST(testAddAcceptType);
+  CPPUNIT_TEST(testAcceptMetalink);
   CPPUNIT_TEST(testEnableAcceptEncoding);
   CPPUNIT_TEST(testConditionalRequest);
   CPPUNIT_TEST_SUITE_END();
@@ -63,7 +63,7 @@ public:
   void testIsRangeSatisfied();
   void testUserAgent();
   void testAddHeader();
-  void testAddAcceptType();
+  void testAcceptMetalink();
   void testEnableAcceptEncoding();
   void testConditionalRequest();
 };
@@ -82,7 +82,7 @@ void HttpRequestTest::testGetStartByte()
 
   httpRequest.setSegment(segment);
   httpRequest.setFileEntry(fileEntry);
-  
+
   CPPUNIT_ASSERT_EQUAL((int64_t)1024LL, httpRequest.getStartByte());
 }
 
@@ -145,8 +145,8 @@ void HttpRequestTest::testCreateRequest()
   httpRequest.setAuthConfigFactory(authConfigFactory_, option_.get());
 
   // remove "Connection: close" and add end byte range
-  request->setPipeliningHint(true);  
-  
+  request->setPipeliningHint(true);
+
   std::string expectedText = "GET /archives/aria2-1.0.0.tar.bz2 HTTP/1.1\r\n"
     "User-Agent: aria2\r\n"
     "Accept: */*\r\n"
@@ -197,7 +197,7 @@ void HttpRequestTest::testCreateRequest()
     "Cache-Control: no-cache\r\n"
     "Range: bytes=1048576-2097151\r\n"
     "\r\n";
-  
+
   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 
   // redirection set persistent connection flag to true
@@ -271,7 +271,6 @@ void HttpRequestTest::testCreateRequest()
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
-    "Proxy-Connection: close\r\n"
     "Proxy-Authorization: Basic YXJpYTJwcm94eXVzZXI6YXJpYTJwcm94eXBhc3N3ZA==\r\n"
     "Authorization: Basic YXJpYTJ1c2VyOmFyaWEycGFzc3dk\r\n"
     "\r\n";
@@ -287,7 +286,7 @@ void HttpRequestTest::testCreateRequest()
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
     "Range: bytes=0-1048575\r\n"
-    "Proxy-Connection: Keep-Alive\r\n"
+    "Connection: Keep-Alive\r\n"
     "Proxy-Authorization: Basic YXJpYTJwcm94eXVzZXI6YXJpYTJwcm94eXBhc3N3ZA==\r\n"
     "Authorization: Basic YXJpYTJ1c2VyOmFyaWEycGFzc3dk\r\n"
     "\r\n";
@@ -306,11 +305,10 @@ void HttpRequestTest::testCreateRequest()
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
-    "Proxy-Connection: close\r\n"
     "Authorization: Basic YXJpYTJ1c2VyOmFyaWEycGFzc3dk\r\n"
     "\r\n";
 
-  CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());  
+  CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 }
 
 void HttpRequestTest::testCreateRequest_ftp()
@@ -347,7 +345,6 @@ void HttpRequestTest::testCreateRequest_ftp()
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
-    "Proxy-Connection: close\r\n"
     "Authorization: Basic YXJpYTJ1c2VyOmFyaWEycGFzc3dk\r\n"
     "\r\n";
 
@@ -366,7 +363,6 @@ void HttpRequestTest::testCreateRequest_ftp()
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
-    "Proxy-Connection: close\r\n"
     "Proxy-Authorization: Basic YXJpYTJwcm94eXVzZXI6YXJpYTJwcm94eXBhc3N3ZA==\r\n"
     "Authorization: Basic YXJpYTJ1c2VyOmFyaWEycGFzc3dk\r\n"
     "\r\n";
@@ -474,7 +470,7 @@ void HttpRequestTest::testCreateRequest_with_cookie()
     "Cookie: name4=value4;\r\n"
     "\r\n";
 
-  CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());  
+  CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 
   request->setUri("http://example.org/aria2-1.0.0.tar.bz2");
 
@@ -509,7 +505,7 @@ void HttpRequestTest::testCreateRequest_query()
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
     "\r\n";
-  
+
   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 }
 
@@ -522,7 +518,7 @@ void HttpRequestTest::testCreateRequest_head()
   HttpRequest httpRequest;
   httpRequest.setRequest(request);
   httpRequest.setAuthConfigFactory(authConfigFactory_, option_.get());
-  
+
   std::stringstream result(httpRequest.createRequest());
   std::string line;
   CPPUNIT_ASSERT(getline(result, line));
@@ -555,7 +551,7 @@ void HttpRequestTest::testCreateRequest_endOffsetOverride()
     "Cache-Control: no-cache\r\n"
     "Connection: close\r\n"
     "\r\n";
-  
+
   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 
   segment->updateWrittenLength(1);
@@ -570,7 +566,7 @@ void HttpRequestTest::testCreateRequest_endOffsetOverride()
     "Connection: close\r\n"
     "Range: bytes=1-1073741823\r\n"
     "\r\n";
-  
+
   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 }
 
@@ -653,7 +649,7 @@ void HttpRequestTest::testIsRangeSatisfied()
   httpRequest.setSegment(segment);
   httpRequest.setFileEntry(fileEntry);
 
-  SharedHandle<Range> range(new Range());
+  Range range;
 
   CPPUNIT_ASSERT(httpRequest.isRangeSatisfied(range));
 
@@ -665,7 +661,7 @@ void HttpRequestTest::testIsRangeSatisfied()
 
   uint64_t entityLength = segment->getSegmentLength()*10;
 
-  range.reset(new Range(segment->getPosition(), 0, entityLength));
+  range = Range(segment->getPosition(), 0, entityLength);
 
   CPPUNIT_ASSERT(httpRequest.isRangeSatisfied(range));
 
@@ -681,14 +677,14 @@ void HttpRequestTest::testIsRangeSatisfied()
 
   CPPUNIT_ASSERT(!httpRequest.isRangeSatisfied(range));
 
-  range.reset(new Range(segment->getPosition(),
-                        segment->getPosition()+segment->getLength()-1,
-                        entityLength));
+  range = Range(segment->getPosition(),
+                segment->getPosition()+segment->getLength()-1,
+                entityLength);
 
   CPPUNIT_ASSERT(httpRequest.isRangeSatisfied(range));
 
-  range.reset(new Range(0, segment->getPosition()+segment->getLength()-1,
-                        entityLength));
+  range = Range(0, segment->getPosition()+segment->getLength()-1,
+                entityLength);
 
   CPPUNIT_ASSERT(!httpRequest.isRangeSatisfied(range));
 }
@@ -721,7 +717,7 @@ void HttpRequestTest::testUserAgent()
 
   SharedHandle<Request> proxyRequest(new Request());
   CPPUNIT_ASSERT(proxyRequest->setUri("http://localhost:9000"));
-  
+
   httpRequest.setProxyRequest(proxyRequest);
 
   std::string expectedTextForProxy = "CONNECT localhost:8080 HTTP/1.1\r\n"
@@ -758,11 +754,8 @@ void HttpRequestTest::testAddHeader()
   CPPUNIT_ASSERT_EQUAL(expectedText, httpRequest.createRequest());
 }
 
-void HttpRequestTest::testAddAcceptType()
+void HttpRequestTest::testAcceptMetalink()
 {
-  std::string acceptTypes[] = { "cream/custard",
-                                "muffin/chocolate" };
-
   SharedHandle<Request> request(new Request());
   request->setUri("http://localhost/archives/aria2-1.0.0.tar.bz2");
 
@@ -770,12 +763,12 @@ void HttpRequestTest::testAddAcceptType()
   httpRequest.disableContentEncoding();
   httpRequest.setRequest(request);
   httpRequest.setAuthConfigFactory(authConfigFactory_, option_.get());
-  httpRequest.addAcceptType(vbegin(acceptTypes), vend(acceptTypes));
+  httpRequest.setAcceptMetalink(true);
 
   std::string expectedText =
     "GET /archives/aria2-1.0.0.tar.bz2 HTTP/1.1\r\n"
     "User-Agent: aria2\r\n"
-    "Accept: */*,cream/custard,muffin/chocolate\r\n"
+    "Accept: */*,application/metalink4+xml,application/metalink+xml\r\n"
     "Host: localhost\r\n"
     "Pragma: no-cache\r\n"
     "Cache-Control: no-cache\r\n"
@@ -798,7 +791,7 @@ void HttpRequestTest::testEnableAcceptEncoding()
 #ifdef HAVE_ZLIB
   acceptEncodings += "deflate, gzip";
 #endif // HAVE_ZLIB
-  
+
   std::string expectedTextHead =
     "GET /archives/aria2-1.0.0.tar.bz2 HTTP/1.1\r\n"
     "User-Agent: aria2\r\n"

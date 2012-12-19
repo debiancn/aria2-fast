@@ -39,7 +39,7 @@
 #include "DlAbortEx.h"
 #include "message.h"
 #include "prefs.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "Logger.h"
 #include "LogFactory.h"
 #include "Peer.h"
@@ -84,7 +84,7 @@ InitiatorMSEHandshakeCommand::~InitiatorMSEHandshakeCommand()
 {
   requestGroup_->decreaseNumCommand();
   btRuntime_->decreaseConnections();
-  
+
   delete mseHandshake_;
 }
 

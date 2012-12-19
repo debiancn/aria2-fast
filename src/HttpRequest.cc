@@ -51,6 +51,7 @@
 #include "TimeA2.h"
 #include "array_fun.h"
 #include "Request.h"
+#include "DownloadHandlerConstants.h"
 
 namespace aria2 {
 
@@ -58,6 +59,8 @@ const std::string HttpRequest::USER_AGENT("aria2");
 
 HttpRequest::HttpRequest():contentEncodingEnabled_(true),
                            userAgent_(USER_AGENT),
+                           acceptMetalink_(false),
+                           option_(0),
                            noCache_(true),
                            acceptGzip_(false),
                            endOffsetOverride_(0)
@@ -99,31 +102,30 @@ int64_t HttpRequest::getEndByte() const
   }
 }
 
-RangeHandle HttpRequest::getRange() const
+Range HttpRequest::getRange() const
 {
   // content-length is always 0
   if(!segment_) {
-    return SharedHandle<Range>(new Range());
+    return Range();
   } else {
-    return SharedHandle<Range>(new Range(getStartByte(), getEndByte(),
-                                         fileEntry_->getLength()));
+    return Range(getStartByte(), getEndByte(), fileEntry_->getLength());
   }
 }
 
-bool HttpRequest::isRangeSatisfied(const RangeHandle& range) const
+bool HttpRequest::isRangeSatisfied(const Range& range) const
 {
   if(!segment_) {
     return true;
   }
-  if((getStartByte() == range->getStartByte()) &&
+  if((getStartByte() == range.startByte) &&
      ((getEndByte() == 0) ||
-      (getEndByte() == range->getEndByte())) &&
+      (getEndByte() == range.endByte)) &&
      ((fileEntry_->getLength() == 0) ||
-      (fileEntry_->getLength() == range->getEntityLength()))) {
+      (fileEntry_->getLength() == range.entityLength))) {
     return true;
   } else {
     return false;
-  }  
+  }
 }
 
 namespace {
@@ -143,7 +145,7 @@ std::string HttpRequest::createRequest()
   std::string requestLine = request_->getMethod();
   requestLine += " ";
   if(proxyRequest_) {
-    if(getProtocol() == Request::PROTO_FTP &&
+    if(getProtocol() == "ftp" &&
        request_->getUsername().empty() && authConfig_) {
       // Insert user into URI, like ftp://USER@host/
       std::string uri = getCurrentURI();
@@ -164,10 +166,13 @@ std::string HttpRequest::createRequest()
   builtinHds.reserve(20);
   builtinHds.push_back(std::make_pair("User-Agent:", userAgent_));
   std::string acceptTypes = "*/*";
-  for(std::vector<std::string>::const_iterator i = acceptTypes_.begin(),
-        eoi = acceptTypes_.end(); i != eoi; ++i) {
-    acceptTypes += ",";
-    acceptTypes += *i;
+  if(acceptMetalink_) {
+    // The mime types of Metalink are used for "transparent metalink".
+    const char** metalinkTypes = getMetalinkContentTypes();
+    for(size_t i = 0; metalinkTypes[i]; ++i) {
+      acceptTypes += ",";
+      acceptTypes += metalinkTypes[i];
+    }
   }
   builtinHds.push_back(std::make_pair("Accept:", acceptTypes));
   if(contentEncodingEnabled_) {
@@ -191,22 +196,20 @@ std::string HttpRequest::createRequest()
   if(!request_->isKeepAliveEnabled() && !request_->isPipeliningEnabled()) {
     builtinHds.push_back(std::make_pair("Connection:", "close"));
   }
-  if(segment_ && segment_->getLength() > 0 && 
+  if(segment_ && segment_->getLength() > 0 &&
      (request_->isPipeliningEnabled() || getStartByte() > 0)) {
     std::string rangeHeader(fmt("bytes=%" PRId64 "-", getStartByte()));
     if(request_->isPipeliningEnabled()) {
       rangeHeader += util::itos(getEndByte());
-    } else if(getProtocol() != Request::PROTO_FTP && endOffsetOverride_ > 0) {
-      // FTP via http proxy does not support endbytes 
+    } else if(getProtocol() != "ftp" && endOffsetOverride_ > 0) {
+      // FTP via http proxy does not support endbytes
       rangeHeader += util::itos(endOffsetOverride_-1);
     }
     builtinHds.push_back(std::make_pair("Range:", rangeHeader));
   }
   if(proxyRequest_) {
     if(request_->isKeepAliveEnabled() || request_->isPipeliningEnabled()) {
-      builtinHds.push_back(std::make_pair("Proxy-Connection:", "Keep-Alive"));
-    } else {
-      builtinHds.push_back(std::make_pair("Proxy-Connection:", "close"));
+      builtinHds.push_back(std::make_pair("Connection:", "Keep-Alive"));
     }
   }
   if(proxyRequest_ && !proxyRequest_->getUsername().empty()) {
@@ -228,7 +231,7 @@ std::string HttpRequest::createRequest()
     std::vector<Cookie> cookies =
       cookieStorage_->criteriaFind(getHost(), path,
                                    Time().getTime(),
-                                   getProtocol() == Request::PROTO_HTTPS);
+                                   getProtocol() == "https");
     for(std::vector<Cookie>::const_iterator itr = cookies.begin(),
           eoi = cookies.end(); itr != eoi; ++itr) {
       cookiesValue += (*itr).toString();
@@ -271,7 +274,6 @@ std::string HttpRequest::createRequest()
 std::string HttpRequest::createProxyRequest() const
 {
   assert(proxyRequest_);
-  //std::string hostport(fmt("%s:%u", getURIHost().c_str(), getPort()));
   std::string requestLine(fmt("CONNECT %s:%u HTTP/1.1\r\n"
                               "User-Agent: %s\r\n"
                               "Host: %s:%u\r\n",
@@ -280,12 +282,6 @@ std::string HttpRequest::createProxyRequest() const
                               userAgent_.c_str(),
                               getURIHost().c_str(),
                               getPort()));
-  // TODO Is "Proxy-Connection" needed here?
-  //   if(request->isKeepAliveEnabled() || request->isPipeliningEnabled()) {
-  //     requestLine += "Proxy-Connection: Keep-Alive\r\n";
-  //   }else {
-  //     requestLine += "Proxy-Connection: close\r\n";
-  //   }
   if(!proxyRequest_->getUsername().empty()) {
     std::pair<std::string, std::string> auth = getProxyAuthString();
     requestLine += auth.first;
@@ -326,11 +322,6 @@ void HttpRequest::addHeader(const std::string& headersString)
 void HttpRequest::clearHeader()
 {
   headers_.clear();
-}
-
-void HttpRequest::addAcceptType(const std::string& type)
-{
-  acceptTypes_.push_back(type);
 }
 
 void HttpRequest::setCookieStorage
@@ -396,7 +387,7 @@ const std::string& HttpRequest::getCurrentURI() const
 {
   return request_->getCurrentUri();
 }
-  
+
 const std::string& HttpRequest::getDir() const
 {
   return request_->getDir();

@@ -73,7 +73,7 @@ void PeerSessionResourceTest::testPeerAllowedIndexSetContains()
 void PeerSessionResourceTest::testAmAllowedIndexSetContains()
 {
   PeerSessionResource res(1024, 1024*1024);
-  
+
   res.addAmAllowedIndex(567);
   res.addAmAllowedIndex(789);
 
@@ -100,7 +100,7 @@ void PeerSessionResourceTest::testHasPiece()
   CPPUNIT_ASSERT(res.hasPiece(300));
   res.updateBitfield(300, 0);
   CPPUNIT_ASSERT(!res.hasPiece(300));
-}  
+}
 
 void PeerSessionResourceTest::testUpdateUploadLength()
 {
@@ -123,7 +123,7 @@ void PeerSessionResourceTest::testUpdateDownloadLength()
 }
 
 void PeerSessionResourceTest::testExtendedMessageEnabled()
-{ 
+{
   PeerSessionResource res(1024, 1024*1024);
 
   CPPUNIT_ASSERT(!res.extendedMessagingEnabled());
@@ -137,12 +137,17 @@ void PeerSessionResourceTest::testGetExtensionMessageID()
 {
   PeerSessionResource res(1024, 1024*1024);
 
-  res.addExtension("a2", 9);
-  CPPUNIT_ASSERT_EQUAL((uint8_t)9, res.getExtensionMessageID("a2"));
-  CPPUNIT_ASSERT_EQUAL((uint8_t)0, res.getExtensionMessageID("non"));
+  res.addExtension(ExtensionMessageRegistry::UT_PEX, 9);
+  CPPUNIT_ASSERT_EQUAL((uint8_t)9,
+                       res.getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_PEX));
+  CPPUNIT_ASSERT_EQUAL((uint8_t)0,
+                       res.getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_METADATA));
 
-  CPPUNIT_ASSERT_EQUAL(std::string("a2"), res.getExtensionName(9));
-  CPPUNIT_ASSERT_EQUAL(std::string(""), res.getExtensionName(10));
+  CPPUNIT_ASSERT_EQUAL(std::string("ut_pex"),
+                       std::string(res.getExtensionName(9)));
+  CPPUNIT_ASSERT(!res.getExtensionName(10));
 }
 
 void PeerSessionResourceTest::testFastExtensionEnabled()
@@ -236,7 +241,7 @@ void PeerSessionResourceTest::testOptUnchoking()
 void PeerSessionResourceTest::testShouldBeChoking()
 {
   PeerSessionResource res(1024, 1024*1024);
-  
+
   CPPUNIT_ASSERT(res.shouldBeChoking());
   res.chokingRequired(false);
   CPPUNIT_ASSERT(!res.shouldBeChoking());

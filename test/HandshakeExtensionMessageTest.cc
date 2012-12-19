@@ -51,7 +51,8 @@ void HandshakeExtensionMessageTest::testGetExtensionMessageID()
 void HandshakeExtensionMessageTest::testGetExtensionName()
 {
   HandshakeExtensionMessage msg;
-  CPPUNIT_ASSERT_EQUAL(std::string("handshake"), msg.getExtensionName());
+  CPPUNIT_ASSERT_EQUAL(std::string("handshake"),
+                       std::string(msg.getExtensionName()));
 }
 
 void HandshakeExtensionMessageTest::testGetBencodedData()
@@ -59,12 +60,12 @@ void HandshakeExtensionMessageTest::testGetBencodedData()
   HandshakeExtensionMessage msg;
   msg.setClientVersion("aria2");
   msg.setTCPPort(6889);
-  msg.setExtension("ut_pex", 1);
-  msg.setExtension("a2_dht", 2);
+  msg.setExtension(ExtensionMessageRegistry::UT_PEX, 1);
+  msg.setExtension(ExtensionMessageRegistry::UT_METADATA, 2);
   msg.setMetadataSize(1024);
   CPPUNIT_ASSERT_EQUAL
     (std::string("d"
-                 "1:md6:a2_dhti2e6:ut_pexi1ee"
+                 "1:md11:ut_metadatai2e6:ut_pexi1ee"
                  "13:metadata_sizei1024e"
                  "1:pi6889e"
                  "1:v5:aria2"
@@ -80,12 +81,12 @@ void HandshakeExtensionMessageTest::testToString()
   HandshakeExtensionMessage msg;
   msg.setClientVersion("aria2");
   msg.setTCPPort(6889);
-  msg.setExtension("ut_pex", 1);
-  msg.setExtension("a2_dht", 2);
+  msg.setExtension(ExtensionMessageRegistry::UT_PEX, 1);
+  msg.setExtension(ExtensionMessageRegistry::UT_METADATA, 2);
   msg.setMetadataSize(1024);
   CPPUNIT_ASSERT_EQUAL
     (std::string("handshake client=aria2, tcpPort=6889, metadataSize=1024,"
-                 " a2_dht=2, ut_pex=1"), msg.toString());
+                 " ut_metadata=2, ut_pex=1"), msg.toString());
 }
 
 void HandshakeExtensionMessageTest::testDoReceivedAction()
@@ -97,7 +98,7 @@ void HandshakeExtensionMessageTest::testDoReceivedAction()
   rg.setDownloadContext(dctx);
 
   SharedHandle<TorrentAttribute> attrs(new TorrentAttribute());
-  dctx->setAttribute(bittorrent::BITTORRENT, attrs);
+  dctx->setAttribute(CTX_ATTR_BT, attrs);
   dctx->markTotalLengthIsUnknown();
 
   SharedHandle<Peer> peer(new Peer("192.168.0.1", 0));
@@ -105,9 +106,8 @@ void HandshakeExtensionMessageTest::testDoReceivedAction()
   HandshakeExtensionMessage msg;
   msg.setClientVersion("aria2");
   msg.setTCPPort(6889);
-  msg.setExtension("ut_pex", 1);
-  msg.setExtension("a2_dht", 2);
-  msg.setExtension("ut_metadata", 3);
+  msg.setExtension(ExtensionMessageRegistry::UT_PEX, 1);
+  msg.setExtension(ExtensionMessageRegistry::UT_METADATA, 3);
   msg.setMetadataSize(1024);
   msg.setPeer(peer);
   msg.setDownloadContext(dctx);
@@ -115,8 +115,12 @@ void HandshakeExtensionMessageTest::testDoReceivedAction()
   msg.doReceivedAction();
 
   CPPUNIT_ASSERT_EQUAL((uint16_t)6889, peer->getPort());
-  CPPUNIT_ASSERT_EQUAL((uint8_t)1, peer->getExtensionMessageID("ut_pex"));
-  CPPUNIT_ASSERT_EQUAL((uint8_t)2, peer->getExtensionMessageID("a2_dht"));
+  CPPUNIT_ASSERT_EQUAL((uint8_t)1,
+                       peer->getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_PEX));
+  CPPUNIT_ASSERT_EQUAL((uint8_t)3,
+                       peer->getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_METADATA));
   CPPUNIT_ASSERT(peer->isSeeder());
   CPPUNIT_ASSERT_EQUAL((size_t)1024, attrs->metadataSize);
   CPPUNIT_ASSERT_EQUAL((int64_t)1024, dctx->getTotalLength());
@@ -132,14 +136,17 @@ void HandshakeExtensionMessageTest::testDoReceivedAction()
 
 void HandshakeExtensionMessageTest::testCreate()
 {
-  std::string in = 
-    "0d1:pi6881e1:v5:aria21:md6:ut_pexi1ee13:metadata_sizei1024ee";
-  SharedHandle<HandshakeExtensionMessage> m =
-    HandshakeExtensionMessage::create(reinterpret_cast<const unsigned char*>(in.c_str()),
-                                      in.size());
+  std::string in =
+    "0d1:pi6881e1:v5:aria21:md5:a2dhti2e6:ut_pexi1ee13:metadata_sizei1024ee";
+  SharedHandle<HandshakeExtensionMessage> m
+    (HandshakeExtensionMessage::create
+     (reinterpret_cast<const unsigned char*>(in.c_str()),
+      in.size()));
   CPPUNIT_ASSERT_EQUAL(std::string("aria2"), m->getClientVersion());
   CPPUNIT_ASSERT_EQUAL((uint16_t)6881, m->getTCPPort());
-  CPPUNIT_ASSERT_EQUAL((uint8_t)1, m->getExtensionMessageID("ut_pex"));
+  CPPUNIT_ASSERT_EQUAL((uint8_t)1,
+                       m->getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_PEX));
   CPPUNIT_ASSERT_EQUAL((size_t)1024, m->getMetadataSize());
   try {
     // bad payload format
@@ -167,21 +174,23 @@ void HandshakeExtensionMessageTest::testCreate()
     CPPUNIT_FAIL("exception must be thrown.");
   } catch(Exception& e) {
     std::cerr << e.stackTrace() << std::endl;
-  }    
+  }
 }
 
 void HandshakeExtensionMessageTest::testCreate_stringnum()
 {
   std::string in = "0d1:p4:68811:v5:aria21:md6:ut_pex1:1ee";
-  SharedHandle<HandshakeExtensionMessage> m =
-    HandshakeExtensionMessage::create
-    (reinterpret_cast<const unsigned char*>(in.c_str()),
-     in.size());
+  SharedHandle<HandshakeExtensionMessage> m
+    (HandshakeExtensionMessage::create
+     (reinterpret_cast<const unsigned char*>(in.c_str()),
+      in.size()));
   CPPUNIT_ASSERT_EQUAL(std::string("aria2"), m->getClientVersion());
   // port number in string is not allowed
   CPPUNIT_ASSERT_EQUAL((uint16_t)0, m->getTCPPort());
   // extension ID in string is not allowed
-  CPPUNIT_ASSERT_EQUAL((uint8_t)0, m->getExtensionMessageID("ut_pex"));
+  CPPUNIT_ASSERT_EQUAL((uint8_t)0,
+                       m->getExtensionMessageID
+                       (ExtensionMessageRegistry::UT_PEX));
 }
 
 } // namespace aria2

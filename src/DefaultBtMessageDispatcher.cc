@@ -72,7 +72,7 @@ DefaultBtMessageDispatcher::~DefaultBtMessageDispatcher()
 }
 
 void DefaultBtMessageDispatcher::addMessageToQueue
-(const BtMessageHandle& btMessage)
+(const SharedHandle<BtMessage>& btMessage)
 {
   btMessage->onQueued();
   messageQueue_.push_back(btMessage);
@@ -90,7 +90,7 @@ void DefaultBtMessageDispatcher::addMessageToQueue
 void DefaultBtMessageDispatcher::sendMessages() {
   std::vector<SharedHandle<BtMessage> > tempQueue;
   while(!messageQueue_.empty()) {
-    BtMessageHandle msg = messageQueue_.front();
+    SharedHandle<BtMessage> msg = messageQueue_.front();
     messageQueue_.pop_front();
     if(msg->isUploading() && !msg->isSendingInProgress()) {
       if(requestGroupMan_->doesOverallUploadSpeedExceed() ||
@@ -100,9 +100,6 @@ void DefaultBtMessageDispatcher::sendMessages() {
       }
     }
     msg->send();
-    if(msg->isUploading()) {
-      peerStorage_->updateTransferStatFor(peer_);
-    }
     if(msg->isSendingInProgress()) {
       messageQueue_.push_front(msg);
       break;
@@ -201,7 +198,7 @@ public:
       peer_(peer),
       pieceStorage_(pieceStorage)
   {}
-  
+
   void operator()(const RequestSlot& slot) const
   {
     if(!peer_->isInPeerAllowedIndexSet(slot.getIndex())) {
@@ -225,7 +222,7 @@ private:
 public:
   FindChokedRequestSlot(const SharedHandle<Peer>& peer):
     peer_(peer) {}
-  
+
   bool operator()(const RequestSlot& slot) const
   {
     return !peer_->isInPeerAllowedIndexSet(slot.getIndex());

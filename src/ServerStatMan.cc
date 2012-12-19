@@ -38,7 +38,6 @@
 #include <cstdio>
 #include <algorithm>
 #include <iterator>
-#include <map>
 #include <vector>
 
 #include "ServerStat.h"
@@ -77,7 +76,7 @@ bool ServerStatMan::add(const SharedHandle<ServerStat>& serverStat)
   } else {
     serverStats_.insert(i, serverStat);
     return true;
-  } 
+  }
 }
 
 bool ServerStatMan::save(const std::string& filename) const
@@ -85,7 +84,7 @@ bool ServerStatMan::save(const std::string& filename) const
   std::string tempfile = filename;
   tempfile += "__temp";
   {
-    BufferedFile fp(tempfile, BufferedFile::WRITE);
+    BufferedFile fp(tempfile.c_str(), BufferedFile::WRITE);
     if(!fp) {
       A2_LOG_ERROR(fmt(MSG_OPENING_WRITABLE_SERVER_STAT_FILE_FAILED,
                        filename.c_str()));
@@ -114,18 +113,49 @@ bool ServerStatMan::save(const std::string& filename) const
   }
 }
 
+namespace {
+// Field and FIELD_NAMES must have same order except for MAX_FIELD.
+enum Field {
+  S_COUNTER,
+  S_DL_SPEED,
+  S_HOST,
+  S_LAST_UPDATED,
+  S_MC_AVG_SPEED,
+  S_PROTOCOL,
+  S_SC_AVG_SPEED,
+  S_STATUS,
+  MAX_FIELD
+};
+
+const char* FIELD_NAMES[] = {
+  "counter",
+  "dl_speed",
+  "host",
+  "last_updated",
+  "mc_avg_speed",
+  "protocol",
+  "sc_avg_speed",
+  "status",
+};
+} // namespace
+
+namespace {
+int idField(std::string::const_iterator first,
+            std::string::const_iterator last)
+{
+  int i;
+  for(i = 0; i < MAX_FIELD; ++i) {
+    if(util::streq(first, last, FIELD_NAMES[i])) {
+      return i;
+    }
+  }
+  return i;
+}
+} // namespace
+
 bool ServerStatMan::load(const std::string& filename)
 {
-  static const std::string S_HOST = "host";
-  static const std::string S_PROTOCOL = "protocol";
-  static const std::string S_DL_SPEED = "dl_speed";
-  static const std::string S_SC_AVG_SPEED = "sc_avg_speed";
-  static const std::string S_MC_AVG_SPEED = "mc_avg_speed";
-  static const std::string S_LAST_UPDATED = "last_updated";
-  static const std::string S_COUNTER = "counter";
-  static const std::string S_STATUS = "status";
-
-  BufferedFile fp(filename, BufferedFile::READ);
+  BufferedFile fp(filename.c_str(), BufferedFile::READ);
   if(!fp) {
     A2_LOG_ERROR(fmt(MSG_OPENING_READABLE_SERVER_STAT_FILE_FAILED,
                      filename.c_str()));
@@ -152,43 +182,54 @@ bool ServerStatMan::load(const std::string& filename)
     }
     std::vector<Scip> items;
     util::splitIter(p.first, p.second, std::back_inserter(items), ',');
-    std::map<std::string, std::string> m;
+    std::vector<std::string> m(MAX_FIELD);
     for(std::vector<Scip>::const_iterator i = items.begin(),
           eoi = items.end(); i != eoi; ++i) {
       std::pair<Scip, Scip> p;
       util::divide(p, (*i).first, (*i).second, '=');
-      m[std::string(p.first.first, p.first.second)] =
-        std::string(p.second.first, p.second.second);
+      int id = idField(p.first.first, p.first.second);
+      if(id != MAX_FIELD) {
+        m[id].assign(p.second.first, p.second.second);
+      }
     }
     if(m[S_HOST].empty() || m[S_PROTOCOL].empty()) {
       continue;
     }
     SharedHandle<ServerStat> sstat(new ServerStat(m[S_HOST], m[S_PROTOCOL]));
-    try {
-      const std::string& dlSpeed = m[S_DL_SPEED];
-      sstat->setDownloadSpeed(util::parseUInt(dlSpeed));
-      // Old serverstat file doesn't contains SC_AVG_SPEED
-      if(m.find(S_SC_AVG_SPEED) != m.end()) {
-        const std::string& s = m[S_SC_AVG_SPEED];
-        sstat->setSingleConnectionAvgSpeed(util::parseUInt(s));
-      }
-      // Old serverstat file doesn't contains MC_AVG_SPEED
-      if(m.find(S_MC_AVG_SPEED) != m.end()) {
-        const std::string& s = m[S_MC_AVG_SPEED];
-        sstat->setMultiConnectionAvgSpeed(util::parseUInt(s));
-      }
-      // Old serverstat file doesn't contains COUNTER_SPEED
-      if(m.find(S_COUNTER) != m.end()) {
-        const std::string& s = m[S_COUNTER];
-        sstat->setCounter(util::parseUInt(s));
-      }
-      const std::string& lastUpdated = m[S_LAST_UPDATED];
-      sstat->setLastUpdated(Time(util::parseInt(lastUpdated)));
-      sstat->setStatus(m[S_STATUS]);
-      add(sstat);
-    } catch(RecoverableException& e) {
+
+    uint32_t uintval;
+    if(!util::parseUIntNoThrow(uintval, m[S_DL_SPEED])) {
       continue;
     }
+    sstat->setDownloadSpeed(uintval);
+    // Old serverstat file doesn't contains SC_AVG_SPEED
+    if(!m[S_SC_AVG_SPEED].empty()) {
+      if(!util::parseUIntNoThrow(uintval, m[S_SC_AVG_SPEED])) {
+        continue;
+      }
+      sstat->setSingleConnectionAvgSpeed(uintval);
+    }
+    // Old serverstat file doesn't contains MC_AVG_SPEED
+    if(!m[S_MC_AVG_SPEED].empty()) {
+      if(!util::parseUIntNoThrow(uintval, m[S_MC_AVG_SPEED])) {
+        continue;
+      }
+      sstat->setMultiConnectionAvgSpeed(uintval);
+    }
+    // Old serverstat file doesn't contains COUNTER_SPEED
+    if(!m[S_COUNTER].empty()) {
+      if(!util::parseUIntNoThrow(uintval, m[S_COUNTER])) {
+        continue;
+      }
+      sstat->setCounter(uintval);
+    }
+    int32_t intval;
+    if(!util::parseIntNoThrow(intval, m[S_LAST_UPDATED])) {
+      continue;
+    }
+    sstat->setLastUpdated(Time(intval));
+    sstat->setStatus(m[S_STATUS]);
+    add(sstat);
   }
   A2_LOG_NOTICE(fmt(MSG_SERVER_STAT_LOADED, filename.c_str()));
   return true;

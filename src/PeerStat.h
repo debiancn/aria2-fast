@@ -39,30 +39,12 @@
 
 #include <string>
 
-#include "SpeedCalc.h"
-#include "SharedHandle.h"
 #include "Command.h"
+#include "NetStat.h"
 
 namespace aria2 {
 
 class PeerStat {
-public:
-  enum STATUS {
-    IDLE,
-    ACTIVE,
-  };
-private:
-  cuid_t cuid_;
-  std::string hostname_;
-  std::string protocol_;
-  SpeedCalc downloadSpeed_;
-  SpeedCalc uploadSpeed_;
-  Timer downloadStartTime_;
-  PeerStat::STATUS status_;
-  int avgDownloadSpeed_;
-  int avgUploadSpeed_;
-  int64_t sessionDownloadLength_;
-  int64_t sessionUploadLength_;
 public:
   PeerStat
   (cuid_t cuid, const std::string& hostname, const::std::string& protocol);
@@ -94,15 +76,9 @@ public:
 
   int getMaxUploadSpeed() const;
 
-  int getAvgDownloadSpeed() const
-  {
-    return avgDownloadSpeed_;
-  }
+  int getAvgDownloadSpeed() const;
 
-  int getAvgUploadSpeed() const
-  {
-    return avgUploadSpeed_;
-  }
+  int getAvgUploadSpeed() const;
 
   void reset();
 
@@ -110,15 +86,17 @@ public:
 
   void downloadStop();
 
-  const Timer& getDownloadStartTime() const
-  {
-    return downloadStartTime_;
-  }
+  const Timer& getDownloadStartTime() const;
 
-  PeerStat::STATUS getStatus() const
-  {
-    return status_;
-  }
+  NetStat::STATUS getStatus() const;
+
+  uint64_t getSessionDownloadLength() const;
+
+  uint64_t getSessionUploadLength() const;
+
+  void addSessionDownloadLength(uint64_t length);
+
+  TransferStat toTransferStat();
 
   cuid_t getCuid() const
   {
@@ -134,24 +112,12 @@ public:
   {
     return protocol_;
   }
-
-  uint64_t getSessionDownloadLength() const
-  {
-    return sessionDownloadLength_;
-  }
-
-  uint64_t getSessionUploadLength() const
-  {
-    return sessionUploadLength_;
-  }
-
-  void addSessionDownloadLength(uint64_t length)
-  {
-    sessionDownloadLength_ += length;
-  }
+private:
+  cuid_t cuid_;
+  std::string hostname_;
+  std::string protocol_;
+  NetStat netStat_;
 };
-
-typedef SharedHandle<PeerStat> PeerStatHandle;
 
 } // namespace aria2
 

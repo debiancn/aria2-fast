@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,33 +32,18 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_DECODER_H
-#define D_DECODER_H
-
-#include "common.h"
-#include <string>
+#include "ContextAttribute.h"
 
 namespace aria2 {
 
-// Interface for basic decoding functionality.
-class Decoder {
-public:
-  virtual ~Decoder() {}
-
-  // init() must be called before calling decode().
-  virtual void init() = 0;
-
-  virtual std::string decode(const unsigned char* inbuf, size_t inlen) = 0;
-
-  virtual bool finished() = 0;
-
-  // The call of release() will free allocated resources.
-  // After calling release(), the object can be reused by calling init().
-  virtual void release() = 0;
-
-  virtual const std::string& getName() const = 0;
-};
+const char* strContextAttributeType(ContextAttributeType key)
+{
+  switch(key) {
+  case CTX_ATTR_BT:
+    return "BitTorrent";
+  default:
+    return "UNKNOWN";
+  }
+}
 
 } // namespace aria2
-
-#endif // D_DECODER_H

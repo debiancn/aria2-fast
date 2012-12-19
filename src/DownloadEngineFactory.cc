@@ -74,12 +74,13 @@
 #include "DlAbortEx.h"
 #include "FileAllocationEntry.h"
 #include "HttpListenCommand.h"
+#include "LogFactory.h"
 
 namespace aria2 {
 
 DownloadEngineFactory::DownloadEngineFactory() {}
 
-DownloadEngineHandle
+SharedHandle<DownloadEngine>
 DownloadEngineFactory::newDownloadEngine
 (Option* op, const std::vector<SharedHandle<RequestGroup> >& requestGroups)
 {
@@ -130,10 +131,10 @@ DownloadEngineFactory::newDownloadEngine
           } else {
             abort();
           }
-  DownloadEngineHandle e(new DownloadEngine(eventPoll));
+  SharedHandle<DownloadEngine> e(new DownloadEngine(eventPoll));
   e->setOption(op);
 
-  RequestGroupManHandle
+  SharedHandle<RequestGroupMan>
     requestGroupMan(new RequestGroupMan(requestGroups, MAX_CONCURRENT_DOWNLOADS,
                                         op));
   e->setRequestGroupMan(requestGroupMan);
@@ -170,11 +171,15 @@ DownloadEngineFactory::newDownloadEngine
   }
   if(op->getAsBool(PREF_ENABLE_RPC)) {
     bool ok = false;
+    bool secure = op->getAsBool(PREF_RPC_SECURE);
+    if(secure) {
+      A2_LOG_NOTICE("RPC transport will be encrypted.");
+    }
     static int families[] = { AF_INET, AF_INET6 };
     size_t familiesLength = op->getAsBool(PREF_DISABLE_IPV6)?1:2;
     for(size_t i = 0; i < familiesLength; ++i) {
       HttpListenCommand* httpListenCommand =
-        new HttpListenCommand(e->newCUID(), e.get(), families[i]);
+        new HttpListenCommand(e->newCUID(), e.get(), families[i], secure);
       if(httpListenCommand->bindPort(op->getAsInt(PREF_RPC_LISTEN_PORT))){
         e->addCommand(httpListenCommand);
         ok = true;

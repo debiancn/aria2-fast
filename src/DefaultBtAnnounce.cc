@@ -106,9 +106,9 @@ bool DefaultBtAnnounce::isAnnounceReady() {
 namespace {
 bool uriHasQuery(const std::string& uri)
 {
-  uri::UriStruct us;
-  if(uri::parse(us, uri)) {
-    return !us.query.empty();
+  uri_split_result us;
+  if(uri_split(&us, uri.c_str()) == 0) {
+    return (us.field_set & (1 << USR_QUERY)) && us.fields[USR_QUERY].len > 0;
   } else {
     return false;
   }
@@ -141,7 +141,7 @@ std::string DefaultBtAnnounce::getAnnounceUrl() {
   if(!btRuntime_->lessThanMinPeers() || btRuntime_->isHalt()) {
     numWant = 0;
   }
-  TransferStat stat = peerStorage_->calculateStat();
+  NetStat& stat = downloadContext_->getNetStat();
   int64_t left =
     pieceStorage_->getTotalLength()-pieceStorage_->getCompletedLength();
   // Use last 8 bytes of peer ID as a key
@@ -172,8 +172,8 @@ std::string DefaultBtAnnounce::getAnnounceUrl() {
   if(tcpPort_) {
     uri += fmt("&port=%u", tcpPort_);
   }
-  std::string event = announceList_.getEventString();
-  if(!event.empty()) {
+  const char* event = announceList_.getEventString();
+  if(event[0]) {
     uri += "&event=";
     uri += event;
   }
@@ -297,22 +297,24 @@ void DefaultBtAnnounce::shuffleAnnounce() {
   announceList_.shuffle();
 }
 
-void DefaultBtAnnounce::setRandomizer(const RandomizerHandle& randomizer)
+void DefaultBtAnnounce::setRandomizer
+(const SharedHandle<Randomizer>& randomizer)
 {
   randomizer_ = randomizer;
 }
 
-void DefaultBtAnnounce::setBtRuntime(const BtRuntimeHandle& btRuntime)
+void DefaultBtAnnounce::setBtRuntime(const SharedHandle<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }
 
-void DefaultBtAnnounce::setPieceStorage(const PieceStorageHandle& pieceStorage)
+void DefaultBtAnnounce::setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
 
-void DefaultBtAnnounce::setPeerStorage(const PeerStorageHandle& peerStorage)
+void DefaultBtAnnounce::setPeerStorage
+(const SharedHandle<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }

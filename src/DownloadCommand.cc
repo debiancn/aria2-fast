@@ -53,7 +53,7 @@
 #include "DownloadContext.h"
 #include "Option.h"
 #include "util.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "message.h"
 #include "prefs.h"
 #include "fmt.h"
@@ -82,7 +82,7 @@ DownloadCommand::DownloadCommand
  const SharedHandle<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SocketHandle& s,
+ const SharedHandle<SocketCore>& s,
  const SharedHandle<SocketRecvBuffer>& socketRecvBuffer)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e, s, socketRecvBuffer),
     startupIdleTime_(10),
@@ -176,8 +176,8 @@ bool DownloadCommand::executeInternal() {
     }
     getSocketRecvBuffer()->shiftBuffer(bufSize);
     peerStat_->updateDownloadLength(bufSize);
+    getDownloadContext()->updateDownloadLength(bufSize);
   }
-  getSegmentMan()->updateDownloadSpeedFor(peerStat_);
   bool segmentPartComplete = false;
   // Note that GrowSegment::complete() always returns false.
   if(sinkFilterOnly_) {
@@ -227,7 +227,7 @@ bool DownloadCommand::executeInternal() {
           if(
 #ifdef ENABLE_BITTORRENT
              (!getPieceStorage()->isEndGame() ||
-              !getDownloadContext()->hasAttribute(bittorrent::BITTORRENT)) &&
+              !getDownloadContext()->hasAttribute(CTX_ATTR_BT)) &&
 #endif // ENABLE_BITTORRENT
              segment->isHashCalculated()) {
             A2_LOG_DEBUG(fmt("Hash is available! index=%lu",

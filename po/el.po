@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
-"PO-Revision-Date: 2011-10-09 21:24+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
+"PO-Revision-Date: 2011-08-25 19:19+0000\n"
 "Last-Translator: Kostas Milonas <milonas.ko@gmail.com>\n"
 "Language-Team: Greek <el@li.org>\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2011-10-09 12:16+0000\n"
-"X-Generator: Launchpad (build 14110)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -40,46 +40,49 @@ msgstr ""
 "Αν υπάρχουν σφάλματα, δείτε το αρχείο καταγραφών. Για περαιτέρω "
 "λεπτομέρειες, δείτε την παράμετρο -l στη σελίδα βοήθειας/man."
 
-#: src/MultiUrlRequestInfo.cc:253
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:273
+#, c-format
 msgid "Serialized session to '%s' successfully."
-msgstr "Το αρχείο ServerStat %s αποθηκεύτηκε επιτυχώς."
+msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:276
+#, c-format
 msgid "Failed to serialize session to '%s'."
-msgstr "Αποτυχία εγγραφής του ServerStat στο %s."
+msgstr ""
 
-#: src/RequestGroupMan.cc:442
-#, fuzzy, c-format
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
+
+#: src/RequestGroupMan.cc:445
+#, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "Η λήψη ολοκληρώθηκε: %s"
+msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "Αποτελέσματα λήψης:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "Υπόμνημα Κατάστασης:"
 
-#: src/RequestGroupMan.cc:773
-#, fuzzy
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
-msgstr "Η λήψη ολοκληρώθηκε."
+msgstr ""
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:782
-#, fuzzy
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
-msgstr "Η λήψη ματαιώθηκε."
+msgstr ""
 
 #: src/OptionHandler.cc:38
 msgid "                              Default: "
@@ -134,7 +137,6 @@ msgstr ""
 "                              \"/dev/null\"."
 
 #: src/usage_text.h:50
-#, fuzzy
 msgid ""
 " -s, --split=N                Download a file using N connections. If more\n"
 "                              than N URLs are given, first N URLs are used "
@@ -150,25 +152,6 @@ msgid ""
 "                              --max-connection-per-server option. See also\n"
 "                              --min-split-size option."
 msgstr ""
-" -s, --split=N                Λήψη ενός αρχείου χρησιμοποιώντας N "
-"συνδέσεις.\n"
-"                              Αν δοθούν περισσότερα από N URLs, θα "
-"χρησιμοποιηθούν\n"
-"                              τα πρώτα N και τα υπόλοιπα θα χρησιμοποιηθούν "
-"ως εφεδρικά.\n"
-"                              Αν δοθούν λιγότερα από N, αυτά τα URLs θα "
-"χρησιμοποιηθούν\n"
-"                              περισσότερες από μια φορά ώστε να γίνουν "
-"συνολικά N\n"
-"                              ταυτόχρονες συνδέσεις. Ο αριθμός των συνδέσεων "
-"στο ίδιο\n"
-"                              μηχάνημα περιορίζεται από την επιλογή --max-"
-"connection-per-server. \n"
-"                              Παρακαλούμε δείτε ακόμη τις επιλογές -j και --"
-"min-split-size.\n"
-"                              Παρακαλούμε σημειώστε ότι στη λήψη Metalink,\n"
-"                              αυτή η επιλογή δε λειτουργεί και αντί αυτής να "
-"χρησιμοποιήσετε τη -C."
 
 #: src/usage_text.h:60
 msgid ""
@@ -367,7 +350,6 @@ msgstr ""
 "download-limit."
 
 #: src/usage_text.h:126
-#, fuzzy
 msgid ""
 " --file-allocation=METHOD     Specify file allocation method.\n"
 "                              'none' doesn't pre-allocate file space. "
@@ -396,32 +378,6 @@ msgid ""
 "file\n"
 "                              to a specified length."
 msgstr ""
-" --file-allocation=METHOD     Καθορίστε τη μέθοδο δέσμευσης χώρου.\n"
-"                              Το 'none' δε προ-δεσμεύει χώρο για το αρχείο.\n"
-"                              Το 'prealloc' προ-δεσμεύει χώρο πριν ξεκινήσει "
-"η λήψη.\n"
-"                              Αυτό ίσως να διαρκέσει λίγο χρόνο, κάτι που "
-"εξαρτάται\n"
-"                              από το μέγεθος του αρχείου.\n"
-"                              Αν χρησιμοποιείτε νεότερα συστήματα αρχείων "
-"όπως\n"
-"                              το ext4 (με υποστήριξη επεκτάσεων), το btrfs, "
-"το xfs\n"
-"                              ή το NTFS (χτισμένο μόνο με το MinGW), η "
-"καλύτερη\n"
-"                              επιλογή για εσάς είναι το 'falloc'. Δεσμεύει "
-"μεγάλα αρχεία\n"
-"                              (λίγων GiB) σχεδόν αμέσως. Μη χρησιμοποιήσετε "
-"το 'falloc'\n"
-"                              με παλαιότερα συστήματα αρχείων όπως το ext3 "
-"και\n"
-"                              το FAT32 γιατί παίρνει σχεδόν τον ίδιο χρόνο "
-"με το 'prealloc'\n"
-"                              και κολλάει τελείως το aria2 μέχρι να "
-"τελειώσει η δέσμευση.\n"
-"                              Το 'falloc' μπορεί να μην είναι διαθέσιμο αν "
-"το σύστημά σας\n"
-"                              δε διαθέτει τη function posix_fallocate()."
 
 #: src/usage_text.h:145
 msgid ""
@@ -644,7 +600,6 @@ msgid " -n, --no-netrc[=true|false]  Disables netrc support."
 msgstr " -n, --no-netrc[=true|false]  Απενεργοποιείστε την υποστήριξη netrc."
 
 #: src/usage_text.h:224
-#, fuzzy
 msgid ""
 " -i, --input-file=FILE        Downloads URIs found in FILE. You can specify\n"
 "                              multiple URIs for a single entity: separate\n"
@@ -661,27 +616,8 @@ msgid ""
 "page\n"
 "                              for details. See also --deferred-input option."
 msgstr ""
-" -i, --input-file=FILE        Κατεβάζει τα URIs που υπάρχουν στο αρχείο "
-"FILE.\n"
-"                              Μπορείτε να ορίσετε πολλά URIs για ένα "
-"αρχείο:\n"
-"                              τοποθετήστε τα URIs σε μια γραμμή και "
-"διαχωρίστε τα\n"
-"                              με τον χαρακτήρα TAB. Μπορεί να διαβάσει "
-"δεδομένα\n"
-"                              από το stdin όταν οριστεί '-'. Επιπλέον, "
-"μπορούν να οριστούν\n"
-"                              επιλογές μετά από κάθε γραμμή με URI. Αυτή η "
-"προαιρετική\n"
-"                              γραμμή θα πρέπει να ξεκινάει με ένα ή "
-"περισσότερα κενά\n"
-"                              και να έχει μια επιλογή ανά γραμμή. Για "
-"περισσότερες\n"
-"                              πληροφορίες δείτε την περιοχή INPUT FILE της "
-"σελίδας man."
 
 #: src/usage_text.h:234
-#, fuzzy
 msgid ""
 " -j, --max-concurrent-downloads=N Set maximum number of parallel downloads "
 "for\n"
@@ -689,11 +625,6 @@ msgid ""
 "metalink.\n"
 "                              See also --split option."
 msgstr ""
-" -j, --max-concurrent-downloads=N Ορίστε το μέγιστο αριθμό παράλληλων "
-"λήψεων\n"
-"                              για κάθε στατικό (HTTP/FTP) URL, torrent και "
-"metalink.\n"
-"                              Ακόμη, δείτε τις επιλογές -s και -C."
 
 #: src/usage_text.h:238
 msgid ""
@@ -2613,7 +2544,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:866
-#, fuzzy
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -2626,21 +2556,8 @@ msgid ""
 "                              If false is given, aria2 reads all URIs and\n"
 "                              options at startup."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Αν δοθεί true, μετά τον έλεγχο του hash\n"
-"                              χρησιμοποιώντας την επιλογή --check-integrity\n"
-"                              και αν το αρχείο είναι ολοκληρωμένο, "
-"συνεχίζεται\n"
-"                              ο διαμοιρασμός του αρχείου. Αν θέλετε να γίνει "
-"έλεγχος\n"
-"                              του αρχείου και να γίνει λήψη μόνο αν είναι "
-"κατεστραμμένο\n"
-"                              ή μη ολοκληρωμένο, ορίστε αυτήν την επιλογή σε "
-"false.\n"
-"                              Αυτή η επιλογή λειτουργεί μόνο στις λήψεις "
-"μέσω BitTorrent."
 
 #: src/usage_text.h:874
-#, fuzzy
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -2650,23 +2567,62 @@ msgid ""
 "                              because it will actually remove files from\n"
 "                              your disk."
 msgstr ""
-" --bt-hash-check-seed[=true|false] Αν δοθεί true, μετά τον έλεγχο του hash\n"
-"                              χρησιμοποιώντας την επιλογή --check-integrity\n"
-"                              και αν το αρχείο είναι ολοκληρωμένο, "
-"συνεχίζεται\n"
-"                              ο διαμοιρασμός του αρχείου. Αν θέλετε να γίνει "
-"έλεγχος\n"
-"                              του αρχείου και να γίνει λήψη μόνο αν είναι "
-"κατεστραμμένο\n"
-"                              ή μη ολοκληρωμένο, ορίστε αυτήν την επιλογή σε "
-"false.\n"
-"                              Αυτή η επιλογή λειτουργεί μόνο στις λήψεις "
-"μέσω BitTorrent."
 
 #: src/usage_text.h:882
-#, fuzzy
 msgid " --enable-mmap[=true|false]   Map files into memory."
-msgstr " --bt-enable-lpd[=true|false] Ενεργοποιείστε το Local Peer Discovery."
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
+msgstr ""
 
 #: src/version_usage.cc:57
 msgid " version "
@@ -2718,37 +2674,37 @@ msgstr ""
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr "Εκτύπωση όλων των επιλογών."
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "Εκτύπωση των επιλογών που έχουν ετικέτα '%s'."
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "Επιλογές:"
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "Εκτύπωση των επιλογών που το όνομά τους περιέχει '%s'."
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr "Δεν υπάρχει επιλογή που να ταιριάζει με το '%s'"
 
-#: src/version_usage.cc:137
+#: src/version_usage.cc:138
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2759,7 +2715,7 @@ msgstr ""
 " την επιλογή -Z, όλα τα URIs πρέπει να δείχνουν στο ίδιο αρχείο αλλιώς\n"
 " η λήψη θα αποτύχει."
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2771,7 +2727,7 @@ msgstr ""
 " τοπικό δίσκο. Παρακαλούμε σημειώστε ότι αντιμετωπίζονται πάντα ως\n"
 " ξεχωριστές λήψεις."
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2795,7 +2751,7 @@ msgstr ""
 " το 'name' και το 'path' του torrent προστίθενται ώστε να δημιουργηθεί\n"
 " ένα URI για κάθε αρχείο."
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
@@ -2805,7 +2761,7 @@ msgstr ""
 "αν περιέχει \"&\" ή άλλους χαρακτήρες που έχουν ιδιαίτερη σημασία για το "
 "κέλυφος."
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2818,7 +2774,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Για περισσότερες πληροφορίες ανατρέξτε στη σελίδα man."
@@ -2881,12 +2837,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -2896,23 +2852,21 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
-#, fuzzy, c-format
+#: src/RequestGroup.cc:680
+#, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
-"Έγινε αφαίρεση του παλιού αρχείου ελέγχου %s γιατί το αρχείο λήψης %s δεν "
-"υπάρχει."
 
 #: src/SingleFileAllocationIterator.cc:75
 msgid ""
@@ -2921,9 +2875,9 @@ msgid ""
 msgstr ""
 
 #: src/message.h:57
-#, fuzzy, c-format
+#, c-format
 msgid "GID#%<PRId64> - Download has already completed: %s"
-msgstr "GID#%s - Η λήψη έχει ήδη ολοκληρωθεί: %s"
+msgstr ""
 
 #: src/message.h:106
 #, c-format
@@ -3213,9 +3167,9 @@ msgid "Network problem has occurred. cause:%s"
 msgstr "Συνέβη κάποιο σφάλμα δικτύου, λόγω:%s"
 
 #: src/message.h:173
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
-msgstr "Αποτυχία φόρτωσης έμπιστων πιστοποιητικών CA από το %s. Λόγος: %s"
+msgstr ""
 
 #: src/message.h:175
 #, c-format
@@ -3612,30 +3566,3 @@ msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""
 "Μη έγκυρο μήκος αρχείου. Δεν είναι δυνατή η συνέχιση της λήψης %s: τοπικό "
 "%s, απομακρυσμένο %s"
-
-#~ msgid "See -h option to know other command-line options(%s)."
-#~ msgstr ""
-#~ "Δείτε την επιλογή -h για να μάθετε και για άλλες επιλογές (%s) της "
-#~ "γραμμής εντολών."
-
-#~ msgid "%ld seconds to allocate %s byte(s)"
-#~ msgstr "%ld δευτερόλεπτα για τη δέσμευση %s byte(s)"
-
-#~ msgid "Too large file size. size=%s"
-#~ msgstr "Πολύ μεγάλο μέγεθος αρχείου. size=%s"
-
-#~ msgid "Size mismatch Expected:%s Actual:%s"
-#~ msgstr "Αναντιστοιχία μεγέθους. Αναμενόμενο:%s Πραγματικό:%s"
-
-#~ msgid "The offset is out of range, offset=%s"
-#~ msgstr "Η μετατόπιση είναι εκτός εύρους, offset=%s"
-
-#~ msgid ""
-#~ "Chunk checksum validation failed. checksumIndex=%lu, offset=%s, "
-#~ "expectedHash=%s, actualHash=%s"
-#~ msgstr ""
-#~ "Αποτυχία επαλήθευσης του checksum του τμήματος. checksumIndex=%lu, offset="
-#~ "%s, expectedHash=%s, actualHash=%s"
-
-#~ msgid "Invalid range header. Request: %s-%s/%s, Response: %s-%s/%s"
-#~ msgstr "Μη έγκυρο εύρος κεφαλίδας. Αίτηση: %s-%s/%s, Απάντηση: %s-%s/%s"

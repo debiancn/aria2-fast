@@ -90,7 +90,7 @@ void BtRejectMessageTest::testCreate() {
   bittorrent::setIntParam(&msg[5], 12345);
   bittorrent::setIntParam(&msg[9], 256);
   bittorrent::setIntParam(&msg[13], 1024);
-  SharedHandle<BtRejectMessage> pm = BtRejectMessage::create(&msg[4], 13);
+  SharedHandle<BtRejectMessage> pm(BtRejectMessage::create(&msg[4], 13));
   CPPUNIT_ASSERT_EQUAL((uint8_t)16, pm->getId());
   CPPUNIT_ASSERT_EQUAL((size_t)12345, pm->getIndex());
   CPPUNIT_ASSERT_EQUAL(256, pm->getBegin());
@@ -133,7 +133,7 @@ void BtRejectMessageTest::testDoReceivedAction() {
   peer->setFastExtensionEnabled(true);
   RequestSlot slot(1, 16, 32, 2);
   dispatcher->setRequestSlot(slot);
-  
+
   CPPUNIT_ASSERT
     (!RequestSlot::isNull(dispatcher->getOutstandingRequest(1, 16, 32)));
 
@@ -147,21 +147,21 @@ void BtRejectMessageTest::testDoReceivedActionNoMatch() {
   peer->setFastExtensionEnabled(true);
   RequestSlot slot(2, 16, 32, 2);
   dispatcher->setRequestSlot(slot);
-  
+
   CPPUNIT_ASSERT
     (!RequestSlot::isNull(dispatcher->getOutstandingRequest(2, 16, 32)));
 
   msg->doReceivedAction();
 
   CPPUNIT_ASSERT
-    (!RequestSlot::isNull(dispatcher->getOutstandingRequest(2, 16, 32)));  
+    (!RequestSlot::isNull(dispatcher->getOutstandingRequest(2, 16, 32)));
 
 }
 
 void BtRejectMessageTest::testDoReceivedActionFastExtensionDisabled() {
   RequestSlot slot(1, 16, 32, 2);
   dispatcher->setRequestSlot(slot);
-  
+
   CPPUNIT_ASSERT
     (!RequestSlot::isNull(dispatcher->getOutstandingRequest(1, 16, 32)));
   try {

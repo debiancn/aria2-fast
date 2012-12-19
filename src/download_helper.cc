@@ -197,7 +197,7 @@ createBtRequestGroup(const std::string& metaInfoUri,
   rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
   // Remove "metalink" from Accept Type list to avoid server from
   // responding Metalink file for web-seeding URIs.
-  util::removeMetalinkContentTypes(rg);
+  dctx->setAcceptMetalink(false);
   removeOneshotOption(option);
   return rg;
 }
@@ -465,7 +465,7 @@ bool createRequestGroupFromUriListParser
     const SharedHandle<OptionParser>& oparser = OptionParser::getInstance();
     for(size_t i = 1, len = option::countOption(); i < len; ++i) {
       const Pref* pref = option::i2p(i);
-      const SharedHandle<OptionHandler>& h = oparser->find(pref);
+      const OptionHandler* h = oparser->find(pref);
       if(h && h->getInitialOption() && tempOption.defined(pref)) {
         requestOption->put(pref, tempOption.get(pref));
       }

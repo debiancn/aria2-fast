@@ -39,8 +39,6 @@
 
 #include <string>
 
-#include "SharedHandle.h"
-
 namespace aria2 {
 class ExtensionMessage {
 public:
@@ -49,15 +47,13 @@ public:
   virtual std::string getPayload() = 0;
 
   virtual uint8_t getExtensionMessageID() = 0;
-  
-  virtual const std::string& getExtensionName() const = 0;
+
+  virtual const char* getExtensionName() const = 0;
 
   virtual std::string toString() const = 0;
 
   virtual void doReceivedAction() = 0;
 };
-
-typedef SharedHandle<ExtensionMessage> ExtensionMessageHandle;
 
 } // namespace aria2
 

@@ -48,7 +48,7 @@
 #include "StatCalc.h"
 #include "LogFactory.h"
 #include "Logger.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "util.h"
 #include "a2functional.h"
 #include "DlAbortEx.h"
@@ -95,7 +95,8 @@ DownloadEngine::DownloadEngine(const SharedHandle<EventPoll>& eventPoll)
 #ifdef HAVE_ARES_ADDR_NODE
     asyncDNSServers_(0),
 #endif // HAVE_ARES_ADDR_NODE
-    dnsCache_(new DNSCache())
+    dnsCache_(new DNSCache()),
+    option_(0)
 {
   unsigned char sessionId[20];
   util::generateRandomKey(sessionId);
@@ -176,28 +177,28 @@ void DownloadEngine::waitData()
   eventPoll_->poll(tv);
 }
 
-bool DownloadEngine::addSocketForReadCheck(const SocketHandle& socket,
+bool DownloadEngine::addSocketForReadCheck(const SharedHandle<SocketCore>& socket,
                                            Command* command)
 {
   return eventPoll_->addEvents(socket->getSockfd(), command,
                                EventPoll::EVENT_READ);
 }
 
-bool DownloadEngine::deleteSocketForReadCheck(const SocketHandle& socket,
+bool DownloadEngine::deleteSocketForReadCheck(const SharedHandle<SocketCore>& socket,
                                               Command* command)
 {
   return eventPoll_->deleteEvents(socket->getSockfd(), command,
                                   EventPoll::EVENT_READ);
 }
 
-bool DownloadEngine::addSocketForWriteCheck(const SocketHandle& socket,
+bool DownloadEngine::addSocketForWriteCheck(const SharedHandle<SocketCore>& socket,
                                             Command* command)
 {
   return eventPoll_->addEvents(socket->getSockfd(), command,
                                EventPoll::EVENT_WRITE);
 }
 
-bool DownloadEngine::deleteSocketForWriteCheck(const SocketHandle& socket,
+bool DownloadEngine::deleteSocketForWriteCheck(const SharedHandle<SocketCore>& socket,
                                                Command* command)
 {
   return eventPoll_->deleteEvents(socket->getSockfd(), command,
@@ -220,7 +221,6 @@ void DownloadEngine::onEndOfRun()
 
 void DownloadEngine::afterEachIteration()
 {
-  requestGroupMan_->calculateStat();
   if(global::globalHaltRequested == 1) {
     A2_LOG_NOTICE(_("Shutdown sequence commencing..."
                     " Press Ctrl-C again for emergency shutdown."));
@@ -249,7 +249,7 @@ void DownloadEngine::requestForceHalt()
   requestGroupMan_->forceHalt();
 }
 
-void DownloadEngine::setStatCalc(const StatCalcHandle& statCalc)
+void DownloadEngine::setStatCalc(const SharedHandle<StatCalc>& statCalc)
 {
   statCalc_ = statCalc;
 }
@@ -328,7 +328,7 @@ void DownloadEngine::poolSocket
  const std::string& proxyhost,
  uint16_t proxyport,
  const SharedHandle<SocketCore>& sock,
- const std::map<std::string, std::string>& options,
+ const std::string& options,
  time_t timeout)
 {
   SocketPoolEntry e(sock, options, timeout);
@@ -387,7 +387,7 @@ void DownloadEngine::poolSocket
  const std::string& username,
  const SharedHandle<Request>& proxyRequest,
  const SharedHandle<SocketCore>& socket,
- const std::map<std::string, std::string>& options,
+ const std::string& options,
  time_t timeout)
 {
   if(!proxyRequest) {
@@ -441,7 +441,7 @@ DownloadEngine::popPooledSocket
 
 SharedHandle<SocketCore>
 DownloadEngine::popPooledSocket
-(std::map<std::string, std::string>& options,
+(std::string& options,
  const std::string& ipaddr, uint16_t port,
  const std::string& username,
  const std::string& proxyhost, uint16_t proxyport)
@@ -475,7 +475,7 @@ DownloadEngine::popPooledSocket
 
 SharedHandle<SocketCore>
 DownloadEngine::popPooledSocket
-(std::map<std::string, std::string>& options,
+(std::string& options,
  const std::vector<std::string>& ipaddrs, uint16_t port,
  const std::string& username)
 {
@@ -492,16 +492,18 @@ DownloadEngine::popPooledSocket
 
 DownloadEngine::SocketPoolEntry::SocketPoolEntry
 (const SharedHandle<SocketCore>& socket,
- const std::map<std::string, std::string>& options,
- time_t timeout):
-  socket_(socket),
-  options_(options),
-  timeout_(timeout) {}
+ const std::string& options,
+ time_t timeout)
+  : socket_(socket),
+    options_(options),
+    timeout_(timeout)
+{}
 
 DownloadEngine::SocketPoolEntry::SocketPoolEntry
-(const SharedHandle<SocketCore>& socket, time_t timeout):
-  socket_(socket),
-  timeout_(timeout) {}
+(const SharedHandle<SocketCore>& socket, time_t timeout)
+  : socket_(socket),
+    timeout_(timeout)
+{}
 
 DownloadEngine::SocketPoolEntry::~SocketPoolEntry() {}
 

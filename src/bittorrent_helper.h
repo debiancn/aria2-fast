@@ -64,9 +64,6 @@ extern const std::string SINGLE;
 
 extern const std::string MULTI;
 
-extern const std::string BITTORRENT;
-
-
 void load(const std::string& torrentFile,
           const SharedHandle<DownloadContext>& ctx,
           const SharedHandle<Option>& option,
@@ -183,7 +180,7 @@ void setShortIntParam(unsigned char* dest, uint16_t param);
 
 // Returns message ID located at first byte:msg[0]
 uint8_t getId(const unsigned char* msg);
-  
+
 void checkIndex(size_t index, size_t pieces);
 void checkBegin(int32_t begin, int32_t pieceLength);
 void checkLength(int32_t length);
@@ -218,15 +215,15 @@ unpackcompact(const unsigned char* compact, int family);
 
 // Throws exception if threshold >= actual
 void assertPayloadLengthGreater
-(size_t threshold, size_t actual, const std::string& msgName);
+(size_t threshold, size_t actual, const char* msgName);
 
 // Throws exception if expected != actual
 void assertPayloadLengthEqual
-(size_t expected, size_t actual, const std::string& msgName);
+(size_t expected, size_t actual, const char* msgName);
 
 // Throws exception if expected is not equal to id from data.
 void assertID
-(uint8_t expected, const unsigned char* data, const std::string& msgName);
+(uint8_t expected, const unsigned char* data, const char* msgName);
 
 // Converts attrs into torrent data. This function does not guarantee
 // the returned string is valid torrent data.

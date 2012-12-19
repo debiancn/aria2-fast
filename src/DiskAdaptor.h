@@ -41,6 +41,7 @@
 #include <vector>
 
 #include "TimeA2.h"
+#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -89,6 +90,8 @@ public:
 
   virtual bool isReadOnlyEnabled() const { return false; }
 
+  // Enables mmap feature. Some derived classes may require that files
+  // have been opened before this method call.
   virtual void enableMmap() {}
 
   // Assumed each file length is stored in fileEntries or DiskAdaptor knows it.
@@ -117,8 +120,6 @@ private:
 
   FileAllocationMethod fileAllocationMethod_;
 };
-
-typedef SharedHandle<DiskAdaptor> DiskAdaptorHandle;
 
 } // namespace aria2
 

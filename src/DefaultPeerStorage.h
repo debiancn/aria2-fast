@@ -56,17 +56,11 @@ private:
   size_t maxPeerListSize_;
   std::deque<SharedHandle<Peer> > peers_;
   std::deque<SharedHandle<Peer> > droppedPeers_;
-  int64_t removedPeerSessionDownloadLength_;
-  int64_t removedPeerSessionUploadLength_;
 
   BtSeederStateChoke* seederStateChoke_;
   BtLeecherStateChoke* leecherStateChoke_;
 
-  std::map<std::string, TransferStat> peerTransferStatMap_;
-
   Timer lastTransferStatMapUpdated_;
-
-  TransferStat cachedTransferStat_;
 
   std::map<std::string, time_t> badPeers_;
   Timer lastBadPeerCleaned_;
@@ -97,12 +91,6 @@ public:
 
   virtual void getActivePeers(std::vector<SharedHandle<Peer> >& peers);
 
-  virtual TransferStat calculateStat();
-
-  virtual void updateTransferStatFor(const SharedHandle<Peer>& peer);
-
-  virtual TransferStat getTransferStatFor(const SharedHandle<Peer>& peer);
-
   virtual bool isBadPeer(const std::string& ipaddr);
 
   virtual void addBadPeer(const std::string& ipaddr);
@@ -114,7 +102,7 @@ public:
   virtual void executeChoke();
 
   void deleteUnusedPeer(size_t delSize);
-  
+
   void onErasingPeer(const SharedHandle<Peer>& peer);
 
   void onReturningPeer(const SharedHandle<Peer>& peer);

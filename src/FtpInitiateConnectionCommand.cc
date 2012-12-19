@@ -50,7 +50,7 @@
 #include "message.h"
 #include "prefs.h"
 #include "HttpConnection.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "util.h"
 #include "AuthConfigFactory.h"
 #include "AuthConfig.h"
@@ -76,7 +76,7 @@ Command* FtpInitiateConnectionCommand::createNextCommand
 {
   Command* command;
   if(proxyRequest) {
-    std::map<std::string, std::string> options;
+    std::string options;
     SharedHandle<SocketCore> pooledSocket;
     std::string proxyMethod = resolveProxyMethod(getRequest()->getProtocol());
     if(proxyMethod == V_GET) {
@@ -95,7 +95,7 @@ Command* FtpInitiateConnectionCommand::createNextCommand
                       getCuid(), addr.c_str(), port));
       createSocket();
       getSocket()->establishConnection(addr, port);
-      
+
       getRequest()->setConnectedAddrInfo(hostname, addr, port);
       if(proxyMethod == V_GET) {
         // Use GET for FTP via HTTP proxy.
@@ -104,7 +104,7 @@ Command* FtpInitiateConnectionCommand::createNextCommand
           (new SocketRecvBuffer(getSocket()));
         SharedHandle<HttpConnection> hc
           (new HttpConnection(getCuid(), getSocket(), socketRecvBuffer));
-        
+
         HttpRequestCommand* c =
           new HttpRequestCommand(getCuid(), getRequest(), getFileEntry(),
                                  getRequestGroup(), hc, getDownloadEngine(),
@@ -124,12 +124,13 @@ Command* FtpInitiateConnectionCommand::createNextCommand
     } else {
       setConnectedAddrInfo(getRequest(), hostname, pooledSocket);
       if(proxyMethod == V_TUNNEL) {
+        // options contains "baseWorkingDir"
         command =
           new FtpNegotiationCommand(getCuid(), getRequest(), getFileEntry(),
                                     getRequestGroup(), getDownloadEngine(),
                                     pooledSocket,
                                     FtpNegotiationCommand::SEQ_SEND_CWD_PREP,
-                                    options["baseWorkingDir"]);
+                                    options);
       } else if(proxyMethod == V_GET) {
         // Use GET for FTP via HTTP proxy.
         getRequest()->setMethod(Request::METHOD_GET);
@@ -137,7 +138,7 @@ Command* FtpInitiateConnectionCommand::createNextCommand
           (new SocketRecvBuffer(pooledSocket));
         SharedHandle<HttpConnection> hc
           (new HttpConnection(getCuid(), pooledSocket, socketRecvBuffer));
-        
+
         HttpRequestCommand* c =
           new HttpRequestCommand(getCuid(), getRequest(), getFileEntry(),
                                  getRequestGroup(), hc, getDownloadEngine(),
@@ -150,7 +151,7 @@ Command* FtpInitiateConnectionCommand::createNextCommand
       }
     }
   } else {
-    std::map<std::string, std::string> options;
+    std::string options;
     SharedHandle<SocketCore> pooledSocket =
       getDownloadEngine()->popPooledSocket
       (options, resolvedAddresses,
@@ -169,12 +170,13 @@ Command* FtpInitiateConnectionCommand::createNextCommand
       getRequest()->setConnectedAddrInfo(hostname, addr, port);
       command = c;
     } else {
+      // options contains "baseWorkingDir"
       command =
         new FtpNegotiationCommand(getCuid(), getRequest(), getFileEntry(),
                                   getRequestGroup(), getDownloadEngine(),
                                   pooledSocket,
                                   FtpNegotiationCommand::SEQ_SEND_CWD_PREP,
-                                  options["baseWorkingDir"]);
+                                  options);
       setConnectedAddrInfo(getRequest(), hostname, pooledSocket);
     }
   }

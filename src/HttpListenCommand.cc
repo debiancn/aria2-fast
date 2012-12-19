@@ -50,10 +50,12 @@
 
 namespace aria2 {
 
-HttpListenCommand::HttpListenCommand(cuid_t cuid, DownloadEngine* e, int family)
+HttpListenCommand::HttpListenCommand(cuid_t cuid, DownloadEngine* e,
+                                     int family, bool secure)
   : Command(cuid),
     e_(e),
-    family_(family)
+    family_(family),
+    secure_(secure)
 {}
 
 HttpListenCommand::~HttpListenCommand()
@@ -71,7 +73,6 @@ bool HttpListenCommand::execute()
   try {
     if(serverSocket_->isReadable(0)) {
       SharedHandle<SocketCore> socket(serverSocket_->acceptConnection());
-      socket->setNonBlockingMode();
 
       std::pair<std::string, uint16_t> peerInfo;
       socket->getPeerInfo(peerInfo);
@@ -80,7 +81,7 @@ bool HttpListenCommand::execute()
                       peerInfo.first.c_str(), peerInfo.second));
 
       HttpServerCommand* c =
-        new HttpServerCommand(e_->newCUID(), e_, socket);
+        new HttpServerCommand(e_->newCUID(), e_, socket, secure_);
       e_->setNoWait(true);
       e_->addCommand(c);
     }
@@ -103,9 +104,8 @@ bool HttpListenCommand::bindPort(uint16_t port)
     if(e_->getOption()->getAsBool(PREF_RPC_LISTEN_ALL)) {
       flags = AI_PASSIVE;
     }
-    serverSocket_->bind(A2STR::NIL, port, family_, flags);
+    serverSocket_->bind(0, port, family_, flags);
     serverSocket_->beginListen();
-    serverSocket_->setNonBlockingMode();
     A2_LOG_INFO(fmt(MSG_LISTENING_PORT,
                     getCuid(), port));
     e_->addSocketForReadCheck(serverSocket_, this);

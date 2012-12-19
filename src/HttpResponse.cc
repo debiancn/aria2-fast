@@ -96,16 +96,16 @@ void HttpResponse::validateResponse() const
   } else if(statusCode == 200 || statusCode == 206) {
     if(!httpHeader_->defined(HttpHeader::TRANSFER_ENCODING)) {
       // compare the received range against the requested range
-      RangeHandle responseRange = httpHeader_->getRange();
+      Range responseRange = httpHeader_->getRange();
       if(!httpRequest_->isRangeSatisfied(responseRange)) {
         throw DL_ABORT_EX2
           (fmt(EX_INVALID_RANGE_HEADER,
                httpRequest_->getStartByte(),
                httpRequest_->getEndByte(),
                httpRequest_->getEntityLength(),
-               responseRange->getStartByte(),
-               responseRange->getEndByte(),
-               responseRange->getEntityLength()),
+               responseRange.startByte,
+               responseRange.endByte,
+               responseRange.entityLength),
            error_code::CANNOT_RESUME);
       }
     }
@@ -140,8 +140,8 @@ std::string HttpResponse::determinFilename() const
 void HttpResponse::retrieveCookie()
 {
   Time now;
-  std::pair<std::multimap<std::string, std::string>::const_iterator,
-            std::multimap<std::string, std::string>::const_iterator> r =
+  std::pair<std::multimap<int, std::string>::const_iterator,
+            std::multimap<int, std::string>::const_iterator> r =
     httpHeader_->equalRange(HttpHeader::SET_COOKIE);
   for(; r.first != r.second; ++r.first) {
     httpRequest_->getCookieStorage()->parseAndStore
@@ -162,7 +162,6 @@ bool HttpResponse::isRedirect() const
 
 void HttpResponse::processRedirect()
 {
-  
   if(httpRequest_->getRequest()->redirectUri
      (util::percentEncodeMini(getRedirectURI()))) {
     A2_LOG_INFO(fmt(MSG_REDIRECT,
@@ -198,7 +197,7 @@ SharedHandle<StreamFilter> HttpResponse::getTransferEncodingStreamFilter() const
   // TODO Transfer-Encoding header field can contains multiple tokens. We should
   // parse the field and retrieve each token.
   if(isTransferEncodingSpecified()) {
-    if(getTransferEncoding() == HttpHeader::CHUNKED) {
+    if(util::strieq(getTransferEncoding(), "chunked")) {
       filter.reset(new ChunkedDecodingStreamFilter());
     }
   }
@@ -219,8 +218,8 @@ SharedHandle<StreamFilter> HttpResponse::getContentEncodingStreamFilter() const
 {
   SharedHandle<StreamFilter> filter;
 #ifdef HAVE_ZLIB
-  if(getContentEncoding() == HttpHeader::GZIP ||
-     getContentEncoding() == HttpHeader::DEFLATE) {
+  if(util::strieq(getContentEncoding(), "gzip") ||
+     util::strieq(getContentEncoding(), "deflate")) {
     filter.reset(new GZipDecodingStreamFilter());
   }
 #endif // HAVE_ZLIB
@@ -232,7 +231,7 @@ int64_t HttpResponse::getContentLength() const
   if(!httpHeader_) {
     return 0;
   } else {
-    return httpHeader_->getRange()->getContentLength();
+    return httpHeader_->getRange().getContentLength();
   }
 }
 
@@ -241,7 +240,7 @@ int64_t HttpResponse::getEntityLength() const
   if(!httpHeader_) {
     return 0;
   } else {
-    return httpHeader_->getRange()->getEntityLength();
+    return httpHeader_->getRange().entityLength;
   }
 }
 
@@ -272,16 +271,6 @@ int HttpResponse::getStatusCode() const
   return httpHeader_->getStatusCode();
 }
 
-bool HttpResponse::hasRetryAfter() const
-{
-  return httpHeader_->defined(HttpHeader::RETRY_AFTER);
-}
-
-time_t HttpResponse::getRetryAfter() const
-{
-  return httpHeader_->findAsInt(HttpHeader::RETRY_AFTER);
-}
-
 Time HttpResponse::getLastModifiedTime() const
 {
   return Time::parseHTTPDate(httpHeader_->find(HttpHeader::LAST_MODIFIED));
@@ -289,25 +278,7 @@ Time HttpResponse::getLastModifiedTime() const
 
 bool HttpResponse::supportsPersistentConnection() const
 {
-  const std::string& connection = httpHeader_->find(HttpHeader::CONNECTION);
-  const std::string& version = httpHeader_->getVersion();
-  const std::string& proxyConn =
-    httpHeader_->find(HttpHeader::PROXY_CONNECTION);
-  return
-    util::strifind(connection.begin(),
-                   connection.end(),
-                   HttpHeader::CLOSE.begin(),
-                   HttpHeader::CLOSE.end()) == connection.end() &&
-    (version == HttpHeader::HTTP_1_1 ||
-     util::strifind(connection.begin(),
-                    connection.end(),
-                    HttpHeader::KEEP_ALIVE.begin(),
-                    HttpHeader::KEEP_ALIVE.end()) != connection.end()) &&
-    (!httpRequest_->isProxyRequestSet() ||
-     util::strifind(proxyConn.begin(),
-                    proxyConn.end(),
-                    HttpHeader::KEEP_ALIVE.begin(),
-                    HttpHeader::KEEP_ALIVE.end()) != proxyConn.end());
+  return httpHeader_->isKeepAlive();
 }
 
 namespace {
@@ -375,8 +346,8 @@ void HttpResponse::getMetalinKHttpEntries
 (std::vector<MetalinkHttpEntry>& result,
  const SharedHandle<Option>& option) const
 {
-  std::pair<std::multimap<std::string, std::string>::const_iterator,
-            std::multimap<std::string, std::string>::const_iterator> p =
+  std::pair<std::multimap<int, std::string>::const_iterator,
+            std::multimap<int, std::string>::const_iterator> p =
     httpHeader_->equalRange(HttpHeader::LINK);
   for(; p.first != p.second; ++p.first) {
     MetalinkHttpEntry e;
@@ -410,8 +381,8 @@ void HttpResponse::getMetalinKHttpEntries
 void HttpResponse::getDigest(std::vector<Checksum>& result) const
 {
   using std::swap;
-  std::pair<std::multimap<std::string, std::string>::const_iterator,
-            std::multimap<std::string, std::string>::const_iterator> p =
+  std::pair<std::multimap<int, std::string>::const_iterator,
+            std::multimap<int, std::string>::const_iterator> p =
     httpHeader_->equalRange(HttpHeader::DIGEST);
   for(; p.first != p.second; ++p.first) {
     const std::string& s = (*p.first).second;

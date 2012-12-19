@@ -94,7 +94,7 @@ void BtDependencyTest::testResolve()
     createDependee(option_, filename, File(filename).size());
   dependee->getPieceStorage()->getDiskAdaptor()->enableReadOnly();
   dependee->getPieceStorage()->markAllPiecesDone();
-  
+
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
 
@@ -126,12 +126,11 @@ void BtDependencyTest::testResolve_originalNameNoMatch()
     createDependee(option_, filename, File(filename).size());
   dependee->getPieceStorage()->getDiskAdaptor()->enableReadOnly();
   dependee->getPieceStorage()->markAllPiecesDone();
-  
+
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
 
-  CPPUNIT_ASSERT(!dependant->getDownloadContext()->hasAttribute
-                 (bittorrent::BITTORRENT));
+  CPPUNIT_ASSERT(!dependant->getDownloadContext()->hasAttribute(CTX_ATTR_BT));
 }
 
 void BtDependencyTest::testResolve_singleFileWithoutOriginalName()
@@ -145,8 +144,7 @@ void BtDependencyTest::testResolve_singleFileWithoutOriginalName()
   dependee->getPieceStorage()->markAllPiecesDone();
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
-  CPPUNIT_ASSERT(dependant->getDownloadContext()->hasAttribute
-                 (bittorrent::BITTORRENT));
+  CPPUNIT_ASSERT(dependant->getDownloadContext()->hasAttribute(CTX_ATTR_BT));
 }
 
 void BtDependencyTest::testResolve_multiFile()
@@ -159,12 +157,11 @@ void BtDependencyTest::testResolve_multiFile()
     createDependee(option_, filename, File(filename).size());
   dependee->getPieceStorage()->getDiskAdaptor()->enableReadOnly();
   dependee->getPieceStorage()->markAllPiecesDone();
-  
+
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
 
-  CPPUNIT_ASSERT(dependant->getDownloadContext()->hasAttribute
-                 (bittorrent::BITTORRENT));
+  CPPUNIT_ASSERT(dependant->getDownloadContext()->hasAttribute(CTX_ATTR_BT));
 
   const std::vector<SharedHandle<FileEntry> >& fileEntries =
     dependant->getDownloadContext()->getFileEntries();
@@ -194,7 +191,7 @@ void BtDependencyTest::testResolve_metadata()
   pieceStorage->setDownloadFinished(true);
   dependee->setPieceStorage(pieceStorage);
   SharedHandle<TorrentAttribute> attrs(new TorrentAttribute());
-  dependee->getDownloadContext()->setAttribute(bittorrent::BITTORRENT, attrs);
+  dependee->getDownloadContext()->setAttribute(CTX_ATTR_BT, attrs);
 
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
@@ -212,12 +209,12 @@ void BtDependencyTest::testResolve_loadError()
   SharedHandle<RequestGroup> dependee =
     createDependee(option_, "notExist", 40);
   dependee->getPieceStorage()->markAllPiecesDone();
-    
+
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
-    
+
   CPPUNIT_ASSERT
-    (!dependant->getDownloadContext()->hasAttribute(bittorrent::BITTORRENT));
+    (!dependant->getDownloadContext()->hasAttribute(CTX_ATTR_BT));
   CPPUNIT_ASSERT_EQUAL(std::string("/tmp/outfile.path"),
                        dependant->getFirstFilePath());
 }
@@ -226,12 +223,12 @@ void BtDependencyTest::testResolve_dependeeFailure()
 {
   SharedHandle<RequestGroup> dependant = createDependant(option_);
   SharedHandle<RequestGroup> dependee = createDependee(option_, "notExist", 40);
-    
+
   BtDependency dep(dependant.get(), dependee);
   CPPUNIT_ASSERT(dep.resolve());
-  
+
   CPPUNIT_ASSERT
-    (!dependant->getDownloadContext()->hasAttribute(bittorrent::BITTORRENT));
+    (!dependant->getDownloadContext()->hasAttribute(CTX_ATTR_BT));
   CPPUNIT_ASSERT_EQUAL(std::string("/tmp/outfile.path"),
                        dependant->getFirstFilePath());
 }

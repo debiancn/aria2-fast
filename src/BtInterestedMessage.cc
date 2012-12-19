@@ -38,13 +38,13 @@
 
 namespace aria2 {
 
-const std::string BtInterestedMessage::NAME("interested");
+const char BtInterestedMessage::NAME[] = "interested";
 
 BtInterestedMessage::BtInterestedMessage():ZeroBtMessage(ID, NAME) {}
 
 BtInterestedMessage::~BtInterestedMessage() {}
 
-SharedHandle<BtInterestedMessage> BtInterestedMessage::create
+BtInterestedMessage* BtInterestedMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return ZeroBtMessage::create<BtInterestedMessage>(data, dataLength);

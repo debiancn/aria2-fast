@@ -43,7 +43,7 @@
 #include "DlAbortEx.h"
 #include "a2functional.h"
 #include "Signature.h"
-#include "ContextAttribute.h"
+#include "RequestGroupMan.h"
 
 namespace aria2 {
 
@@ -52,9 +52,9 @@ DownloadContext::DownloadContext():
   checksumVerified_(false),
   knowsTotalLength_(true),
   ownerRequestGroup_(0),
-  downloadStartTime_(0),
-  downloadStopTime_(downloadStartTime_),
-  metalinkServerContacted_(false) {}
+  attrs_(MAX_CTX_ATTR),
+  downloadStopTime_(0),
+  acceptMetalink_(true) {}
 
 DownloadContext::DownloadContext(int32_t pieceLength,
                                  int64_t totalLength,
@@ -63,9 +63,9 @@ DownloadContext::DownloadContext(int32_t pieceLength,
   checksumVerified_(false),
   knowsTotalLength_(true),
   ownerRequestGroup_(0),
-  downloadStartTime_(0),
+  attrs_(MAX_CTX_ATTR),
   downloadStopTime_(0),
-  metalinkServerContacted_(false)
+  acceptMetalink_(true)
 {
   SharedHandle<FileEntry> fileEntry(new FileEntry(path, totalLength, 0));
   fileEntries_.push_back(fileEntry);
@@ -75,23 +75,20 @@ DownloadContext::~DownloadContext() {}
 
 void DownloadContext::resetDownloadStartTime()
 {
-  downloadStartTime_ = global::wallclock();
   downloadStopTime_.reset(0);
+  netStat_.downloadStart();
 }
 
 void DownloadContext::resetDownloadStopTime()
 {
   downloadStopTime_ = global::wallclock();
+  netStat_.downloadStop();
 }
 
 int64_t DownloadContext::calculateSessionTime() const
 {
-  if(downloadStopTime_ > downloadStartTime_) {
-    return
-      downloadStartTime_.differenceInMillis(downloadStopTime_);
-  } else {
-    return 0;
-  }
+  const Timer& startTime = netStat_.getDownloadStartTime();
+  return startTime.differenceInMillis(downloadStopTime_);
 }
 
 SharedHandle<FileEntry>
@@ -151,32 +148,29 @@ void DownloadContext::setFileFilter(SegList<int>& sgl)
 }
 
 void DownloadContext::setAttribute
-(const std::string& key, const SharedHandle<ContextAttribute>& value)
+(ContextAttributeType key, const SharedHandle<ContextAttribute>& value)
 {
-  std::map<std::string, SharedHandle<ContextAttribute> >::value_type p =
-    std::make_pair(key, value);
-  std::pair<std::map<std::string, SharedHandle<ContextAttribute> >::iterator,
-            bool> r = attrs_.insert(p);
-  if(!r.second) {
-    (*r.first).second = value;
-  }
+  assert(key < MAX_CTX_ATTR);
+  attrs_[key] = value;
 }
 
 const SharedHandle<ContextAttribute>& DownloadContext::getAttribute
-(const std::string& key)
+(ContextAttributeType key)
 {
-  std::map<std::string, SharedHandle<ContextAttribute> >::const_iterator itr =
-    attrs_.find(key);
-  if(itr == attrs_.end()) {
-    throw DL_ABORT_EX(fmt("No attribute named %s", key.c_str()));
+  assert(key < MAX_CTX_ATTR);
+  const SharedHandle<ContextAttribute>& attr = attrs_[key];
+  if(attr) {
+    return attr;
   } else {
-    return (*itr).second;
+    throw DL_ABORT_EX(fmt("No attribute named %s",
+                          strContextAttributeType(key)));
   }
 }
 
-bool DownloadContext::hasAttribute(const std::string& key) const
+bool DownloadContext::hasAttribute(ContextAttributeType key) const
 {
-  return attrs_.count(key) == 1;
+  assert(key < MAX_CTX_ATTR);
+  return attrs_[key];
 }
 
 void DownloadContext::releaseRuntimeResource()
@@ -283,6 +277,24 @@ void DownloadContext::setBasePath(const std::string& basePath)
 void DownloadContext::setSignature(const SharedHandle<Signature>& signature)
 {
   signature_ = signature;
+}
+
+void DownloadContext::updateDownloadLength(size_t bytes)
+{
+  netStat_.updateDownloadLength(bytes);
+  RequestGroupMan* rgman = ownerRequestGroup_->getRequestGroupMan();
+  if(rgman) {
+    rgman->getNetStat().updateDownloadLength(bytes);
+  }
+}
+
+void DownloadContext::updateUploadLength(size_t bytes)
+{
+  netStat_.updateUploadLength(bytes);
+  RequestGroupMan* rgman = ownerRequestGroup_->getRequestGroupMan();
+  if(rgman) {
+    rgman->getNetStat().updateUploadLength(bytes);
+  }
 }
 
 } // namespace aria2

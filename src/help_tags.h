@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,21 +35,38 @@
 #ifndef D_HELP_TAGS_H
 #define D_HELP_TAGS_H
 
-#define TAG_BASIC "#basic"
-#define TAG_ADVANCED "#advanced"
-#define TAG_HTTP "#http"
-#define TAG_HTTPS "#https"
-#define TAG_FTP "#ftp"
-#define TAG_METALINK "#metalink"
-#define TAG_BITTORRENT "#bittorrent"
-#define TAG_COOKIE "#cookie"
-#define TAG_HOOK "#hook"
-#define TAG_FILE "#file"
-#define TAG_RPC "#rpc"
-#define TAG_CHECKSUM "#checksum"
-#define TAG_EXPERIMENTAL "#experimental"
-#define TAG_DEPRECATED "#deprecated"
-#define TAG_HELP "#help"
-#define TAG_ALL "#all"
+#include "common.h"
+
+namespace aria2 {
+
+enum HelpTag {
+  TAG_BASIC,
+  TAG_ADVANCED,
+  TAG_HTTP,
+  TAG_HTTPS,
+  TAG_FTP,
+  TAG_METALINK,
+  TAG_BITTORRENT,
+  TAG_COOKIE,
+  TAG_HOOK,
+  TAG_FILE,
+  TAG_RPC,
+  TAG_CHECKSUM,
+  TAG_EXPERIMENTAL,
+  TAG_DEPRECATED,
+  TAG_HELP,
+  MAX_HELP_TAG
+};
+
+#define STR_TAG_ALL "#all"
+
+// Returns tag name of the given |tag| ID.
+const char* strHelpTag(uint32_t tag);
+
+// Returns the corresponding enum value of the given |tagName|.  If
+// there is no such tag, returns MAX_HELP_TAG.
+uint32_t idHelpTag(const char* tagName);
+
+} // namespace aria2
 
 #endif // D_HELP_TAGS_H

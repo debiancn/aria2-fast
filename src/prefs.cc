@@ -270,6 +270,14 @@ const Pref* PREF_RPC_MAX_REQUEST_SIZE = makePref("rpc-max-request-size");
 const Pref* PREF_RPC_LISTEN_ALL = makePref("rpc-listen-all");
 // value: true | false
 const Pref* PREF_RPC_ALLOW_ORIGIN_ALL = makePref("rpc-allow-origin-all");
+// value: string that your file system recognizes as a file name.
+const Pref* PREF_RPC_CERTIFICATE = makePref("rpc-certificate");
+// value: string that your file system recognizes as a file name.
+const Pref* PREF_RPC_PRIVATE_KEY = makePref("rpc-private-key");
+// value: true | false
+const Pref* PREF_RPC_SECURE = makePref("rpc-secure");
+// value: true | false
+const Pref* PREF_RPC_SAVE_UPLOAD_METADATA = makePref("rpc-save-upload-metadata");
 // value: true | false
 const Pref* PREF_DRY_RUN = makePref("dry-run");
 // value: true | false
@@ -328,6 +336,8 @@ const Pref* PREF_CHECKSUM = makePref("checksum");
 const Pref* PREF_STOP_WITH_PROCESS = makePref("stop-with-process");
 // value: true | false
 const Pref* PREF_ENABLE_MMAP = makePref("enable-mmap");
+// value: true | false
+const Pref* PREF_FORCE_SAVE = makePref("force-save");
 
 /**
  * FTP related preferences
@@ -377,7 +387,7 @@ const Pref* PREF_HTTP_NO_CACHE = makePref("http-no-cache");
 // value: true | false
 const Pref* PREF_HTTP_ACCEPT_GZIP = makePref("http-accept-gzip");
 
-/** 
+/**
  * Proxy related preferences
  */
 const Pref* PREF_HTTP_PROXY = makePref("http-proxy");

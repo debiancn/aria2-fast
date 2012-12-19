@@ -41,11 +41,11 @@
 
 namespace aria2 {
 
-const std::string BtHaveAllMessage::NAME("have all");
+const char BtHaveAllMessage::NAME[] = "have all";
 
 BtHaveAllMessage::BtHaveAllMessage():ZeroBtMessage(ID, NAME) {}
 
-SharedHandle<BtHaveAllMessage> BtHaveAllMessage::create
+BtHaveAllMessage* BtHaveAllMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return ZeroBtMessage::create<BtHaveAllMessage>(data, dataLength);

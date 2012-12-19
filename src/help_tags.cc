@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,16 +32,52 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_SOCKET_H
-#define D_SOCKET_H
+#include "help_tags.h"
 
-#include "SocketCore.h"
-#include "SharedHandle.h"
+#include <cstring>
+
+#include "array_fun.h"
 
 namespace aria2 {
 
-typedef SharedHandle<SocketCore> SocketHandle;
+namespace {
+const char* HELP_TAG_NAMES[] = {
+  "#basic",
+  "#advanced",
+  "#http",
+  "#https",
+  "#ftp",
+  "#metalink",
+  "#bittorrent",
+  "#cookie",
+  "#hook",
+  "#file",
+  "#rpc",
+  "#checksum",
+  "#experimental",
+  "#deprecated",
+  "#help"
+};
+} // namespace
+
+const char* strHelpTag(uint32_t tag)
+{
+  if(tag >= MAX_HELP_TAG) {
+    return "UNKNOWN";
+  } else {
+    return HELP_TAG_NAMES[tag];
+  }
+}
+
+uint32_t idHelpTag(const char* tagName)
+{
+  for(const char** p = vbegin(HELP_TAG_NAMES), ** eop = vend(HELP_TAG_NAMES);
+      p != eop; ++p) {
+    if(strcmp(*p, tagName) == 0) {
+      return p - vbegin(HELP_TAG_NAMES);
+    }
+  }
+  return MAX_HELP_TAG;
+}
 
 } // namespace aria2
-
-#endif // D_SOCKET_H

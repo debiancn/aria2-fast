@@ -102,21 +102,24 @@ void printProgress
 {
   TransferStat stat = rg->calculateStat();
   int eta = 0;
-  if(rg->getTotalLength() > 0 && stat.getDownloadSpeed() > 0) {
-    eta = (rg->getTotalLength()-rg->getCompletedLength())/stat.getDownloadSpeed();
+  if(rg->getTotalLength() > 0 && stat.downloadSpeed > 0) {
+    eta = (rg->getTotalLength()-rg->getCompletedLength())/stat.downloadSpeed;
   }
 
   o << "["
     << "#" << rg->getGID() << " ";
 
 #ifdef ENABLE_BITTORRENT
-  if(rg->getDownloadContext()->hasAttribute(bittorrent::BITTORRENT) &&
+  if(rg->getDownloadContext()->hasAttribute(CTX_ATTR_BT) &&
      !bittorrent::getTorrentAttrs(rg->getDownloadContext())->metadata.empty() &&
      rg->downloadFinished()) {
     o << "SEEDING" << "(" << "ratio:";
     if(rg->getCompletedLength() > 0) {
+      std::streamsize oldprec = o.precision();
       o << std::fixed << std::setprecision(1)
-        << ((stat.getAllTimeUploadLength()*10)/rg->getCompletedLength())/10.0;
+        << ((stat.allTimeUploadLength*10)/rg->getCompletedLength())/10.0
+        << std::setprecision(oldprec)
+        << std::resetiosflags(std::ios::fixed);
     } else {
       o << "--";
     }
@@ -152,13 +155,13 @@ void printProgress
   if(!rg->downloadFinished()) {
     o << " "
       << "SPD:"
-      << sizeFormatter(stat.getDownloadSpeed()) << "Bs";
+      << sizeFormatter(stat.downloadSpeed) << "Bs";
   }
-  if(stat.getSessionUploadLength() > 0) {
+  if(stat.sessionUploadLength > 0) {
     o << " "
       << "UP:"
-      << sizeFormatter(stat.getUploadSpeed()) << "Bs"
-      << "(" << sizeFormatter(stat.getAllTimeUploadLength()) << "B)";
+      << sizeFormatter(stat.uploadSpeed) << "Bs"
+      << "(" << sizeFormatter(stat.allTimeUploadLength) << "B)";
   }
   if(eta > 0) {
     o << " "
@@ -304,10 +307,8 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
 
   if(e->getRequestGroupMan()->countRequestGroup() > 1 &&
      !e->getRequestGroupMan()->downloadFinished()) {
-    TransferStat stat = e->getRequestGroupMan()->calculateStat();
-    o << " "
-      << "[TOTAL SPD:"
-      << sizeFormatter(stat.getDownloadSpeed()) << "Bs" << "]";
+    int spd = e->getRequestGroupMan()->getNetStat().calculateDownloadSpeed();
+    o << " [TOTAL SPD:" << sizeFormatter(spd) << "Bs" << "]";
   }
 
   {

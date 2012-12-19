@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2012 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,41 +32,61 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_GZIP_DECODER_H
-#define D_GZIP_DECODER_H
+#ifndef D_URI_SPLIT_H
+#define D_URI_SPLIT_H
 
-#include "Decoder.h"
-#include <zlib.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-namespace aria2 {
+#include <sys/types.h>
+#include <stdint.h>
 
-// GZipDecoder can decode both gzip and deflate format.
-class GZipDecoder : public Decoder {
-private:
-  z_stream* strm_;
+typedef enum {
+  USR_SCHEME,
+  USR_HOST,
+  USR_PORT,
+  USR_PATH,
+  USR_QUERY,
+  USR_FRAGMENT,
+  USR_USERINFO,
+  USR_USER,
+  USR_PASSWD,
+  USR_BASENAME,
+  USR_MAX
+} uri_split_field;
 
-  bool finished_;
+typedef enum {
+  USF_IPV6ADDR = 1
+} uri_split_flag;
 
-  static const size_t OUTBUF_LENGTH = 16*1024;
-  
-  static const std::string NAME;
-public:
-  GZipDecoder();
+/* The structure is based on http-parser by Joyent, Inc and other Node
+   contributors. https://github.com/joyent/http-parser */
+typedef struct {
+  uint16_t field_set;
+  uint16_t port;
 
-  virtual ~GZipDecoder();
+  struct {
+    uint16_t off;
+    uint16_t len;
+  } fields[USR_MAX];
 
-  virtual void init();
+  uint8_t flags;
+} uri_split_result;
 
-  virtual std::string decode(const unsigned char* inbuf, size_t inlen);
+/* Splits URI |uri| and stores the results in the |res|. To check
+ * particular URI component is available, evaluate |res->field_set|
+ * with 1 shifted by the field defined in uri_split_field. If the
+ * |res| is NULL, processing is done but the result will not stored.
+ * If the host component of the |uri| is IPv6 numeric address, then
+ * USF_IPV6ADDR & res->flags will be nonzero.
+ *
+ * This function returns 0 if it succeeds, or -1.
+ */
+int uri_split(uri_split_result *res, const char *uri);
 
-  virtual bool finished();
+#ifdef __cplusplus
+}
+#endif
 
-  virtual void release();
-
-  virtual const std::string& getName() const;
-
-};
-
-} // namespace aria2
-
-#endif // D_GZIP_DECODER_H
+#endif /* D_URI_SPLIT_H */

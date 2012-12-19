@@ -61,12 +61,11 @@ public:
 
   static const uint8_t ID = 9;
 
-  static const std::string NAME;
+  static const char NAME[];
 
   uint16_t getPort() const { return port_; }
 
-  static SharedHandle<BtPortMessage> create
-  (const unsigned char* data, size_t dataLength);
+  static BtPortMessage* create(const unsigned char* data, size_t dataLength);
 
   virtual void doReceivedAction();
 

@@ -45,7 +45,7 @@
 #include "ReceiverMSEHandshakeCommand.h"
 #include "Logger.h"
 #include "LogFactory.h"
-#include "Socket.h"
+#include "SocketCore.h"
 #include "SimpleRandomizer.h"
 #include "util.h"
 #include "fmt.h"
@@ -77,9 +77,8 @@ bool PeerListenCommand::bindPort(uint16_t& port, SegList<int>& sgl)
         eoi = ports.end(); i != eoi; ++i) {
     port = *i;
     try {
-      socket_->bind(A2STR::NIL, port, family_);
+      socket_->bind(0, port, family_);
       socket_->beginListen();
-      socket_->setNonBlockingMode();
       A2_LOG_NOTICE(fmt(_("IPv%d BitTorrent: listening to port %u"),
                         ipv, port));
       return true;
@@ -108,13 +107,11 @@ bool PeerListenCommand::execute() {
     return true;
   }
   for(int i = 0; i < 3 && socket_->isReadable(0); ++i) {
-    SocketHandle peerSocket;
+    SharedHandle<SocketCore> peerSocket;
     try {
-      peerSocket.reset(socket_->acceptConnection());
+      peerSocket = socket_->acceptConnection();
       std::pair<std::string, uint16_t> peerInfo;
       peerSocket->getPeerInfo(peerInfo);
-
-      peerSocket->setNonBlockingMode();
 
       SharedHandle<Peer> peer(new Peer(peerInfo.first, peerInfo.second, true));
       cuid_t cuid = e_->newCUID();

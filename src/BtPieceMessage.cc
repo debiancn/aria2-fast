@@ -56,10 +56,11 @@
 #include "fmt.h"
 #include "DownloadContext.h"
 #include "PeerStorage.h"
+#include "array_fun.h"
 
 namespace aria2 {
 
-const std::string BtPieceMessage::NAME("piece");
+const char BtPieceMessage::NAME[] = "piece";
 
 BtPieceMessage::BtPieceMessage
 (size_t index, int32_t begin, int32_t blockLength)
@@ -67,6 +68,7 @@ BtPieceMessage::BtPieceMessage
     index_(index),
     begin_(begin),
     blockLength_(blockLength),
+    msgHdrLen_(0),
     data_(0)
 {
   setUploading(true);
@@ -80,12 +82,12 @@ void BtPieceMessage::setMsgPayload(const unsigned char* data)
   data_ = data;
 }
 
-BtPieceMessageHandle BtPieceMessage::create
+BtPieceMessage* BtPieceMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   bittorrent::assertPayloadLengthGreater(9, dataLength, NAME);
   bittorrent::assertID(ID, data, NAME);
-  BtPieceMessageHandle message(new BtPieceMessage());
+  BtPieceMessage* message(new BtPieceMessage());
   message->setIndex(bittorrent::getIntParam(data, 1));
   message->setBegin(bittorrent::getIntParam(data, 5));
   message->setBlockLength(dataLength-9);
@@ -100,6 +102,7 @@ void BtPieceMessage::doReceivedAction()
   RequestSlot slot = getBtMessageDispatcher()->getOutstandingRequest
     (index_, begin_, blockLength_);
   getPeer()->updateDownloadLength(blockLength_);
+  downloadContext_->updateDownloadLength(blockLength_);
   if(!RequestSlot::isNull(slot)) {
     getPeer()->snubbing(false);
     SharedHandle<Piece> piece = getPieceStorage()->getPiece(index_);
@@ -178,32 +181,38 @@ void BtPieceMessage::send()
                     getPeer()->getPort(),
                     toString().c_str()));
     unsigned char* msgHdr = createMessageHeader();
-    size_t msgHdrLen = getMessageHeaderLength();
+    msgHdrLen_ = getMessageHeaderLength();
     A2_LOG_DEBUG(fmt("msglength = %lu bytes",
-                     static_cast<unsigned long>(msgHdrLen+blockLength_)));
-    getPeerConnection()->pushBytes(msgHdr, msgHdrLen);
+                     static_cast<unsigned long>(msgHdrLen_+blockLength_)));
+    getPeerConnection()->pushBytes(msgHdr, msgHdrLen_);
     int64_t pieceDataOffset =
       static_cast<int64_t>(index_)*downloadContext_->getPieceLength()+begin_;
     pushPieceData(pieceDataOffset, blockLength_);
   }
   writtenLength = getPeerConnection()->sendPendingData();
-  getPeer()->updateUploadLength(writtenLength);
+  // Subtract msgHdrLen_ from writtenLength to get the uploaded data
+  // size.
+  if(writtenLength > msgHdrLen_) {
+    writtenLength -= msgHdrLen_;
+    msgHdrLen_ = 0;
+    getPeer()->updateUploadLength(writtenLength);
+    downloadContext_->updateUploadLength(writtenLength);
+  } else {
+    msgHdrLen_ -= writtenLength;
+  }
   setSendingInProgress(!getPeerConnection()->sendBufferIsEmpty());
 }
 
 void BtPieceMessage::pushPieceData(int64_t offset, int32_t length) const
 {
   assert(length <= 16*1024);
-  unsigned char* buf = new unsigned char[length];
+  array_ptr<unsigned char> buf(new unsigned char[length]);
   ssize_t r;
-  try {
-    r = getPieceStorage()->getDiskAdaptor()->readData(buf, length, offset);
-  } catch(RecoverableException& e) {
-    delete [] buf;
-    throw;
-  }
+  r = getPieceStorage()->getDiskAdaptor()->readData(buf, length, offset);
   if(r == length) {
-    getPeerConnection()->pushBytes(buf, length);
+    unsigned char* dbuf = buf;
+    buf.reset(0);
+    getPeerConnection()->pushBytes(dbuf, length);
   } else {
     throw DL_ABORT_EX(EX_DATA_READ);
   }
@@ -212,7 +221,7 @@ void BtPieceMessage::pushPieceData(int64_t offset, int32_t length) const
 std::string BtPieceMessage::toString() const
 {
   return fmt("%s index=%lu, begin=%d, length=%d",
-             NAME.c_str(),
+             NAME,
              static_cast<unsigned long>(index_),
              begin_, blockLength_);
 }
@@ -281,7 +290,7 @@ void BtPieceMessage::onChokingEvent(const BtChokingEvent& event)
                      begin_,
                      blockLength_));
     if(getPeer()->isFastExtensionEnabled()) {
-      BtMessageHandle rej =
+      SharedHandle<BtMessage> rej =
         getBtMessageFactory()->createRejectMessage
         (index_, begin_, blockLength_);
       getBtMessageDispatcher()->addMessageToQueue(rej);
@@ -304,13 +313,13 @@ void BtPieceMessage::onCancelSendingPieceEvent
                      begin_,
                      blockLength_));
     if(getPeer()->isFastExtensionEnabled()) {
-      BtMessageHandle rej =
+      SharedHandle<BtMessage> rej =
         getBtMessageFactory()->createRejectMessage
         (index_, begin_, blockLength_);
       getBtMessageDispatcher()->addMessageToQueue(rej);
     }
     setInvalidate(true);
-  } 
+  }
 }
 
 void BtPieceMessage::setDownloadContext

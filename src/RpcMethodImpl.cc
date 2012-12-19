@@ -185,7 +185,12 @@ namespace {
 a2_gid_t str2Gid(const String* str)
 {
   assert(str);
-  return util::parseLLInt(str->s());
+  int64_t gid;
+  if(util::parseLLIntNoThrow(gid, str->s())) {
+    return gid;
+  } else {
+    throw DL_ABORT_EX(fmt("Bad GID %s", str->s().c_str()));
+  }
 }
 } // namespace
 
@@ -273,19 +278,23 @@ SharedHandle<ValueBase> AddTorrentRpcMethod::process
   bool posGiven = checkPosParam(posParam);
   size_t pos = posGiven ? posParam->i() : 0;
 
-  std::string filename = util::applyDir
-    (requestOption->get(PREF_DIR), getHexSha1(torrentParam->s())+".torrent");
-  std::vector<SharedHandle<RequestGroup> > result;
-  // Save uploaded data in order to save this download in
-  // --save-session file.
-  if(util::saveAs(filename, torrentParam->s(), true)) {
-    A2_LOG_INFO(fmt("Uploaded torrent data was saved as %s", filename.c_str()));
-    requestOption->put(PREF_TORRENT_FILE, filename);
-  } else {
-    A2_LOG_INFO(fmt("Uploaded torrent data was not saved."
-                    " Failed to write file %s", filename.c_str()));
-    filename.clear();
+  std::string filename;
+  if(requestOption->getAsBool(PREF_RPC_SAVE_UPLOAD_METADATA)) {
+    filename = util::applyDir
+      (requestOption->get(PREF_DIR), getHexSha1(torrentParam->s())+".torrent");
+    // Save uploaded data in order to save this download in
+    // --save-session file.
+    if(util::saveAs(filename, torrentParam->s(), true)) {
+      A2_LOG_INFO(fmt("Uploaded torrent data was saved as %s",
+                      filename.c_str()));
+      requestOption->put(PREF_TORRENT_FILE, filename);
+    } else {
+      A2_LOG_INFO(fmt("Uploaded torrent data was not saved."
+                      " Failed to write file %s", filename.c_str()));
+      filename.clear();
+    }
   }
+  std::vector<SharedHandle<RequestGroup> > result;
   createRequestGroupForBitTorrent(result, requestOption, uris, filename,
                                   torrentParam->s());
 
@@ -320,22 +329,27 @@ SharedHandle<ValueBase> AddMetalinkRpcMethod::process
 
   std::vector<SharedHandle<RequestGroup> > result;
 #ifdef ENABLE_MESSAGE_DIGEST
-  // TODO RFC5854 Metalink has the extension .meta4 and Metalink
-  // Version 3 uses .metalink extension. We use .meta4 for both
-  // RFC5854 Metalink and Version 3. aria2 can detect which of which
-  // by reading content rather than extension.
-  std::string filename = util::applyDir
-    (requestOption->get(PREF_DIR), getHexSha1(metalinkParam->s())+".meta4");
-  // Save uploaded data in order to save this download in
-  // --save-session file.
-  if(util::saveAs(filename, metalinkParam->s(), true)) {
-    A2_LOG_INFO(fmt("Uploaded metalink data was saved as %s",
-                    filename.c_str()));
-    requestOption->put(PREF_METALINK_FILE, filename);
-    createRequestGroupForMetalink(result, requestOption);
+  std::string filename;
+  if(requestOption->getAsBool(PREF_RPC_SAVE_UPLOAD_METADATA)) {
+    // TODO RFC5854 Metalink has the extension .meta4 and Metalink
+    // Version 3 uses .metalink extension. We use .meta4 for both
+    // RFC5854 Metalink and Version 3. aria2 can detect which of which
+    // by reading content rather than extension.
+    filename = util::applyDir
+      (requestOption->get(PREF_DIR), getHexSha1(metalinkParam->s())+".meta4");
+    // Save uploaded data in order to save this download in
+    // --save-session file.
+    if(util::saveAs(filename, metalinkParam->s(), true)) {
+      A2_LOG_INFO(fmt("Uploaded metalink data was saved as %s",
+                      filename.c_str()));
+      requestOption->put(PREF_METALINK_FILE, filename);
+      createRequestGroupForMetalink(result, requestOption);
+    } else {
+      A2_LOG_INFO(fmt("Uploaded metalink data was not saved."
+                      " Failed to write file %s", filename.c_str()));
+      createRequestGroupForMetalink(result, requestOption, metalinkParam->s());
+    }
   } else {
-    A2_LOG_INFO(fmt("Uploaded metalink data was not saved."
-                    " Failed to write file %s", filename.c_str()));
     createRequestGroupForMetalink(result, requestOption, metalinkParam->s());
   }
 #else // !ENABLE_MESSAGE_DIGEST
@@ -354,7 +368,7 @@ SharedHandle<ValueBase> AddMetalinkRpcMethod::process
     }
   }
   return gids;
-} 
+}
 #endif // ENABLE_METALINK
 
 namespace {
@@ -508,7 +522,7 @@ SharedHandle<ValueBase> UnpauseRpcMethod::process
     throw DL_ABORT_EX(fmt("GID#%" PRId64 " cannot be unpaused now", gid));
   } else {
     group->setPauseRequested(false);
-    e->getRequestGroupMan()->requestQueueCheck();    
+    e->getRequestGroupMan()->requestQueueCheck();
   }
   return createGIDResponse(gid);
 }
@@ -521,7 +535,7 @@ SharedHandle<ValueBase> UnpauseAllRpcMethod::process
   std::for_each(groups.begin(), groups.end(),
                 std::bind2nd(mem_fun_sh(&RequestGroup::setPauseRequested),
                              false));
-  e->getRequestGroupMan()->requestQueueCheck();    
+  e->getRequestGroupMan()->requestQueueCheck();
   return VLB_OK;
 }
 
@@ -643,14 +657,14 @@ void gatherProgressCommon
   }
   TransferStat stat = group->calculateStat();
   if(requested_key(keys, KEY_DOWNLOAD_SPEED)) {
-    entryDict->put(KEY_DOWNLOAD_SPEED, util::itos(stat.getDownloadSpeed()));
+    entryDict->put(KEY_DOWNLOAD_SPEED, util::itos(stat.downloadSpeed));
   }
   if(requested_key(keys, KEY_UPLOAD_SPEED)) {
-    entryDict->put(KEY_UPLOAD_SPEED, util::itos(stat.getUploadSpeed()));
+    entryDict->put(KEY_UPLOAD_SPEED, util::itos(stat.uploadSpeed));
   }
   if(requested_key(keys, KEY_UPLOAD_LENGTH)) {
     entryDict->put
-      (KEY_UPLOAD_LENGTH, util::itos(stat.getAllTimeUploadLength()));
+      (KEY_UPLOAD_LENGTH, util::itos(stat.allTimeUploadLength));
   }
   if(requested_key(keys, KEY_CONNECTIONS)) {
     entryDict->put(KEY_CONNECTIONS, util::itos(group->getNumConnection()));
@@ -782,9 +796,10 @@ void gatherPeer
                    util::toHex((*i)->getBitfield(), (*i)->getBitfieldLength()));
     peerEntry->put(KEY_AM_CHOKING, (*i)->amChoking()?VLB_TRUE:VLB_FALSE);
     peerEntry->put(KEY_PEER_CHOKING, (*i)->peerChoking()?VLB_TRUE:VLB_FALSE);
-    TransferStat stat = ps->getTransferStatFor(*i);
-    peerEntry->put(KEY_DOWNLOAD_SPEED, util::itos(stat.getDownloadSpeed()));
-    peerEntry->put(KEY_UPLOAD_SPEED, util::itos(stat.getUploadSpeed()));
+    peerEntry->put(KEY_DOWNLOAD_SPEED,
+                   util::itos((*i)->calculateDownloadSpeed()));
+    peerEntry->put(KEY_UPLOAD_SPEED,
+                   util::itos((*i)->calculateUploadSpeed()));
     peerEntry->put(KEY_SEEDER, (*i)->isSeeder()?VLB_TRUE:VLB_FALSE);
     peers->append(peerEntry);
   }
@@ -801,7 +816,7 @@ void gatherProgress
 {
   gatherProgressCommon(entryDict, group, keys);
 #ifdef ENABLE_BITTORRENT
-  if(group->getDownloadContext()->hasAttribute(bittorrent::BITTORRENT)) {
+  if(group->getDownloadContext()->hasAttribute(CTX_ATTR_BT)) {
     SharedHandle<TorrentAttribute> torrentAttrs =
       bittorrent::getTorrentAttrs(group->getDownloadContext());
     const SharedHandle<BtObject>& btObject =
@@ -1117,7 +1132,7 @@ void changeOption
   if(option.defined(PREF_DIR) || option.defined(PREF_OUT)) {
     if(dctx->getFileEntries().size() == 1
 #ifdef ENABLE_BITTORRENT
-       && !dctx->hasAttribute(bittorrent::BITTORRENT)
+       && !dctx->hasAttribute(CTX_ATTR_BT)
 #endif // ENABLE_BITTORRENT
        ) {
       dctx->getFirstFileEntry()->setPath
@@ -1127,7 +1142,7 @@ void changeOption
   }
 #ifdef ENABLE_BITTORRENT
   if(option.defined(PREF_DIR) || option.defined(PREF_INDEX_OUT)) {
-    if(dctx->hasAttribute(bittorrent::BITTORRENT)) {
+    if(dctx->hasAttribute(CTX_ATTR_BT)) {
       std::istringstream indexOutIn(grOption->get(PREF_INDEX_OUT));
       std::vector<std::pair<size_t, std::string> > indexPaths =
         util::createIndexPaths(indexOutIn);
@@ -1228,11 +1243,10 @@ SharedHandle<ValueBase> GetVersionRpcMethod::process
   SharedHandle<Dict> result = Dict::g();
   result->put(KEY_VERSION, PACKAGE_VERSION);
   SharedHandle<List> featureList = List::g();
-  const FeatureMap& features = FeatureConfig::getInstance()->getFeatures();
-  for(FeatureMap::const_iterator i = features.begin(), eoi = features.end();
-      i != eoi;++i){
-    if((*i).second) {
-      featureList->append((*i).first);
+  for(int feat = 0; feat < MAX_FEATURE; ++feat) {
+    const char* name = strSupportedFeature(feat);
+    if(name) {
+      featureList->append(name);
     }
   }
   result->put(KEY_ENABLED_FEATURES, featureList);
@@ -1247,7 +1261,7 @@ void pushRequestOption
 {
   for(size_t i = 1, len = option::countOption(); i < len; ++i) {
     const Pref* pref = option::i2p(i);
-    const SharedHandle<OptionHandler>& h = oparser->find(pref);
+    const OptionHandler* h = oparser->find(pref);
     if(h && h->getInitialOption() && option->defined(pref)) {
       dict->put(pref->k, option->get(pref));
     }
@@ -1280,7 +1294,7 @@ SharedHandle<ValueBase> GetGlobalOptionRpcMethod::process
     if(!e->getOption()->defined(pref)) {
       continue;
     }
-    const SharedHandle<OptionHandler>& h = getOptionParser()->find(pref);
+    const OptionHandler* h = getOptionParser()->find(pref);
     if(h) {
       result->put(pref->k, e->getOption()->get(pref));
     }

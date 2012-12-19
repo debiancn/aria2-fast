@@ -47,16 +47,16 @@ private:
   static const size_t MESSAGE_LENGTH = 9;
 protected:
   template<typename T>
-  static SharedHandle<T> create(const unsigned char* data, size_t dataLength)
+  static T* create(const unsigned char* data, size_t dataLength)
   {
     bittorrent::assertPayloadLengthEqual(5, dataLength, T::NAME);
     bittorrent::assertID(T::ID, data, T::NAME);
-    SharedHandle<T> message(new T());
+    T* message(new T());
     message->setIndex(bittorrent::getIntParam(data, 1));
     return message;
   }
 public:
-  IndexBtMessage(uint8_t id, const std::string& name, size_t index)
+  IndexBtMessage(uint8_t id, const char* name, size_t index)
     :SimpleBtMessage(id, name),
      index_(index) {}
 

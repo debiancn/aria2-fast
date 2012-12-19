@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
 "PO-Revision-Date: 2009-09-05 14:29+0000\n"
 "Last-Translator: minkob <minkobasa@gmail.com>\n"
 "Language-Team: Slovak <sk@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-09-20 09:12+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:41+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -40,42 +40,47 @@ msgstr ""
 "Ak máte nejaké chybové hlášky, pozrite si log súbor. Pozrite možnosť '-l' v "
 "help/man stránkach kvôli detailom."
 
-#: src/MultiUrlRequestInfo.cc:253
+#: src/MultiUrlRequestInfo.cc:273
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
+#: src/MultiUrlRequestInfo.cc:276
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:442
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
+
+#: src/RequestGroupMan.cc:445
 #, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
 msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "Výsledky sťahovania:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "Stavová legenda:"
 
-#: src/RequestGroupMan.cc:773
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
 msgstr ""
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:782
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
 msgstr ""
 
@@ -97,13 +102,10 @@ msgid ""
 msgstr " -d, --dir=DIR Adresár pre uloženie stiahnutého súboru."
 
 #: src/usage_text.h:39
-#, fuzzy
 msgid ""
 " -o, --out=FILE               The file name of the downloaded file. When -Z\n"
 "                              option is used, this option is ignored."
 msgstr ""
-" -l, --log=LOG Meno log súboru. Ak '-' je\n"
-"                              špecifikované, log je zapísaný do stdout."
 
 #: src/usage_text.h:42
 msgid ""
@@ -158,31 +160,22 @@ msgid " -m, --max-tries=N            Set number of tries. 0 means unlimited."
 msgstr " -m, --max-tries=N Nastaví počet pokusov. 0 znamená neobmedzene."
 
 #: src/usage_text.h:68
-#, fuzzy
 msgid ""
 " --http-proxy=PROXY           Use this proxy server for HTTP. To erase\n"
 "                              previously defined proxy, use \"\".\n"
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --http-proxy=PROXY Použije tento proxy server pre HTTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:73
-#, fuzzy
 msgid ""
 " --https-proxy=PROXY          Use this proxy server for HTTPS. To erase\n"
 "                              previously defined proxy, use \"\".\n"
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --https-proxy=PROXY Použije tento proxy server pre HTTPS.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:78
-#, fuzzy
 msgid ""
 " --ftp-proxy=PROXY            Use this proxy server for FTP. To erase "
 "previously\n"
@@ -190,9 +183,6 @@ msgid ""
 "                              See also  --all-proxy option.\n"
 "                              This affects all URLs."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:83
 msgid ""
@@ -1045,7 +1035,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:540
-#, fuzzy
 msgid ""
 " --on-download-complete=COMMAND Set the command to be executed after "
 "download\n"
@@ -1054,12 +1043,8 @@ msgid ""
 "                              requirement of COMMAND.\n"
 "                              See also --on-download-stop option."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:546
-#, fuzzy
 msgid ""
 " --on-download-start=COMMAND  Set the command to be executed after download\n"
 "                              got started. aria2 passes 3 arguments to "
@@ -1068,24 +1053,16 @@ msgid ""
 "Event\n"
 "                              Hook in man page for more details."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:551
-#, fuzzy
 msgid ""
 " --on-download-pause=COMMAND  Set the command to be executed after download\n"
 "                              was paused.\n"
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:556
-#, fuzzy
 msgid ""
 " --on-download-error=COMMAND  Set the command to be executed after download\n"
 "                              aborted due to error.\n"
@@ -1093,12 +1070,8 @@ msgid ""
 "                              requirement of COMMAND.\n"
 "                              See also --on-download-stop option."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:562
-#, fuzzy
 msgid ""
 " --on-download-stop=COMMAND   Set the command to be executed after download\n"
 "                              stopped. You can override the command to be\n"
@@ -1110,9 +1083,6 @@ msgid ""
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:571
 msgid ""
@@ -1323,7 +1293,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:677
-#, fuzzy
 msgid ""
 " --save-session=FILE          Save error/unfinished downloads to FILE on "
 "exit.\n"
@@ -1340,9 +1309,6 @@ msgid ""
 "not\n"
 "                              be saved."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:686
 msgid ""
@@ -1378,7 +1344,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:702
-#, fuzzy
 msgid ""
 " --on-bt-download-complete=COMMAND For BitTorrent, a command specified in\n"
 "                              --on-download-complete is called after "
@@ -1391,9 +1356,6 @@ msgid ""
 "                              See --on-download-start option for the\n"
 "                              requirement of COMMAND."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:710
 msgid ""
@@ -1516,9 +1478,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:773
-#, fuzzy
 msgid " --rpc-user=USER              Set JSON-RPC/XML-RPC user."
-msgstr " --http-user=USER Nastaví HTTP užívateľa. Toto ovplyvní všetky URL."
+msgstr ""
 
 #: src/usage_text.h:775
 msgid " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password."
@@ -1693,7 +1654,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:874
-#, fuzzy
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -1703,12 +1663,61 @@ msgid ""
 "                              because it will actually remove files from\n"
 "                              your disk."
 msgstr ""
-" --ftp-proxy=PROXY Použije tento proxy server pre FTP.\n"
-"                              Pozrite tiež možnosť --all-proxy .\n"
-"                              Toto ovplyvní všetky URL."
 
 #: src/usage_text.h:882
 msgid " --enable-mmap[=true|false]   Map files into memory."
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
 msgstr ""
 
 #: src/version_usage.cc:57
@@ -1760,37 +1769,37 @@ msgstr ""
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr ""
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr ""
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr ""
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:137
+#: src/version_usage.cc:138
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -1798,7 +1807,7 @@ msgid ""
 " URIs must point to the same file or downloading will fail."
 msgstr ""
 
-#: src/version_usage.cc:140
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -1806,7 +1815,7 @@ msgid ""
 " treated as a separate download."
 msgstr ""
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -1821,14 +1830,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:152
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -1841,7 +1850,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr ""
@@ -1904,12 +1913,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -1919,18 +1928,18 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
+#: src/RequestGroup.cc:680
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -2603,37 +2612,3 @@ msgstr ""
 #, c-format
 msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""
-
-#~ msgid "must be either 'true' or 'false'."
-#~ msgstr "musí byť buď 'true' alebo 'false'."
-
-#~ msgid "must be between %s and %s."
-#~ msgstr "musí byť medzi %s a %s."
-
-#~ msgid "must be smaller than or equal to %s."
-#~ msgstr "musí byť menšie ako alebo rovné %s."
-
-#~ msgid "must be greater than or equal to %s."
-#~ msgstr "musí byť väčšie ako alebo rovné %s."
-
-#~ msgid "must be a number."
-#~ msgstr "musí byť číslo."
-
-#~ msgid "must be smaller than or equal to %.1f."
-#~ msgstr "musí byť menšie ako alebo rovné %.1f."
-
-#~ msgid "must be between %.1f and %.1f."
-#~ msgstr "musí byť medzi %.1f a %.1f."
-
-#~ msgid "must be greater than or equal to %.1f."
-#~ msgstr "musí byť väčšie ako alebo rovné %.1f."
-
-#~ msgid "must be one of the following:"
-#~ msgstr "musí byť jedno z následujúcich:"
-
-#, fuzzy
-#~ msgid "Unrecognized format"
-#~ msgstr "nerozpoznaný proxy formát"
-
-#~ msgid "unrecognized proxy format"
-#~ msgstr "nerozpoznaný proxy formát"

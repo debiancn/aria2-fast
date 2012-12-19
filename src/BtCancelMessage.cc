@@ -37,13 +37,13 @@
 
 namespace aria2 {
 
-const std::string BtCancelMessage::NAME("cancel");
+const char BtCancelMessage::NAME[] = "cancel";
 
 BtCancelMessage::BtCancelMessage
 (size_t index, int32_t begin, int32_t length)
   :RangeBtMessage(ID, NAME, index, begin, length) {}
 
-SharedHandle<BtCancelMessage> BtCancelMessage::create
+BtCancelMessage* BtCancelMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return RangeBtMessage::create<BtCancelMessage>(data, dataLength);

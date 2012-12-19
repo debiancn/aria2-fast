@@ -185,13 +185,15 @@ void AnnounceListTest::testNextEventIfAfterStarted() {
   announceList.setEvent(AnnounceTier::STOPPED);
   announceList.announceFailure();
   announceList.resetTier();
-  CPPUNIT_ASSERT_EQUAL(std::string(""), announceList.getEventString());
+  CPPUNIT_ASSERT_EQUAL(std::string(""),
+                       std::string(announceList.getEventString()));
   CPPUNIT_ASSERT_EQUAL(AnnounceTier::HALTED, announceList.getEvent());
 
   announceList.setEvent(AnnounceTier::COMPLETED);
   announceList.announceFailure();
   announceList.resetTier();
-  CPPUNIT_ASSERT_EQUAL(std::string(""), announceList.getEventString());
+  CPPUNIT_ASSERT_EQUAL(std::string(""),
+                       std::string(announceList.getEventString()));
   CPPUNIT_ASSERT_EQUAL(AnnounceTier::SEEDING, announceList.getEvent());
 }
 
@@ -205,16 +207,19 @@ void AnnounceListTest::testEvent() {
 
   announceList.setEvent(AnnounceTier::STOPPED);
   announceList.announceSuccess();
-  CPPUNIT_ASSERT_EQUAL(std::string(""), announceList.getEventString());
+  CPPUNIT_ASSERT_EQUAL(std::string(""),
+                       std::string(announceList.getEventString()));
   CPPUNIT_ASSERT_EQUAL(AnnounceTier::HALTED, announceList.getEvent());
 
   announceList.setEvent(AnnounceTier::COMPLETED);
   announceList.announceSuccess();
-  CPPUNIT_ASSERT_EQUAL(std::string(""), announceList.getEventString());
+  CPPUNIT_ASSERT_EQUAL(std::string(""),
+                       std::string(announceList.getEventString()));
   CPPUNIT_ASSERT_EQUAL(AnnounceTier::SEEDING, announceList.getEvent());
 
   announceList.setEvent(AnnounceTier::STARTED_AFTER_COMPLETION);
-  CPPUNIT_ASSERT_EQUAL(std::string("started"), announceList.getEventString());
+  CPPUNIT_ASSERT_EQUAL(std::string("started"),
+                       std::string(announceList.getEventString()));
   announceList.announceSuccess();
   CPPUNIT_ASSERT_EQUAL(AnnounceTier::SEEDING, announceList.getEvent());
 }
@@ -302,7 +307,7 @@ void AnnounceListTest::testMoveToStoppedAllowedTier() {
   CPPUNIT_ASSERT_EQUAL(std::string("tracker3"), announceList.getAnnounce());
   // test wrapped search
   announceList.moveToStoppedAllowedTier();
-  CPPUNIT_ASSERT_EQUAL(std::string("tracker2"), announceList.getAnnounce());  
+  CPPUNIT_ASSERT_EQUAL(std::string("tracker2"), announceList.getAnnounce());
 }
 
 void AnnounceListTest::testMoveToCompletedAllowedTier() {
@@ -328,7 +333,7 @@ void AnnounceListTest::testMoveToCompletedAllowedTier() {
   CPPUNIT_ASSERT_EQUAL(std::string("tracker3"), announceList.getAnnounce());
   // test wrapped search
   announceList.moveToStoppedAllowedTier();
-  CPPUNIT_ASSERT_EQUAL(std::string("tracker2"), announceList.getAnnounce());  
+  CPPUNIT_ASSERT_EQUAL(std::string("tracker2"), announceList.getAnnounce());
 }
 
 } // namespace aria2

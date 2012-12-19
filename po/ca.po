@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-09-02 21:24+0900\n"
-"PO-Revision-Date: 2009-11-02 23:14+0900\n"
+"POT-Creation-Date: 2012-12-01 23:54+0900\n"
+"PO-Revision-Date: 2009-10-13 07:43+0000\n"
 "Last-Translator: Jordi Pujol <Unknown>\n"
 "Language-Team: Catalan <ca@li.org>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2009-11-01 09:48+0000\n"
-"X-Generator: Launchpad (build Unknown)\n"
+"X-Launchpad-Export-Date: 2012-12-01 12:40+0000\n"
+"X-Generator: Launchpad (build 16319)\n"
 
 #: src/DownloadEngine.cc:225
 msgid ""
@@ -41,46 +41,49 @@ msgstr ""
 "Si hi han errors, llavors miri el fitxer d'anotacions. Per més informació "
 "vegi l'opció '-l' en les pàgines help/man."
 
-#: src/MultiUrlRequestInfo.cc:253
+#: src/MultiUrlRequestInfo.cc:273
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:256
-#, fuzzy, c-format
+#: src/MultiUrlRequestInfo.cc:276
+#, c-format
 msgid "Failed to serialize session to '%s'."
-msgstr "Fallo al posar una opció del sòcol, causa: %s"
+msgstr ""
 
-#: src/RequestGroupMan.cc:442
-#, fuzzy, c-format
+#: src/RequestGroupMan.cc:399
+#, c-format
+msgid "Download GID#%<PRId64> paused"
+msgstr ""
+
+#: src/RequestGroupMan.cc:445
+#, c-format
 msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "Descàrrega completa: %s"
+msgstr ""
 
-#: src/RequestGroupMan.cc:728
+#: src/RequestGroupMan.cc:726
 msgid "Download Results:"
 msgstr "Resultats de la descàrrega:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:769
 msgid "Status Legend:"
 msgstr "llegenda d'estat:"
 
-#: src/RequestGroupMan.cc:773
-#, fuzzy
+#: src/RequestGroupMan.cc:771
 msgid "(OK):download completed."
-msgstr "S'ha completat la descàrrega."
+msgstr ""
 
-#: src/RequestGroupMan.cc:776
+#: src/RequestGroupMan.cc:774
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:779
+#: src/RequestGroupMan.cc:777
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:782
-#, fuzzy
+#: src/RequestGroupMan.cc:780
 msgid "(RM):download removed."
-msgstr "Descàrrega cancel·lada."
+msgstr ""
 
 #: src/OptionHandler.cc:38
 msgid "                              Default: "
@@ -105,14 +108,10 @@ msgstr ""
 "descarregat."
 
 #: src/usage_text.h:39
-#, fuzzy
 msgid ""
 " -o, --out=FILE               The file name of the downloaded file. When -Z\n"
 "                              option is used, this option is ignored."
 msgstr ""
-" -l, --log=LOG                El nom del fitxer d'anotacions.. Si es posa "
-"'-',\n"
-"                              les anotacions s'escriuen a stdout."
 
 #: src/usage_text.h:42
 msgid ""
@@ -330,17 +329,12 @@ msgstr ""
 "                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:153
-#, fuzzy
 msgid ""
 " --allow-overwrite[=true|false] Restart download from scratch if the\n"
 "                              corresponding control file doesn't exist.  "
 "See\n"
 "                              also --auto-file-renaming option."
 msgstr ""
-" --enable-direct-io[=true|false] Activa E/S directe, minimitza l'ùs de CPU "
-"quan\n"
-"                              es reserva espai per fitxers.\n"
-"                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:157
 msgid ""
@@ -439,20 +433,14 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:209
-#, fuzzy
 msgid ""
 " --realtime-chunk-checksum[=true|false]  Validate chunk of data by "
 "calculating\n"
 "                              checksum while downloading a file if chunk\n"
 "                              checksums are provided."
 msgstr ""
-" --enable-direct-io[=true|false] Activa E/S directe, minimitza l'ùs de CPU "
-"quan\n"
-"                              es reserva espai per fitxers.\n"
-"                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:213
-#, fuzzy
 msgid ""
 " -c, --continue[=true|false]  Continue downloading a partially downloaded\n"
 "                              file. Use this option to resume a download\n"
@@ -461,16 +449,6 @@ msgid ""
 "                              beginning. Currently this option is only\n"
 "                              applicable to http(s)/ftp downloads."
 msgstr ""
-" -c, --continue               Continua descarregant un fitxer parcialment "
-"descarregat.\n"
-"                              Feu servir aquesta opció per seguir la "
-"descàrrega\n"
-"                              començada per un navegador Web o un altre "
-"programa\n"
-"                              que descarrega els fitxers seqüèncialment des "
-"del\n"
-"                              principi. Aquesta opció només és\n"
-"                              aplicable a descàrregues http(s)/ftp."
 
 #: src/usage_text.h:220
 msgid " -U, --user-agent=USER_AGENT  Set user agent for http(s) downloads."
@@ -479,9 +457,8 @@ msgstr ""
 "http."
 
 #: src/usage_text.h:222
-#, fuzzy
 msgid " -n, --no-netrc[=true|false]  Disables netrc support."
-msgstr " -n, --no-netrc               Desactiva el suport netrc."
+msgstr ""
 
 #: src/usage_text.h:224
 msgid ""
@@ -529,17 +506,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:246
-#, fuzzy
 msgid ""
 " -S, --show-files[=true|false] Print file listing of .torrent, .meta4 and\n"
 "                              .metalink file and exit. More detailed\n"
 "                              information will be listed in case of torrent\n"
 "                              file."
 msgstr ""
-" -S, --show-files             Escriu el llistat de fitxers d'un fitxer ."
-"torrent o .metalink\n"
-"                              i surt. Es llistarà Informació més detallada\n"
-"                              en el cas d'un fitxer torrent."
 
 #: src/usage_text.h:251
 msgid ""
@@ -648,9 +620,8 @@ msgstr ""
 "iguals."
 
 #: src/usage_text.h:310
-#, fuzzy
 msgid " --enable-dht[=true|false]    Enable IPv4 DHT functionality."
-msgstr " --enable-dht[=true|false] Activa la funcionalitat DHT."
+msgstr ""
 
 #: src/usage_text.h:312
 msgid ""
@@ -663,20 +634,16 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:318
-#, fuzzy
 msgid ""
 " --dht-entry-point=HOST:PORT  Set host and port as an entry point to IPv4 "
 "DHT\n"
 "                              network."
 msgstr ""
-" --dht-entry-point=HOST:PORT Estableix host i port com el punt d'entrada a \n"
-"                                           una xarxa DHT."
 
 #: src/usage_text.h:321
-#, fuzzy
 msgid ""
 " --dht-file-path=PATH         Change the IPv4 DHT routing table file to PATH."
-msgstr " --conf-path=PATH Canvia el camí al fitxer de configuració a PATH."
+msgstr ""
 
 #: src/usage_text.h:323
 msgid ""
@@ -735,13 +702,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:351
-#, fuzzy
 msgid ""
 " -M, --metalink-file=METALINK_FILE The file path to the .meta4 and ."
 "metalink\n"
 "                              file. Reads input from stdin when '-' is\n"
 "                              specified."
-msgstr " -M, --metalink-file=METALINK_FILE  El camí al fitxer .metalink."
+msgstr ""
 
 #: src/usage_text.h:355
 msgid ""
@@ -832,9 +798,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:403
-#, fuzzy
 msgid " --no-conf[=true|false]       Disable loading aria2.conf file."
-msgstr " --no-conf Desactiva la càrrega del fitxer de configuració aria2.conf."
+msgstr ""
 
 #: src/usage_text.h:405
 msgid ""
@@ -1247,9 +1212,8 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:614
-#, fuzzy
 msgid " --bt-enable-lpd[=true|false] Enable Local Peer Discovery."
-msgstr " --enable-dht[=true|false] Activa la funcionalitat DHT."
+msgstr ""
 
 #: src/usage_text.h:616
 msgid ""
@@ -1272,11 +1236,8 @@ msgid " --all-proxy-user=USER        Set user for --all-proxy option."
 msgstr ""
 
 #: src/usage_text.h:626
-#, fuzzy
 msgid " --all-proxy-passwd=PASSWD    Set password for --all-proxy option."
 msgstr ""
-" --http-passwd=PASSWD         Estableix el mot de pas HTTP. Això afecta a "
-"totes les URLs."
 
 #: src/usage_text.h:628
 msgid " --http-proxy-user=USER       Set user for --http-proxy option."
@@ -1390,15 +1351,11 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:686
-#, fuzzy
 msgid ""
 " -x, --max-connection-per-server=NUM The maximum number of connections to "
 "one\n"
 "                              server for each download."
 msgstr ""
-" --bt-max-open-files=NUM Especifica el nombre màxim de fitxers a obrir en "
-"cada\n"
-"                              descàrrega BitTorrent."
 
 #: src/usage_text.h:689
 msgid ""
@@ -1418,7 +1375,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:698
-#, fuzzy
 msgid ""
 " --conditional-get[=true|false] Download file only when the local file is "
 "older\n"
@@ -1426,10 +1382,6 @@ msgid ""
 "has\n"
 "                              many limitations. See man page for details."
 msgstr ""
-" --enable-direct-io[=true|false] Activa E/S directe, minimitza l'ùs de CPU "
-"quan\n"
-"                              es reserva espai per fitxers.\n"
-"                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:702
 msgid ""
@@ -1446,7 +1398,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:710
-#, fuzzy
 msgid ""
 " --enable-async-dns6[=true|false] Enable IPv6 name resolution in "
 "asynchronous\n"
@@ -1454,10 +1405,6 @@ msgid ""
 "when\n"
 "                              --async-dns=false."
 msgstr ""
-" --enable-direct-io[=true|false] Activa E/S directe, minimitza l'ùs de CPU "
-"quan\n"
-"                              es reserva espai per fitxers.\n"
-"                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:714
 msgid ""
@@ -1477,20 +1424,16 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:723
-#, fuzzy
 msgid ""
 " --dht-entry-point6=HOST:PORT Set host and port as an entry point to IPv6 "
 "DHT\n"
 "                              network."
 msgstr ""
-" --dht-entry-point=HOST:PORT Estableix host i port com el punt d'entrada a \n"
-"                                           una xarxa DHT."
 
 #: src/usage_text.h:726
-#, fuzzy
 msgid ""
 " --dht-file-path6=PATH        Change the IPv6 DHT routing table file to PATH."
-msgstr " --conf-path=PATH Canvia el camí al fitxer de configuració a PATH."
+msgstr ""
 
 #: src/usage_text.h:728
 msgid ""
@@ -1575,21 +1518,14 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:773
-#, fuzzy
 msgid " --rpc-user=USER              Set JSON-RPC/XML-RPC user."
 msgstr ""
-" --http-user=USER             Estableix l'usuari HTTP. Això afecta a totes "
-"les URLs."
 
 #: src/usage_text.h:775
-#, fuzzy
 msgid " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password."
 msgstr ""
-" --http-passwd=PASSWD         Estableix el mot de pas HTTP. Això afecta a "
-"totes les URLs."
 
 #: src/usage_text.h:777
-#, fuzzy
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -1597,10 +1533,6 @@ msgid ""
 "only\n"
 "                              on local loopback interface."
 msgstr ""
-" -S, --show-files             Escriu el llistat de fitxers d'un fitxer ."
-"torrent o .metalink\n"
-"                              i surt. Es llistarà Informació més detallada\n"
-"                              en el cas d'un fitxer torrent."
 
 #: src/usage_text.h:781
 msgid ""
@@ -1614,7 +1546,6 @@ msgid " --show-console-readout[=true|false] Show console readout."
 msgstr ""
 
 #: src/usage_text.h:786
-#, fuzzy
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -1623,10 +1554,6 @@ msgid ""
 "points\n"
 "                              to a directory, URI must end with '/'."
 msgstr ""
-" -S, --show-files             Escriu el llistat de fitxers d'un fitxer ."
-"torrent o .metalink\n"
-"                              i surt. Es llistarà Informació més detallada\n"
-"                              en el cas d'un fitxer torrent."
 
 #: src/usage_text.h:791
 msgid ""
@@ -1705,17 +1632,12 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:839
-#, fuzzy
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
 "whether\n"
 "                              or not download is complete."
 msgstr ""
-" --enable-direct-io[=true|false] Activa E/S directe, minimitza l'ùs de CPU "
-"quan\n"
-"                              es reserva espai per fitxers.\n"
-"                              Desactiveu-lo si trobeu algún error"
 
 #: src/usage_text.h:843
 msgid ""
@@ -1772,7 +1694,6 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:874
-#, fuzzy
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -1782,21 +1703,62 @@ msgid ""
 "                              because it will actually remove files from\n"
 "                              your disk."
 msgstr ""
-" -c, --continue               Continua descarregant un fitxer parcialment "
-"descarregat.\n"
-"                              Feu servir aquesta opció per seguir la "
-"descàrrega\n"
-"                              començada per un navegador Web o un altre "
-"programa\n"
-"                              que descarrega els fitxers seqüèncialment des "
-"del\n"
-"                              principi. Aquesta opció només és\n"
-"                              aplicable a descàrregues http(s)/ftp."
 
 #: src/usage_text.h:882
-#, fuzzy
 msgid " --enable-mmap[=true|false]   Map files into memory."
-msgstr " --enable-dht[=true|false] Activa la funcionalitat DHT."
+msgstr ""
+
+#: src/usage_text.h:884
+msgid ""
+" --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
+"                              The certificate must be in PEM format.\n"
+"                              Use --rpc-private-key option to specify the\n"
+"                              private key. Use --rpc-secure option to "
+"enable\n"
+"                              encryption."
+msgstr ""
+
+#: src/usage_text.h:890
+msgid ""
+" --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
+"                              The private key must be decrypted and in PEM\n"
+"                              format. Use --rpc-secure option to enable\n"
+"                              encryption. See also --rpc-certificate option."
+msgstr ""
+
+#: src/usage_text.h:895
+msgid ""
+" --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
+"                              The RPC clients must use https scheme to "
+"access\n"
+"                              the server. For WebSocket client, use wss\n"
+"                              scheme. Use --rpc-certificate and\n"
+"                              --rpc-private-key options to specify the\n"
+"                              server certificate and private key."
+msgstr ""
+
+#: src/usage_text.h:902
+msgid ""
+" --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
+"                              metalink metadata in the directory specified\n"
+"                              by --dir option. The filename consists of\n"
+"                              SHA-1 hash hex string of metadata plus\n"
+"                              extension. For torrent, the extension is\n"
+"                              '.torrent'. For metalink, it is '.meta4'.\n"
+"                              If false is given to this option, the\n"
+"                              downloads added by aria2.addTorrent or\n"
+"                              aria2.addMetalink will not be saved by\n"
+"                              --save-session option."
+msgstr ""
+
+#: src/usage_text.h:913
+msgid ""
+" --force-save[=true|false]    Save download with --save-session option even\n"
+"                              if the download is completed or removed. This\n"
+"                              may be useful to save BitTorrent seeding "
+"which\n"
+"                              is recognized as completed state."
+msgstr ""
 
 #: src/version_usage.cc:57
 msgid " version "
@@ -1847,59 +1809,53 @@ msgstr ""
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:99
+#: src/version_usage.cc:100
 #, c-format
 msgid "Printing all options."
 msgstr "Imprimint totes les opcions."
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:102
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "Imprimint les opcions etiquetades amb '%s'."
 
-#: src/version_usage.cc:104
+#: src/version_usage.cc:105
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:107 src/version_usage.cc:121
+#: src/version_usage.cc:108 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "Opcions:"
 
-#: src/version_usage.cc:118
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr ""
 
-#: src/version_usage.cc:129
+#: src/version_usage.cc:130
 #, c-format
 msgid "No option matching with '%s'."
 msgstr ""
 
-#: src/version_usage.cc:137
-#, fuzzy, c-format
+#: src/version_usage.cc:138
+#, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
 "all\n"
 " URIs must point to the same file or downloading will fail."
 msgstr ""
-" Es poden posar vàries URLs. A menys que s'especifiqui la opció -Z, totes "
-"les URLs han\n"
-" d'apuntar al mateix fitxer o la descàrrega fallarà."
 
-#: src/version_usage.cc:140
-#, fuzzy, c-format
+#: src/version_usage.cc:141
+#, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
 " metalink files stored in a local drive. Please note that they are always\n"
 " treated as a separate download."
 msgstr ""
-" Vostè també pot especificar varis fitxers torrent i fitxers metalink\n"
-" emmagatzemats en un disc local. Si us plau, tingui en compte que sempre\n"
-" son tractats com descàrregues separades."
 
-#: src/version_usage.cc:144
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -1914,16 +1870,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:151
-#, fuzzy, c-format
+#: src/version_usage.cc:152
+#, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
-" Asseguri's de que la URL és entre simples (') o dobles(\") cometes Si\n"
-"conté \"&\" o altres caràcters que tenen un significat especial en el shell."
 
-#: src/version_usage.cc:154
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -1936,7 +1890,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:161
+#: src/version_usage.cc:162
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Per més informació consulti la pàgina man."
@@ -1999,12 +1953,12 @@ msgid ""
 "%d was:%d)"
 msgstr ""
 
-#: src/BtStopDownloadCommand.cc:64
+#: src/BtStopDownloadCommand.cc:65
 #, c-format
 msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:89
+#: src/DHTConnectionImpl.cc:85
 #, c-format
 msgid "IPv%d DHT: listening to port %u"
 msgstr ""
@@ -2014,23 +1968,21 @@ msgstr ""
 msgid "IPv%d RPC: listening to port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:83
+#: src/PeerListenCommand.cc:82
 #, c-format
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:378
+#: src/RequestGroup.cc:375
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:683
-#, fuzzy, c-format
+#: src/RequestGroup.cc:680
+#, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
-"Eliminat el fitxer antic de control %s perquè el fitxer de descàrrega %s no "
-"existeix."
 
 #: src/SingleFileAllocationIterator.cc:75
 msgid ""
@@ -2039,9 +1991,9 @@ msgid ""
 msgstr ""
 
 #: src/message.h:57
-#, fuzzy, c-format
+#, c-format
 msgid "GID#%<PRId64> - Download has already completed: %s"
-msgstr "#%d - Ja s'ha completat la descàrrega: %s"
+msgstr ""
 
 #: src/message.h:106
 #, c-format
@@ -2147,9 +2099,9 @@ msgid "The download was complete."
 msgstr "S'ha completat la descàrrega."
 
 #: src/message.h:126
-#, fuzzy, c-format
+#, c-format
 msgid "Removed %lu have entries."
-msgstr "Esborrat %d té entrades."
+msgstr ""
 
 #: src/message.h:127
 #, c-format
@@ -2240,11 +2192,9 @@ msgstr ""
 "No es pot interpretat el fitxer XML metalink. El XML pot ser malconstruït."
 
 #: src/message.h:148
-#, fuzzy, c-format
+#, c-format
 msgid "Too small payload size for %s, size=%lu."
 msgstr ""
-"La mida de càrrega útil (payload) és incorrecte per %s, mida=%d. Ha de ser "
-"%d."
 
 #: src/message.h:149
 #, c-format
@@ -2274,9 +2224,9 @@ msgid "Windows socket library initialization failed"
 msgstr "Ha fallat la inicialització de la biblioteca de sòcals de Windows"
 
 #: src/message.h:154
-#, fuzzy, c-format
+#, c-format
 msgid "%ld second(s) has passed. Stopping application."
-msgstr "Han passat %d segon(s). Aturant l'aplicació."
+msgstr ""
 
 #: src/message.h:155
 #, c-format
@@ -2332,9 +2282,9 @@ msgid "Network problem has occurred. cause:%s"
 msgstr ""
 
 #: src/message.h:173
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
-msgstr "Fallo al llegir del fitxer %s, causa: %s"
+msgstr ""
 
 #: src/message.h:175
 #, c-format
@@ -2381,9 +2331,9 @@ msgid "Is '%s' a file?"
 msgstr ""
 
 #: src/message.h:192
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to find given interface %s, cause: %s"
-msgstr "Fallo al obrir el fitxer %s, causa: %s"
+msgstr ""
 
 #: src/message.h:194
 #, c-format
@@ -2391,9 +2341,9 @@ msgid "Saved metadata as %s."
 msgstr ""
 
 #: src/message.h:195
-#, fuzzy, c-format
+#, c-format
 msgid "Saving metadata as %s failed. Maybe file already exists."
-msgstr "Ha fallat guardar la signatura com %s. Potser el fitxer ja existeix."
+msgstr ""
 
 #: src/message.h:197
 #, c-format
@@ -2640,11 +2590,9 @@ msgid "File %s exists, but %s does not exist."
 msgstr "Fitxer %s existeix, però %s no existeix."
 
 #: src/message.h:259
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid payload size for %s, size=%lu. It should be %lu."
 msgstr ""
-"La mida de càrrega útil (payload) és incorrecte per %s, mida=%d. Ha de ser "
-"%d."
 
 #: src/message.h:260
 #, c-format
@@ -2674,13 +2622,11 @@ msgid "Flooding detected."
 msgstr "Detectat vessament."
 
 #: src/message.h:268
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Drop connection because no request/piece messages were exchanged in a "
 "certain period(%ld seconds)."
 msgstr ""
-"Lliberem la connexió degut a que no hem intercanviat missatges de peticions "
-"o peces en el període establert (%d segons)."
 
 #: src/message.h:270
 msgid "The infoHash in torrent file doesn't match to one in .aria2 file."
@@ -2724,269 +2670,3 @@ msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""
 "Longitud de fitxer incorrecte. No es pot continuar la descàrrega %s: local "
 "%s, remot %s"
-
-#~ msgid "See -h option to know other command-line options(%s)."
-#~ msgstr ""
-#~ "Consulti la opció -h per trobar altres opcions (%s) de la línia d'ordres."
-
-#, fuzzy
-#~ msgid "%ld seconds to allocate %s byte(s)"
-#~ msgstr "%d segons per reservar %s byte(s)"
-
-#~ msgid "Too large file size. size=%s"
-#~ msgstr "Mida del fitxer massa llarga. mida=%s"
-
-#~ msgid "Size mismatch Expected:%s Actual:%s"
-#~ msgstr "Mida incorrecta. Esperada:%s Actual:%s"
-
-#~ msgid "The offset is out of range, offset=%s"
-#~ msgstr "La desviació és fora de límits, desviació=%s"
-
-#, fuzzy
-#~ msgid ""
-#~ "Chunk checksum validation failed. checksumIndex=%lu, offset=%s, "
-#~ "expectedHash=%s, actualHash=%s"
-#~ msgstr ""
-#~ "Ha fallat la validació de la suma de comprovació del tros. "
-#~ "índexSumaComprovació=%d, desviació=%s, HashEsperat=%s, HashActual=%s"
-
-#~ msgid "Invalid range header. Request: %s-%s/%s, Response: %s-%s/%s"
-#~ msgstr "Capçalera de rang incorrecte. Petició: %s-%s/%s, Resposta: %s-%s/%s"
-
-#, fuzzy
-#~ msgid " --enable-xml-rpc[=true|false] Deprecated. Use --enable-rpc instead."
-#~ msgstr " --enable-dht[=true|false] Activa la funcionalitat DHT."
-
-#~ msgid "must be either 'true' or 'false'."
-#~ msgstr "ha de ser \"true\" o \"false\""
-
-#~ msgid "must be between %s and %s."
-#~ msgstr "ha de estar entre %s i %s"
-
-#~ msgid "must be smaller than or equal to %s."
-#~ msgstr "ha de ser més petit o igual que %s"
-
-#~ msgid "must be greater than or equal to %s."
-#~ msgstr "ha de ser més gran o igual que %s"
-
-#~ msgid "must be a number."
-#~ msgstr "ha de ser un número."
-
-#~ msgid "must be smaller than or equal to %.1f."
-#~ msgstr "ha de ser més petit o igual a %.1f."
-
-#~ msgid "must be between %.1f and %.1f."
-#~ msgstr "ha de estar entre %.1f i %.1f."
-
-#~ msgid "must be greater than or equal to %.1f."
-#~ msgstr "ha de ser més gran o igual que %.1f."
-
-#~ msgid "must be one of the following:"
-#~ msgstr "ha de ser un dels següents:"
-
-#, fuzzy
-#~ msgid "Unrecognized format"
-#~ msgstr "format proxy no reconegut"
-
-#~ msgid "unrecognized proxy format"
-#~ msgstr "format proxy no reconegut"
-
-#~ msgid "Failed to open the segment file %s, cause: %s"
-#~ msgstr "Fallo al obrir el fitxer de segments %s, causa: %s"
-
-#~ msgid "Failed to write into the segment file %s, cause: %s"
-#~ msgstr "Fallo al escriure en el fitxer de segments %s, causa: %s"
-
-#~ msgid "Failed to read from the segment file %s, cause: %s"
-#~ msgstr "Fallo al llegir del fitxer de segments %s, causa: %s"
-
-#~ msgid "CUID#%d - The download for one segment completed successfully."
-#~ msgstr ""
-#~ "CUID#%d - La descàrrega per un segment s'ha completat satisfactòriament."
-
-#~ msgid "CUID#%d - No segment available."
-#~ msgstr "CUID#%d - No hi ha cap segment disponible."
-
-#~ msgid "CUID#%d - Connecting to %s:%d"
-#~ msgstr "CUID#%d - Connectant a %s:%d"
-
-#~ msgid ""
-#~ "CUID#%d - The segment changed. We send the request again with new Range "
-#~ "header."
-#~ msgstr ""
-#~ "CUID#%d - El segment ha canviat. Enviarem la petició una altre vegada amb "
-#~ "una capçalera de Rang nova."
-
-#~ msgid "CUID#%d - Redirecting to %s"
-#~ msgstr "CUID#%d - Redirigint cap a %s"
-
-#~ msgid ""
-#~ "CUID#%d - Requesting:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - Demanant:\n"
-#~ "%s"
-
-#~ msgid ""
-#~ "CUID#%d - Response received:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "CUID#%d - Resposta rebuda:\n"
-#~ "%s"
-
-#~ msgid "CUID#%d - Download aborted. URI=%s"
-#~ msgstr "CUID#%d - Descàrrega cancel·lada. URI=%s"
-
-#~ msgid "CUID#%d - Restarting the download. URI=%s"
-#~ msgstr "CUID#%d - Re-arrencant la descàrrega. URI=%s"
-
-#~ msgid "CUID#%d - Download aborted."
-#~ msgstr "CUID#%d - Descàrrega cancel·lada."
-
-#~ msgid "CUID#%d - %d times attempted, but no success. Download aborted."
-#~ msgstr ""
-#~ "CUID#%d - Intentat %d vegades, però sense èxit. Descàrrega cancel·lada."
-
-#~ msgid "CUID#%d - we got new piece. index=%d"
-#~ msgstr "CUID#%d - tenim una nova peça. índex=%d"
-
-#~ msgid "CUID#%d - we got wrong piece. index=%d"
-#~ msgstr "CUID#%d - hem agafat una peça dolenta. índex=%d"
-
-#~ msgid "CUID#%d - Download not complete: %s"
-#~ msgstr "CUID#%d - Descàrrega incompleta: %s"
-
-#~ msgid "CUID#%d - Good checksum: %s"
-#~ msgstr "CUID#%d - Suma de comprovació correcta: %s"
-
-#~ msgid "CUID#%d - Bad checksum: %s"
-#~ msgstr "CUID#%d - Suma de comprovació incorrecta: %s"
-
-#~ msgid "CUID#%d - Resolving hostname %s"
-#~ msgstr "CUID#%d - Resolent nom del host %s"
-
-#~ msgid "CUID#%d - Name resolution complete: %s -> %s"
-#~ msgstr "CUID#%d - Resolució del nom completa: %s -> %s"
-
-#~ msgid "CUID#%d - Name resolution for %s failed:%s"
-#~ msgstr "CUID#%d - La resolució del nom per %s ha fallat:%s"
-
-#~ msgid "CUID#%d - DNS cache hit: %s -> %s"
-#~ msgstr "CUID#%d - Encertat el cau DNS: %s -> %s"
-
-#~ msgid "CUID#%d - Abort requested."
-#~ msgstr "CUID#%d - Cancel·lació demanada."
-
-#~ msgid "CUID#%d - Connecting to the peer %s"
-#~ msgstr "CUID#%d - Connectant a l'igual %s"
-
-#~ msgid ""
-#~ "CUID#%d - Piece received. index=%d, begin=%d, length=%d, offset=%llu, "
-#~ "blockIndex=%d"
-#~ msgstr ""
-#~ "CUID#%d - Peça rebuda. índex=%d, començament=%d, longitud=%d, desviació="
-#~ "%llu, bloc-índex=%d"
-
-#~ msgid "CUID#%d - Piece bitfield %s"
-#~ msgstr "CUID#%d - Camp de bits de la peça %s"
-
-#~ msgid ""
-#~ "CUID#%d - Reject piece message in queue because the peer has been choked. "
-#~ "index=%d, begin=%d, length=%d"
-#~ msgstr ""
-#~ "CUID#%d - Missatge de rebuig de peça en cua degut a que l'igual ha estat "
-#~ "estrangulat. índex=%d, començament=%d, longitud=%d"
-
-#~ msgid ""
-#~ "CUID#%d - Reject piece message in queue because cancel message received. "
-#~ "index=%d, begin=%d, length=%d"
-#~ msgstr ""
-#~ "CUID#%d - Missatge de rebuig de peça en cua degut a que s'ha rebut un "
-#~ "missatge de cancel·lació. índex=%d, començament=%d, longitud=%d"
-
-#~ msgid "CUID#%d - Exception caught while validating file integrity."
-#~ msgstr ""
-#~ "CUID#%d - Hem trobat una excepció mentre validàvem l'integritat del "
-#~ "fitxer."
-
-#~ msgid "CUID#%d - Interested in the peer"
-#~ msgstr "CUID#%d - Interessat en l'igual"
-
-#~ msgid "CUID#%d - Not interested in the peer"
-#~ msgstr "CUID#%d - No interessat en l'igual"
-
-#~ msgid "CUID#%d - Deleting request slot index=%d, blockIndex=%d"
-#~ msgstr "CUID#%d - Esborrant petició en l'eslot. índex=%d, bloc-índex=%d"
-
-#~ msgid ""
-#~ "CUID#%d - Deleting request slot index=%d, blockIndex=%d because localhost "
-#~ "got choked."
-#~ msgstr ""
-#~ "CUID#%d - Esborrant petició en l'eslot. índex=%d, bloc-índex=%d degut a "
-#~ "que el localhost ha estat estrangulat."
-
-#~ msgid "CUID#%d - Deleting request slot blockIndex=%d because of time out"
-#~ msgstr ""
-#~ "CUID#%d - Esborrant petició en l'eslot. bloc-índex=%d degut a temps "
-#~ "excedit"
-
-#~ msgid ""
-#~ "CUID#%d - Deleting request slot blockIndex=%d because the block has been "
-#~ "acquired."
-#~ msgstr ""
-#~ "CUID#%d - Esborrant petició en l'eslot. bloc-índex=%d degut a que el bloc "
-#~ "ha estat rebut."
-
-#~ msgid "CUID#%d - Fast extension enabled."
-#~ msgstr "CUID#%d - Extensió ràpida activada."
-
-#~ msgid "CUID#%d - Extended Messaging enabled."
-#~ msgstr "CUID#%d - S'han activat els missatges ampliats."
-
-#~ msgid "CUID#%d - Exception caught while allocating file space."
-#~ msgstr ""
-#~ "CUID#%d - Hem trobat una excepció mentre reservàvem espai per el fitxer."
-
-#~ msgid "CUID#%d - Content-Disposition detected. Use %s as filename"
-#~ msgstr ""
-#~ "CUID#%d - Hem detectat Content-Disposition. Fem servir %s com nom de "
-#~ "fitxer"
-
-#~ msgid "CUID#%d - Peer %s:%d banned."
-#~ msgstr "CUID#%d - Igual %s:%d vetat."
-
-#~ msgid "CUID#%d - Using port %d for accepting new connections"
-#~ msgstr "CUID#%d - Fent servir el port %d per acceptar noves connexions"
-
-#~ msgid "CUID#%d - An error occurred while binding port=%d"
-#~ msgstr "CUID#%d - Hi ha hagut en error mentre preníem el port=%d"
-
-#~ msgid "CUID#%d - Incoming connection, adding new command CUID#%d"
-#~ msgstr "CUID#%d - Connexió entrant, afegint nova ordre CUID#%d"
-
-#~ msgid "CUID#%d - Error in accepting connection"
-#~ msgstr "CUID#%d - Error acceptant connexió"
-
-#~ msgid "CUID#%d - Error occurred while processing tracker response."
-#~ msgstr ""
-#~ "CUID#%d - Hi ha hagut un error mentre processàvem la resposta del "
-#~ "seguidor."
-
-#~ msgid "CUID#%d - Cannot create tracker request."
-#~ msgstr "CUID#%d - No es pot crear la petició en el seguidor."
-
-#~ msgid "CUID#%d - Creating new tracker request command #%d"
-#~ msgstr "CUID#%d - Creant una nova ordre de petició al seguidor #%d"
-
-#~ msgid "CUID#%d - The peer is DHT-enabled."
-#~ msgstr "CUID#%d - L'igual és DHT-actiu."
-
-#~ msgid "Dispatching FileAllocationCommand for CUID#%d."
-#~ msgstr "Executant Ordre de Reservar Fitxer per CUID#%d."
-
-#~ msgid "CUID#%d cancels segment index=%d. CUID#%d handles it instead."
-#~ msgstr ""
-#~ "CUID#%d cancel·la el segment índex=%d. En comptes el CUID#%d el gestiona."
-
-#~ msgid " -o, --out=FILE               The file name of the downloaded file."
-#~ msgstr " -o, --out=FILE                El nom del fitxer descarregat."

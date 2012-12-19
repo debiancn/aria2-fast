@@ -97,9 +97,7 @@ public:
 
 };
 
-typedef SharedHandle<DiskWriterEntry> DiskWriterEntryHandle;
-
-typedef std::vector<DiskWriterEntryHandle> DiskWriterEntries;
+typedef std::vector<SharedHandle<DiskWriterEntry> > DiskWriterEntries;
 
 class MultiDiskAdaptor : public DiskAdaptor {
   friend class MultiFileAllocationIterator;
@@ -112,13 +110,12 @@ private:
   int maxOpenFiles_;
 
   bool readOnly_;
-  bool enableMmap_;
 
   void resetDiskWriterEntries();
 
   void openIfNot(const SharedHandle<DiskWriterEntry>& entry,
                  void (DiskWriterEntry::*f)());
- 
+
   static const int DEFAULT_MAX_OPEN_FILES = 100;
 
 public:
@@ -150,6 +147,8 @@ public:
 
   virtual bool isReadOnlyEnabled() const { return readOnly_; }
 
+  // Enables mmap feature. This method must be called after files are
+  // opened.
   virtual void enableMmap();
 
   void setPieceLength(int32_t pieceLength)
@@ -174,8 +173,6 @@ public:
   }
 
 };
-
-typedef SharedHandle<MultiDiskAdaptor> MultiDiskAdaptorHandle;
 
 } // namespace aria2
 

@@ -107,8 +107,6 @@ const std::string C_CREATED_BY("created by");
 const std::string DEFAULT_PEER_ID_PREFIX("aria2-");
 } // namespace
 
-const std::string BITTORRENT("bittorrent");
-
 const std::string MULTI("multi");
 
 const std::string SINGLE("single");
@@ -267,7 +265,7 @@ void extractFileEntries
         throw DL_ABORT_EX2("Path is empty.",
                            error_code::BITTORRENT_PARSE_ERROR);
       }
-      
+
       std::vector<std::string> pathelem(pathList->size()+1);
       pathelem[0] = utf8Name;
       std::vector<std::string>::iterator pathelemOutItr = pathelem.begin();
@@ -515,7 +513,7 @@ void processRootDictionary
     torrent->createdBy = util::encodeNonUtf8(createdBy->s());
   }
 
-  ctx->setAttribute(BITTORRENT, torrent);
+  ctx->setAttribute(CTX_ATTR_BT, torrent);
 }
 } // namespace
 
@@ -626,7 +624,7 @@ void loadFromMemory(const SharedHandle<ValueBase>& torrent,
 SharedHandle<TorrentAttribute> getTorrentAttrs
 (const SharedHandle<DownloadContext>& dctx)
 {
-  return static_pointer_cast<TorrentAttribute>(dctx->getAttribute(BITTORRENT));
+  return static_pointer_cast<TorrentAttribute>(dctx->getAttribute(CTX_ATTR_BT));
 }
 
 const unsigned char*
@@ -759,7 +757,7 @@ void checkBegin(int32_t begin, int32_t pieceLength)
 {
   if(!(begin < pieceLength)) {
     throw DL_ABORT_EX(fmt("Invalid begin: %d", begin));
-  }  
+  }
 }
 
 void checkLength(int32_t length)
@@ -849,34 +847,33 @@ std::pair<std::string, uint16_t> unpackcompact
 }
 
 void assertPayloadLengthGreater
-(size_t threshold, size_t actual, const std::string& msgName)
+(size_t threshold, size_t actual, const char* msgName)
 {
   if(actual <= threshold) {
     throw DL_ABORT_EX
-      (fmt(MSG_TOO_SMALL_PAYLOAD_SIZE, msgName.c_str(),
+      (fmt(MSG_TOO_SMALL_PAYLOAD_SIZE, msgName,
            static_cast<unsigned long>(actual)));
   }
 }
 
 void assertPayloadLengthEqual
-(size_t expected, size_t actual, const std::string& msgName)
+(size_t expected, size_t actual, const char* msgName)
 {
   if(expected != actual) {
     throw DL_ABORT_EX
-      (fmt(EX_INVALID_PAYLOAD_SIZE, msgName.c_str(),
+      (fmt(EX_INVALID_PAYLOAD_SIZE, msgName,
            static_cast<unsigned long>(actual),
            static_cast<unsigned long>(expected)));
   }
 }
 
 void assertID
-(uint8_t expected, const unsigned char* data, const std::string& msgName)
+(uint8_t expected, const unsigned char* data, const char* msgName)
 {
   uint8_t id = getId(data);
   if(expected != id) {
     throw DL_ABORT_EX
-      (fmt(EX_INVALID_BT_MESSAGE_ID, id, msgName.c_str(),
-           expected));
+      (fmt(EX_INVALID_BT_MESSAGE_ID, id, msgName, expected));
   }
 }
 
@@ -943,7 +940,7 @@ void loadMagnet
 (const std::string& magnet, const SharedHandle<DownloadContext>& dctx)
 {
   SharedHandle<TorrentAttribute> attrs = parseMagnet(magnet);
-  dctx->setAttribute(BITTORRENT, attrs);
+  dctx->setAttribute(CTX_ATTR_BT, attrs);
 }
 
 std::string metadata2Torrent

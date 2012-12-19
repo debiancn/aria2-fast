@@ -66,7 +66,7 @@ bool SessionSerializer::save(const std::string& filename) const
   std::string tempFilename = filename;
   tempFilename += "__temp";
   {
-    BufferedFile fp(tempFilename, BufferedFile::WRITE);
+    BufferedFile fp(tempFilename.c_str(), BufferedFile::WRITE);
     if(!fp) {
       return false;
     }
@@ -83,7 +83,7 @@ bool writeOption(BufferedFile& fp, const SharedHandle<Option>& op)
   const SharedHandle<OptionParser>& oparser = OptionParser::getInstance();
   for(size_t i = 1, len = option::countOption(); i < len; ++i) {
     const Pref* pref = option::i2p(i);
-    const SharedHandle<OptionHandler>& h = oparser->find(pref);
+    const OptionHandler* h = oparser->find(pref);
     if(h && h->getInitialOption() && op->defined(pref)) {
       if(h->getCumulative()) {
         const std::string& val = op->get(pref);
@@ -159,7 +159,13 @@ bool SessionSerializer::save(BufferedFile& fp) const
         results.begin(), eoi = results.end(); itr != eoi; ++itr) {
     if((*itr)->result == error_code::FINISHED ||
        (*itr)->result == error_code::REMOVED) {
-      continue;
+      if((*itr)->option->getAsBool(PREF_FORCE_SAVE)) {
+        if(!writeDownloadResult(fp, metainfoCache, *itr)) {
+          return false;
+        }
+      } else {
+        continue;
+      }
     } else if((*itr)->result == error_code::IN_PROGRESS) {
       if(saveInProgress_) {
         if(!writeDownloadResult(fp, metainfoCache, *itr)) {
