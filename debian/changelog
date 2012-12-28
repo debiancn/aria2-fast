@@ -1,11 +1,11 @@
-aria2 (1.16.1-1) UNRELEASED; urgency=low
+aria2 (1.16.1-1) unstable; urgency=low
 
   * New upstream release.
   * debian/docs:
     + Added NEWS file to include in documentation which contains detailed
       upstream changelog.
 
- -- Kartik Mistry <kartik@debian.org>  Fri, 28 Dec 2012 11:52:53 +0530
+ -- Kartik Mistry <kartik@debian.org>  Fri, 28 Dec 2012 13:04:17 +0530
 
 aria2 (1.16.0-1) unstable; urgency=low
 
