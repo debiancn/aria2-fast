@@ -1,1048 +1,439 @@
-commit 8ac433a8e9ab8bddd96c62db4bbeac3adce2b3ba
+commit f019eae5df7955c544e491517c4e1391a3c3f11e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-12-01
+AuthorDate: 2012-12-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-12-01
+CommitDate: 2012-12-27
 
-    Fixed compile error without SSL/TLS lib
+    mingw32: Use LANG_ENGLISH for error message
 
-commit 2cbdd8b8452f0946693b2a283f08f3de4a8f1eb1
+commit 247084f9c32bcd12b15fe0bb83bb3646b37bae01
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-12-01
+AuthorDate: 2012-12-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-12-01
+CommitDate: 2012-12-27
 
-    Fixed compile error without BitTorrent support
-
-commit 031ff9ae6270a2346d644af84b71132833391991
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-12-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-12-01
-
-    Updated NEWS for 1.16.0 release
-
-commit 7e59e2dbb55649989102cccba96e56dbac4483ce
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-12-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-12-01
-
-    mingw32: Open file using _wsopen and added --enable-mmap support
+    Fixed bug that USR_BASENAME is not defined
     
-    I tried CreateFile but the subsequent ReadFile fails with Access
-    Denied if sparse file is read on NTFS. I mostly reverted previous
-    changes and use _wsopen with read/write share enabled instead of
-    CreateFile.
-    
-    This change also includes --enable-mmap support for MinGW32
-    build. Memory mapped file may be useful for 64-bits OS and lots of
-    RAM. Currently, FlushViewOfFile is not called during the download, so
-    it is slightly vulnerable against sudden power loss. I found lots of
-    read when resuming download due to page fault. So for now it is useful
-    for the initial download. I recommend not to use
-    --file-allocation=prealloc with --enable-mmap for MinGW32, because it
-    triggers page faults even in the initial download. Anyway, the option
-    is experimental.
+    In some cases, if the dirname is only "/", the basename will not be
+    defined (e.g., "/f"). This change fixes this bug.
 
-commit b95f15b462a0481d3197409eb1ac552d17e53fb6
+commit e1f661d5b7d854e42fc32c6c0ec36c7f04836df5
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-30
+AuthorDate: 2012-12-26
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-30
+CommitDate: 2012-12-26
 
-    Use Win32 API for file I/O in AbstractDiskWriter
-    
-    Now file has been opened by aria2 is now readable by other processes.
+    Updated NEWS for 1.16.1 release
 
-commit 53dcfea6a8ef14491cbf04efa7d3fdcc802c43e7
+commit e9de4db0d57cabb7dee16c821185ff01a9c8986f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-29
+AuthorDate: 2012-12-26
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-29
-
-    Removed generated aria2.pot
-
-commit d3859f7b13c5ae3d23404f6a166cdd590eac0e13
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Updated translation template
-
-commit 8ce0e69c2bd73722e175f0768479463663bf22c7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Removed PO files from repository
-    
-    Currently, message translation is done at launchpad.  All PO files can
-    be exported from there. The merge process from launchpad is done when
-    new release. First download export file from launchpad And use
-    import-po script to import PO files into po directory.
-
-commit 74520b03f86cbe043e594035f229d2079668671c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Set F_GLOBAL_NOCACHE for Mac OS X
-
-commit 506a9358e17ea5843d5b3d9cce66b1d6894cf76c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Refactored file open code
-
-commit 16e25ef4e1ca1fe1e3e8cdacd77de228f997ceaf
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Enabled TCP_NODELAY in SocketCore::establishConnection and acceptConnection
-
-commit e781e6eac1e3f45c143d9db303bf394a17191ba2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Made socket non-blocking mode in SocketCore::beginListen()
-
-commit 438f95abaeb34a47a681825ef48775321333acc6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-28
-
-    Made socket non-blocking mode in SocketCore::acceptConnection()
-
-commit e1c03e30dd452f8e7e0a76c74733299bde38b41f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-25
-
-    Don't use AC_FUNC_MMAP
-    
-    Don't use AC_FUNC_MMAP becaue it fails on some platforms (e.g.,
-    OpenWRT) which have mmap and it works in the way we use in aria2.
-    Instead use mmap in AC_CHECK_FUNCS list.
-
-commit f52d7024d19c8612b9a75f6242d5e473493cfd82
-Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2012-11-17
-Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2012-11-17
-
-    Update doc/manual-src/ru/aria2c.rst
-
-commit 5f04183672fb1b850b036246762ab1bd07d08e4b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-17
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-17
+CommitDate: 2012-12-26
 
     Updated bash_completion
 
-commit c8e710024824dd14e9bb80e0a653cfa14f0e5c87
+commit bd671403bcaeb3dcd718e8a0ddc760170c4e3557
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-17
+AuthorDate: 2012-12-26
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-17
+CommitDate: 2012-12-26
 
-    Documented --force-save option in man page
+    Fix compiler warning
 
-commit e0dcb942b27335be9368ea59d5b259df7eea793a
+commit c09a5a95f4963cd67c5f3c92250ac3c1876bc430
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-17
+AuthorDate: 2012-12-24
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-17
+CommitDate: 2012-12-24
 
-    Added --force-save option.
+    mingw32: Re-open files with read-only mode enabled on seeding
     
-    --force-save option saves download with --save-session option even if
-    the download is completed or removed. This may be useful to save
-    BitTorrent seeding which is recognized as completed state.  The
-    default value is false.
+    On Mingw32 build, if aria2 opens file with GENERIC_WRITE access right,
+    some programs cannot open the file aria2 is seeding. To avoid this
+    situation, re-open files with read-only enabled when seeding is about
+    to begin.
 
-commit 2ee4361848578757604200354b99d09844fe654e
+commit 43cee0c2641b9867a7e2506264eaedf583727034
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-17
+AuthorDate: 2012-12-24
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-17
+CommitDate: 2012-12-24
 
-    Removed unused static function util::parseParam
+    Updated Compiling Android  binary section about toolchain path
 
-commit 9c1fe4addd1fec52f9d071b9c308ba167562ae70
+commit d13aa3a0b3b32c619e17c4c30d767267c3648359
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-15
+AuthorDate: 2012-12-24
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-15
+CommitDate: 2012-12-24
 
-    Use array_ptr to remove try block
+    Added missing IndexedList.h to SRCS
 
-commit 6b2f5ab1f57d20e467d3e839a18723a48d87006e
+commit 616cd9e75f49b7b3a29e7f2337b3f1f92ab4226a
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-15
+AuthorDate: 2012-12-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-15
+CommitDate: 2012-12-22
 
-    SocketCore::bind now accepts const char* host instead of std::string
+    Simplified RequestGroupMan::fillRequestGroupFromReserver
 
-commit b2893f1e31ca91f5051de211a3323ada2c160c78
+commit b017e80438a785ea228a6e89411e060556dd730a
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-04
+AuthorDate: 2012-12-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-04
+CommitDate: 2012-12-19
 
-    Get the correct uploaded data size
-    
-    Subtract msgHdrLen_ from writtenLength to get the uploaded data size.
-    Without this correction, the seeder assumes it has uploaded more data
-    than it actually has.
+    Changed threshold of using upper unit for abbrevSize
 
-commit 31189b1222a8612ed4e7513c70906fc5e883bfe3
+commit 07bb779eb05478864efb8b5f4d264945bb3f30ac
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-11-01
+AuthorDate: 2012-12-19
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-11-01
+CommitDate: 2012-12-19
 
-    Made return type of util::parse_content_disposition ssize_t
+    Faster deletion of RequestGroup and DownloadResult lists
 
-commit 7db480b024c64c855809396071158aba92b4f5ea
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
-
-    Updated bash_completion
-
-commit 08cd68ec9539296726614a91a16d2a323c0120ef
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
-
-    Removed Socket.h from SRCS
-
-commit cb5984ce52c811ec3eddeb3a64ad89c7596a6a29
+commit d2892cf7b467c62b63c12a57c7c0ab424b79f7b1
 Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-17
 Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-17
 
     Update doc/manual-src/ru/aria2c.rst
 
-commit bf342a2827e61dff71f02cd6df369edf1fe6785e
+commit c8565360b0dadcef72df75bd9ba244b36c8bdaec
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-17
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-17
 
-    Fixed compile error with mingw
+    Removed unused variables
 
-commit f4f6ecda3766d91eb80c2514dc328e5c3de66830
+commit 77a4ee4de008ff38d884f283c0b2f6ba4ce75390
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-17
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-17
 
-    Bump up version number to 1.16.0
+    Save gid option with --save-session option
 
-commit d4e7b51eb9eef7eb3fd680b33fe85ad8dc6c5927
+commit 983cb3683afd1fa540192059cbe38fb62cc6ffba
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-16
 
-    Made --http-no-cache false by default
+    Documented --gid option and updated RPC interface section in man page
 
-commit eacbd50e75808f35fcbe0aadc893a1f3b90a69f7
+commit 0a4ce4fdb5fb60eeb2c236e01c7bc54c2627ad83
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-16
 
-    Added makerelease script
+    Use map to make DownloadResult lookup fast
+
+commit 0001f4cfbdc4c9550f133111c84c71f9ad1a68f9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-16
+
+    Added --gid option
     
-    makerelease script creates distribution packages including source tar
-    ball, mingw 32 and 64 bit and android binary packages.
+    This option sets GID manually. aria2 identifies each download by the
+    ID called GID. The GID must be hex string of 16 characters, thus
+    [0-9a-zA-Z] are allowed and leading zeros must not be stripped. The
+    GID all 0 is reserved and must not be used. The GID must be unique,
+    otherwise error is reported and the download is not added.  This
+    option is useful when restoring the sessions saved using
+    --save-session option. If this option is not used, new GID is
+    generated by aria2.
 
-commit 4d6c1a8748903f37e286403119e27fc90a3f96b2
+commit b9da9d4ed3ef9fe7b1488506555e3605aeb500ed
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
+AuthorDate: 2012-12-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
+CommitDate: 2012-12-16
 
-    Added .gitignore in doc/manual-src
-
-commit 49e9f66c16a317b7aad95e6d6ab1862060d7f1ae
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-31
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-31
-
-    Use len formal parameter of util::parse_content_disposition
-
-commit 5dfd1a5af770910c53fc977dfffb42bebb92973d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Fixed memory leak
-
-commit 00e315111051c6b65b2bc03fe7236ff312f06dfb
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Initialized member
-
-commit f60b956a4897db7f660b0d82f140f4cdace5f124
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Removed always-true condition
-
-commit 39da18f156e73ab01745295d70d68e5800b0b6c1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Removed dead code
-
-commit 2676bbe9c66c5403710c80fe2ff7c4a6ce69fd8d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Initialized scalar members
-
-commit feb548e174478b99bcb65706d3f386d17739599b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Removed unused members
-
-commit 6fddbc845c76396b23b4ccaf9fef9a875540e8e7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Removed dead code
-
-commit f42199b46df776abb80f3095330660fc556b7623
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Fixed resource leak
-
-commit 8566d050ff69fb0493cce6d8534ee57a8bdf86df
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-29
-
-    Reset stream format state
-
-commit d6f73292fa5d5040981e6ecf354a7f638b81fc47
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-27
-
-    gnutls: Added more status checking when verifying peer
-
-commit d689ad3bd032748883ba80592d360057274c9201
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-27
-
-    Added RFC 6266 in References section
-
-commit 118aed9c24174069f196bec59bc8f22bf022b7a5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-27
-
-    Content-Disposition parser conforming to RFC 6266.
+    Use 64 bits random bytes as GID
     
-    RFC 2231 Continuation is not supported.
+    This change replaces the current 64 bit sequential GID with 64 bits
+    random bytes GID in an attempt to support persistent GID. Internally,
+    the GID is stored as uint64_t. For human representation and RPC
+    interface, GID is represented as 16 bytes hex string. For console
+    readout, 16 bytes are too long, so it is abbreviated to first 6 bytes.
+    When querying GID in RPC calls, user can speicfy the prefix of GID as
+    long as the prefix is shared by more than 1 GID entries.
 
-commit 21c3903af0f5ee17b16453f82c809e03afd151d8
+commit 04586f50b17317ef257f6d3f81190021c93ad5ea
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-26
+AuthorDate: 2012-12-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-26
+CommitDate: 2012-12-16
 
-    Simplified TransferStat struct
+    Fixed BitfieldMan::getOffsetCompletedLength overflow on 32-bit systems
 
-commit 0ecfa19925453e3e4bf8ca947dc72a597654e401
+commit de1ca6d6b80c3784a788671977223a4c1bbf9a25
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-25
+AuthorDate: 2012-12-15
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-25
+CommitDate: 2012-12-15
 
-    Reworked download/upload statistics calculation
-    
-    The old implementation calculates download/upload statistics for a
-    RequestGroup by summing up all PeerStat objects. For global
-    statistics, those are summed together. This clearly incurs runtime
-    penalty and we introduced some kind of caching which updates
-    statistics every 250ms but it did not work right.
-    
-    This change removes all these aggregation code, and instead makes
-    RequestGroup and RequestGroupMan objects hold NetStat object and
-    download/upload bytes are directly calculated by thier own NetStat.
-    This is far more simplar than the old way and less runtime penalty and
-    brings more accuracy.
+    mingw32: Use HANDLE only for MinGW32 build
 
-commit 46bdaf0e8dae04d223d9b8b65ac80bc0773d8398
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-24
-
-    Made HTTP/FTP download speed limiter more accurate
-    
-    We have to do the same thing for BitTorrent.
-
-commit ea456001d3f82829944e6cce8b2b76e8ec919b80
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-17
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-17
-
-    Updated po templates
-
-commit bc33433e58693de759ae4de5949ea9b1f29ce4c5
+commit 8c3e08f15a64bbb4f928152f635034f2c727f0b2
 Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2012-10-17
+AuthorDate: 2012-12-12
 Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2012-10-17
+CommitDate: 2012-12-12
 
-    Update and fixed some bugs
+    Update doc/manual-src/ru/aria2c.rst
 
-commit b48d9082db8e682bc818f06b9201481e53524a36
+commit 0995d3fa0cb7a80ea3e9513b82f724ef731bc46a
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-16
+AuthorDate: 2012-12-13
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-16
+CommitDate: 2012-12-13
 
-    Documented --rpc-save-upload-metadata option in manpage
+    Updated README.rst
 
-commit da8086cbc9cf3b4dfb650e30a00e58fe8e22ef14
+commit 2235743de303b407cb8d3f0069260842ed3c41f3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-16
+AuthorDate: 2012-12-12
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-16
+CommitDate: 2012-12-12
 
-    Updated doc
-
-commit a9c76ed35e3b6025b68f85d8e1d1efd339e735f6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-16
-
-    Added --rpc-save-upload-metadata option
+    Changed console readout, making it more compact
     
-    If true is given, which is default, save the uploaded torrent or
-    metalink metadata in the directory specified by --dir option. The
-    filename consists of SHA1-hash hex string of metadata plus
-    extension. For torrent, the extension is '.torrent'. For metalink, it
-    is '.meta4'.  If false is given to this option, the downloads added by
-    aria2.addTorrent or aria2.addMetalink will not be saved by
-    --save-session option.
+    "SIZE:" is removed because it is obvious. SEEDING, SEED, SPD and UP
+    are now replaced with SEED, SD, DL and UL respectively.
 
-commit 4a4fec2c8c17dad5d1983adeb1857c1a082e75f0
+commit 4fdd5da27dd167caf14c3591383b59e41cef9089
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-15
+AuthorDate: 2012-12-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-15
+CommitDate: 2012-12-11
 
-    Removed socket readability check from checkIfConnectionEstablished()
+    Compact readout when more than 1 simultaneous downloads are going on
+    
+    If more than 1 simultaneous downloads are going on, use more compact
+    format in readout. Currently, at most 5 download stats are displayed.
+    
+    util::abbrevSize() is rewritten to support "Gi" unit and provides more
+    compact abbreviation.
 
-commit 841395f3321763368ad64d70e3835be33c92a845
+commit 79fce29bda0dadc5e970693c28ed6cd421ae9e95
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-15
+AuthorDate: 2012-12-11
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-15
+CommitDate: 2012-12-11
 
-    Perform SSL/TLS handshake after checking whether connection is established
+    Fixed segmentation fault if fp_ is NULL
 
-commit c904aa50fedd354937cb1dc29044712404c0c785
+commit e86fd44dc5a87d64efc18652b2833ae17b72bf10
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-14
+AuthorDate: 2012-12-08
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-14
+CommitDate: 2012-12-08
 
-    Use uri_split instead of uri::parse where appropriate
+    Console color output
+    
+    Log level and download result string is now colored.
 
-commit eebc704b1933e5e43ff38cd37adb48d3daef1aad
+commit 9a5fff0de095078932e2878338acaa12a5c9daa3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-14
+AuthorDate: 2012-12-08
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-14
+CommitDate: 2012-12-08
+
+    Logger: Simplified console output and change level format in log
+    
+    The date and time are now removed from console output.  The log level
+    is now formatted as "[LEVEL]".
+
+commit 2364f809c3facae25c430cadf2fc1d9e651ad37b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-08
+
+    Code cleanup: Merged successive string literals in readout
+
+commit bf56f3c2999bd073c952dfd20aa2c98650f6c95c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-08
+
+    Check the output file is terminal or not in ctor
+
+commit 9d7bb9d01af2c0ef1b748ac2e240b20439285fd4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-08
+
+    Release statically allocated resources for prefs and options
+    
+    Not realeasing these resources does not hurt the correctness of the
+    program, but memory leak detection tool, such as valgrind, reports it
+    as potential memory leak. It is better to distinguish it from the real
+    ones.
+
+commit a8641b0998af7b2a5876a77d4f18c9a78230d6b1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-08
 
     Updated .gitignore
 
-commit 692f978978808eb093ad334a4921cfb276943691
+commit 3e656fd6d1735cfd603475c427519804623e01ea
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-14
+AuthorDate: 2012-12-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-14
+CommitDate: 2012-12-07
 
-    Rewritten URI parser
+    Bump up version number to 1.16.1
 
-commit 5367c34de3643e2d4f27216dd4f0154aa3554c51
+commit 0c491b86d02aa0a049f9fafc4f29296a728befa6
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-08
+AuthorDate: 2012-12-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-08
+CommitDate: 2012-12-07
 
-    Fixed bug that mmap won't work if MultiDiskAdaptor is used
+    Documented --disk-cache option in man page
 
-commit 71620854c73624da775dc190e5f17ef6b556442a
+commit 901227db9b9abbe3eb1122b5b7e68d5c40fb6079
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-07
+AuthorDate: 2012-12-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-07
+CommitDate: 2012-12-07
 
-    Moved bool members to the last to reduce structure size
+    Updated usage of --disk-cache
 
-commit 8b0c701266a56c5ccc7c4ea6b605a9e0c9ef823d
+commit 7a0217769840acdde53561330b141607600c286c
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-01
+AuthorDate: 2012-12-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-01
+CommitDate: 2012-12-07
 
-    Removed trailing spaces
-
-commit 390b2e546ece51c2f19261949ecf4aa59177dda8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-10-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-10-01
-
-    Updated po templates
-
-commit bc3c553b3cb8a2b630ba0e59be23dc872807db31
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    Updated doc
-
-commit 7c878d3c812383d707ed36859a97addf7cf93d17
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    Moved implementation of SharedCount and WeakCount to cc file
-
-commit e34d0e7ffa602d611ec6ec14cf9aa381da41c24e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    Dont' return SharedHandle from HttpHeader::getRange()
-
-commit 492d6d1eeb7df7c848c07487dbdef0306a462332
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    Added RPC encryption command-line example
-
-commit 71cc44bedd54bf420e35ea6fa8e712681bc6de38
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    Documented --rpc-private-key, --rpc-certificate and --rpc-secure in manpage
-
-commit 90515dfa50c676df37f440893de6e344fbfd2cdc
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-30
-
-    RPC over SSL/TLS transport
+    Start to find faster host before the number of missing segments becomes 1
     
-    To enable RPC over SSL/TLS, specify server certificate and private key
-    using --rpc-certificate and --rpc-private-key options and enable
-    --rpc-secure option.  After the encryption is enabled, use https and
-    wss scheme to access RPC server.
+    The old implementation starts to find faster host when the number of
+    missing segment becomes 1. Because of --min-split-size option, before
+    the number of missing segment becomes 1, the number of connection
+    becomes 1 and it can be slow. In this case, we have to wait until the
+    last segment is reached. The new implementation starts to find faster
+    host when the remaining length is less than --min-split-size * 2, to
+    mitigate the problem stated above.
 
-commit 4b94ede268ff2ff793b22a0730dcbda09d280618
+commit 5683f2fb3ee09af4d81260e457c2dcbaf937d157
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-28
+AuthorDate: 2012-12-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-28
+CommitDate: 2012-12-07
 
-    Return ExtensionMessage subclass create return raw pointer
+    Removed unused staticSHA1Digest
 
-commit 3258614033aaf8288dc4b14275c72a1bb3b65a7e
+commit bec0f6dc11316ce9ba80ee4963d98af54a42dc01
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-28
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-28
+CommitDate: 2012-12-06
 
-    Removed *Handle typedef
-
-commit 1c57a3ff9f5021a40aca1fec2583f6245f3a4581
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-28
-
-    Code cleanup
-
-commit 1fdc6e0a332e9952e271caa36f6fb19798cb9457
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-28
-
-    Code cleanup
-
-commit c6b76f1d32db210b349b32c4513b19ed7cf6f079
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-28
-
-    Don't instantiate SharedHandle for DHT{Query, Response}Message subclass
-
-commit 5323afa5b2ce00c932f976e90a1fa895ebe329ee
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Removed instantiation of unused BtMessageValidator
-
-commit 215d1d3d0bf7530e27ea83aab873528c1500478d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Made static create function of BtMessage subclass return raw pointer
-
-commit ae2e4cb7ffbe5d0384056cbf40f355e75f9defd7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Handle OptionHandlers as raw pointer
-
-commit 8fc5cdea02afe9992acb680cf7ecce9f445fc5de
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Removed unused functions
-
-commit 89f18dde856894eef23dde77a9257655725ba843
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Use nothrow version of parseInt, parseUInt and parseLLInt
-
-commit a879d75aaacce6c838b20c3c961b38182a1179b2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Don't use parseInt in cookie_helper
-
-commit f75402739bd3c226500ec73a28638d4f7c349050
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-27
-
-    Rewritten ServerStatMan::load() using nothrow version of parseInt
-
-commit 8f2030da0983188147f321da697c331964dc1431
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
-
-    Removed HttpHeader::findAs{LL}Int and unused HttpResponse::{has,get}RetryAfter
-
-commit b9f972665b9a0ec348167d42a9acd5002b35ac3c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
-
-    Rewritten LpdMessageReceiver::receiveMessage()
-
-commit 3a917ff695bd378421c83990bfb490d726065cd3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
-
-    Rewritten FtpConnection::receiveMdtmResponse without util::parseInt
-
-commit 10a68061f7385d655ee3bb5ee273d526534b99b4
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
-
-    Code cleanup
-
-commit a20e279606f0a1e0e388a7d39a81cc62fc69f6c8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
-
-    Use std::string for SocketPoolEntry::options_
+    Removed warning when --file-allocation=falloc is used in MinGW32 build
     
-    Currently, we only store 1 value for FTP download. std::map is
-    overkill in the this situation.
+    The warning was just a mistake. SetFilePointerEx + SetEndOfFile
+    actually allocate disk space.
 
-commit c13dc166dec73d93dbc05d5cbb53e51dac5d4dc8
+commit a6b18c868bcf32ddb14ddea79281fa3c12e22803
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
+CommitDate: 2012-12-06
 
-    Rewritten ExtensionMessageRegistry
+    Log size before flush
 
-commit f0000a87544fde9beb3d38fa979f02ce001c7efe
+commit df5f1fe77fac127c10af35b218ce613cbc33db1e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-26
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-26
+CommitDate: 2012-12-06
 
-    Made ExtensionMessage's NAME const char[]
+    Fixed bug that size_ is not updated when WrDiskCacheEntry::append is called
 
-commit c522d79d898d4a47b682dcc8de0cf82996abb502
+commit 838949ab85ad830db10f7c683b6105edc6c6bc28
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
+CommitDate: 2012-12-06
 
-    Code cleanup
-
-commit f133091a9ec127bf923d224007e31583f1b1115f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Made BufferedFile ctor take const char* args
-
-commit c63af24c63d1ee8571a997c1a3b86b4e71ccd49b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Made BtMessage's NAME const char[]
-
-commit 9a510ddac03ef9b929623d40e918306d455bc8f3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Made MetalinkMetaurl::MEDIATYPE_TORRENT const char[]
-
-commit 8788cae7e390b57a270c0eed3fe869aec8d8f95d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Removed MetalinkResource static strings
-
-commit be77d1394e94bf42c644586d2e7dfcaec778504b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Removed Request::PROTO_*
-
-commit c186e93488d3a4c4f41584bbd3ba47dafb391e9d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Code cleanup
-
-commit c16cebbc9af11aff8ff3c5bf304d0298c226052e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Code cleanup
-
-commit 41cb7743746a6013c13a425eb9283ee23113ce84
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Made getMethodName() of RpcMethod subclass return const char*
-
-commit 260a0b8bcb925a63bc54196d633614c1e818cc35
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Rewritten AnnounceList::getEventString()
-
-commit b640b830a20a09cd5677616918850b39953f0bcd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-25
-
-    Made STATUS_STRING const char*[]
-
-commit a8c079464079789132221f093d27706ab973a86a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Made DEFAULT_STRIP_CHARSET const char[]
-
-commit 656a766bb09cccdc199d4449b62d7ac9597a3438
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Rewritten ServerStatMan::load()
-
-commit d8c44fe9e8cc73903fba710490c59016d5dfd972
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Use const char* instead of static const std::string
-
-commit 0144397e4b3897035d76c40827d7f8a753868f2a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Rewritten File::getPathSeparators()
-
-commit d95a1798760baba948a821b7c849f1a85cc04e80
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Removed A2STR strings other than NIL
-
-commit 4423ece43d4aea21a4f34043625838230ce1966c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Moved GZipDecoder to test
-
-commit dc74ebecedf394697d18934d68df12feaeb4d584
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-24
-
-    Removed unused code
-
-commit e83b03b2cd3fa7e70cc8d8acf3560c660aff0bad
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
-
-    aria2rpc: Added appendUri command
+    Append new data to the contagious cache data
     
-    This command calls aria2.changeUri(GID, fileIndex, [], [URI,...])
-    internally.
+    If we receive small data (e.g., 1 or 2 bytes), cache entry becomes a
+    headache. To mitigate this problem, we allocate cache buffer at least
+    4KiB and append the data to the contagious cache data.
 
-commit 8d8ba403fe9bd9ed5bef02e1d70dc555c5fef3c3
+commit 2c5e77f4222f2d0e62c70a321b4b770467e3dae3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
+CommitDate: 2012-12-06
 
-    Removed proxy-connection from InterestingHeader
-
-commit 8b0bdacace9c914818905c6a9a4d398fc11ffab6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
-
-    Don't send Proxy-Connection header field
+    Flush cached data on checkout/cancel Segment
     
-    It was deprecated long ago.
+    This change prevents the cached data from overlap because of BT peers.
 
-commit 54665ff4093f4517104fe36c1b58f9a339710adf
+commit 56c498bcbfa1b7645c75e39142ac9f6c6ca369c6
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
+AuthorDate: 2012-12-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
+CommitDate: 2012-12-06
 
-    Removed static std::string constant in HttpHeader
+    Clear write cache on Segment::clear and Piece::clearAllBlock
+
+commit 9ed8502e742452568695181014410fe924f45e26
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-06
+
+    Write data in 4K aligned offset in write with disk cache enabled
     
-    This change also removes inspection of Proxy-Connection header field
-    when checking whether the remote endpoint keeps connection open.
+    This greatly reduces disk activity especially on Win + NTFS.  Not so
+    much difference on Linux.
 
-commit dd7014a6121c0985e94451e2492a112402501335
+commit 911851debbaa573777d9cd38fa2e714ed70e731e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
+AuthorDate: 2012-12-03
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
+CommitDate: 2012-12-03
 
-    Store only interesting HTTP headers in HttpHeader
+    mingw32: Removed FSCTL_SET_SPARSE set
+
+commit 8f2a4cc7167a8c331f6bc9f7983e867c72177214
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-12-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-03
+
+    Removed unused members
+
+commit f314719618d181036ceebcf45338ab76559daf55
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2012-11-27
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2012-12-03
+
+    Added --disk-cache option
     
-    In this change, we defined HTTP header fields we are interested in.
-    We only store those headers in HttpHeader object.  Accessing HTTP
-    headers in HttpHeader object is now done through enum values.
-
-commit 0b4dec02505a0be3dabcd01eab98f015f115bed8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
-
-    Increased shreshold of command-line option suggestion
-
-commit 295a62f538df8115d932f09e69e2950484e038c0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-23
-
-    Rewritten help tags and various internal flag handling in OptionHandler
-    
-    Now help tags are defined as enum values to avoid vector of strings.
-    The internal flags are represented by bitmask to shrink size.
-
-commit 461a542c5e236a22bb4edba3fae9610df4ba44c6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-22
-
-    Rewritten DownloadHandlerConstants
-    
-    DownloadHandlerConstants was simplified.  MIME type handling in Accept
-    header was also reworked.  DownloadContext's metalinkServerContacted_
-    is replaced with acceptMetalink_ and its boolean value is reverted.
-    RequestGroup and HttpRequest now do not hold vector of accepting
-    types.  HttpRequest has the flag acceptMetalink_ which will be set by
-    the same value of DownloadContext::accpetMetalink_ and if it is true,
-    Metalink MIME types are added to Accept header field.
-
-commit 9d294741fd1bb469ed6be4e46af2f6521ce75054
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-22
-
-    Rewritten FeatureConfig into set of functions
-
-commit e2340efe2788648a6edc49eaa236e1f62d96a937
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-22
-
-    Use std::vector instead of std::map for ContextAttribute objects
-    
-    Now key for ContextAttribute object store is int instead of string.
-
-commit 0030025bb6989b130c7f609819669e0619519d64
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-15
-
-    Don't set SNI hostname if it does not include "." for GNUTLS
-
-commit 393d0d9fbc64ec3345fddae12f2c295473dba78a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-15
-
-    Disable SSL/TLS compression with OpenSSL
-
-commit d0703a2f26822e8edac0e95a8a3093bea4ee3213
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-07
-
-    Code cleanup
-
-commit 763c7a0aa0419c6ee7dbbc2bace5bdb09e3ba563
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-07
-
-    Pause download even if download is completed
-    
-    This allows to pause and unpause BitTorrent seed.
-
-commit f6c7aaa1cdfc940c1cbc5455c246e4752b5b2aa4
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2012-09-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2012-09-07
-
-    Use execlp() instead of execl()
+    This option enables disk cache. If SIZE is 0, the disk cache is
+    disabled. This feature caches the downloaded data in memory, which
+    grows to at most SIZE bytes. The cache storage is created for aria2
+    instance and shared by all downloads. The one advantage of the disk
+    cache is reduce the disk seek time because the data is written in
+    larger unit and it is reordered by the offset of the file. If the
+    underlying file is heavily fragmented it is not the case.

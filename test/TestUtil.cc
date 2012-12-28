@@ -15,6 +15,11 @@
 #include "DefaultDiskWriter.h"
 #include "fmt.h"
 #include "util.h"
+#include "RequestGroupMan.h"
+#include "RequestGroup.h"
+#include "DownloadContext.h"
+#include "Option.h"
+#include "FileEntry.h"
 #ifdef ENABLE_MESSAGE_DIGEST
 # include "message_digest_helper.h"
 #endif // ENABLE_MESSAGE_DIGEST
@@ -24,16 +29,9 @@ namespace aria2 {
 void createFile(const std::string& path, size_t length)
 {
   File(File(path).getDirname()).mkdirs();
-  int fd = creat(path.c_str(), OPEN_MODE);
-  if(fd == -1) {
-    throw FATAL_EXCEPTION(fmt("Could not create file=%s. cause:%s",
-                              path.c_str(),
-                              strerror(errno)));
-  }
-  if(-1 == ftruncate(fd, length)) {
-    throw FATAL_EXCEPTION(fmt("ftruncate failed. cause:%s", strerror(errno)));
-  }
-  close(fd);
+  DefaultDiskWriter dw(path);
+  dw.initAndOpenFile();
+  dw.truncate(length);
 }
 
 std::string readFile(const std::string& path)
@@ -90,5 +88,60 @@ std::string fileHexDigest
   return util::toHex(message_digest::digest(ctx, writer, 0, writer->size()));
 }
 #endif // ENABLE_MESSAGE_DIGEST
+
+WrDiskCacheEntry::DataCell* createDataCell(int64_t goff,
+                                           const char* data,
+                                           size_t offset)
+{
+  WrDiskCacheEntry::DataCell* cell = new WrDiskCacheEntry::DataCell();
+  cell->goff = goff;
+  size_t len = strlen(data);
+  cell->data = new unsigned char[len];
+  memcpy(cell->data, data, len);
+  cell->offset = offset;
+  cell->len = cell->capacity = len - offset;
+  return cell;
+}
+
+SharedHandle<RequestGroup> findReservedGroup
+(const SharedHandle<RequestGroupMan>& rgman, a2_gid_t gid)
+{
+  SharedHandle<RequestGroup> rg = rgman->findGroup(gid);
+  if(rg) {
+    if(rg->getState() == RequestGroup::STATE_WAITING) {
+      return rg;
+    } else {
+      rg.reset();
+    }
+  }
+  return rg;
+}
+
+SharedHandle<RequestGroup> getReservedGroup
+(const SharedHandle<RequestGroupMan>& rgman, size_t index)
+{
+  assert(rgman->getReservedGroups().size() > index);
+  RequestGroupList::SeqType::const_iterator i =
+    rgman->getReservedGroups().begin();
+  std::advance(i, index);
+  return (*i).second;
+}
+
+SharedHandle<RequestGroup> createRequestGroup(int32_t pieceLength,
+                                              int64_t totalLength,
+                                              const std::string& path,
+                                              const std::string& uri,
+                                              const SharedHandle<Option>& opt)
+{
+  SharedHandle<DownloadContext> dctx(new DownloadContext(pieceLength,
+                                                         totalLength,
+                                                         path));
+  std::vector<std::string> uris;
+  uris.push_back(uri);
+  dctx->getFirstFileEntry()->addUris(uris.begin(), uris.end());
+  SharedHandle<RequestGroup> group(new RequestGroup(GroupId::create(), opt));
+  group->setDownloadContext(dctx);
+  return group;
+}
 
 } // namespace aria2

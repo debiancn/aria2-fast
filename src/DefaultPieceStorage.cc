@@ -65,6 +65,8 @@
 #include "bitfield.h"
 #include "SingletonHolder.h"
 #include "Notifier.h"
+#include "WrDiskCache.h"
+#include "RequestGroup.h"
 #ifdef ENABLE_BITTORRENT
 # include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
@@ -81,7 +83,8 @@ DefaultPieceStorage::DefaultPieceStorage
    endGamePieceNum_(END_GAME_PIECE_NUM),
    option_(option),
    pieceStatMan_(new PieceStatMan(downloadContext->getNumPieces(), true)),
-   pieceSelector_(new RarestPieceSelector(pieceStatMan_))
+   pieceSelector_(new RarestPieceSelector(pieceStatMan_)),
+   wrDiskCache_(0)
 {
   const std::string& pieceSelectorOpt =
     option_->get(PREF_STREAM_PIECE_SELECTOR);
@@ -116,6 +119,13 @@ SharedHandle<Piece> DefaultPieceStorage::checkOutPiece
     addUsedPiece(piece);
   }
   piece->addUser(cuid);
+  RequestGroup* group = downloadContext_->getOwnerRequestGroup();
+  if((!group || !group->inMemoryDownload()) &&
+     wrDiskCache_ && !piece->getWrDiskCacheEntry()) {
+    // So, we rely on the fact that diskAdaptor_ is not reinitialized
+    // in the session.
+    piece->initWrCache(wrDiskCache_, diskAdaptor_);
+  }
   return piece;
 }
 
@@ -401,6 +411,7 @@ void DefaultPieceStorage::deleteUsedPiece(const SharedHandle<Piece>& piece)
     return;
   }
   usedPieces_.erase(piece);
+  piece->releaseWrCache(wrDiskCache_);
 }
 
 // void DefaultPieceStorage::reduceUsedPieces(size_t upperBound)
@@ -469,6 +480,17 @@ void DefaultPieceStorage::completePiece(const SharedHandle<Piece>& piece)
       SharedHandle<TorrentAttribute> torrentAttrs =
         bittorrent::getTorrentAttrs(downloadContext_);
       if(!torrentAttrs->metadata.empty()) {
+#ifdef __MINGW32__
+        // On Windows, if aria2 opens files with GENERIC_WRITE access
+        // right, some programs cannot open them aria2 is seeding. To
+        // avoid this situation, re-open the files with read-only
+        // enabled.
+        A2_LOG_INFO("Closing files and re-open them with read-only mode"
+                    " enabled.");
+        diskAdaptor_->closeFile();
+        diskAdaptor_->enableReadOnly();
+        diskAdaptor_->openFile();
+#endif // __MINGW32__
         util::executeHookByOptName(downloadContext_->getOwnerRequestGroup(),
                                    option_, PREF_ON_BT_DOWNLOAD_COMPLETE);
         SingletonHolder<Notifier>::instance()->
@@ -659,6 +681,29 @@ const unsigned char* DefaultPieceStorage::getBitfield()
 
 SharedHandle<DiskAdaptor> DefaultPieceStorage::getDiskAdaptor() {
   return diskAdaptor_;
+}
+
+WrDiskCache* DefaultPieceStorage::getWrDiskCache()
+{
+  return wrDiskCache_;
+}
+
+void DefaultPieceStorage::flushWrDiskCacheEntry()
+{
+  if(!wrDiskCache_) {
+    return;
+  }
+  // UsedPieceSet is sorted by piece index. It means we can flush
+  // cache by non-decreasing offset, which is good to reduce disk seek
+  // unless the file is heavily fragmented.
+  for(UsedPieceSet::const_iterator i = usedPieces_.begin(),
+        eoi = usedPieces_.end(); i != eoi; ++i) {
+    WrDiskCacheEntry* ce = (*i)->getWrDiskCacheEntry();
+    if(ce) {
+      (*i)->flushWrCache(wrDiskCache_);
+      (*i)->releaseWrCache(wrDiskCache_);
+    }
+  }
 }
 
 int32_t DefaultPieceStorage::getPieceLength(size_t index)

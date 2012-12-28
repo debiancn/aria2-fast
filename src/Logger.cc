@@ -34,6 +34,7 @@
 /* copyright --> */
 #include "Logger.h"
 
+#include <unistd.h>
 #include <cstring>
 #include <cstdio>
 
@@ -50,7 +51,14 @@ namespace aria2 {
 
 Logger::Logger()
   : logLevel_(Logger::A2_DEBUG),
-    stdoutField_(0)
+    stdoutField_(0),
+#ifdef __MINGW32__
+    // Windows DOS prompt does not handle ANSI color code, so make
+    // this false.
+    useColor_(false)
+#else // !__MINGW32__
+    useColor_(isatty(STDOUT_FILENO) == 1)
+#endif // !__MINGW32__
 {}
 
 Logger::~Logger()
@@ -126,9 +134,39 @@ void writeHeader
   size_t dateLength =
     strftime(datestr, sizeof(datestr), "%Y-%m-%d %H:%M:%S", &tm);
   assert(dateLength <= (size_t)20);
-  fp.printf("%s.%06ld %s - ", datestr, tv.tv_usec, levelToString(level));
-  if(sourceFile) {
-    fp.printf("[%s:%d]", sourceFile, lineNum);
+  fp.printf("%s.%06ld [%s] [%s:%d] ", datestr, tv.tv_usec, levelToString(level),
+            sourceFile, lineNum);
+}
+} // namespace
+
+namespace {
+const char* levelColor(Logger::LEVEL level)
+{
+  switch(level) {
+  case Logger::A2_DEBUG:
+  case Logger::A2_INFO:
+    // We don't print these levels in console
+    return "";
+  case Logger::A2_NOTICE:
+    return "\033[1;32m";
+  case Logger::A2_WARN:
+    return "\033[1;33m";
+  case Logger::A2_ERROR:
+    return "\033[1;31m";
+  default:
+    return "";
+  }
+}
+} // namespace
+
+namespace {
+template<typename Output>
+void writeHeaderConsole(Output& fp, Logger::LEVEL level, bool useColor)
+{
+  if(useColor) {
+    fp.printf("[%s%s\033[0m] ", levelColor(level), levelToString(level));
+  } else {
+    fp.printf("[%s] ", levelToString(level));
   }
 }
 } // namespace
@@ -158,7 +196,7 @@ void Logger::writeLog
   }
   if(toConsole) {
     global::cout()->printf("\n");
-    writeHeader(*global::cout(), level, 0, 0);
+    writeHeaderConsole(*global::cout(), level, useColor_);
     global::cout()->printf("%s\n", msg);
     writeStackTrace(*global::cout(), trace);
     global::cout()->flush();

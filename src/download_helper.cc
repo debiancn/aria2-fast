@@ -106,13 +106,35 @@ void splitURI(std::vector<std::string>& result,
 } // namespace
 
 namespace {
+SharedHandle<GroupId> getGID(const SharedHandle<Option>& option)
+{
+  SharedHandle<GroupId> gid;
+  if(option->defined(PREF_GID)) {
+    a2_gid_t n;
+    if(GroupId::toNumericId(n, option->get(PREF_GID).c_str()) != 0) {
+      throw DL_ABORT_EX(fmt("%s is invalid for GID.",
+                            option->get(PREF_GID).c_str()));
+    }
+    gid = GroupId::import(n);
+    if(!gid) {
+      throw DL_ABORT_EX(fmt("GID %s is not unique.",
+                            option->get(PREF_GID).c_str()));
+    }
+  } else {
+    gid = GroupId::create();
+  }
+  return gid;
+}
+} // namespace
+
+namespace {
 SharedHandle<RequestGroup> createRequestGroup
 (const SharedHandle<Option>& optionTemplate,
  const std::vector<std::string>& uris,
  bool useOutOption = false)
 {
   SharedHandle<Option> option = util::copy(optionTemplate);
-  SharedHandle<RequestGroup> rg(new RequestGroup(option));
+  SharedHandle<RequestGroup> rg(new RequestGroup(getGID(option), option));
   SharedHandle<DownloadContext> dctx
     (new DownloadContext
      (option->getAsInt(PREF_PIECE_LENGTH),
@@ -143,9 +165,10 @@ SharedHandle<RequestGroup> createRequestGroup
 
 #if defined ENABLE_BITTORRENT || ENABLE_METALINK
 namespace {
-SharedHandle<MetadataInfo> createMetadataInfo(const std::string& uri)
+SharedHandle<MetadataInfo> createMetadataInfo(const SharedHandle<GroupId>& gid,
+                                              const std::string& uri)
 {
-  return SharedHandle<MetadataInfo>(new MetadataInfo(uri));
+  return SharedHandle<MetadataInfo>(new MetadataInfo(gid, uri));
 }
 } // namespace
 
@@ -168,7 +191,8 @@ createBtRequestGroup(const std::string& metaInfoUri,
                      bool adjustAnnounceUri = true)
 {
   SharedHandle<Option> option = util::copy(optionTemplate);
-  SharedHandle<RequestGroup> rg(new RequestGroup(option));
+  SharedHandle<GroupId> gid = getGID(option);
+  SharedHandle<RequestGroup> rg(new RequestGroup(gid, option));
   SharedHandle<DownloadContext> dctx(new DownloadContext());
   // may throw exception
   bittorrent::loadFromMemory(torrent, dctx, option, auxUris,
@@ -176,7 +200,7 @@ createBtRequestGroup(const std::string& metaInfoUri,
   if(metaInfoUri.empty()) {
     rg->setMetadataInfo(createMetadataInfoDataOnly());
   } else {
-    rg->setMetadataInfo(createMetadataInfo(metaInfoUri));
+    rg->setMetadataInfo(createMetadataInfo(gid, metaInfoUri));
   }
   if(adjustAnnounceUri) {
     bittorrent::adjustAnnounceUri(bittorrent::getTorrentAttrs(dctx), option);
@@ -210,7 +234,8 @@ createBtMagnetRequestGroup
  const SharedHandle<Option>& optionTemplate)
 {
   SharedHandle<Option> option = util::copy(optionTemplate);
-  SharedHandle<RequestGroup> rg(new RequestGroup(option));
+  SharedHandle<GroupId> gid = getGID(option);
+  SharedHandle<RequestGroup> rg(new RequestGroup(gid, option));
   SharedHandle<DownloadContext> dctx
     (new DownloadContext(METADATA_PIECE_SIZE, 0,
                          A2STR::NIL));
@@ -230,7 +255,7 @@ createBtMagnetRequestGroup
   rg->addPostDownloadHandler(utMetadataPostHandler);
   rg->setDiskWriterFactory
     (SharedHandle<DiskWriterFactory>(new ByteArrayDiskWriterFactory()));
-  rg->setMetadataInfo(createMetadataInfo(magnetLink));
+  rg->setMetadataInfo(createMetadataInfo(gid, magnetLink));
   rg->markInMemoryDownload();
   rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
   removeOneshotOption(option);
@@ -432,10 +457,18 @@ void createRequestGroupForUri
       size_t numSplit = option->getAsInt(PREF_SPLIT);
       std::vector<std::string> streamURIs;
       splitURI(streamURIs, nargs.begin(), strmProtoEnd, numSplit, numIter);
-      SharedHandle<RequestGroup> rg =
-        createRequestGroup(option, streamURIs, true);
-      rg->setNumConcurrentCommand(numSplit);
-      result.push_back(rg);
+      try {
+        SharedHandle<RequestGroup> rg =
+          createRequestGroup(option, streamURIs, true);
+        rg->setNumConcurrentCommand(numSplit);
+        result.push_back(rg);
+      } catch(RecoverableException& e) {
+        if(throwOnError) {
+          throw;
+        } else {
+          A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
+        }
+      }
     }
     // process remaining URIs(local metalink, BitTorrent files)
     std::for_each(strmProtoEnd, nargs.end(),
@@ -505,7 +538,8 @@ void createRequestGroupForUriList
 }
 
 SharedHandle<MetadataInfo>
-createMetadataInfoFromFirstFileEntry(const SharedHandle<DownloadContext>& dctx)
+createMetadataInfoFromFirstFileEntry(const SharedHandle<GroupId>& gid,
+                                     const SharedHandle<DownloadContext>& dctx)
 {
   if(dctx->getFileEntries().empty()) {
     return SharedHandle<MetadataInfo>();
@@ -515,13 +549,14 @@ createMetadataInfoFromFirstFileEntry(const SharedHandle<DownloadContext>& dctx)
     if(uris.empty()) {
       return SharedHandle<MetadataInfo>();
     }
-    return SharedHandle<MetadataInfo>(new MetadataInfo(uris[0]));
+    return SharedHandle<MetadataInfo>(new MetadataInfo(gid, uris[0]));
   }
 }
 
 void removeOneshotOption(const SharedHandle<Option>& option)
 {
   option->remove(PREF_PAUSE);
+  option->remove(PREF_GID);
 }
 
 } // namespace aria2

@@ -78,18 +78,29 @@
 #include "SingletonHolder.h"
 #include "Notifier.h"
 #include "PeerStat.h"
+#include "WrDiskCache.h"
 #ifdef ENABLE_BITTORRENT
 #  include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
 
 namespace aria2 {
 
+namespace {
+template<typename InputIterator>
+void appendReservedGroup(RequestGroupList& list,
+                         InputIterator first, InputIterator last)
+{
+  for(; first != last; ++first) {
+    list.push_back((*first)->getGID(), *first);
+  }
+}
+} // namespace
+
 RequestGroupMan::RequestGroupMan
 (const std::vector<SharedHandle<RequestGroup> >& requestGroups,
  int maxSimultaneousDownloads,
  const Option* option)
-  : reservedGroups_(requestGroups.begin(), requestGroups.end()),
-    maxSimultaneousDownloads_(maxSimultaneousDownloads),
+  : maxSimultaneousDownloads_(maxSimultaneousDownloads),
     option_(option),
     serverStatMan_(new ServerStatMan()),
     maxOverallDownloadSpeedLimit_
@@ -100,12 +111,17 @@ RequestGroupMan::RequestGroupMan
     queueCheck_(true),
     removedErrorResult_(0),
     removedLastErrorResult_(error_code::FINISHED),
-    maxDownloadResult_(option->getAsInt(PREF_MAX_DOWNLOAD_RESULT))
+    maxDownloadResult_(option->getAsInt(PREF_MAX_DOWNLOAD_RESULT)),
+    wrDiskCache_(0)
 {
-  addRequestGroupIndex(requestGroups);
+  appendReservedGroup(reservedGroups_,
+                      requestGroups.begin(), requestGroups.end());
 }
 
-RequestGroupMan::~RequestGroupMan() {}
+RequestGroupMan::~RequestGroupMan()
+{
+  delete wrDiskCache_;
+}
 
 bool RequestGroupMan::downloadFinished()
 {
@@ -118,191 +134,73 @@ bool RequestGroupMan::downloadFinished()
 void RequestGroupMan::addRequestGroup
 (const SharedHandle<RequestGroup>& group)
 {
-  requestGroups_.push_back(group);
+  requestGroups_.push_back(group->getGID(), group);
 }
 
 void RequestGroupMan::addReservedGroup
 (const std::vector<SharedHandle<RequestGroup> >& groups)
 {
   requestQueueCheck();
-  addRequestGroupIndex(groups);
-  reservedGroups_.insert(reservedGroups_.end(), groups.begin(), groups.end());
+  appendReservedGroup(reservedGroups_, groups.begin(), groups.end());
 }
 
 void RequestGroupMan::addReservedGroup
 (const SharedHandle<RequestGroup>& group)
 {
   requestQueueCheck();
-  addRequestGroupIndex(group);
-  reservedGroups_.push_back(group);
+  reservedGroups_.push_back(group->getGID(), group);
 }
 
 void RequestGroupMan::insertReservedGroup
 (size_t pos, const std::vector<SharedHandle<RequestGroup> >& groups)
 {
   requestQueueCheck();
-  addRequestGroupIndex(groups);
-  reservedGroups_.insert
-    (reservedGroups_.begin()+std::min(reservedGroups_.size(), pos),
-     groups.begin(), groups.end());
+  pos = std::min(reservedGroups_.size(), pos);
+  RequestGroupList::SeqType::iterator dest =  reservedGroups_.begin();
+  std::advance(dest, pos);
+  for(std::vector<SharedHandle<RequestGroup> >::const_iterator i =
+        groups.begin(), eoi = groups.end(); i != eoi; ++i, ++dest) {
+    dest = reservedGroups_.insert(dest, (*i)->getGID(), *i);
+  }
 }
 
 void RequestGroupMan::insertReservedGroup
 (size_t pos, const SharedHandle<RequestGroup>& group)
 {
   requestQueueCheck();
-  addRequestGroupIndex(group);
-  reservedGroups_.insert
-    (reservedGroups_.begin()+std::min(reservedGroups_.size(), pos), group);
+  pos = std::min(reservedGroups_.size(), pos);
+  reservedGroups_.insert(pos, group->getGID(), group);
 }
-
-void RequestGroupMan::addRequestGroupIndex
-(const SharedHandle<RequestGroup>& group)
-{
-  assert(groupIndex_.count(group->getGID()) == 0);
-  groupIndex_[group->getGID()] = group;
-}
-
-void RequestGroupMan::addRequestGroupIndex
-(const std::vector<SharedHandle<RequestGroup> >& groups)
-{
-  for(std::vector<SharedHandle<RequestGroup> >::const_iterator i =
-        groups.begin(); i != groups.end(); ++i) {
-    addRequestGroupIndex(*i);
-  }
-}
-
-namespace {
-void removeRequestGroupIndex
-(std::map<a2_gid_t, SharedHandle<RequestGroup> >& groupIndex,
- const SharedHandle<RequestGroup>& group)
-{
-  assert(groupIndex.count(group->getGID()) == 1);
-  groupIndex.erase(group->getGID());
-}
-} // namespace
 
 size_t RequestGroupMan::countRequestGroup() const
 {
   return requestGroups_.size();
 }
 
-SharedHandle<RequestGroup> RequestGroupMan::getRequestGroup(size_t index) const
-{
-  if(index < requestGroups_.size()) {
-    return requestGroups_[index];
-  } else {
-    return SharedHandle<RequestGroup>();
-  }
-}
-
-namespace {
-template<typename Iterator>
-Iterator findByGID(Iterator first, Iterator last, a2_gid_t gid)
-{
-  for(; first != last; ++first) {
-    if((*first)->getGID() == gid) {
-      return first;
-    }
-  }
-  return first;
-}
-} // namespace
-
-SharedHandle<RequestGroup>
-RequestGroupMan::findRequestGroup(a2_gid_t gid) const
-{
-  SharedHandle<RequestGroup> res = findGroup(gid);
-  if(res) {
-    if(res->getState() == RequestGroup::STATE_ACTIVE) {
-      return res;
-    } else {
-      return SharedHandle<RequestGroup>();
-    }
-  } else {
-    return res;
-  }
-}
-
-SharedHandle<RequestGroup>
-RequestGroupMan::findReservedGroup(a2_gid_t gid) const
-{
-  SharedHandle<RequestGroup> res = findGroup(gid);
-  if(res) {
-    if(res->getState() == RequestGroup::STATE_WAITING) {
-      return res;
-    } else {
-      return SharedHandle<RequestGroup>();
-    }
-  } else {
-    return res;
-  }
-}
-
 SharedHandle<RequestGroup> RequestGroupMan::findGroup(a2_gid_t gid) const
 {
-  std::map<a2_gid_t, SharedHandle<RequestGroup> >::const_iterator i =
-    groupIndex_.find(gid);
-  if(i != groupIndex_.end()) {
-    return (*i).second;
-  } else {
-    return SharedHandle<RequestGroup>();
+  SharedHandle<RequestGroup> rg = requestGroups_.get(gid);
+  if(!rg) {
+    rg = reservedGroups_.get(gid);
   }
+  return rg;
 }
 
 size_t RequestGroupMan::changeReservedGroupPosition
-(a2_gid_t gid, int pos, HOW how)
+(a2_gid_t gid, int pos, A2_HOW how)
 {
-  std::deque<SharedHandle<RequestGroup> >::iterator i =
-    findByGID(reservedGroups_.begin(), reservedGroups_.end(), gid);
-  if(i == reservedGroups_.end()) {
-    throw DL_ABORT_EX(fmt("GID#%" PRId64 " not found in the waiting queue.", gid));
-  }
-  SharedHandle<RequestGroup> rg = *i;
-  const size_t maxPos = reservedGroups_.size()-1;
-  if(how == POS_SET) {
-    if(pos < 0) {
-      pos = 0;
-    } else if(pos > 0) {
-      pos = std::min(maxPos, (size_t)pos);
-    }
-  } else if(how == POS_CUR) {
-    size_t abspos = std::distance(reservedGroups_.begin(), i);
-    if(pos < 0) {
-      int dist = -std::distance(reservedGroups_.begin(), i);
-      pos = abspos+std::max(pos, dist);
-    } else if(pos > 0) {
-      int dist = std::distance(i, reservedGroups_.end())-1;
-      pos = abspos+std::min(pos, dist);
-    } else {
-      pos = abspos;
-    }
-  } else if(how == POS_END) {
-    if(pos >= 0) {
-      pos = maxPos;
-    } else {
-      pos = maxPos-std::min(maxPos, (size_t)-pos);
-    }
-  }
-  if(std::distance(reservedGroups_.begin(), i) < pos) {
-    std::rotate(i, i+1, reservedGroups_.begin()+pos+1);
+  ssize_t dest = reservedGroups_.move(gid, pos, how);
+  if(dest == -1) {
+    throw DL_ABORT_EX(fmt("GID#%s not found in the waiting queue.",
+                          GroupId::toHex(gid).c_str()));
   } else {
-    std::rotate(reservedGroups_.begin()+pos, i, i+1);
+    return dest;
   }
-  return pos;
 }
 
 bool RequestGroupMan::removeReservedGroup(a2_gid_t gid)
 {
-  std::deque<SharedHandle<RequestGroup> >::iterator i =
-    findByGID(reservedGroups_.begin(), reservedGroups_.end(), gid);
-  if(i == reservedGroups_.end()) {
-    return false;
-  } else {
-    removeRequestGroupIndex(groupIndex_, *i);
-    reservedGroups_.erase(i);
-    return true;
-  }
+  return reservedGroups_.erase(gid);
 }
 
 namespace {
@@ -310,7 +208,11 @@ namespace {
 void notifyDownloadEvent
 (const std::string& event, const SharedHandle<RequestGroup>& group)
 {
-  SingletonHolder<Notifier>::instance()->notifyDownloadEvent(event, group);
+  // Check NULL to make unit test easier.
+  Notifier* notifier = SingletonHolder<Notifier>::instance();
+  if(notifier) {
+    notifier->notifyDownloadEvent(event, group);
+  }
 }
 
 } // namespace
@@ -348,9 +250,7 @@ namespace {
 class ProcessStoppedRequestGroup {
 private:
   DownloadEngine* e_;
-  std::deque<SharedHandle<DownloadResult> >& downloadResults_;
-  std::deque<SharedHandle<RequestGroup> >& reservedGroups_;
-  std::map<a2_gid_t, SharedHandle<RequestGroup> >& groupIndex_;
+  RequestGroupList& reservedGroups_;
 
   void saveSignature(const SharedHandle<RequestGroup>& group)
   {
@@ -370,17 +270,14 @@ private:
 public:
   ProcessStoppedRequestGroup
   (DownloadEngine* e,
-   std::deque<SharedHandle<DownloadResult> >& downloadResults,
-   std::deque<SharedHandle<RequestGroup> >& reservedGroups,
-   std::map<a2_gid_t, SharedHandle<RequestGroup> >& groupIndex)
+   RequestGroupList& reservedGroups)
     : e_(e),
-      downloadResults_(downloadResults),
-      reservedGroups_(reservedGroups),
-      groupIndex_(groupIndex)
+      reservedGroups_(reservedGroups)
   {}
 
-  void operator()(const SharedHandle<RequestGroup>& group)
+  void operator()(const RequestGroupList::SeqType::value_type& val)
   {
+    const SharedHandle<RequestGroup>& group = val.second;
     if(group->getNumCommand() == 0) {
       const SharedHandle<DownloadContext>& dctx = group->getDownloadContext();
       // DownloadContext::resetDownloadStopTime() is only called when
@@ -396,7 +293,8 @@ public:
         group->closeFile();
         if(group->isPauseRequested()) {
           A2_LOG_NOTICE
-            (fmt(_("Download GID#%" PRId64 " paused"), group->getGID()));
+            (fmt(_("Download GID#%s paused"),
+                 GroupId::toHex(group->getGID()).c_str()));
           group->saveControlFile();
         } else if(group->downloadFinished() &&
            !group->getDownloadContext()->isChecksumVerificationNeeded()) {
@@ -424,7 +322,8 @@ public:
           if(group->getOption()->getAsBool(PREF_BT_REMOVE_UNSELECTED_FILE) &&
              !group->inMemoryDownload() &&
              dctx->hasAttribute(CTX_ATTR_BT)) {
-            A2_LOG_INFO(fmt(MSG_REMOVING_UNSELECTED_FILE, group->getGID()));
+            A2_LOG_INFO(fmt(MSG_REMOVING_UNSELECTED_FILE,
+                            GroupId::toHex(group->getGID()).c_str()));
             const std::vector<SharedHandle<FileEntry> >& files =
               dctx->getFileEntries();
             for(std::vector<SharedHandle<FileEntry> >::const_iterator i =
@@ -442,8 +341,8 @@ public:
 #endif // ENABLE_BITTORRENT
         } else {
           A2_LOG_NOTICE
-            (fmt(_("Download GID#%" PRId64 " not complete: %s"),
-                 group->getGID(),
+            (fmt(_("Download GID#%s not complete: %s"),
+                 GroupId::toHex(group->getGID()).c_str(),
                  group->getDownloadContext()->getBasePath().c_str()));
           group->saveControlFile();
         }
@@ -452,7 +351,7 @@ public:
       }
       if(group->isPauseRequested()) {
         group->setState(RequestGroup::STATE_WAITING);
-        reservedGroups_.push_front(group);
+        reservedGroups_.push_front(group->getGID(), group);
         group->releaseRuntimeResource(e_);
         group->setForceHaltRequested(false);
         util::executeHookByOptName(group, e_->getOption(),
@@ -465,7 +364,6 @@ public:
         e_->getRequestGroupMan()->addDownloadResult(dr);
         executeStopHook(group, e_->getOption(), dr->result);
         group->releaseRuntimeResource(e_);
-        removeRequestGroupIndex(groupIndex_, group);
       }
     }
   }
@@ -480,8 +378,9 @@ public:
   CollectServerStat(RequestGroupMan* requestGroupMan):
     requestGroupMan_(requestGroupMan) {}
 
-  void operator()(const SharedHandle<RequestGroup>& group)
+  void operator()(const RequestGroupList::SeqType::value_type& val)
   {
+    const SharedHandle<RequestGroup>& group = val.second;
     if(group->getNumCommand() == 0) {
       // Collect statistics during download in PeerStats and update/register
       // ServerStatMan
@@ -516,15 +415,6 @@ public:
 };
 } // namespace
 
-namespace {
-class FindStoppedRequestGroup {
-public:
-  bool operator()(const SharedHandle<RequestGroup>& group) {
-    return group->getNumCommand() == 0;
-  }
-};
-} // namespace
-
 void RequestGroupMan::updateServerStat()
 {
   std::for_each(requestGroups_.begin(), requestGroups_.end(),
@@ -538,16 +428,18 @@ void RequestGroupMan::removeStoppedGroup(DownloadEngine* e)
   updateServerStat();
 
   std::for_each(requestGroups_.begin(), requestGroups_.end(),
-                ProcessStoppedRequestGroup
-                (e, downloadResults_, reservedGroups_, groupIndex_));
-  std::deque<SharedHandle<RequestGroup> >::iterator i =
-    std::remove_if(requestGroups_.begin(),
-                   requestGroups_.end(),
-                   FindStoppedRequestGroup());
-  if(i != requestGroups_.end()) {
-    requestGroups_.erase(i, requestGroups_.end());
+                ProcessStoppedRequestGroup(e, reservedGroups_));
+  for(RequestGroupList::SeqType::iterator i = requestGroups_.begin(),
+        eoi = requestGroups_.end(); i != eoi;) {
+    const SharedHandle<RequestGroup>& rg = (*i).second;
+    if(rg->getNumCommand() == 0) {
+      ++i;
+      requestGroups_.erase(rg->getGID());
+      // rg is invalid here.
+    } else {
+      ++i;
+    }
   }
-
   size_t numRemoved = numPrev-requestGroups_.size();
   if(numRemoved > 0) {
     A2_LOG_DEBUG(fmt("%lu RequestGroup(s) deleted.",
@@ -588,48 +480,47 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
   if(static_cast<size_t>(maxSimultaneousDownloads_) <= requestGroups_.size()) {
     return;
   }
-  std::vector<SharedHandle<RequestGroup> > temp;
   int count = 0;
   int num = maxSimultaneousDownloads_-requestGroups_.size();
-  while(count < num && (uriListParser_ || !reservedGroups_.empty())) {
-    if(uriListParser_ && reservedGroups_.empty()) {
+  // In the following loop, the download which is not ready to start
+  // is kept in reservedGroups_. We use iterator to see if we
+  // evaluated them all. So don't use empty() for this. Compare to
+  // reservedGroups_.end() instead.
+  RequestGroupList::SeqType::iterator resitr = reservedGroups_.begin();
+  while(count < num && (uriListParser_ || resitr != reservedGroups_.end())) {
+    if(uriListParser_ && resitr == reservedGroups_.end()) {
       std::vector<SharedHandle<RequestGroup> > groups;
+      // May throw exception
       bool ok = createRequestGroupFromUriListParser(groups, option_,
                                                     uriListParser_.get());
       if(ok) {
-        addRequestGroupIndex(groups);
-        reservedGroups_.insert(reservedGroups_.end(), groups.begin(),
-                               groups.end());
+        appendReservedGroup(reservedGroups_, groups.begin(), groups.end());
+        resitr = reservedGroups_.end();
+        std::advance(resitr, -static_cast<ssize_t>(groups.size()));
       } else {
         uriListParser_.reset();
-        if(reservedGroups_.empty()) {
+        if(resitr == reservedGroups_.end()) {
           break;
         }
       }
     }
-    SharedHandle<RequestGroup> groupToAdd = reservedGroups_.front();
-    reservedGroups_.pop_front();
+    SharedHandle<RequestGroup> groupToAdd = (*resitr).second;
     std::vector<Command*> commands;
+    if((rpc_ && groupToAdd->isPauseRequested()) ||
+       !groupToAdd->isDependencyResolved()) {
+      ++resitr;
+      continue;
+    }
+    ++resitr;
+    reservedGroups_.erase(groupToAdd->getGID());
+    // Drop pieceStorage here because paused download holds its
+    // reference.
+    groupToAdd->dropPieceStorage();
+    configureRequestGroup(groupToAdd);
+    groupToAdd->setRequestGroupMan(this);
     try {
-      if((rpc_ && groupToAdd->isPauseRequested()) ||
-         !groupToAdd->isDependencyResolved()) {
-        temp.push_back(groupToAdd);
-        continue;
-      }
-      // Drop pieceStorage here because paused download holds its
-      // reference.
-      groupToAdd->dropPieceStorage();
-      configureRequestGroup(groupToAdd);
       createInitialCommand(groupToAdd, commands, e);
-      groupToAdd->setRequestGroupMan(this);
-      if(commands.empty()) {
-        requestQueueCheck();
-      }
-      groupToAdd->setState(RequestGroup::STATE_ACTIVE);
-      requestGroups_.push_back(groupToAdd);
       ++count;
-      e->addCommand(commands);
-      commands.clear();
     } catch(RecoverableException& ex) {
       A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, ex);
       A2_LOG_DEBUG("Deleting temporal commands.");
@@ -637,18 +528,20 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
       commands.clear();
       A2_LOG_DEBUG("Commands deleted");
       groupToAdd->setLastErrorCode(ex.getErrorCode());
-      // We add groupToAdd to e in order to it is processed in
+      // We add groupToAdd to e later in order to it is processed in
       // removeStoppedGroup().
-      groupToAdd->setState(RequestGroup::STATE_ACTIVE);
-      requestGroups_.push_back(groupToAdd);
-      requestQueueCheck();
     }
+    if(commands.empty()) {
+      requestQueueCheck();
+    } else {
+      e->addCommand(commands);
+    }
+    groupToAdd->setState(RequestGroup::STATE_ACTIVE);
+    requestGroups_.push_back(groupToAdd->getGID(), groupToAdd);
+
     util::executeHookByOptName(groupToAdd, e->getOption(),
                                PREF_ON_DOWNLOAD_START);
     notifyDownloadEvent(Notifier::ON_DOWNLOAD_START, groupToAdd);
-  }
-  if(!temp.empty()) {
-    reservedGroups_.insert(reservedGroups_.begin(), temp.begin(), temp.end());
   }
   if(count > 0) {
     e->setNoWait(true);
@@ -659,14 +552,15 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
 
 void RequestGroupMan::save()
 {
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator itr =
-        requestGroups_.begin(), eoi = requestGroups_.end(); itr != eoi; ++itr) {
-    if((*itr)->allDownloadFinished() &&
-       !(*itr)->getDownloadContext()->isChecksumVerificationNeeded()) {
-      (*itr)->removeControlFile();
+  for(RequestGroupList::SeqType::iterator itr = requestGroups_.begin(),
+        eoi = requestGroups_.end(); itr != eoi; ++itr) {
+    const SharedHandle<RequestGroup>& rg = (*itr).second;
+    if(rg->allDownloadFinished() &&
+       !rg->getDownloadContext()->isChecksumVerificationNeeded()) {
+      rg->removeControlFile();
     } else {
       try {
-        (*itr)->saveControlFile();
+        rg->saveControlFile();
       } catch(RecoverableException& e) {
         A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
       }
@@ -676,9 +570,9 @@ void RequestGroupMan::save()
 
 void RequestGroupMan::closeFile()
 {
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator itr =
-        requestGroups_.begin(), eoi = requestGroups_.end(); itr != eoi; ++itr) {
-    (*itr)->closeFile();
+  for(RequestGroupList::SeqType::iterator itr = requestGroups_.begin(),
+        eoi = requestGroups_.end(); itr != eoi; ++itr) {
+    (*itr).second->closeFile();
   }
 }
 
@@ -689,21 +583,22 @@ RequestGroupMan::DownloadStat RequestGroupMan::getDownloadStat() const
   int inprogress = 0;
   int removed = 0;
   error_code::Value lastError = removedLastErrorResult_;
-  for(std::deque<SharedHandle<DownloadResult> >::const_iterator itr =
-        downloadResults_.begin(), eoi = downloadResults_.end();
-      itr != eoi; ++itr) {
-    if((*itr)->belongsTo != 0) {
+  for(DownloadResultList::SeqType::const_iterator itr =
+        downloadResults_.begin(), eoi = downloadResults_.end(); itr != eoi;
+      ++itr) {
+    const SharedHandle<DownloadResult>& dr = (*itr).second;
+    if(dr->belongsTo != 0) {
       continue;
     }
-    if((*itr)->result == error_code::FINISHED) {
+    if(dr->result == error_code::FINISHED) {
       ++finished;
-    } else if((*itr)->result == error_code::IN_PROGRESS) {
+    } else if(dr->result == error_code::IN_PROGRESS) {
       ++inprogress;
-    } else if((*itr)->result == error_code::REMOVED) {
+    } else if(dr->result == error_code::REMOVED) {
       ++removed;
     } else {
       ++error;
-      lastError = (*itr)->result;
+      lastError = dr->result;
     }
   }
   return DownloadStat(finished, error, inprogress, removed,
@@ -711,57 +606,101 @@ RequestGroupMan::DownloadStat RequestGroupMan::getDownloadStat() const
                       lastError);
 }
 
+enum DownloadStatus {
+  A2_STATUS_OK,
+  A2_STATUS_INPR,
+  A2_STATUS_RM,
+  A2_STATUS_ERR
+};
+
+namespace {
+const char* getStatusStr(DownloadStatus status, bool useColor)
+{
+  // status string is formatted in 4 characters wide.
+  switch(status) {
+  case(A2_STATUS_OK):
+    if(useColor) {
+      return "\033[1;32mOK\033[0m  ";
+    } else {
+      return "OK  ";
+    }
+  case(A2_STATUS_INPR):
+    if(useColor) {
+      return "\033[1;34mINPR\033[0m";
+    } else {
+      return "INPR";
+    }
+  case(A2_STATUS_RM):
+    if(useColor) {
+      return "\033[1mRM\033[0m  ";
+    } else {
+      return "RM  ";
+    }
+  case(A2_STATUS_ERR):
+    if(useColor) {
+      return "\033[1;31mERR\033[0m ";
+    } else {
+      return "ERR ";
+    }
+  default:
+    return "";
+  }
+}
+} // namespace
+
 void RequestGroupMan::showDownloadResults(OutputFile& o, bool full) const
 {
-#ifdef __MINGW32__
-  int pathRowSize = 58;
-#else // !__MINGW32__
-  int pathRowSize = 59;
-#endif // !__MINGW32__
+  int pathRowSize = 55;
   // Download Results:
   // idx|stat|path/length
   // ===+====+=======================================================================
   o.printf("\n%s"
-           "\ngid|stat|avg speed  |",
+           "\ngid   |stat|avg speed  |",
            _("Download Results:"));
   if(full) {
     o.write("  %|path/URI"
-            "\n===+====+===========+===+");
+            "\n======+====+===========+===+");
     pathRowSize -= 4;
   } else {
     o.write("path/URI"
-            "\n===+====+===========+");
+            "\n======+====+===========+");
   }
   std::string line(pathRowSize, '=');
   o.printf("%s\n", line.c_str());
+  bool useColor = o.supportsColor();
   int ok = 0;
   int err = 0;
   int inpr = 0;
   int rm = 0;
-  for(std::deque<SharedHandle<DownloadResult> >::const_iterator itr =
-        downloadResults_.begin(), eoi = downloadResults_.end();
-      itr != eoi; ++itr) {
-    if((*itr)->belongsTo != 0) {
+  for(DownloadResultList::SeqType::const_iterator itr =
+        downloadResults_.begin(), eoi = downloadResults_.end(); itr != eoi;
+      ++itr) {
+    const SharedHandle<DownloadResult>& dr = (*itr).second;
+    if(dr->belongsTo != 0) {
       continue;
     }
     const char* status;
-    if((*itr)->result == error_code::FINISHED) {
-      status = "OK";
+    switch(dr->result) {
+    case error_code::FINISHED:
+      status = getStatusStr(A2_STATUS_OK, useColor);
       ++ok;
-    } else if((*itr)->result == error_code::IN_PROGRESS) {
-      status = "INPR";
+      break;
+    case error_code::IN_PROGRESS:
+      status = getStatusStr(A2_STATUS_INPR, useColor);
       ++inpr;
-    } else if((*itr)->result == error_code::REMOVED) {
-      status = "RM";
+      break;
+    case error_code::REMOVED:
+      status = getStatusStr(A2_STATUS_RM, useColor);
       ++rm;
-    } else {
-      status = "ERR";
+      break;
+    default:
+      status = getStatusStr(A2_STATUS_ERR, useColor);
       ++err;
     }
     if(full) {
-      formatDownloadResultFull(o, status, *itr);
+      formatDownloadResultFull(o, status, dr);
     } else {
-      o.write(formatDownloadResult(status, *itr).c_str());
+      o.write(formatDownloadResult(status, dr).c_str());
       o.write("\n");
     }
   }
@@ -789,7 +728,7 @@ void formatDownloadResultCommon
  const char* status,
  const SharedHandle<DownloadResult>& downloadResult)
 {
-  o << std::setw(3) << downloadResult->gid << "|"
+  o << std::setw(3) << downloadResult->gid->toAbbrevHex() << "|"
     << std::setw(4) << status << "|"
     << std::setw(11);
   if(downloadResult->sessionTime > 0) {
@@ -883,11 +822,12 @@ bool RequestGroupMan::isSameFileBeingDownloaded(RequestGroup* requestGroup) cons
     return false;
   }
   std::vector<std::string> files;
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator itr =
-        requestGroups_.begin(), eoi = requestGroups_.end(); itr != eoi; ++itr) {
-    if((*itr).get() != requestGroup) {
+  for(RequestGroupList::SeqType::const_iterator itr = requestGroups_.begin(),
+        eoi = requestGroups_.end(); itr != eoi; ++itr) {
+    const SharedHandle<RequestGroup>& rg = (*itr).second;
+    if(rg.get() != requestGroup) {
       const std::vector<SharedHandle<FileEntry> >& entries =
-        (*itr)->getDownloadContext()->getFileEntries();
+        rg->getDownloadContext()->getFileEntries();
       std::transform(entries.begin(), entries.end(),
                      std::back_inserter(files),
                      mem_fun_sh(&FileEntry::getPath));
@@ -902,17 +842,17 @@ bool RequestGroupMan::isSameFileBeingDownloaded(RequestGroup* requestGroup) cons
 
 void RequestGroupMan::halt()
 {
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator i =
-        requestGroups_.begin(), eoi = requestGroups_.end(); i != eoi; ++i) {
-    (*i)->setHaltRequested(true);
+  for(RequestGroupList::SeqType::const_iterator i = requestGroups_.begin(),
+        eoi = requestGroups_.end(); i != eoi; ++i) {
+    (*i).second->setHaltRequested(true);
   }
 }
 
 void RequestGroupMan::forceHalt()
 {
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator i =
-        requestGroups_.begin(), eoi = requestGroups_.end(); i != eoi; ++i) {
-    (*i)->setForceHaltRequested(true);
+  for(RequestGroupList::SeqType::const_iterator i = requestGroups_.begin(),
+        eoi = requestGroups_.end(); i != eoi; ++i) {
+    (*i).second->setForceHaltRequested(true);
   }
 }
 
@@ -925,60 +865,25 @@ TransferStat RequestGroupMan::calculateStat()
 SharedHandle<DownloadResult>
 RequestGroupMan::findDownloadResult(a2_gid_t gid) const
 {
-  for(std::deque<SharedHandle<DownloadResult> >::const_iterator i =
-        downloadResults_.begin(), eoi = downloadResults_.end(); i != eoi; ++i) {
-    if((*i)->gid == gid) {
-      return *i;
-    }
-  }
-  return SharedHandle<DownloadResult>();
+  return downloadResults_.get(gid);
 }
 
 bool RequestGroupMan::removeDownloadResult(a2_gid_t gid)
 {
-  for(std::deque<SharedHandle<DownloadResult> >::iterator i =
-        downloadResults_.begin(), eoi = downloadResults_.end(); i != eoi; ++i) {
-    if((*i)->gid == gid) {
-      downloadResults_.erase(i);
-      return true;
-    }
-  }
-  return false;
+  return downloadResults_.erase(gid);
 }
 
 void RequestGroupMan::addDownloadResult(const SharedHandle<DownloadResult>& dr)
 {
-  if(maxDownloadResult_ == 0) {
-    if(!downloadResults_.empty()) {
-      for(std::deque<SharedHandle<DownloadResult> >::iterator i =
-            downloadResults_.begin(), eoi = downloadResults_.end(); i != eoi;
-          ++i) {
-        if((*i)->belongsTo == 0 && (*i)->result != error_code::FINISHED) {
-          removedLastErrorResult_ = (*i)->result;
-          ++removedErrorResult_;
-        }
-      }
-      downloadResults_.clear();
-    }
+  bool rv = downloadResults_.push_back(dr->gid->getNumericId(), dr);
+  assert(rv);
+  while(downloadResults_.size() > maxDownloadResult_){
+    DownloadResultList::SeqType::iterator i = downloadResults_.begin();
+    const SharedHandle<DownloadResult>& dr = (*i).second;
     if(dr->belongsTo == 0 && dr->result != error_code::FINISHED) {
       removedLastErrorResult_ = dr->result;
       ++removedErrorResult_;
     }
-  } else {
-    int curSize = downloadResults_.size();
-    if(curSize >= maxDownloadResult_) {
-      std::deque<SharedHandle<DownloadResult> >::iterator last =
-        downloadResults_.begin()+curSize-maxDownloadResult_+1;
-      for(std::deque<SharedHandle<DownloadResult> >::iterator i =
-            downloadResults_.begin(); i != last; ++i) {
-        if((*i)->belongsTo == 0 && (*i)->result != error_code::FINISHED) {
-          removedLastErrorResult_ = (*i)->result;
-          ++removedErrorResult_;
-        }
-      }
-      downloadResults_.erase(downloadResults_.begin(), last);
-    }
-    downloadResults_.push_back(dr);
   }
 }
 
@@ -1046,10 +951,11 @@ void RequestGroupMan::getUsedHosts
   // speed. We use -download speed so that we can sort them using
   // operator<().
   std::vector<Triplet<size_t, int, std::string> > tempHosts;
-  for(std::deque<SharedHandle<RequestGroup> >::const_iterator i =
-        requestGroups_.begin(), eoi = requestGroups_.end(); i != eoi; ++i) {
+  for(RequestGroupList::SeqType::const_iterator i = requestGroups_.begin(),
+        eoi = requestGroups_.end(); i != eoi; ++i) {
+    const SharedHandle<RequestGroup>& rg = (*i).second;
     const FileEntry::InFlightRequestSet& inFlightReqs =
-      (*i)->getDownloadContext()->getFirstFileEntry()->getInFlightRequests();
+      rg->getDownloadContext()->getFirstFileEntry()->getInFlightRequests();
     for(FileEntry::InFlightRequestSet::iterator j =
           inFlightReqs.begin(), eoj = inFlightReqs.end(); j != eoj; ++j) {
       uri_split_result us;
@@ -1085,6 +991,15 @@ void RequestGroupMan::setUriListParser
 (const SharedHandle<UriListParser>& uriListParser)
 {
   uriListParser_ = uriListParser;
+}
+
+void RequestGroupMan::initWrDiskCache()
+{
+  assert(wrDiskCache_ == 0);
+  size_t limit = option_->getAsInt(PREF_DISK_CACHE);
+  if(limit > 0) {
+    wrDiskCache_ = new WrDiskCache(limit);
+  }
 }
 
 } // namespace aria2

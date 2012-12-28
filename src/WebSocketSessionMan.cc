@@ -66,7 +66,7 @@ void WebSocketSessionMan::addNotification
   dict->put("jsonrpc", "2.0");
   dict->put("method", method);
   SharedHandle<Dict> eventSpec = Dict::g();
-  eventSpec->put("gid", util::itos(group->getGID()));
+  eventSpec->put("gid", GroupId::toHex((group->getGID())));
   SharedHandle<List> params = List::g();
   params->append(eventSpec);
   dict->put("params", params);

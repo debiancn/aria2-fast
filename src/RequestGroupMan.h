@@ -47,6 +47,7 @@
 #include "TransferStat.h"
 #include "RequestGroup.h"
 #include "NetStat.h"
+#include "IndexedList.h"
 
 namespace aria2 {
 
@@ -58,14 +59,19 @@ class ServerStat;
 class Option;
 class OutputFile;
 class UriListParser;
+class WrDiskCache;
+
+typedef IndexedList<a2_gid_t,
+                    SharedHandle<RequestGroup> > RequestGroupList;
+typedef IndexedList<a2_gid_t,
+                    SharedHandle<DownloadResult> > DownloadResultList;
 
 class RequestGroupMan {
 private:
-  std::deque<SharedHandle<RequestGroup> > requestGroups_;
-  std::deque<SharedHandle<RequestGroup> > reservedGroups_;
-  // GID => RequestGroup index for faster retrieval.
-  std::map<a2_gid_t, SharedHandle<RequestGroup> > groupIndex_;
-  std::deque<SharedHandle<DownloadResult> > downloadResults_;
+  RequestGroupList requestGroups_;
+  RequestGroupList reservedGroups_;
+  DownloadResultList downloadResults_;
+
   int maxSimultaneousDownloads_;
 
   const Option* option_;
@@ -90,10 +96,12 @@ private:
   // The last error of removed DownloadResult
   error_code::Value removedLastErrorResult_;
 
-  int maxDownloadResult_;
+  size_t maxDownloadResult_;
 
   // UriListParser for deferred input.
   SharedHandle<UriListParser> uriListParser_;
+
+  WrDiskCache* wrDiskCache_;
 
   void formatDownloadResultFull
   (OutputFile& out,
@@ -147,35 +155,19 @@ public:
 
   size_t countRequestGroup() const;
 
-  SharedHandle<RequestGroup> getRequestGroup(size_t index) const;
-
-  const std::deque<SharedHandle<RequestGroup> >& getRequestGroups() const
+  const RequestGroupList& getRequestGroups() const
   {
     return requestGroups_;
   }
 
-  // Note: Use only for unit testing. Use findGroup() and test
-  // RequestGroup::getState() instead.
-  SharedHandle<RequestGroup> findRequestGroup(a2_gid_t gid) const;
-
-  const std::deque<SharedHandle<RequestGroup> >& getReservedGroups() const
+  const RequestGroupList& getReservedGroups() const
   {
     return reservedGroups_;
   }
 
-  // Note: Use only for unit testing. Use findGroup() and test
-  // RequestGroup::getState() instead.
-  SharedHandle<RequestGroup> findReservedGroup(a2_gid_t gid) const;
-
   // Returns RequestGroup object whose gid is gid. This method returns
   // RequestGroup either in requestGroups_ or reservedGroups_.
   SharedHandle<RequestGroup> findGroup(a2_gid_t gid) const;
-
-  enum HOW {
-    POS_SET,
-    POS_CUR,
-    POS_END
-  };
 
   // Changes the position of download denoted by gid.  If how is
   // POS_SET, it moves the download to a position relative to the
@@ -186,7 +178,8 @@ public:
   // beyond the end of the queue, it moves the download to the
   // beginning or the end of the queue respectively.  Returns the
   // destination position.
-  size_t changeReservedGroupPosition(a2_gid_t gid, int pos, HOW how);
+  size_t changeReservedGroupPosition(a2_gid_t gid, int pos,
+                                     A2_HOW how);
 
   bool removeReservedGroup(a2_gid_t gid);
 
@@ -237,7 +230,7 @@ public:
 
   DownloadStat getDownloadStat() const;
 
-  const std::deque<SharedHandle<DownloadResult> >& getDownloadResults() const
+  const DownloadResultList& getDownloadResults() const
   {
     return downloadResults_;
   }
@@ -330,7 +323,7 @@ public:
     return serverStatMan_;
   }
 
-  void setMaxDownloadResult(int v)
+  void setMaxDownloadResult(size_t v)
   {
     maxDownloadResult_ = v;
   }
@@ -341,6 +334,15 @@ public:
   {
     return netStat_;
   }
+
+  WrDiskCache* getWrDiskCache() const
+  {
+    return wrDiskCache_;
+  }
+
+  // Initializes WrDiskCache according to PREF_DISK_CACHE option.  If
+  // its value is 0, cache storage will not be initialized.
+  void initWrDiskCache();
 };
 
 } // namespace aria2

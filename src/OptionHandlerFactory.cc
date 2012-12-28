@@ -205,6 +205,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new UnitNumberOptionHandler
+                      (PREF_DISK_CACHE,
+                       TEXT_DISK_CACHE,
+                       "0",
+                       0));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_DEFERRED_INPUT,
                        TEXT_DEFERRED_INPUT,
@@ -391,6 +400,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
                        OptionHandler::OPT_ARG,
                        'Z'));
     op->addTag(TAG_BASIC);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new DefaultOptionHandler
+                      (PREF_GID,
+                       TEXT_GID,
+                       NO_DEFAULT_VALUE));
+    op->addTag(TAG_ADVANCED);
+    op->setInitialOption(true);
     handlers.push_back(op);
   }
 #ifdef ENABLE_MESSAGE_DIGEST

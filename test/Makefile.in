@@ -241,7 +241,8 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 	BufferedFileTest.cc GeomStreamPieceSelectorTest.cc \
 	SegListTest.cc ParamedStringTest.cc RpcHelperTest.cc \
 	AbstractCommandTest.cc SinkStreamFilterTest.cc \
-	XmlRpcRequestParserControllerTest.cc \
+	WrDiskCacheTest.cc WrDiskCacheEntryTest.cc GroupIdTest.cc \
+	IndexedListTest.cc XmlRpcRequestParserControllerTest.cc \
 	FallocFileAllocationIteratorTest.cc GZipDecoderTest.cc \
 	GZipEncoderTest.cc GZipDecodingStreamFilterTest.cc \
 	Sqlite3CookieParserTest.cc MessageDigestHelperTest.cc \
@@ -449,6 +450,8 @@ am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	GeomStreamPieceSelectorTest.$(OBJEXT) SegListTest.$(OBJEXT) \
 	ParamedStringTest.$(OBJEXT) RpcHelperTest.$(OBJEXT) \
 	AbstractCommandTest.$(OBJEXT) SinkStreamFilterTest.$(OBJEXT) \
+	WrDiskCacheTest.$(OBJEXT) WrDiskCacheEntryTest.$(OBJEXT) \
+	GroupIdTest.$(OBJEXT) IndexedListTest.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
 	$(am__objects_7) $(am__objects_8) $(am__objects_9)
@@ -723,10 +726,12 @@ aria2c_SOURCES = AllTest.cc TestUtil.cc TestUtil.h GZipDecoder.cc \
 	ValueBaseJsonParserTest.cc RpcResponseTest.cc RpcMethodTest.cc \
 	BufferedFileTest.cc GeomStreamPieceSelectorTest.cc \
 	SegListTest.cc ParamedStringTest.cc RpcHelperTest.cc \
-	AbstractCommandTest.cc SinkStreamFilterTest.cc $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8) $(am__append_9)
+	AbstractCommandTest.cc SinkStreamFilterTest.cc \
+	WrDiskCacheTest.cc WrDiskCacheEntryTest.cc GroupIdTest.cc \
+	IndexedListTest.cc $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9)
 aria2c_LDADD = ../src/libaria2c.a @LIBINTL@ @CPPUNIT_LIBS@
 AM_CPPFLAGS = -Wall\
 	-I$(top_srcdir)/src\
@@ -915,12 +920,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipDecodingStreamFilterTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipEncoderTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeomStreamPieceSelectorTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GroupIdTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GrowSegmentTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HandshakeExtensionMessageTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeaderProcessorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeaderTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequestTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponseTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexedListTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderURISelectorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChecksumValidatorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChunkChecksumValidatorTest.Po@am__quote@
@@ -997,6 +1004,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseBencodeParserTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseJsonParserTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheEntryTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XORCloserTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserControllerTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/a2algoTest.Po@am__quote@

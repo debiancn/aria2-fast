@@ -497,14 +497,16 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	UnknownOptionException.h Notifier.cc Notifier.h \
 	ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
 	XmlRpcRequestParserController.cc \
-	XmlRpcRequestParserController.h WinConsoleFile.cc \
-	WinConsoleFile.h WebSocketSession.cc WebSocketSession.h \
-	WebSocketSessionMan.cc WebSocketSessionMan.h \
-	WebSocketResponseCommand.cc WebSocketResponseCommand.h \
-	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h \
-	NullWebSocketSessionMan.h XmlAttr.cc XmlAttr.h XmlParser.cc \
-	XmlParser.h ParserStateMachine.h Xml2XmlParser.cc \
-	Xml2XmlParser.h ExpatXmlParser.cc ExpatXmlParser.h \
+	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
+	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
+	IndexedList.h WinConsoleFile.cc WinConsoleFile.h \
+	WebSocketSession.cc WebSocketSession.h WebSocketSessionMan.cc \
+	WebSocketSessionMan.h WebSocketResponseCommand.cc \
+	WebSocketResponseCommand.h WebSocketInteractionCommand.cc \
+	WebSocketInteractionCommand.h NullWebSocketSessionMan.h \
+	XmlAttr.cc XmlAttr.h XmlParser.cc XmlParser.h \
+	ParserStateMachine.h Xml2XmlParser.cc Xml2XmlParser.h \
+	ExpatXmlParser.cc ExpatXmlParser.h \
 	XmlRpcRequestParserStateMachine.cc \
 	XmlRpcRequestParserStateMachine.h XmlRpcRequestParserState.h \
 	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h \
@@ -994,18 +996,19 @@ am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	paramed_string.$(OBJEXT) rpc_helper.$(OBJEXT) \
 	WatchProcessCommand.$(OBJEXT) UnknownOptionException.$(OBJEXT) \
 	Notifier.$(OBJEXT) XmlRpcRequestParserController.$(OBJEXT) \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
-	$(am__objects_3) $(am__objects_10) $(am__objects_11) \
-	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
-	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
-	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
-	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
-	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
-	$(am__objects_27) $(am__objects_28) $(am__objects_29) \
-	$(am__objects_30) $(am__objects_31) $(am__objects_32) \
-	$(am__objects_33) $(am__objects_34)
+	WrDiskCache.$(OBJEXT) WrDiskCacheEntry.$(OBJEXT) \
+	GroupId.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_3) $(am__objects_10) \
+	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
+	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
+	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
+	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
+	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
+	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
+	$(am__objects_32) $(am__objects_33) $(am__objects_34)
 am_libaria2c_a_OBJECTS = $(am__objects_35)
 libaria2c_a_OBJECTS = $(am_libaria2c_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
@@ -1403,19 +1406,20 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	UnknownOptionException.h Notifier.cc Notifier.h \
 	ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
 	XmlRpcRequestParserController.cc \
-	XmlRpcRequestParserController.h $(am__append_1) \
-	$(am__append_2) $(am__append_3) $(am__append_4) \
-	$(am__append_5) $(am__append_6) $(am__append_7) \
-	$(am__append_8) $(am__append_9) $(am__append_10) \
-	$(am__append_11) $(am__append_12) $(am__append_13) \
-	$(am__append_14) $(am__append_15) $(am__append_16) \
-	$(am__append_17) $(am__append_18) $(am__append_19) \
-	$(am__append_20) $(am__append_21) $(am__append_22) \
-	$(am__append_23) $(am__append_24) $(am__append_25) \
-	$(am__append_26) $(am__append_27) $(am__append_28) \
-	$(am__append_29) $(am__append_30) $(am__append_31) \
-	$(am__append_32) $(am__append_33) $(am__append_34) \
-	$(am__append_35)
+	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
+	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
+	IndexedList.h $(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) $(am__append_5) $(am__append_6) \
+	$(am__append_7) $(am__append_8) $(am__append_9) \
+	$(am__append_10) $(am__append_11) $(am__append_12) \
+	$(am__append_13) $(am__append_14) $(am__append_15) \
+	$(am__append_16) $(am__append_17) $(am__append_18) \
+	$(am__append_19) $(am__append_20) $(am__append_21) \
+	$(am__append_22) $(am__append_23) $(am__append_24) \
+	$(am__append_25) $(am__append_26) $(am__append_27) \
+	$(am__append_28) $(am__append_29) $(am__append_30) \
+	$(am__append_31) $(am__append_32) $(am__append_33) \
+	$(am__append_34) $(am__append_35)
 noinst_LIBRARIES = libaria2c.a
 libaria2c_a_SOURCES = $(SRCS)
 aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
@@ -1695,6 +1699,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipDecodingStreamFilter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipEncoder.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeomStreamPieceSelector.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GroupId.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GrowSegment.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HandshakeExtensionMessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HaveEraseCommand.Po@am__quote@
@@ -1868,6 +1873,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSession.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSessionMan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinConsoleFile.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCache.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheEntry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Xml2XmlParser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlAttr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlParser.Po@am__quote@

@@ -51,6 +51,13 @@ public:
     // We add special null pref whose ID is 0.
     makePref("");
   }
+  ~PrefFactory()
+  {
+    for(size_t i = 0; i < count_; ++i) {
+      delete i2p_[i];
+    }
+  }
+
   size_t nextId()
   {
     return count_++;
@@ -115,6 +122,11 @@ const Pref* i2p(size_t id)
 const Pref* k2p(const std::string& key)
 {
   return getPrefFactory()->k2p(key);
+}
+
+void deletePrefResource()
+{
+  delete getPrefFactory();
 }
 
 } // namespace option
@@ -338,6 +350,10 @@ const Pref* PREF_STOP_WITH_PROCESS = makePref("stop-with-process");
 const Pref* PREF_ENABLE_MMAP = makePref("enable-mmap");
 // value: true | false
 const Pref* PREF_FORCE_SAVE = makePref("force-save");
+// value: 1*digit
+const Pref* PREF_DISK_CACHE = makePref("disk-cache");
+// value: string
+const Pref* PREF_GID = makePref("gid");
 
 /**
  * FTP related preferences

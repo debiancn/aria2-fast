@@ -39,13 +39,15 @@
 
 namespace aria2 {
 
+class WrDiskCache;
+
 class SinkStreamFilter:public StreamFilter {
 private:
+  WrDiskCache* wrDiskCache_;
   bool hashUpdate_;
-
   size_t bytesProcessed_;
 public:
-  SinkStreamFilter(bool hashUpdate = false);
+  SinkStreamFilter(WrDiskCache* wrDiskCache = 0, bool hashUpdate = false);
 
   virtual void init() {}
 
