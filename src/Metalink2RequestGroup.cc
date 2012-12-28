@@ -123,7 +123,9 @@ Metalink2RequestGroup::generate
   if(metalinkFile == DEV_STDIN) {
     mi.reset(new MetadataInfo());
   } else {
-    mi.reset(new MetadataInfo(metalinkFile));
+    // TODO Downloads from local metalink file does not save neither
+    // its gid nor MetadataInfo's gid.
+    mi.reset(new MetadataInfo(GroupId::create(), metalinkFile));
   }
   setMetadataInfo(tempgroups.begin(), tempgroups.end(), mi);
   groups.insert(groups.end(), tempgroups.begin(), tempgroups.end());
@@ -241,7 +243,7 @@ Metalink2RequestGroup::createRequestGroup
     }
 #endif // ENABLE_BITTORRENT
     SharedHandle<Option> option = util::copy(optionTemplate);
-    SharedHandle<RequestGroup> rg(new RequestGroup(option));
+    SharedHandle<RequestGroup> rg(new RequestGroup(GroupId::create(), option));
     SharedHandle<DownloadContext> dctx;
     int numSplit = option->getAsInt(PREF_SPLIT);
     int maxConn = option->getAsInt(PREF_MAX_CONNECTION_PER_SERVER);

@@ -361,8 +361,8 @@ and <a class="reference external" href="http://sourceforge.net/apps/trac/aria2/w
 <li>HTTP Proxy support</li>
 <li>HTTP BASIC authentication support</li>
 <li>HTTP Proxy authentication support</li>
-<li>Well-known environment variables for proxy: http_proxy, https_proxy,
-ftp_proxy, all_proxy and no_proxy</li>
+<li>Well-known environment variables for proxy: <tt class="docutils literal">http_proxy</tt>, <tt class="docutils literal">https_proxy</tt>,
+<tt class="docutils literal">ftp_proxy</tt>, <tt class="docutils literal">all_proxy</tt> and <tt class="docutils literal">no_proxy</tt></li>
 <li>HTTP gzip, deflate content encoding support</li>
 <li>Verify peer using given trusted CA certificate in HTTPS</li>
 <li>Client certificate authentication in HTTPS</li>
@@ -393,6 +393,7 @@ completely</li>
 output filename can be specified optionally</li>
 <li>Parameterized URI support</li>
 <li>IPv6 support</li>
+<li>Disk cache to reduce disk activity</li>
 </ul>
 </div>
 <div class="section" id="how-to-get-source-code">
@@ -626,13 +627,22 @@ library and enable only static library. We are going to link those
 libraries statically.</p>
 <p>We use zlib which comes with Android NDK, so we don't have to build it
 by ourselves.</p>
-<p><tt class="docutils literal"><span class="pre">android-config</span></tt> assumes following points:</p>
-<ul class="simple">
-<li>Android NDK toolchain is installed under <tt class="docutils literal">$ANDROID_HOME</tt>.  Refer
-to &quot;3/ Invoking the compiler (the easy way):&quot; section in Android NDK
-<tt class="docutils literal"><span class="pre">docs/STANDALONE-TOOLCHAIN.html</span></tt> to install custom toolchain.</li>
-<li>The dependant libraries must be installed under
-<tt class="docutils literal">$ANDROID_HOME/usr/local</tt>.</li>
+<p><tt class="docutils literal"><span class="pre">android-config</span></tt> assumes the existence of <tt class="docutils literal">$ANDROID_HOME</tt>
+environment variable which must fulfill the following conditions:</p>
+<ul>
+<li><p class="first">Android NDK toolchain is installed under
+<tt class="docutils literal">$ANDROID_HOME/toolchain</tt>.  Refer to &quot;3/ Invoking the compiler
+(the easy way):&quot; section in Android NDK
+<tt class="docutils literal"><span class="pre">docs/STANDALONE-TOOLCHAIN.html</span></tt> to install custom toolchain.</p>
+<p>For example, to install toolchain under <tt class="docutils literal">$ANDROID_HOME/toolchain</tt>,
+do this:</p>
+<pre class="literal-block">
+$NDK/build/tools/make-standalone-toolchain.sh --platform=android-9 --install-dir=$ANDROID_HOME/toolchain
+</pre>
+</li>
+<li><p class="first">The dependant libraries must be installed under
+<tt class="docutils literal">$ANDROID_HOME/usr/local</tt>.</p>
+</li>
 </ul>
 <p>Before running <tt class="docutils literal"><span class="pre">android-config</span></tt> and <tt class="docutils literal"><span class="pre">android-make</span></tt>,
 <tt class="docutils literal">$ANDOIRD_HOME</tt> environment variable must be set to point to the

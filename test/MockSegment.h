@@ -67,11 +67,11 @@ public:
 
 #endif // ENABLE_MESSAGE_DIGEST
 
-  virtual void clear() {}
+  virtual void clear(WrDiskCache* diskCache) {}
 
   virtual SharedHandle<Piece> getPiece() const
   {
-    return SharedHandle<Piece>();
+    return SharedHandle<Piece>(new Piece());
   }
 };
 

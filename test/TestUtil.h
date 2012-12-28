@@ -4,10 +4,15 @@
 
 #include "SharedHandle.h"
 #include "Cookie.h"
+#include "WrDiskCacheEntry.h"
+#include "GroupId.h"
 
 namespace aria2 {
 
 class MessageDigest;
+class RequestGroupMan;
+class RequestGroup;
+class Option;
 
 void createFile(const std::string& filename, size_t length);
 
@@ -50,4 +55,19 @@ std::string fileHexDigest
 (const SharedHandle<MessageDigest>& ctx, const std::string& filename);
 #endif // ENABLE_MESSAGE_DIGEST
 
+WrDiskCacheEntry::DataCell* createDataCell(int64_t goff,
+                                           const char* data,
+                                           size_t offset = 0);
+
+SharedHandle<RequestGroup> findReservedGroup
+(const SharedHandle<RequestGroupMan>& rgman, a2_gid_t gid);
+
+SharedHandle<RequestGroup> getReservedGroup
+(const SharedHandle<RequestGroupMan>& rgman, size_t index);
+
+SharedHandle<RequestGroup> createRequestGroup(int32_t pieceLength,
+                                              int64_t totalLength,
+                                              const std::string& path,
+                                              const std::string& uri,
+                                              const SharedHandle<Option>& opt);
 } // namespace aria2

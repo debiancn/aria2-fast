@@ -201,10 +201,6 @@ error_code::Value main(int argc, char* argv[])
   A2_LOG_INFO(fmt("%s %s %s", PACKAGE, PACKAGE_VERSION, TARGET));
   A2_LOG_INFO(MSG_LOGGING_STARTED);
 
-#ifdef ENABLE_MESSAGE_DIGEST
-  message_digest::staticSHA1DigestInit();
-#endif // ENABLE_MESSAGE_DIGEST
-
   if(op->getAsBool(PREF_DISABLE_IPV6)) {
     SocketCore::setProtocolFamily(AF_INET);
     // Get rid of AI_ADDRCONFIG. It causes name resolution error
@@ -276,6 +272,7 @@ error_code::Value main(int argc, char* argv[])
   op->remove(PREF_SELECT_FILE);
   op->remove(PREF_PAUSE);
   op->remove(PREF_CHECKSUM);
+  op->remove(PREF_GID);
   if(!op->getAsBool(PREF_ENABLE_RPC) && requestGroups.empty() &&
      !uriListParser) {
     global::cout()->printf("%s\n", MSG_NO_FILES_TO_DOWNLOAD);

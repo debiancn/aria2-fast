@@ -120,10 +120,9 @@
 
 namespace aria2 {
 
-a2_gid_t RequestGroup::gidCounter_ = 0;
-
-RequestGroup::RequestGroup(const SharedHandle<Option>& option)
-  : gid_(newGID()),
+RequestGroup::RequestGroup(const SharedHandle<GroupId>& gid,
+                           const SharedHandle<Option>& option)
+  : gid_(gid),
     state_(STATE_WAITING),
     option_(option),
     numConcurrentCommand_(option->getAsInt(PREF_SPLIT)),
@@ -210,6 +209,7 @@ error_code::Value RequestGroup::downloadResult() const
 void RequestGroup::closeFile()
 {
   if(pieceStorage_) {
+    pieceStorage_->flushWrDiskCacheEntry();
     pieceStorage_->getDiskAdaptor()->closeFile();
   }
 }
@@ -243,7 +243,8 @@ SharedHandle<CheckIntegrityEntry> RequestGroup::createCheckIntegrityEntry()
         {
           downloadContext_->setChecksumVerified(true);
           A2_LOG_NOTICE(fmt(MSG_DOWNLOAD_ALREADY_COMPLETED,
-                            gid_, downloadContext_->getBasePath().c_str()));
+                            gid_->toHex().c_str(),
+                            downloadContext_->getBasePath().c_str()));
         }
     } else {
       checkEntry.reset(new StreamCheckIntegrityEntry(this));
@@ -345,9 +346,9 @@ void RequestGroup::createInitialCommand
       btAnnouncePtr->shuffleAnnounce();
       SharedHandle<BtAnnounce> btAnnounce(btAnnouncePtr);
 
-      assert(!btRegistry->get(gid_));
+      assert(!btRegistry->get(gid_->getNumericId()));
       btRegistry->put
-        (gid_, SharedHandle<BtObject>
+        (gid_->getNumericId(), SharedHandle<BtObject>
          (new BtObject
           (downloadContext_,
            pieceStorage_,
@@ -621,6 +622,9 @@ void RequestGroup::initPieceStorage()
       new DefaultPieceStorage(downloadContext_, option_.get());
     SharedHandle<PieceStorage> psHolder(ps);
 #endif // !ENABLE_BITTORRENT
+    if(requestGroupMan_) {
+      ps->setWrDiskCache(requestGroupMan_->getWrDiskCache());
+    }
     if(diskWriterFactory_) {
       ps->setDiskWriterFactory(diskWriterFactory_);
     }
@@ -958,7 +962,7 @@ void RequestGroup::decreaseNumCommand()
 {
   --numCommand_;
   if(!numCommand_ && requestGroupMan_) {
-    A2_LOG_DEBUG(fmt("GID#%" PRId64 " - Request queue check", gid_));
+    A2_LOG_DEBUG(fmt("GID#%s - Request queue check", gid_->toHex().c_str()));
     requestGroupMan_->requestQueueCheck();
   }
 }
@@ -1003,7 +1007,7 @@ void RequestGroup::setPauseRequested(bool f)
 void RequestGroup::releaseRuntimeResource(DownloadEngine* e)
 {
 #ifdef ENABLE_BITTORRENT
-  e->getBtRegistry()->remove(gid_);
+  e->getBtRegistry()->remove(gid_->getNumericId());
   btRuntime_ = 0;
   peerStorage_ = 0;
 #endif // ENABLE_BITTORRENT
@@ -1148,7 +1152,8 @@ bool RequestGroup::needsFileAllocation() const
 
 SharedHandle<DownloadResult> RequestGroup::createDownloadResult() const
 {
-  A2_LOG_DEBUG(fmt("GID#%" PRId64 " - Creating DownloadResult.", gid_));
+  A2_LOG_DEBUG(fmt("GID#%s - Creating DownloadResult.",
+                   gid_->toHex().c_str()));
   TransferStat st = calculateStat();
   SharedHandle<DownloadResult> res(new DownloadResult());
   res->gid = gid_;
@@ -1292,14 +1297,6 @@ bool RequestGroup::p2pInvolved() const
 #else // !ENABLE_BITTORRENT
   return false;
 #endif // !ENABLE_BITTORRENT
-}
-
-a2_gid_t RequestGroup::newGID()
-{
-  if(gidCounter_ == INT64_MAX) {
-    gidCounter_ = 0;
-  }
-  return ++gidCounter_;
 }
 
 } // namespace aria2

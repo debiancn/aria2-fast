@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: aria2 1.16.0\n"
+"Project-Id-Version: aria2 1.16.1\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2012-12-01 23:54+0900\n"
-"PO-Revision-Date: 2012-12-01 23:54+0900\n"
+"POT-Creation-Date: 2012-12-27 01:10+0900\n"
+"PO-Revision-Date: 2012-12-27 01:10+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -74,37 +74,37 @@ msgstr "Serialized session to ‘[1m%s[0m’ successfully."
 msgid "Failed to serialize session to '%s'."
 msgstr "Failed to serialize session to '%s'."
 
-#: src/RequestGroupMan.cc:399
+#: src/RequestGroupMan.cc:296
 #, c-format
-msgid "Download GID#%<PRId64> paused"
-msgstr "Download GID#%<PRId64> paused"
+msgid "Download GID#%s paused"
+msgstr "Download GID#%s paused"
 
-#: src/RequestGroupMan.cc:445
+#: src/RequestGroupMan.cc:344
 #, c-format
-msgid "Download GID#%<PRId64> not complete: %s"
-msgstr "Download GID#%<PRId64> not complete: %s"
+msgid "Download GID#%s not complete: %s"
+msgstr "Download GID#%s not complete: %s"
 
-#: src/RequestGroupMan.cc:726
+#: src/RequestGroupMan.cc:659
 msgid "Download Results:"
 msgstr "Download Results:"
 
-#: src/RequestGroupMan.cc:769
+#: src/RequestGroupMan.cc:708
 msgid "Status Legend:"
 msgstr "Status Legend:"
 
-#: src/RequestGroupMan.cc:771
+#: src/RequestGroupMan.cc:710
 msgid "(OK):download completed."
 msgstr "(OK):download completed."
 
-#: src/RequestGroupMan.cc:774
+#: src/RequestGroupMan.cc:713
 msgid "(ERR):error occurred."
 msgstr "(ERR):error occurred."
 
-#: src/RequestGroupMan.cc:777
+#: src/RequestGroupMan.cc:716
 msgid "(INPR):download in-progress."
 msgstr "(INPR):download in-progress."
 
-#: src/RequestGroupMan.cc:780
+#: src/RequestGroupMan.cc:719
 msgid "(RM):download removed."
 msgstr "(RM):download removed."
 
@@ -2682,6 +2682,78 @@ msgstr ""
 "which\n"
 "                              is recognized as completed state."
 
+#: src/usage_text.h:918
+msgid ""
+" --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
+"cache\n"
+"                              is disabled. This feature caches the "
+"downloaded\n"
+"                              data in memory, which grows to at most SIZE\n"
+"                              bytes. The cache storage is created for aria2\n"
+"                              instance and shared by all downloads. The one\n"
+"                              advantage of the disk cache is reduce the "
+"disk\n"
+"                              I/O because the data are written in larger "
+"unit\n"
+"                              and it is reordered by the offset of the "
+"file.\n"
+"                              If hash checking is involved and the data are\n"
+"                              cached in memory, we don't need to read them\n"
+"                              from the disk.\n"
+"                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
+msgstr ""
+" --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
+"cache\n"
+"                              is disabled. This feature caches the "
+"downloaded\n"
+"                              data in memory, which grows to at most SIZE\n"
+"                              bytes. The cache storage is created for aria2\n"
+"                              instance and shared by all downloads. The one\n"
+"                              advantage of the disk cache is reduce the "
+"disk\n"
+"                              I/O because the data are written in larger "
+"unit\n"
+"                              and it is reordered by the offset of the "
+"file.\n"
+"                              If hash checking is involved and the data are\n"
+"                              cached in memory, we don't need to read them\n"
+"                              from the disk.\n"
+"                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
+
+#: src/usage_text.h:931
+msgid ""
+" --gid=GID                    Set GID manually. aria2 identifies each\n"
+"                              download by the ID called GID. The GID must "
+"be\n"
+"                              hex string of 16 characters, thus [0-9a-zA-Z]\n"
+"                              are allowed and leading zeros must not be\n"
+"                              stripped. The GID all 0 is reserved and must\n"
+"                              not be used. The GID must be unique, "
+"otherwise\n"
+"                              error is reported and the download is not "
+"added.\n"
+"                              This option is useful when restoring the\n"
+"                              sessions saved using --save-session option. "
+"If\n"
+"                              this option is not used, new GID is generated\n"
+"                              by aria2."
+msgstr ""
+" --gid=GID                    Set GID manually. aria2 identifies each\n"
+"                              download by the ID called GID. The GID must "
+"be\n"
+"                              hex string of 16 characters, thus [0-9a-zA-Z]\n"
+"                              are allowed and leading zeros must not be\n"
+"                              stripped. The GID all 0 is reserved and must\n"
+"                              not be used. The GID must be unique, "
+"otherwise\n"
+"                              error is reported and the download is not "
+"added.\n"
+"                              This option is useful when restoring the\n"
+"                              sessions saved using --save-session option. "
+"If\n"
+"                              this option is not used, new GID is generated\n"
+"                              by aria2."
+
 #: src/version_usage.cc:57
 msgid " version "
 msgstr " version "
@@ -2892,7 +2964,7 @@ msgstr "Unknown option ‘[1m%s[0m’"
 msgid "Errors occurred while binding port.\n"
 msgstr "Errors occurred while binding port.\n"
 
-#: src/AbstractCommand.cc:443
+#: src/AbstractCommand.cc:444
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr "CUID#%<PRId64> - Failed to resume download. Download from scratch."
@@ -2917,9 +2989,8 @@ msgstr ""
 
 #: src/BtStopDownloadCommand.cc:65
 #, c-format
-msgid "GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
-msgstr ""
-"GID#%<PRId64> Stop downloading torrent due to --bt-stop-timeout option."
+msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
+msgstr "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 
 #: src/DHTConnectionImpl.cc:85
 #, c-format
@@ -2936,7 +3007,7 @@ msgstr "IPv%d RPC: listening to port %u"
 msgid "IPv%d BitTorrent: listening to port %u"
 msgstr "IPv%d BitTorrent: listening to port %u"
 
-#: src/RequestGroup.cc:375
+#: src/RequestGroup.cc:376
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
@@ -2944,7 +3015,7 @@ msgstr ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 
-#: src/RequestGroup.cc:680
+#: src/RequestGroup.cc:684
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr "Removed control file for %s because it is requested by user."
@@ -2959,8 +3030,8 @@ msgstr ""
 
 #: src/message.h:57
 #, c-format
-msgid "GID#%<PRId64> - Download has already completed: %s"
-msgstr "GID#%<PRId64> - Download has already completed: %s"
+msgid "GID#%s - Download has already completed: %s"
+msgstr "GID#%s - Download has already completed: %s"
 
 #: src/message.h:106
 #, c-format
@@ -3318,8 +3389,8 @@ msgstr "Detected directory traversal directive in %s"
 
 #: src/message.h:200
 #, c-format
-msgid "GID#%<PRId64> - Removing unselected file."
-msgstr "GID#%<PRId64> - Removing unselected file."
+msgid "GID#%s - Removing unselected file."
+msgstr "GID#%s - Removing unselected file."
 
 #: src/message.h:201
 #, c-format

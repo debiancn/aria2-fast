@@ -33,14 +33,20 @@
  */
 /* copyright --> */
 #include "SinkStreamFilter.h"
+
+#include <cstring>
+
 #include "BinaryStream.h"
 #include "Segment.h"
+#include "WrDiskCache.h"
+#include "Piece.h"
 
 namespace aria2 {
 
 const std::string SinkStreamFilter::NAME("SinkStreamFilter");
 
-SinkStreamFilter::SinkStreamFilter(bool hashUpdate):
+SinkStreamFilter::SinkStreamFilter(WrDiskCache* wrDiskCache, bool hashUpdate):
+  wrDiskCache_(wrDiskCache),
   hashUpdate_(hashUpdate),
   bytesProcessed_(0) {}
 
@@ -60,7 +66,27 @@ ssize_t SinkStreamFilter::transform
     } else {
       wlen = inlen;
     }
-    out->writeData(inbuf, wlen, segment->getPositionToWrite());
+    const SharedHandle<Piece>& piece = segment->getPiece();
+    if(piece->getWrDiskCacheEntry()) {
+      assert(wrDiskCache_);
+      // If we receive small data (e.g., 1 or 2 bytes), cache entry
+      // becomes a headache. To mitigate this problem, we allocate
+      // cache buffer at least 4KiB and append the data to the
+      // contagious cache data.
+      size_t alen = piece->appendWrCache(wrDiskCache_,
+                                         segment->getPositionToWrite(),
+                                         inbuf, wlen);
+      if(alen < wlen) {
+        size_t len = wlen - alen;
+        size_t capacity = std::max(len, static_cast<size_t>(4096));
+        unsigned char* dataCopy = new unsigned char[capacity];
+        memcpy(dataCopy, inbuf + alen, len);
+        piece->updateWrCache(wrDiskCache_, dataCopy, 0, len, capacity,
+                             segment->getPositionToWrite() + alen);
+      }
+    } else {
+      out->writeData(inbuf, wlen, segment->getPositionToWrite());
+    }
 #ifdef ENABLE_MESSAGE_DIGEST
     if(hashUpdate_) {
       segment->updateHash(segment->getWrittenLength(), inbuf, wlen);

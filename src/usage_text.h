@@ -914,3 +914,28 @@
     "                              if the download is completed or removed. This\n" \
     "                              may be useful to save BitTorrent seeding which\n" \
     "                              is recognized as completed state.")
+#define TEXT_DISK_CACHE                         \
+  _(" --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk cache\n" \
+    "                              is disabled. This feature caches the downloaded\n" \
+    "                              data in memory, which grows to at most SIZE\n" \
+    "                              bytes. The cache storage is created for aria2\n" \
+    "                              instance and shared by all downloads. The one\n" \
+    "                              advantage of the disk cache is reduce the disk\n" \
+    "                              I/O because the data are written in larger unit\n" \
+    "                              and it is reordered by the offset of the file.\n" \
+    "                              If hash checking is involved and the data are\n" \
+    "                              cached in memory, we don't need to read them\n" \
+    "                              from the disk.\n"                    \
+    "                              SIZE can include K or M(1K = 1024, 1M = 1024K).")
+#define TEXT_GID                                \
+  _(" --gid=GID                    Set GID manually. aria2 identifies each\n" \
+    "                              download by the ID called GID. The GID must be\n" \
+    "                              hex string of 16 characters, thus [0-9a-zA-Z]\n" \
+    "                              are allowed and leading zeros must not be\n" \
+    "                              stripped. The GID all 0 is reserved and must\n" \
+    "                              not be used. The GID must be unique, otherwise\n" \
+    "                              error is reported and the download is not added.\n" \
+    "                              This option is useful when restoring the\n" \
+    "                              sessions saved using --save-session option. If\n" \
+    "                              this option is not used, new GID is generated\n" \
+    "                              by aria2.")

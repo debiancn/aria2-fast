@@ -60,6 +60,10 @@ const Pref* i2p(size_t id);
 // special null Pref whose ID is 0.
 const Pref* k2p(const std::string& k);
 
+// Deletes resources allocated for preferences. Call this function at
+// the end of the program only once.
+void deletePrefResource();
+
 } // namespace option
 
 /**
@@ -281,6 +285,10 @@ extern const Pref* PREF_STOP_WITH_PROCESS;
 extern const Pref* PREF_ENABLE_MMAP;
 // value: true | false
 extern const Pref* PREF_FORCE_SAVE;
+// value: 1*digit
+extern const Pref* PREF_DISK_CACHE;
+// value: string
+extern const Pref* PREF_GID;
 
 /**
  * FTP related preferences
