@@ -85,12 +85,13 @@ PeerConnection::~PeerConnection()
   delete [] resbuf_;
 }
 
-void PeerConnection::pushBytes(unsigned char* data, size_t len)
+void PeerConnection::pushBytes(unsigned char* data, size_t len,
+                               ProgressUpdate* progressUpdate)
 {
   if(encryptionEnabled_) {
     encryptor_->encrypt(len, data, data);
   }
-  socketBuffer_.pushBytes(data, len);
+  socketBuffer_.pushBytes(data, len, progressUpdate);
 }
 
 bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
@@ -250,6 +251,11 @@ void PeerConnection::presetBuffer(const unsigned char* data, size_t length)
 bool PeerConnection::sendBufferIsEmpty() const
 {
   return socketBuffer_.sendBufferIsEmpty();
+}
+
+size_t PeerConnection::getBufferEntrySize() const
+{
+  return socketBuffer_.getBufferEntrySize();
 }
 
 ssize_t PeerConnection::sendPendingData()

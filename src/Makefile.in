@@ -499,8 +499,9 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	XmlRpcRequestParserController.cc \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h WinConsoleFile.cc WinConsoleFile.h \
-	WebSocketSession.cc WebSocketSession.h WebSocketSessionMan.cc \
+	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	WinConsoleFile.cc WinConsoleFile.h WebSocketSession.cc \
+	WebSocketSession.h WebSocketSessionMan.cc \
 	WebSocketSessionMan.h WebSocketResponseCommand.cc \
 	WebSocketResponseCommand.h WebSocketInteractionCommand.cc \
 	WebSocketInteractionCommand.h NullWebSocketSessionMan.h \
@@ -997,18 +998,19 @@ am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	WatchProcessCommand.$(OBJEXT) UnknownOptionException.$(OBJEXT) \
 	Notifier.$(OBJEXT) XmlRpcRequestParserController.$(OBJEXT) \
 	WrDiskCache.$(OBJEXT) WrDiskCacheEntry.$(OBJEXT) \
-	GroupId.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9) $(am__objects_3) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
-	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
-	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
-	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
-	$(am__objects_32) $(am__objects_33) $(am__objects_34)
+	GroupId.$(OBJEXT) SaveSessionCommand.$(OBJEXT) \
+	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
+	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
+	$(am__objects_3) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_14) \
+	$(am__objects_15) $(am__objects_16) $(am__objects_17) \
+	$(am__objects_18) $(am__objects_19) $(am__objects_20) \
+	$(am__objects_21) $(am__objects_22) $(am__objects_23) \
+	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
+	$(am__objects_27) $(am__objects_28) $(am__objects_29) \
+	$(am__objects_30) $(am__objects_31) $(am__objects_32) \
+	$(am__objects_33) $(am__objects_34)
 am_libaria2c_a_OBJECTS = $(am__objects_35)
 libaria2c_a_OBJECTS = $(am_libaria2c_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
@@ -1408,7 +1410,8 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	XmlRpcRequestParserController.cc \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h $(am__append_1) $(am__append_2) $(am__append_3) \
+	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	$(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5) $(am__append_6) \
 	$(am__append_7) $(am__append_8) $(am__append_9) \
 	$(am__append_10) $(am__append_11) $(am__append_12) \
@@ -1819,6 +1822,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcRequest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcResponse.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SaveSessionCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SeedCheckCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SegmentMan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SelectEventPoll.Po@am__quote@

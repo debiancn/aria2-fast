@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "December 27, 2012" "1.16.1" "aria2"
+.TH "ARIA2C" "1" "February 03, 2013" "1.16.3" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -493,7 +493,9 @@ See also \fI\%--certificate\fP option.
 .INDENT 0.0
 .TP
 .B \-\-referer=<REFERER>
-Set Referer. This affects all URIs.
+Set Referer. This affects all URIs.  If \fB*\fP is given, each request
+URI is used as a referer.  This may be useful when used with
+\fI\%--parameterized-uri\fP option.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1177,6 +1179,12 @@ Default: \fB$HOME/.aria2/aria2.conf\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-console\-log\-level=<LEVEL>
+Set log level to output to console.  LEVEL is either \fBdebug\fP,
+\fBinfo\fP, \fBnotice\fP, \fBwarn\fP or \fBerror\fP.  Default: \fBnotice\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-D, \-\-daemon[=true|false]
 Run as daemon. The current working directory will be changed to \fB/\fP
 and standard input, standard output and standard error will be
@@ -1548,6 +1556,13 @@ Any meaningful GID is not saved.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-save\-session\-interval=<SEC>
+Save error/unfinished downloads to a file specified by
+\fI\%--save-session\fP option every SEC seconds. If \fB0\fP is
+given, file will be saved only when aria2 exits. Default: \fB0\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-stop=<SEC>
 Stop application after SEC seconds has passed.
 If \fB0\fP is given, this feature is disabled.
@@ -1573,7 +1588,8 @@ Default: \fBtrue\fP
 Print the version number, copyright and the configuration information and
 exit.
 .UNINDENT
-.SS Options That Take An Optional Argument
+.SS Notes for Options
+.SS Optional arguments
 .sp
 The options that have its argument surrounded by square brackets([])
 take an optional argument. Usually omiting the argument is evaluated to \fBtrue\fP.
@@ -1581,6 +1597,12 @@ If you use short form of these options(such as \fB\-V\fP) and give
 an argument, then the option name and its argument should be concatenated(e.g.
 \fB\-Vfalse\fP). If any spaces are inserted between the option name and the argument,
 the argument will be treated as URI and usually this is not what you expect.
+.SS Units (K and M)
+.sp
+Some options takes \fBK\fP and \fBM\fP to conveniently represent 1024 and
+1048576 respectively.  aria2 detects these characters in
+case\-insensitive way. In other words, \fBk\fP and \fBm\fP can be used as
+well as \fBK\fP and \fBM\fP respectively.
 .SS URI, MAGNET, TORRENT_FILE, METALINK_FILE
 .sp
 You can specify multiple URIs in command\-line.  Unless you specify

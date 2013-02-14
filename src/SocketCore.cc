@@ -369,7 +369,6 @@ SharedHandle<SocketCore> SocketCore::acceptConnection() const
   }
   SharedHandle<SocketCore> sock(new SocketCore(fd, sockType_));
   sock->setNonBlockingMode();
-  sock->setTcpNodelay(true);
   return sock;
 }
 
@@ -410,7 +409,8 @@ int SocketCore::getPeerInfo(std::pair<std::string, uint16_t>& peerinfo) const
   return sockaddr.storage.ss_family;
 }
 
-void SocketCore::establishConnection(const std::string& host, uint16_t port)
+void SocketCore::establishConnection(const std::string& host, uint16_t port,
+                                     bool tcpNodelay)
 {
   closeConnection();
   std::string error;
@@ -462,7 +462,9 @@ void SocketCore::establishConnection(const std::string& host, uint16_t port)
     sockfd_ = fd;
     // make socket non-blocking mode
     setNonBlockingMode();
-    setTcpNodelay(true);
+    if(tcpNodelay) {
+      setTcpNodelay(true);
+    }
     if(connect(fd, rp->ai_addr, rp->ai_addrlen) == -1 &&
        SOCKET_ERRNO != A2_EINPROGRESS) {
       errNum = SOCKET_ERRNO;
@@ -738,14 +740,57 @@ void SocketCore::gnutlsRecordCheckDirection()
 }
 #endif // HAVE_LIBGNUTLS
 
-ssize_t SocketCore::writeData(const char* data, size_t len)
+ssize_t SocketCore::writeVector(a2iovec *iov, size_t iovcnt)
+{
+  ssize_t ret = 0;
+  wantRead_ = false;
+  wantWrite_ = false;
+  if(!secure_) {
+#ifdef __MINGW32__
+    DWORD nsent;
+    int rv = WSASend(sockfd_, iov, iovcnt, &nsent, 0, 0, 0);
+    if(rv == 0) {
+      ret = nsent;
+    } else {
+      ret = -1;
+    }
+#else // !__MINGW32__
+    while((ret = writev(sockfd_, iov, iovcnt)) == -1 &&
+          SOCKET_ERRNO == A2_EINTR);
+#endif // !__MINGW32__
+    int errNum = SOCKET_ERRNO;
+    if(ret == -1) {
+      if(A2_WOULDBLOCK(errNum)) {
+        wantWrite_ = true;
+        ret = 0;
+      } else {
+        throw DL_RETRY_EX(fmt(EX_SOCKET_SEND, errorMsg(errNum).c_str()));
+      }
+    }
+  } else {
+    // For SSL/TLS, we could not use writev, so just iterate vector
+    // and write the data in normal way.
+    for(size_t i = 0; i < iovcnt; ++i) {
+      ssize_t rv = writeData(iov[i].A2IOVEC_BASE, iov[i].A2IOVEC_LEN);
+      if(rv == 0) {
+        break;
+      }
+      ret += rv;
+    }
+  }
+  return ret;
+}
+
+ssize_t SocketCore::writeData(const void* data, size_t len)
 {
   ssize_t ret = 0;
   wantRead_ = false;
   wantWrite_ = false;
 
   if(!secure_) {
-    while((ret = send(sockfd_, data, len, 0)) == -1 && SOCKET_ERRNO == A2_EINTR);
+    // Cast for Windows send()
+    while((ret = send(sockfd_, reinterpret_cast<const char*>(data),
+                      len, 0)) == -1 && SOCKET_ERRNO == A2_EINTR);
     int errNum = SOCKET_ERRNO;
     if(ret == -1) {
       if(A2_WOULDBLOCK(errNum)) {
@@ -782,14 +827,15 @@ ssize_t SocketCore::writeData(const char* data, size_t len)
   return ret;
 }
 
-void SocketCore::readData(char* data, size_t& len)
+void SocketCore::readData(void* data, size_t& len)
 {
   ssize_t ret = 0;
   wantRead_ = false;
   wantWrite_ = false;
 
   if(!secure_) {
-    while((ret = recv(sockfd_, data, len, 0)) == -1 &&
+    // Cast for Windows recv()
+    while((ret = recv(sockfd_, reinterpret_cast<char*>(data), len, 0)) == -1 &&
           SOCKET_ERRNO == A2_EINTR);
     int errNum = SOCKET_ERRNO;
     if(ret == -1) {
@@ -1166,7 +1212,7 @@ bool SocketCore::tlsHandshake(TLSContext* tlsctx, const std::string& hostname)
 
 #endif // ENABLE_SSL
 
-ssize_t SocketCore::writeData(const char* data, size_t len,
+ssize_t SocketCore::writeData(const void* data, size_t len,
                               const std::string& host, uint16_t port)
 {
   wantRead_ = false;
@@ -1184,7 +1230,9 @@ ssize_t SocketCore::writeData(const char* data, size_t len,
   ssize_t r = -1;
   int errNum = 0;
   for(rp = res; rp; rp = rp->ai_next) {
-    while((r = sendto(sockfd_, data, len, 0, rp->ai_addr, rp->ai_addrlen)) == -1
+    // Cast for Windows sendto()
+    while((r = sendto(sockfd_, reinterpret_cast<const char*>(data), len, 0,
+                      rp->ai_addr, rp->ai_addrlen)) == -1
           && A2_EINTR == SOCKET_ERRNO);
     errNum = SOCKET_ERRNO;
     if(r == static_cast<ssize_t>(len)) {
@@ -1202,7 +1250,7 @@ ssize_t SocketCore::writeData(const char* data, size_t len,
   return r;
 }
 
-ssize_t SocketCore::readDataFrom(char* data, size_t len,
+ssize_t SocketCore::readDataFrom(void* data, size_t len,
                                  std::pair<std::string /* numerichost */,
                                  uint16_t /* port */>& sender)
 {
@@ -1211,7 +1259,9 @@ ssize_t SocketCore::readDataFrom(char* data, size_t len,
   sockaddr_union sockaddr;
   socklen_t sockaddrlen = sizeof(sockaddr);
   ssize_t r;
-  while((r = recvfrom(sockfd_, data, len, 0, &sockaddr.sa, &sockaddrlen)) == -1
+  // Cast for Windows recvfrom()
+  while((r = recvfrom(sockfd_, reinterpret_cast<char*>(data), len, 0,
+                      &sockaddr.sa, &sockaddrlen)) == -1
         && A2_EINTR == SOCKET_ERRNO);
   int errNum = SOCKET_ERRNO;
   if(r == -1) {

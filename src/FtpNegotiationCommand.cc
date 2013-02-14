@@ -682,7 +682,7 @@ bool FtpNegotiationCommand::preparePasvConnect() {
                     dataAddr.first.c_str(),
                     pasvPort_));
     dataSocket_.reset(new SocketCore());
-    dataSocket_->establishConnection(dataAddr.first, pasvPort_);
+    dataSocket_->establishConnection(dataAddr.first, pasvPort_, false);
     disableReadCheckSocket();
     setWriteCheckSocket(dataSocket_);
     sequence_ = SEQ_SEND_REST_PASV;

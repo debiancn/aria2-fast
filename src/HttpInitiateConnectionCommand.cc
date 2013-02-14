@@ -139,6 +139,7 @@ Command* HttpInitiateConnectionCommand::createNextCommand
                       getCuid(), addr.c_str(), port));
       createSocket();
       getSocket()->establishConnection(addr, port);
+
       getRequest()->setConnectedAddrInfo(hostname, addr, port);
     } else {
       setSocket(pooledSocket);

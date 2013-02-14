@@ -94,7 +94,9 @@
 #define TEXT_PROXY_METHOD                                               \
   _(" --proxy-method=METHOD        Set the method to use in proxy request.")
 #define TEXT_REFERER                                                    \
-  _(" --referer=REFERER            Set Referer. This affects all URLs.")
+  _(" --referer=REFERER            Set Referer. This affects all URLs. If \"*\" is\n" \
+    "                              given, each request URI is used as a referer.\n" \
+    "                              This may be useful when used with -P option.")
 #define TEXT_FTP_USER                                                   \
   _(" --ftp-user=USER              Set FTP user. This affects all URLs.")
 #define TEXT_FTP_PASSWD                                                 \
@@ -422,7 +424,8 @@
   _(" --summary-interval=SEC       Set interval to output download progress summary.\n" \
     "                              Setting 0 suppresses the output.")
 #define TEXT_LOG_LEVEL                                          \
-  _(" --log-level=LEVEL            Set log level to output.")
+  _(" --log-level=LEVEL            Set log level to output to file specified using\n" \
+    "                             --log option.")
 #define TEXT_REMOTE_TIME                                                \
   _(" -R, --remote-time[=true|false] Retrieve timestamp of the remote file from the\n" \
     "                              remote HTTP/FTP server and if it is available,\n" \
@@ -939,3 +942,10 @@
     "                              sessions saved using --save-session option. If\n" \
     "                              this option is not used, new GID is generated\n" \
     "                              by aria2.")
+#define TEXT_CONSOLE_LOG_LEVEL                                          \
+  _(" --console-log-level=LEVEL    Set log level to output to console.")
+#define TEXT_SAVE_SESSION_INTERVAL                                      \
+  _(" --save-session-interval=SEC  Save error/unfinished downloads to a file\n" \
+    "                              specified by --save-session option every SEC\n" \
+    "                              seconds. If 0 is given, file will be saved only\n" \
+    "                              when aria2 exits.")

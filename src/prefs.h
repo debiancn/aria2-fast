@@ -189,6 +189,8 @@ extern const Pref* PREF_ASYNC_DNS;
 extern const Pref* PREF_SUMMARY_INTERVAL;
 // value: debug, info, notice, warn, error
 extern const Pref* PREF_LOG_LEVEL;
+// value: debug, info, notice, warn, error
+extern const Pref* PREF_CONSOLE_LOG_LEVEL;
 // value: inorder | feedback | adaptive
 extern const Pref* PREF_URI_SELECTOR;
 // value: 1*digit
@@ -289,6 +291,8 @@ extern const Pref* PREF_FORCE_SAVE;
 extern const Pref* PREF_DISK_CACHE;
 // value: string
 extern const Pref* PREF_GID;
+// values: 1*digit
+extern const Pref* PREF_SAVE_SESSION_INTERVAL;
 
 /**
  * FTP related preferences

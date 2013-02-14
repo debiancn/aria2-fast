@@ -56,6 +56,7 @@
 #include "RequestGroup.h"
 #include "util.h"
 #include "fmt.h"
+#include "PeerConnection.h"
 
 namespace aria2 {
 
@@ -87,12 +88,13 @@ void DefaultBtMessageDispatcher::addMessageToQueue
   }
 }
 
-void DefaultBtMessageDispatcher::sendMessages() {
+void DefaultBtMessageDispatcher::sendMessagesInternal()
+{
   std::vector<SharedHandle<BtMessage> > tempQueue;
   while(!messageQueue_.empty()) {
     SharedHandle<BtMessage> msg = messageQueue_.front();
     messageQueue_.pop_front();
-    if(msg->isUploading() && !msg->isSendingInProgress()) {
+    if(msg->isUploading()) {
       if(requestGroupMan_->doesOverallUploadSpeedExceed() ||
          downloadContext_->getOwnerRequestGroup()->doesUploadSpeedExceed()) {
         tempQueue.push_back(msg);
@@ -100,22 +102,19 @@ void DefaultBtMessageDispatcher::sendMessages() {
       }
     }
     msg->send();
-    if(msg->isSendingInProgress()) {
-      messageQueue_.push_front(msg);
-      break;
-    }
   }
   if(!tempQueue.empty()) {
-    // Insert pending message to the front, so that message is likely sent in
-    // the same order as it is queued.
-    if(!messageQueue_.empty() && messageQueue_.front()->isSendingInProgress()) {
-      messageQueue_.insert(messageQueue_.begin()+1,
-                           tempQueue.begin(), tempQueue.end());
-    } else {
       messageQueue_.insert(messageQueue_.begin(),
                            tempQueue.begin(), tempQueue.end());
-    }
   }
+}
+
+void DefaultBtMessageDispatcher::sendMessages()
+{
+  if(peerConnection_->getBufferEntrySize() < A2_IOV_MAX) {
+    sendMessagesInternal();
+  }
+  peerConnection_->sendPendingData();
 }
 
 // Cancel sending piece message to peer.
@@ -344,11 +343,7 @@ void DefaultBtMessageDispatcher::checkRequestSlotAndDoNecessaryThing()
 
 bool DefaultBtMessageDispatcher::isSendingInProgress()
 {
-  if(messageQueue_.empty()) {
-    return false;
-  } else {
-    return messageQueue_.front()->isSendingInProgress();
-  }
+  return peerConnection_->getBufferEntrySize();
 }
 
 namespace {

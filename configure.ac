@@ -3,7 +3,7 @@
 #
 AC_PREREQ([2.67])
 LT_PREREQ([2.2.6])
-AC_INIT([aria2],[1.16.1],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.16.3],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
 AC_USE_SYSTEM_EXTENSIONS
 LT_INIT()
 AC_CONFIG_MACRO_DIR([m4])
@@ -375,6 +375,7 @@ AC_CHECK_HEADERS([argz.h \
                   sys/socket.h \
                   sys/time.h \
                   sys/types.h \
+                  sys/uio.h \
                   termios.h \
                   unistd.h \
 		  utime.h \

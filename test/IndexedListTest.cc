@@ -17,11 +17,13 @@ class IndexedListTest:public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE(IndexedListTest);
   CPPUNIT_TEST(testPushBack);
   CPPUNIT_TEST(testPushFront);
+  CPPUNIT_TEST(testRemove);
   CPPUNIT_TEST(testErase);
   CPPUNIT_TEST(testPopFront);
   CPPUNIT_TEST(testMove);
   CPPUNIT_TEST(testGet);
   CPPUNIT_TEST(testInsert);
+  CPPUNIT_TEST(testInsert_keyFunc);
   CPPUNIT_TEST_SUITE_END();
 public:
   void setUp()
@@ -29,11 +31,13 @@ public:
 
   void testPushBack();
   void testPushFront();
+  void testRemove();
   void testErase();
   void testPopFront();
   void testMove();
   void testGet();
   void testInsert();
+  void testInsert_keyFunc();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( IndexedListTest );
@@ -72,7 +76,7 @@ void IndexedListTest::testPushFront()
   }
 }
 
-void IndexedListTest::testErase()
+void IndexedListTest::testRemove()
 {
   int a[] = {1,2,3,4,5};
   IndexedList<int, int*> list;
@@ -80,10 +84,31 @@ void IndexedListTest::testErase()
     list.push_back(i, &a[i]);
   }
   for(int i = 0; i < 5; ++i) {
-    CPPUNIT_ASSERT(list.erase(i));
+    CPPUNIT_ASSERT(list.remove(i));
     CPPUNIT_ASSERT_EQUAL((size_t)5-i-1, list.size());
     for(int j = i+1; j < 5; ++j) {
       CPPUNIT_ASSERT_EQUAL(a[j], *list.get(j));
+    }
+  }
+}
+
+void IndexedListTest::testErase()
+{
+  int a[] = {1,2,3,4,5};
+  IndexedList<int, int*> list;
+  for(int i = 0; i < 5; ++i) {
+    list.push_back(i, &a[i]);
+  }
+  int* p = a;
+  for(IndexedList<int, int*>::SeqType::iterator i = list.begin();
+      i != list.end();) {
+    i = list.erase(i);
+    CPPUNIT_ASSERT_EQUAL((size_t)(std::distance(i, list.end())), list.size());
+
+    int* pp = ++p;
+    for(IndexedList<int, int*>::SeqType::iterator j = list.begin();
+        j != list.end(); ++j, ++pp) {
+      CPPUNIT_ASSERT_EQUAL(*pp, *(*j).second);
     }
   }
 }
@@ -203,9 +228,57 @@ void IndexedListTest::testGet()
   list.push_back(1, &b);
   CPPUNIT_ASSERT_EQUAL((int*)0, list.get(1000));
   CPPUNIT_ASSERT_EQUAL(&a, list.get(123));
+}
 
-  CPPUNIT_ASSERT(list.begin() == list.find(123));
-  CPPUNIT_ASSERT(list.end() == list.find(124));
+namespace {
+struct KeyFunc {
+  int n;
+  KeyFunc(int n):n(n) {}
+  int operator()(const SharedHandle<std::string>& x)
+  {
+    return n++;
+  }
+};
+} // namespace
+
+void IndexedListTest::testInsert_keyFunc()
+{
+  SharedHandle<std::string> s[] = {
+    SharedHandle<std::string>(new std::string("a")),
+    SharedHandle<std::string>(new std::string("b")),
+    SharedHandle<std::string>(new std::string("c")),
+    SharedHandle<std::string>(new std::string("d"))
+  };
+  size_t slen = sizeof(s)/sizeof(s[0]);
+  IndexedList<int, SharedHandle<std::string> > list;
+  list.insert(list.begin(), KeyFunc(0), vbegin(s), vend(s));
+  CPPUNIT_ASSERT_EQUAL((size_t)slen, list.size());
+  for(size_t i = 0; i < slen; ++i) {
+    CPPUNIT_ASSERT_EQUAL(*s[i], *list.get(i));
+  }
+  list.insert(list.begin()+2, KeyFunc(slen), vbegin(s), vend(s));
+  CPPUNIT_ASSERT_EQUAL((size_t)slen*2, list.size());
+  for(size_t i = slen; i < slen*2; ++i) {
+    CPPUNIT_ASSERT_EQUAL(*s[i - slen], *list.get(i));
+  }
+  IndexedList<int, SharedHandle<std::string> >::SeqType::iterator itr;
+  itr = list.begin();
+  CPPUNIT_ASSERT_EQUAL(std::string("a"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("b"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("a"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("b"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("c"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("d"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("c"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("d"), *(*itr++).second);
+
+  list.insert(list.begin(), KeyFunc(2*slen-1), vbegin(s), vend(s));
+  CPPUNIT_ASSERT_EQUAL((size_t)slen*3-1, list.size());
+  itr = list.begin();
+  CPPUNIT_ASSERT_EQUAL(std::string("b"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("c"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("d"), *(*itr++).second);
+  CPPUNIT_ASSERT_EQUAL(std::string("a"), *(*itr++).second);
 }
 
 void IndexedListTest::testInsert()
