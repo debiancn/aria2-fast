@@ -5,6 +5,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
+#include "TestUtil.h"
 #include "RequestGroupMan.h"
 #include "array_fun.h"
 #include "download_helper.h"
@@ -12,6 +13,8 @@
 #include "Option.h"
 #include "a2functional.h"
 #include "FileEntry.h"
+#include "SelectEventPoll.h"
+#include "DownloadEngine.h"
 
 namespace aria2 {
 
@@ -26,26 +29,6 @@ public:
 
 
 CPPUNIT_TEST_SUITE_REGISTRATION(SessionSerializerTest);
-
-namespace {
-SharedHandle<DownloadResult> createDownloadResult
-(error_code::Value result, const std::string& uri)
-{
-  std::vector<std::string> uris;
-  uris.push_back(uri);
-  SharedHandle<FileEntry> entry(new FileEntry("/tmp/path", 1, 0, uris));
-  std::vector<SharedHandle<FileEntry> > entries;
-  entries.push_back(entry);
-  SharedHandle<DownloadResult> dr(new DownloadResult());
-  dr->gid = GroupId::create();
-  dr->fileEntries = entries;
-  dr->result = result;
-  dr->belongsTo = 0;
-  dr->inMemoryDownload = false;
-  dr->option = SharedHandle<Option>(new Option());
-  return dr;
-}
-} // namespace
 
 void SessionSerializerTest::testSave()
 {
@@ -62,6 +45,7 @@ void SessionSerializerTest::testSave()
   option->put(PREF_DIR, "/tmp");
   createRequestGroupForUri(result, option, uris);
   CPPUNIT_ASSERT_EQUAL((size_t)5, result.size());
+  result[4]->getOption()->put(PREF_PAUSE, A2_V_TRUE);
   option->put(PREF_MAX_DOWNLOAD_RESULT, "10");
   SharedHandle<RequestGroupMan> rgman
     (new RequestGroupMan(result, 1, option.get()));
@@ -69,11 +53,20 @@ void SessionSerializerTest::testSave()
   SharedHandle<DownloadResult> drs[] = {
     // REMOVED downloads will not be saved.
     createDownloadResult(error_code::REMOVED, "http://removed"),
-    createDownloadResult(error_code::TIME_OUT, "http://error")
+    createDownloadResult(error_code::TIME_OUT, "http://error"),
+    createDownloadResult(error_code::FINISHED, "http://finished"),
+    createDownloadResult(error_code::FINISHED, "http://force-save")
   };
+  drs[3]->option->put(PREF_FORCE_SAVE, A2_V_TRUE);
   for(size_t i = 0; i < sizeof(drs)/sizeof(drs[0]); ++i) {
     rgman->addDownloadResult(drs[i]);
   }
+
+  DownloadEngine e(SharedHandle<EventPoll>(new SelectEventPoll()));
+  e.setOption(option.get());
+  rgman->fillRequestGroupFromReserver(&e);
+  CPPUNIT_ASSERT_EQUAL((size_t)1, rgman->getRequestGroups().size());
+
   std::string filename = A2_TEST_OUT_DIR"/aria2_SessionSerializerTest_testSave";
   s.save(filename);
   std::ifstream ss(filename.c_str(), std::ios::binary);
@@ -82,6 +75,14 @@ void SessionSerializerTest::testSave()
   CPPUNIT_ASSERT_EQUAL(std::string("http://error\t"), line);
   std::getline(ss, line);
   CPPUNIT_ASSERT_EQUAL(fmt(" gid=%s", drs[1]->gid->toHex().c_str()), line);
+  std::getline(ss, line);
+  // finished and force-save option
+  CPPUNIT_ASSERT_EQUAL(std::string("http://force-save\t"), line);
+  std::getline(ss, line);
+  CPPUNIT_ASSERT_EQUAL(fmt(" gid=%s", drs[3]->gid->toHex().c_str()), line);
+  std::getline(ss, line);
+  CPPUNIT_ASSERT_EQUAL(std::string(" force-save=true"), line);
+  // Check active download is also saved
   std::getline(ss, line);
   CPPUNIT_ASSERT_EQUAL(uris[0]+"\t"+uris[1]+"\t", line);
   std::getline(ss, line);
@@ -115,6 +116,8 @@ void SessionSerializerTest::testSave()
                        line);
   std::getline(ss, line);
   CPPUNIT_ASSERT_EQUAL(std::string(" dir=/tmp"), line);
+  std::getline(ss, line);
+  CPPUNIT_ASSERT_EQUAL(std::string(" pause=true"), line);
   std::getline(ss, line);
   CPPUNIT_ASSERT(!ss);
 #endif // defined(ENABLE_BITTORRENT) && defined(ENABLE_METALINK)

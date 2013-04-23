@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "February 03, 2013" "1.16.3" "aria2"
+.TH "ARIA2C" "1" "April 20, 2013" "1.17.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -59,6 +59,7 @@ Reads input from stdin when \fB\-\fP is specified.
 Additionally, options can be specified after each line of
 URI. This optional line must start with one or more white spaces and have
 one option per single line.
+The input file can use gzip compression.
 See \fI\%Input File\fP subsection for details.
 See also \fI\%--deferred-input\fP option.
 .UNINDENT
@@ -827,10 +828,10 @@ unicast IPv6 address of the host.
 .INDENT 0.0
 .TP
 .B \-\-dht\-listen\-port=<PORT>...
-Set UDP listening port for both IPv4 and IPv6 DHT.
-Multiple ports can be specified by using \fB,\fP, for example: \fB6881,6885\fP.
-You can also use \fB\-\fP to specify a range: \fB6881\-6999\fP. \fB,\fP and \fB\-\fP can be used
-together.
+Set UDP listening port used by DHT(IPv4, IPv6) and UDP tracker.
+Multiple ports can be specified by using \fB,\fP, for example:
+\fB6881,6885\fP.  You can also use \fB\-\fP to specify a range:
+\fB6881\-6999\fP. \fB,\fP and \fB\-\fP can be used together.
 Default: \fB6881\-6999\fP
 .IP Note
 Make sure that the specified ports are open for incoming UDP traffic.
@@ -844,9 +845,9 @@ Set timeout in seconds. Default: \fB10\fP
 .INDENT 0.0
 .TP
 .B \-\-enable\-dht[=true|false]
-Enable IPv4 DHT functionality. If a private flag is set in a
-torrent, aria2 doesn\(aqt use DHT for that download even if \fBtrue\fP is
-given.  Default: \fBtrue\fP
+Enable IPv4 DHT functionality. It also enables UDP tracker
+support. If a private flag is set in a torrent, aria2 doesn\(aqt use
+DHT for that download even if \fBtrue\fP is given.  Default: \fBtrue\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1040,6 +1041,14 @@ Default: \fBfalse\fP
 Use the certificate in FILE for RPC server. The certificate must be
 in PEM format. Use \fI\%--rpc-private-key\fP option to specify the
 private key. Use \fI\%--rpc-secure\fP option to enable encryption.
+.sp
+\fIAppleTLS\fP users should use the Keychain Access utility to first generate a
+self\-signed SSL\-Server certificate, e.g. using the wizard, and get the
+SHA\-1 fingerprint from the Information dialog corresponding to that new
+certificate.
+To start aria2c with \fI\%--rpc-secure\fP use
+\fI\-\-rpc\-certificate=<SHA\-1>\fP and just omit the \fI\%--rpc-private-key\fP
+option.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1231,13 +1240,6 @@ requested file is printed and remaining ones are omitted.  If OPT is
 progress and path/URI. The percentage of progress and path/URI are
 printed for each requested file in each row.
 Default: \fBdefault\fP
-.UNINDENT
-.INDENT 0.0
-.TP
-.B \-\-enable\-async\-dns6[=true|false]
-Enable IPv6 name resolution in asynchronous DNS resolver. This
-option will be ignored when \fI\%--async-dns=false.\fP
-Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1510,7 +1512,9 @@ disables resume.
 .B \-\-save\-session=<FILE>
 Save error/unfinished downloads to FILE on exit.  You can pass this
 output file to aria2c with \fI\%--input-file\fP option on
-restart. Please note that downloads added by
+restart. If you like the output to be gzipped append a .gz extension to
+the file name.
+Please note that downloads added by
 \fI\%aria2.addTorrent()\fP and \fI\%aria2.addMetalink()\fP RPC method
 and whose metadata could not be saved as a file are not saved.
 Downloads removed using \fI\%aria2.remove()\fP and
@@ -1994,11 +1998,9 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%dry-run\fP
 .IP \(bu 2
-\fI\%enable-async-dns6\fP
+\fI\%enable-http-keep-alive\fP
 .UNINDENT
 .INDENT 2.0
-.IP \(bu 2
-\fI\%enable-http-keep-alive\fP
 .IP \(bu 2
 \fI\%enable-http-pipelining\fP
 .IP \(bu 2
@@ -4190,12 +4192,11 @@ forwarding, it\(aqs up to you to do it manually.
 .sp
 .nf
 .ft C
-$ aria2c \-\-enable\-dht6 \-\-dht\-listen\-port=6881 \-\-dht\-listen\-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR \-\-enable\-async\-dns6
+$ aria2c \-\-enable\-dht6 \-\-dht\-listen\-port=6881 \-\-dht\-listen\-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR
 .ft P
 .fi
 .IP Note
-If aria2c is not built with c\-ares, \fI\%--enable-async-dns6\fP is
-unnecessary. aria2 shares same port between IPv4 and IPv6 DHT.
+aria2 shares same port between IPv4 and IPv6 DHT.
 .RE
 .SS Add and remove tracker URI
 .sp

@@ -104,7 +104,7 @@ void handler(int signal) {
 } // namespace
 
 MultiUrlRequestInfo::MultiUrlRequestInfo
-(const std::vector<SharedHandle<RequestGroup> >& requestGroups,
+(std::vector<SharedHandle<RequestGroup> >& requestGroups,
  const SharedHandle<Option>& op,
  const SharedHandle<StatCalc>& statCalc,
  const SharedHandle<OutputFile>& summaryOut,
@@ -129,6 +129,7 @@ void MultiUrlRequestInfo::printMessageForContinue()
 error_code::Value MultiUrlRequestInfo::execute()
 {
   error_code::Value returnValue = error_code::FINISHED;
+  sigset_t mask;
   try {
     SharedHandle<rpc::WebSocketSessionMan> wsSessionMan;
     if(option_->getAsBool(PREF_ENABLE_RPC)) {
@@ -140,11 +141,14 @@ error_code::Value MultiUrlRequestInfo::execute()
 #ifdef ENABLE_SSL
     if(option_->getAsBool(PREF_ENABLE_RPC) &&
        option_->getAsBool(PREF_RPC_SECURE)) {
-      if(!option_->blank(PREF_RPC_CERTIFICATE) &&
-         !option_->blank(PREF_RPC_PRIVATE_KEY)) {
+      if(!option_->blank(PREF_RPC_CERTIFICATE)
+#ifndef HAVE_APPLETLS
+         && !option_->blank(PREF_RPC_PRIVATE_KEY)
+#endif // HAVE_APPLETLS
+         ) {
         // We set server TLS context to the SocketCore before creating
         // DownloadEngine instance.
-        SharedHandle<TLSContext> svTlsContext(new TLSContext(TLS_SERVER));
+        SharedHandle<TLSContext> svTlsContext(TLSContext::make(TLS_SERVER));
         svTlsContext->addCredentialFile(option_->get(PREF_RPC_CERTIFICATE),
                                         option_->get(PREF_RPC_PRIVATE_KEY));
         SocketCore::setServerTLSContext(svTlsContext);
@@ -157,6 +161,8 @@ error_code::Value MultiUrlRequestInfo::execute()
 
     SharedHandle<DownloadEngine> e =
       DownloadEngineFactory().newDownloadEngine(option_.get(), requestGroups_);
+    // Avoid keeping RequestGroups alive longer than necessary
+    requestGroups_.clear();
 
     if(!option_->blank(PREF_LOAD_COOKIES)) {
       File cookieFile(option_->get(PREF_LOAD_COOKIES));
@@ -191,7 +197,7 @@ error_code::Value MultiUrlRequestInfo::execute()
     e->setAuthConfigFactory(authConfigFactory);
 
 #ifdef ENABLE_SSL
-    SharedHandle<TLSContext> clTlsContext(new TLSContext(TLS_CLIENT));
+    SharedHandle<TLSContext> clTlsContext(TLSContext::make(TLS_CLIENT));
     if(!option_->blank(PREF_CERTIFICATE) &&
        !option_->blank(PREF_PRIVATE_KEY)) {
       clTlsContext->addCredentialFile(option_->get(PREF_CERTIFICATE),
@@ -208,9 +214,7 @@ error_code::Value MultiUrlRequestInfo::execute()
         A2_LOG_INFO(MSG_WARN_NO_CA_CERT);
       }
     }
-    if(option_->getAsBool(PREF_CHECK_CERTIFICATE)) {
-      clTlsContext->enablePeerVerification();
-    }
+    clTlsContext->setVerifyPeer(option_->getAsBool(PREF_CHECK_CERTIFICATE));
     SocketCore::setClientTLSContext(clTlsContext);
 #endif
 #ifdef HAVE_ARES_ADDR_NODE
@@ -233,11 +237,22 @@ error_code::Value MultiUrlRequestInfo::execute()
     if(uriListParser_) {
       e->getRequestGroupMan()->setUriListParser(uriListParser_);
     }
+#ifdef HAVE_SIGACTION
+    sigemptyset(&mask);
+    sigaddset(&mask, SIGINT);
+    sigaddset(&mask, SIGTERM);
 #ifdef SIGHUP
-    util::setGlobalSignalHandler(SIGHUP, handler, 0);
+    sigaddset(&mask, SIGHUP);
 #endif // SIGHUP
-    util::setGlobalSignalHandler(SIGINT, handler, 0);
-    util::setGlobalSignalHandler(SIGTERM, handler, 0);
+#else // !HAVE_SIGACTION
+    mask = 0;
+#endif // !HAVE_SIGACTION
+
+#ifdef SIGHUP
+    util::setGlobalSignalHandler(SIGHUP, &mask, handler, 0);
+#endif // SIGHUP
+    util::setGlobalSignalHandler(SIGINT, &mask, handler, 0);
+    util::setGlobalSignalHandler(SIGTERM, &mask, handler, 0);
 
     e->getRequestGroupMan()->getNetStat().downloadStart();
     e->run();
@@ -284,11 +299,15 @@ error_code::Value MultiUrlRequestInfo::execute()
     A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
   }
   SingletonHolder<Notifier>::instance(0);
+
+#ifdef HAVE_SIGACTION
+  sigemptyset(&mask);
+#endif // HAVE_SIGACTION
 #ifdef SIGHUP
-  util::setGlobalSignalHandler(SIGHUP, SIG_DFL, 0);
+  util::setGlobalSignalHandler(SIGHUP, &mask, SIG_DFL, 0);
 #endif // SIGHUP
-  util::setGlobalSignalHandler(SIGINT, SIG_DFL, 0);
-  util::setGlobalSignalHandler(SIGTERM, SIG_DFL, 0);
+  util::setGlobalSignalHandler(SIGINT, &mask, SIG_DFL, 0);
+  util::setGlobalSignalHandler(SIGTERM, &mask, SIG_DFL, 0);
   return returnValue;
 }
 

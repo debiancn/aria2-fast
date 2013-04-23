@@ -228,7 +228,15 @@ SharedHandle<CheckIntegrityEntry> RequestGroup::createCheckIntegrityEntry()
     // infoFile exists.
     loadAndOpenFile(infoFile);
     checkEntry.reset(new StreamCheckIntegrityEntry(this));
-  } else if(isPreLocalFileCheckEnabled() && infoFile->exists()) {
+  } else if(isPreLocalFileCheckEnabled() &&
+            (infoFile->exists() ||
+             (File(getFirstFilePath()).exists() &&
+              option_->getAsBool(PREF_CONTINUE)))) {
+    // If infoFile exists or -c option is given, we need to check
+    // download has been completed (which is determined after
+    // loadAndOpenFile()). If so, use ChecksumCheckIntegrityEntry when
+    // verification is enabled, because CreateRequestCommand does not
+    // issue checksum verification and download fails without it.
     loadAndOpenFile(infoFile);
     if(downloadFinished()) {
 #ifdef ENABLE_MESSAGE_DIGEST
@@ -631,7 +639,7 @@ void RequestGroup::initPieceStorage()
     tempPieceStorage.swap(psHolder);
   } else {
     UnknownLengthPieceStorage* ps =
-      new UnknownLengthPieceStorage(downloadContext_, option_.get());
+      new UnknownLengthPieceStorage(downloadContext_);
     SharedHandle<PieceStorage> psHolder(ps);
     if(diskWriterFactory_) {
       ps->setDiskWriterFactory(diskWriterFactory_);
@@ -639,8 +647,8 @@ void RequestGroup::initPieceStorage()
     tempPieceStorage.swap(psHolder);
   }
   tempPieceStorage->initStorage();
-  SharedHandle<SegmentMan> tempSegmentMan
-    (new SegmentMan(option_.get(), downloadContext_, tempPieceStorage));
+  SharedHandle<SegmentMan> tempSegmentMan(new SegmentMan(downloadContext_,
+                                                         tempPieceStorage));
 
   pieceStorage_.swap(tempPieceStorage);
   segmentMan_.swap(tempSegmentMan);

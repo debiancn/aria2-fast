@@ -69,6 +69,7 @@
 #include "SocketRecvBuffer.h"
 #ifdef ENABLE_ASYNC_DNS
 #include "AsyncNameResolver.h"
+#include "AsyncNameResolverMan.h"
 #endif // ENABLE_ASYNC_DNS
 #ifdef ENABLE_MESSAGE_DIGEST
 # include "ChecksumCheckIntegrityEntry.h"
@@ -90,8 +91,10 @@ AbstractCommand::AbstractCommand
     requestGroup_(requestGroup),
     req_(req), fileEntry_(fileEntry), e_(e), socket_(s),
     socketRecvBuffer_(socketRecvBuffer),
+#ifdef ENABLE_ASYNC_DNS
+    asyncNameResolverMan_(new AsyncNameResolverMan()),
+#endif // ENABLE_ASYNC_DNS
     checkSocketIsReadable_(false), checkSocketIsWritable_(false),
-    nameResolverCheck_(false),
     incNumConnection_(incNumConnection),
     serverStatTimer_(global::wallclock())
 {
@@ -103,13 +106,16 @@ AbstractCommand::AbstractCommand
   }
   requestGroup_->increaseStreamCommand();
   requestGroup_->increaseNumCommand();
+#ifdef ENABLE_ASYNC_DNS
+  configureAsyncNameResolverMan(asyncNameResolverMan_.get(), e_->getOption());
+#endif // ENABLE_ASYNC_DNS
 }
 
 AbstractCommand::~AbstractCommand() {
   disableReadCheckSocket();
   disableWriteCheckSocket();
 #ifdef ENABLE_ASYNC_DNS
-  disableNameResolverCheck(asyncNameResolver_);
+  asyncNameResolverMan_->disableNameResolverCheck(e_, this);
 #endif // ENABLE_ASYNC_DNS
   requestGroup_->decreaseNumCommand();
   requestGroup_->decreaseStreamCommand();
@@ -206,10 +212,14 @@ bool AbstractCommand::execute() {
        (checkSocketIsWritable_ && writeEventEnabled()) ||
        hupEventEnabled() ||
 #ifdef ENABLE_ASYNC_DNS
-       (nameResolverCheck_ && nameResolveFinished()) ||
+       (asyncNameResolverMan_->resolverChecked() &&
+        asyncNameResolverMan_->getStatus() != 0) ||
 #endif // ENABLE_ASYNC_DNS
-       (!checkSocketIsReadable_ && !checkSocketIsWritable_ &&
-        !nameResolverCheck_)) {
+       (!checkSocketIsReadable_ && !checkSocketIsWritable_
+#ifdef ENABLE_ASYNC_DNS
+        && !asyncNameResolverMan_->resolverChecked()
+#endif // ENABLE_ASYNC_DNS
+        ) || noCheck()) {
       checkPoint_ = global::wallclock();
       if(getPieceStorage()) {
         if(!req_ || req_->getMaxPipelinedRequest() == 1 ||
@@ -545,6 +555,13 @@ void AbstractCommand::setWriteCheckSocketIf
   }
 }
 
+void AbstractCommand::swapSocket(SharedHandle<SocketCore>& socket)
+{
+  disableReadCheckSocket();
+  disableWriteCheckSocket();
+  socket_.swap(socket);
+}
+
 namespace {
 // Constructs proxy URI, merging username and password if they are
 // defined.
@@ -688,86 +705,6 @@ SharedHandle<Request> AbstractCommand::createProxyRequest() const
   return proxyRequest;
 }
 
-#ifdef ENABLE_ASYNC_DNS
-
-bool AbstractCommand::isAsyncNameResolverInitialized() const
-{
-  return asyncNameResolver_;
-}
-
-void AbstractCommand::initAsyncNameResolver(const std::string& hostname)
-{
-  int family;
-  if(getOption()->getAsBool(PREF_ENABLE_ASYNC_DNS6)) {
-    family = AF_UNSPEC;
-  } else {
-    family = AF_INET;
-  }
-  asyncNameResolver_.reset
-    (new AsyncNameResolver(family
-#ifdef HAVE_ARES_ADDR_NODE
-                           ,
-                           e_->getAsyncDNSServers()
-#endif // HAVE_ARES_ADDR_NODE
-                           ));
-  A2_LOG_INFO(fmt(MSG_RESOLVING_HOSTNAME,
-                  getCuid(),
-                  hostname.c_str()));
-  asyncNameResolver_->resolve(hostname);
-  setNameResolverCheck(asyncNameResolver_);
-}
-
-bool AbstractCommand::asyncResolveHostname()
-{
-  switch(asyncNameResolver_->getStatus()) {
-  case AsyncNameResolver::STATUS_SUCCESS:
-    disableNameResolverCheck(asyncNameResolver_);
-    return true;
-  case AsyncNameResolver::STATUS_ERROR:
-    disableNameResolverCheck(asyncNameResolver_);
-    if(!isProxyRequest(req_->getProtocol(), getOption())) {
-      e_->getRequestGroupMan()->getOrCreateServerStat
-        (req_->getHost(), req_->getProtocol())->setError();
-    }
-    throw DL_ABORT_EX2
-      (fmt(MSG_NAME_RESOLUTION_FAILED,
-           getCuid(),
-           asyncNameResolver_->getHostname().c_str(),
-           asyncNameResolver_->getError().c_str()),
-       error_code::NAME_RESOLVE_ERROR);
-  default:
-    return false;
-  }
-}
-
-const std::vector<std::string>& AbstractCommand::getResolvedAddresses()
-{
-  return asyncNameResolver_->getResolvedAddresses();
-}
-
-void AbstractCommand::setNameResolverCheck
-(const SharedHandle<AsyncNameResolver>& resolver) {
-  if(resolver) {
-    nameResolverCheck_ = true;
-    e_->addNameResolverCheck(resolver, this);
-  }
-}
-
-void AbstractCommand::disableNameResolverCheck
-(const SharedHandle<AsyncNameResolver>& resolver) {
-  if(resolver) {
-    nameResolverCheck_ = false;
-    e_->deleteNameResolverCheck(resolver, this);
-  }
-}
-
-bool AbstractCommand::nameResolveFinished() const {
-  return
-    asyncNameResolver_->getStatus() ==  AsyncNameResolver::STATUS_SUCCESS ||
-    asyncNameResolver_->getStatus() == AsyncNameResolver::STATUS_ERROR;
-}
-#endif // ENABLE_ASYNC_DNS
-
 std::string AbstractCommand::resolveHostname
 (std::vector<std::string>& addrs, const std::string& hostname, uint16_t port)
 {
@@ -780,13 +717,30 @@ std::string AbstractCommand::resolveHostname
   if(addrs.empty()) {
 #ifdef ENABLE_ASYNC_DNS
     if(getOption()->getAsBool(PREF_ASYNC_DNS)) {
-      if(!isAsyncNameResolverInitialized()) {
-        initAsyncNameResolver(hostname);
+      if(!asyncNameResolverMan_->started()) {
+        asyncNameResolverMan_->startAsync(hostname, e_, this);
       }
-      if(asyncResolveHostname()) {
-        addrs = getResolvedAddresses();
-      } else {
+      switch(asyncNameResolverMan_->getStatus()) {
+      case -1:
+        if(!isProxyRequest(req_->getProtocol(), getOption())) {
+          e_->getRequestGroupMan()->getOrCreateServerStat
+            (req_->getHost(), req_->getProtocol())->setError();
+        }
+        throw DL_ABORT_EX2
+          (fmt(MSG_NAME_RESOLUTION_FAILED, getCuid(), hostname.c_str(),
+               asyncNameResolverMan_->getLastError().c_str()),
+           error_code::NAME_RESOLVE_ERROR);
+      case 0:
         return A2STR::NIL;
+      case 1:
+        asyncNameResolverMan_->getResolvedAddress(addrs);
+        if(addrs.empty()) {
+          throw DL_ABORT_EX2
+            (fmt(MSG_NAME_RESOLUTION_FAILED, getCuid(), hostname.c_str(),
+                 "No address returned"),
+             error_code::NAME_RESOLVE_ERROR);
+        }
+        break;
       }
     } else
 #endif // ENABLE_ASYNC_DNS

@@ -1,34 +1,493 @@
-commit d1c88fbabf8ecf82111fb03495c0246958661903
+commit 8604714c4ee2251adb240186a7cca155abb7ceca
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-02-03
+AuthorDate: 2013-04-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-02-03
+CommitDate: 2013-04-20
 
-    Bump up version number to 1.16.3
+    Update bash_completion
 
-commit b86da6b7b2245ffd2d1a756cde27d4939179b261
+commit 9abbd5c917d03f3a8a117484fc475391ec359158
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-02-03
+AuthorDate: 2013-04-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-02-03
+CommitDate: 2013-04-20
 
-    Update NEWS
+    Use INFO level log when get_associate failed in PortEventPoll::poll()
 
-commit 98e7018599c010b56ade294942e2e7b3d58d1bb6
+commit 51f3bc59e1714426f9856dcfdfe3e4fd16741c88
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-02-03
+AuthorDate: 2013-04-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-02-03
+CommitDate: 2013-04-20
 
-    Fix failure to set TCP_NODELAY on Windows
+    Update NEWS for 1.17.0 release
+
+commit 71713709e50f4afa614c996cbe82c317ca7d2956
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-16
+
+    Bump up version number to 1.17.0
+
+commit 9041be8e32bc7880e6104ca422797eb4bbe5807d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-15
+
+    Add tailmatch testcase for cookie
+
+commit f326955108bda8394dcb381e6015f2cd7b9e2a19
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-15
+
+    Fix sphinx warnings
+
+commit adab7ace6ec36ae4a249c4c0b45cf6d7d7eca50a
+Merge: a3aec02 6ced9de
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-15
+
+    Merge branch 'master' of https://github.com/gsavix/aria2 into gsavix-master
+
+commit 6ced9deef82ce570bd4072a3309c392114ecd0f8
+Author:     gilberto dos santos alves <gsavix@gmail.com>
+AuthorDate: 2013-04-14
+Commit:     gilberto dos santos alves <gsavix@gmail.com>
+CommitDate: 2013-04-14
+
+    Update aria2c.rst
     
-    On Windows setting TCP_NODELAY after non-blocking connect fails
-    at least on Windows 7.
+    appletls warnings. first create private certificate with sha-1
 
-commit 1c9cfccac4bdd16b8c6662eab9e58d6f517424d0
+commit ca57f82dae1751293f7915ec71beb58013b45ba9
+Author:     gilberto dos santos alves <gsavix@gmail.com>
+AuthorDate: 2013-04-14
+Commit:     gilberto dos santos alves <gsavix@gmail.com>
+CommitDate: 2013-04-14
+
+    Update aria2c.rst
+    
+    type error metalink option rst title chars (mixed ~----~~
+
+commit a3aec02fe17ed36348cb889ec7223799f024bea0
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-04-14
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2013-04-14
+
+    Update aria2c.rst
+
+commit 8a431bfc891c52cc4f439cb3d0168a831f6ad88c
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-02-03
+AuthorDate: 2013-04-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-02-03
+CommitDate: 2013-04-14
 
-    Fix invalid iterator handling when deleting RequestGroup
+    Don't wait for AAAA query response if A query response has been received
+    
+    If we got IPv4 lookup response, we don't wait for IPv6 lookup
+    response. This is because DNS server may drop AAAA query and we have
+    to wait for the long time before timeout. We don't do the inverse,
+    because, based on todays deployment of DNS server, almost all of them
+    can respond A query just fine.
+
+commit 5e245c33971c557f1291ceb44356584098757178
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-14
+
+    Fix compile error without SSL/TLS lib
+
+commit 2e39fd6273b192d560c576f6fe42119255231f5a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-13
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-13
+
+    Check configured addresses again if previous check found none of them
+    
+    Currently, aria2 checks configured addresses at the startup. But there
+    are chances that interfaces are not setup at that moment. For example,
+    if aria2 is used as daemon, it may start before network interfaces
+    up. To workaround this, we check addresses again if both addresses are
+    not configured at the startup.
+
+commit 994eb551f18bbaea399b5fc564df80dd18a241c7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-13
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-13
+
+    Append --static to pkg-config arguments when ARIA2_STATIC=yes
+
+commit 4070113ef0fef840a0fdd5104c38fb23cd0008eb
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-11
+
+    Save options directly specified for download in --save-session
+    
+    This change makes --save-session save only options specified for
+    download, more specifically, options in command-line, -i file and via
+    RPC. The other options from conf file and default values are not
+    saved.  This will drastically decrease the size of session file.
+
+commit 07d38e31adb7a01a002b0a844a47f5f8ee4fe875
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-11
+
+    Save URI returned only from FileEntry::getRemainingUris()
+    
+    The currently used URIs are inserted back into remaining URI list in
+    FileEntry::putBackRequest(), which overlaps to some of the URIs in
+    spentUris_. If we save spent URIs, each time save is performed, the
+    number of URIs are increased due to this overlap. This change fixes
+    this bug.
+
+commit b874c7df11f5f4a5407fb91ebef8f6b12dfd47f4
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-10
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-10
+
+    AppleMD: Add destructors to make compilers happy
+
+commit b35fbd3172169bb0f586fa9a708808dc6d8b7ecd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-10
+
+    Print linked 3rd party libraries with version in `aria2c -v` output
+
+commit d0ff31faf850b671220f60e81c4982d14aa6fccf
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-09
+
+    Format MessageDigest.cc
+
+commit f333231c7a0cd08e25bf56ff7ddb6aaf8c6972da
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-09
+
+    Fix broken MessageDigst::getSupportedHashTypeString()
+
+commit 15e1a799147fdb5fb9471cb9e96c928b6cae31c3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-09
+
+    Update TLSSession::checkDirection() doc
+    
+    Make it clear that TLS_WANT_READ must be returned if underlying
+    SSL/TLS lib does not indicate I/O direction. This is because
+    SocketCore sets wantRead_ = true when TLS_WANT_READ is returned and
+    otherwise sets wantWrite_ = true. We only want to set wantWrite_ =
+    true iff we have some pending data to send.
+
+commit 83b801a0a50af72f124a6b6ff3e740854d178876
+Merge: f9225db 16876a5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-09
+
+    Merge branch 'appletls-wantread' of https://github.com/nmaier/aria2 into nmaier-appletls-cred-kc
+
+commit 16876a53344a4d3d5224a480fc17811574339301
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-08
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-08
+
+    AppleTLS: Fixup checkDirection() to return WANT_READ by default
+
+commit f9225db135682ee092d0b374cfff0f1041a41ccd
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-08
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-08
+
+    AppleTLS: Document new --rpc-certificate behavior
+
+commit 82a861f8d88bbe5d978dfa2ebfc184d903981ead
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-08
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-08
+
+    AppleTLS: Support credentials via KeyChain fingerprints
+
+commit 89cf6c046833c578e153f71b9ad40817464d0ba5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-06
+
+    Append comment to endif
+
+commit 457356ad13f560c1aa674d58540e19aa9c14206e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-06
+
+    Fix make distcheck
+
+commit ddad275dbd69a05f7aa537cf023c304d684bf44a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-06
+
+    Make log level INFO in addTrustedCACertFile()
+    
+    With WARN level, they will be always printed on Mac OS and old GNUTLS
+    build which does not have its API.
+
+commit 35d00f6b7f046f227e0d7058a41bdd8378d3ca17
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-06
+
+    Remove meta directive for now since it breaks manpage generation
+
+commit e6d75020ea14da38c058f2cd429b63e2f1b01b3b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-06
+
+    Fix openssl build
+
+commit 57097468204250b35e05436ff7eed4465744c648
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-05
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-05
+
+    AppleTLS: Block worst ciphers and log session information
+
+commit 0bcbd947b47d8f3af6c04508f7d493edc901dfdc
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-04-05
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-04-05
+
+    AppleTLS: Implement AppleTLS and Apple Message Digest
+
+commit b292ae1305e8915edd7099446bdd533ac5c4d0a4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-05
+
+    Use info level log for system trusted ca imports failure
+    
+    This is because on some platforms (gnutls on cygwin for example),
+    library always fails for this function and getting ERROR every time
+    aria2c invoked is too hard.
+
+commit 7994894172eac2db34d3321917cf9d5bf6a7973f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-05
+
+    Don't add Windows native DLLs for Cygwin build
+
+commit 81718d698baf2a42771b4dad4e92a9c6e5aef1d4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-05
+
+    Update pt manual translation
+    
+    Contributed by Gilberto dos Santos Alves
+
+commit ad75b0e0c1d7c4bb75331ea7b5a15d8fe3b88b57
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-04-04
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2013-04-04
+
+    Update aria2c.rst
+
+commit 7ce725098b0ee308e35ae4da9af4581f2876a8a8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-03
+
+    Remove default value for deprecated --enable-async-dns6 to suppress warning
+
+commit 8580c98bce8e5b85c1cf7be150d9315cd663db93
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-03
+
+    Abstract TLS session implementation
+    
+    Now TLS session object is abstracted as TLSSession class. Currently,
+    we have GNUTLS and OpenSSL implementations.
+
+commit 10a19b138209fde31841a4271582b51940e607d4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-02
+
+    Update README.rst
+
+commit 19b5b7e214a3d29e1579af4504ba5c90e1dc3e36
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-02
+
+    Remove deprecated options: --enable-direct-io and --metalink-servers
+
+commit 7d65d38807fac743136f5b979763a39bddb3653d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-02
+
+    Remove --enable-async-dns6 from manual
+
+commit cd1f1fb56df3f34f6b5631614eb09b26cf122f97
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-02
+
+    Deprecate --enable-async-dns6
+    
+    The IPv6 asynchronous name resolver is enabled if the host has at
+    least one interface with IPv6 address configured (the loopback address
+    will not be counted), which is roughly the same behaviour of the
+    standard getaddrinfo(3). To disable IPv6 asynchronous name resolver,
+    use --disable-ipv6.
+
+commit 26972b85359a4ab1f00545c9082a6c1b7d5a2593
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Rewrite backup connection handling
+    
+    Now dedicated ConnectCommand handles connection establishment.  It
+    checks whether connection is established or not.  It also handles
+    backup connection. The next Command creation is abstracted using
+    ControlChain struct template.
+
+commit cf23e3e11dfc7abfd4b95c5ce200404113cbe8e8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Fix compile error without c-ares
+
+commit d575e3cc7770c0fcadc07d327749374267120345
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Rewrite async DNS portion without exception
+
+commit 497c1dd8c9da850158d07e5bd4a51701f7cbdeaf
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Use AsyncNameResolverMan in NameResolveCommand
+
+commit 12a3eaf23392ecf49ce51e44af8ae7e173340de4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Fix uninitialized UDPTrackerClient::numWatchers_
+
+commit b5a6c39262a3adeba1c04eee7b6ef29913081c28
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Use AsyncNameResolverMan in DHTEntryPointNameResolveCommand
+
+commit 597e1a5c1b10aa3668f91bcae02a864dcd0c045b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-04-01
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-04-01
+
+    Implement simple Happy Eyeballs for HTTP/FTP downloads
+
+commit d671d8bf3672cbefc06f3727f82b77872abe6120
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-03-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-03-31
+
+    mingw: Ignore tunnel interface and address in 169.254.*
+
+commit 80dbaf256616e96a0aea4db1c9e94ac16426059f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-03-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-03-31
+
+    Use util::sleep() instead of sleep()
+
+commit b9fb15f88454d628e006f3b8240e21933341675b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-03-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-03-31
+
+    Use GetAdaptersAddresses for Mingw
+
+commit f4a098754429019c356f6480238ff5cf941ed391
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-03-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-03-31
+
+    Check non-loopback (and non-linklocak for IPv6) address is configured
+    
+    Issue A record query only when non-loopback IPv4 address is
+    configured.  Likewise, issue AAA record query only when non-loopback
+    and non-linklocak IPv6 address is configured.
+
+commit 56fac58b4d05e1fc97ac37195c7a8cbacb08fb07
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-03-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-03-31
+
+    Parallel A and AAAA record lookups with c-ares

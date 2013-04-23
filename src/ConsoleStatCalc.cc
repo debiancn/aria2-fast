@@ -142,9 +142,9 @@ void printProgressCompact(std::ostream& o, const DownloadEngine* e,
     e->getRequestGroupMan()->getRequestGroups();
   size_t cnt = 0;
   const size_t MAX_ITEM = 5;
-  for(RequestGroupList::SeqType::const_iterator i = groups.begin(),
+  for(RequestGroupList::const_iterator i = groups.begin(),
         eoi = groups.end(); i != eoi && cnt < MAX_ITEM; ++i, ++cnt) {
-    const SharedHandle<RequestGroup>& rg = (*i).second;
+    const SharedHandle<RequestGroup>& rg = *i;
     TransferStat stat = rg->calculateStat();
     o << "[#" << GroupId::toAbbrevHex(rg->getGID()) << " ";
     printSizeProgress(o, rg, stat, sizeFormatter);
@@ -209,9 +209,8 @@ public:
    const SizeFormatter& sizeFormatter):
     cols_(cols), e_(e), sizeFormatter_(sizeFormatter) {}
 
-  void operator()(const RequestGroupList::SeqType::value_type& val)
+  void operator()(const RequestGroupList::value_type& rg)
   {
-    const SharedHandle<RequestGroup>& rg = val.second;
     const char SEP_CHAR = '-';
     std::stringstream o;
     printProgress(o, rg, e_, sizeFormatter_);
@@ -296,6 +295,11 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
       cols = std::max(0, (int)size.ws_col-1);
     }
 #endif // HAVE_TERMIOS_H
+#else // __MINGW32__
+    CONSOLE_SCREEN_BUFFER_INFO info;
+    if(::GetConsoleScreenBufferInfo(::GetStdHandle(STD_OUTPUT_HANDLE), &info)) {
+      cols = std::max(0, info.dwSize.X - 2);
+    }
 #endif // !__MINGW32__
     std::string line(cols, ' ');
     global::cout()->printf("\r%s\r", line.c_str());
@@ -318,7 +322,7 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
   size_t numGroup = e->getRequestGroupMan()->countRequestGroup();
   if(numGroup == 1) {
     const SharedHandle<RequestGroup>& rg =
-      (*e->getRequestGroupMan()->getRequestGroups().begin()).second;
+      *e->getRequestGroupMan()->getRequestGroups().begin();
     printProgress(o, rg, e, sizeFormatter);
   } else if(numGroup > 1) {
     // For more than 2 RequestGroups, use compact readout form

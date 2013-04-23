@@ -34,6 +34,7 @@ Basic Options
   Additionally, options can be specified after each line of
   URI. This optional line must start with one or more white spaces and have
   one option per single line.
+  The input file can use gzip compression.
   See `Input File`_ subsection for details.
   See also :option:`--deferred-input` option.
 
@@ -726,10 +727,10 @@ BitTorrent Specific Options
 
 .. option:: --dht-listen-port=<PORT>...
 
-  Set UDP listening port for both IPv4 and IPv6 DHT.
-  Multiple ports can be specified by using ``,``, for example: ``6881,6885``.
-  You can also use ``-`` to specify a range: ``6881-6999``. ``,`` and ``-`` can be used
-  together.
+  Set UDP listening port used by DHT(IPv4, IPv6) and UDP tracker.
+  Multiple ports can be specified by using ``,``, for example:
+  ``6881,6885``.  You can also use ``-`` to specify a range:
+  ``6881-6999``. ``,`` and ``-`` can be used together.
   Default: ``6881-6999``
 
   .. note::
@@ -742,9 +743,9 @@ BitTorrent Specific Options
 
 .. option:: --enable-dht[=true|false]
 
-  Enable IPv4 DHT functionality. If a private flag is set in a
-  torrent, aria2 doesn't use DHT for that download even if ``true`` is
-  given.  Default: ``true``
+  Enable IPv4 DHT functionality. It also enables UDP tracker
+  support. If a private flag is set in a torrent, aria2 doesn't use
+  DHT for that download even if ``true`` is given.  Default: ``true``
 
 .. option:: --enable-dht6[=true|false]
 
@@ -921,6 +922,14 @@ RPC Options
   in PEM format. Use :option:`--rpc-private-key` option to specify the
   private key. Use :option:`--rpc-secure` option to enable encryption.
 
+  *AppleTLS* users should use the Keychain Access utility to first generate a
+  self-signed SSL-Server certificate, e.g. using the wizard, and get the
+  SHA-1 fingerprint from the Information dialog corresponding to that new
+  certificate.
+  To start aria2c with :option:`--rpc-secure` use
+  `--rpc-certificate=<SHA-1>` and just omit the :option:`--rpc-private-key`
+  option.
+
 .. option:: --rpc-listen-all[=true|false]
 
   Listen incoming JSON-RPC/XML-RPC requests on all network interfaces. If false
@@ -1089,12 +1098,6 @@ Advanced Options
   progress and path/URI. The percentage of progress and path/URI are
   printed for each requested file in each row.
   Default: ``default``
-
-.. option:: --enable-async-dns6[=true|false]
-
-  Enable IPv6 name resolution in asynchronous DNS resolver. This
-  option will be ignored when :option:`--async-dns=false. <--async-dns>`
-  Default: ``false``
 
 .. option:: --enable-mmap[=true|false]
 
@@ -1342,7 +1345,9 @@ Advanced Options
 
   Save error/unfinished downloads to FILE on exit.  You can pass this
   output file to aria2c with :option:`--input-file <-i>` option on
-  restart. Please note that downloads added by
+  restart. If you like the output to be gzipped append a .gz extension to
+  the file name.
+  Please note that downloads added by
   :func:`aria2.addTorrent` and :func:`aria2.addMetalink` RPC method
   and whose metadata could not be saved as a file are not saved.
   Downloads removed using :func:`aria2.remove` and
@@ -1783,7 +1788,6 @@ of URIs. These optional lines must start with white space(s).
   * :option:`continue <-c>`
   * :option:`dir <-d>`
   * :option:`dry-run <--dry-run>`
-  * :option:`enable-async-dns6 <--enable-async-dns6>`
   * :option:`enable-http-keep-alive <--enable-http-keep-alive>`
   * :option:`enable-http-pipelining <--enable-http-pipelining>`
   * :option:`enable-mmap <--enable-mmap>`
@@ -3707,12 +3711,11 @@ Enable IPv6 DHT
 ^^^^^^^^^^^^^^^
 .. code-block:: console
 
-  $ aria2c --enable-dht6 --dht-listen-port=6881 --dht-listen-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR --enable-async-dns6
+  $ aria2c --enable-dht6 --dht-listen-port=6881 --dht-listen-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR
 
 .. note::
 
-  If aria2c is not built with c-ares, :option:`--enable-async-dns6` is
-  unnecessary. aria2 shares same port between IPv4 and IPv6 DHT.
+  aria2 shares same port between IPv4 and IPv6 DHT.
 
 Add and remove tracker URI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^

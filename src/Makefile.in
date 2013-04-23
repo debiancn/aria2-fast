@@ -74,31 +74,41 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 
 @HAVE_SOME_FALLOCATE_TRUE@am__append_8 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
 @HAVE_EPOLL_TRUE@am__append_9 = EpollEventPoll.cc EpollEventPoll.h
-@ENABLE_SSL_TRUE@am__append_10 = TLSContext.h
-@HAVE_LIBGNUTLS_TRUE@am__append_11 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h
-@HAVE_LIBGCRYPT_TRUE@am__append_12 = LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h\
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h\
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+@ENABLE_SSL_TRUE@am__append_10 = TLSContext.h TLSSession.h
+@USE_APPLE_MD_TRUE@am__append_11 = AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
+@HAVE_APPLETLS_TRUE@am__append_12 = AppleTLSContext.cc AppleTLSContext.h \
+@HAVE_APPLETLS_TRUE@        AppleTLSSession.cc AppleTLSSession.h
 
-@HAVE_LIBNETTLE_TRUE@am__append_13 = LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h\
-@HAVE_LIBNETTLE_TRUE@	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBGNUTLS_TRUE@am__append_13 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+@HAVE_LIBGNUTLS_TRUE@        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 
-@HAVE_LIBGMP_TRUE@am__append_14 = a2gmp.cc a2gmp.h\
-@HAVE_LIBGMP_TRUE@	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
+@HAVE_LIBGCRYPT_TRUE@am__append_14 = LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+@HAVE_LIBGCRYPT_TRUE@        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
 
-@HAVE_OPENSSL_TRUE@am__append_15 = LibsslTLSContext.cc LibsslTLSContext.h\
-@HAVE_OPENSSL_TRUE@	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h\
-@HAVE_OPENSSL_TRUE@	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h\
-@HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_15 = LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
+@HAVE_LIBNETTLE_TRUE@am__append_16 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_17 = LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
+@HAVE_LIBGMP_TRUE@am__append_18 = a2gmp.cc a2gmp.h \
+@HAVE_LIBGMP_TRUE@        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 
-@HAVE_ZLIB_TRUE@am__append_16 = GZipEncoder.cc GZipEncoder.h\
-@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h
+@HAVE_OPENSSL_TRUE@am__append_19 = LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+@HAVE_OPENSSL_TRUE@        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
 
-@HAVE_SQLITE3_TRUE@am__append_17 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_20 = LibsslTLSContext.cc LibsslTLSContext.h \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@        LibsslTLSSession.cc LibsslTLSSession.h
+
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_21 = LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
+@HAVE_ZLIB_TRUE@am__append_22 = GZipEncoder.cc GZipEncoder.h\
+@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
+@HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h
+
+@HAVE_SQLITE3_TRUE@am__append_23 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_18 = AsyncNameResolver.cc AsyncNameResolver.h
-@ENABLE_MESSAGE_DIGEST_TRUE@am__append_19 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
+@ENABLE_ASYNC_DNS_TRUE@am__append_24 = AsyncNameResolver.cc AsyncNameResolver.h\
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.cc AsyncNameResolverMan.h
+
+@ENABLE_MESSAGE_DIGEST_TRUE@am__append_25 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.cc IteratableChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.cc CheckIntegrityDispatcherCommand.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.cc CheckIntegrityCommand.h\
@@ -110,7 +120,7 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestImpl.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	HashFuncEntry.h
 
-@ENABLE_BITTORRENT_TRUE@am__append_20 = PeerAbstractCommand.cc PeerAbstractCommand.h\
+@ENABLE_BITTORRENT_TRUE@am__append_26 = PeerAbstractCommand.cc PeerAbstractCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.cc PeerInteractionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	Peer.cc Peer.h\
@@ -280,9 +290,12 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_BITTORRENT_TRUE@	ValueBaseBencodeParser.h\
 @ENABLE_BITTORRENT_TRUE@	BencodeDiskWriter.h\
 @ENABLE_BITTORRENT_TRUE@	BencodeDiskWriterFactory.h\
-@ENABLE_BITTORRENT_TRUE@	MemoryBencodePreDownloadHandler.h
+@ENABLE_BITTORRENT_TRUE@	MemoryBencodePreDownloadHandler.h\
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.cc UDPTrackerClient.h\
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.cc UDPTrackerRequest.h\
+@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.cc NameResolveCommand.h
 
-@ENABLE_METALINK_TRUE@am__append_21 = Metalinker.cc Metalinker.h\
+@ENABLE_METALINK_TRUE@am__append_27 = Metalinker.cc Metalinker.h\
 @ENABLE_METALINK_TRUE@	MetalinkEntry.cc MetalinkEntry.h\
 @ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.cc MetalinkMetaurl.h\
@@ -296,20 +309,20 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.cc MetalinkPostDownloadHandler.h\
 @ENABLE_METALINK_TRUE@	metalink_helper.cc metalink_helper.h
 
-@HAVE_ASCTIME_R_FALSE@am__append_22 = asctime_r.c asctime_r.h
-@HAVE_BASENAME_FALSE@am__append_23 = libgen.c libgen.h
-@HAVE_GETADDRINFO_FALSE@am__append_24 = getaddrinfo.c getaddrinfo.h
-@HAVE_GAI_STRERROR_FALSE@am__append_25 = gai_strerror.c gai_strerror.h
-@HAVE_GETTIMEOFDAY_FALSE@am__append_26 = gettimeofday.c gettimeofday.h
-@HAVE_LOCALTIME_R_FALSE@am__append_27 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_28 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_29 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_30 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_31 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_32 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_33 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_34 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_35 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_ASCTIME_R_FALSE@am__append_28 = asctime_r.c asctime_r.h
+@HAVE_BASENAME_FALSE@am__append_29 = libgen.c libgen.h
+@HAVE_GETADDRINFO_FALSE@am__append_30 = getaddrinfo.c getaddrinfo.h
+@HAVE_GAI_STRERROR_FALSE@am__append_31 = gai_strerror.c gai_strerror.h
+@HAVE_GETTIMEOFDAY_FALSE@am__append_32 = gettimeofday.c gettimeofday.h
+@HAVE_LOCALTIME_R_FALSE@am__append_33 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_34 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_35 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_36 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_37 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_38 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_39 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_40 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_41 = KqueueEventPoll.cc KqueueEventPoll.h
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in alloca.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -500,6 +513,10 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
 	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
+	ConnectCommand.cc ConnectCommand.h ControlChain.h \
+	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
+	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
 	WinConsoleFile.cc WinConsoleFile.h WebSocketSession.cc \
 	WebSocketSession.h WebSocketSessionMan.cc \
 	WebSocketSessionMan.h WebSocketResponseCommand.cc \
@@ -513,23 +530,28 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h \
 	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h \
 	FallocFileAllocationIterator.cc FallocFileAllocationIterator.h \
-	EpollEventPoll.cc EpollEventPoll.h TLSContext.h \
-	LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
-	LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h \
+	EpollEventPoll.cc EpollEventPoll.h TLSContext.h TLSSession.h \
+	AppleMessageDigestImpl.cc AppleMessageDigestImpl.h \
+	AppleTLSContext.cc AppleTLSContext.h AppleTLSSession.cc \
+	AppleTLSSession.h LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+	LibgnutlsTLSSession.cc LibgnutlsTLSSession.h \
 	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
 	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h \
+	LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h \
+	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h \
 	LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h \
-	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h a2gmp.cc \
-	a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
-	LibsslTLSContext.cc LibsslTLSContext.h \
-	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h \
+	a2gmp.cc a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
 	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
-	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h GZipEncoder.cc \
-	GZipEncoder.h GZipDecodingStreamFilter.cc \
-	GZipDecodingStreamFilter.h Sqlite3CookieParser.cc \
+	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h \
+	LibsslTLSContext.cc LibsslTLSContext.h LibsslTLSSession.cc \
+	LibsslTLSSession.h LibsslMessageDigestImpl.cc \
+	LibsslMessageDigestImpl.h GZipEncoder.cc GZipEncoder.h \
+	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h \
+	GZipFile.cc GZipFile.h Sqlite3CookieParser.cc \
 	Sqlite3CookieParser.h Sqlite3CookieParserImpl.cc \
 	Sqlite3CookieParserImpl.h AsyncNameResolver.cc \
-	AsyncNameResolver.h IteratableChunkChecksumValidator.cc \
+	AsyncNameResolver.h AsyncNameResolverMan.cc \
+	AsyncNameResolverMan.h IteratableChunkChecksumValidator.cc \
 	IteratableChunkChecksumValidator.h \
 	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
 	CheckIntegrityDispatcherCommand.cc \
@@ -668,6 +690,8 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	bencode2.cc bencode2.h BencodeParser.cc BencodeParser.h \
 	ValueBaseBencodeParser.h BencodeDiskWriter.h \
 	BencodeDiskWriterFactory.h MemoryBencodePreDownloadHandler.h \
+	UDPTrackerClient.cc UDPTrackerClient.h UDPTrackerRequest.cc \
+	UDPTrackerRequest.h NameResolveCommand.cc NameResolveCommand.h \
 	Metalinker.cc Metalinker.h MetalinkEntry.cc MetalinkEntry.h \
 	MetalinkResource.cc MetalinkResource.h MetalinkMetaurl.cc \
 	MetalinkMetaurl.h MetalinkParserController.cc \
@@ -702,26 +726,33 @@ am__objects_3 =
 @ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.$(OBJEXT)
 @HAVE_SOME_FALLOCATE_TRUE@am__objects_8 = FallocFileAllocationIterator.$(OBJEXT)
 @HAVE_EPOLL_TRUE@am__objects_9 = EpollEventPoll.$(OBJEXT)
-@HAVE_LIBGNUTLS_TRUE@am__objects_10 = LibgnutlsTLSContext.$(OBJEXT)
-@HAVE_LIBGCRYPT_TRUE@am__objects_11 =  \
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptMessageDigestImpl.$(OBJEXT) \
+@USE_APPLE_MD_TRUE@am__objects_10 = AppleMessageDigestImpl.$(OBJEXT)
+@HAVE_APPLETLS_TRUE@am__objects_11 = AppleTLSContext.$(OBJEXT) \
+@HAVE_APPLETLS_TRUE@	AppleTLSSession.$(OBJEXT)
+@HAVE_LIBGNUTLS_TRUE@am__objects_12 = LibgnutlsTLSContext.$(OBJEXT) \
+@HAVE_LIBGNUTLS_TRUE@	LibgnutlsTLSSession.$(OBJEXT)
+@HAVE_LIBGCRYPT_TRUE@am__objects_13 =  \
 @HAVE_LIBGCRYPT_TRUE@	LibgcryptARC4Encryptor.$(OBJEXT) \
 @HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.$(OBJEXT)
-@HAVE_LIBNETTLE_TRUE@am__objects_12 =  \
-@HAVE_LIBNETTLE_TRUE@	LibnettleMessageDigestImpl.$(OBJEXT) \
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_14 = LibgcryptMessageDigestImpl.$(OBJEXT)
+@HAVE_LIBNETTLE_TRUE@am__objects_15 =  \
 @HAVE_LIBNETTLE_TRUE@	LibnettleARC4Encryptor.$(OBJEXT)
-@HAVE_LIBGMP_TRUE@am__objects_13 = a2gmp.$(OBJEXT) \
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_16 = LibnettleMessageDigestImpl.$(OBJEXT)
+@HAVE_LIBGMP_TRUE@am__objects_17 = a2gmp.$(OBJEXT) \
 @HAVE_LIBGMP_TRUE@	LibgmpDHKeyExchange.$(OBJEXT)
-@HAVE_OPENSSL_TRUE@am__objects_14 = LibsslTLSContext.$(OBJEXT) \
-@HAVE_OPENSSL_TRUE@	LibsslMessageDigestImpl.$(OBJEXT) \
-@HAVE_OPENSSL_TRUE@	LibsslARC4Encryptor.$(OBJEXT) \
+@HAVE_OPENSSL_TRUE@am__objects_18 = LibsslARC4Encryptor.$(OBJEXT) \
 @HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.$(OBJEXT)
-@HAVE_ZLIB_TRUE@am__objects_15 = GZipEncoder.$(OBJEXT) \
-@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.$(OBJEXT)
-@HAVE_SQLITE3_TRUE@am__objects_16 = Sqlite3CookieParser.$(OBJEXT) \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_19 = LibsslTLSContext.$(OBJEXT) \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSSession.$(OBJEXT)
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_20 = LibsslMessageDigestImpl.$(OBJEXT)
+@HAVE_ZLIB_TRUE@am__objects_21 = GZipEncoder.$(OBJEXT) \
+@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.$(OBJEXT) \
+@HAVE_ZLIB_TRUE@	GZipFile.$(OBJEXT)
+@HAVE_SQLITE3_TRUE@am__objects_22 = Sqlite3CookieParser.$(OBJEXT) \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.$(OBJEXT)
-@ENABLE_ASYNC_DNS_TRUE@am__objects_17 = AsyncNameResolver.$(OBJEXT)
-@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_18 = IteratableChunkChecksumValidator.$(OBJEXT) \
+@ENABLE_ASYNC_DNS_TRUE@am__objects_23 = AsyncNameResolver.$(OBJEXT) \
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.$(OBJEXT)
+@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_24 = IteratableChunkChecksumValidator.$(OBJEXT) \
 @ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.$(OBJEXT) \
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.$(OBJEXT) \
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.$(OBJEXT) \
@@ -730,7 +761,7 @@ am__objects_3 =
 @ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.$(OBJEXT) \
 @ENABLE_MESSAGE_DIGEST_TRUE@	ChunkChecksum.$(OBJEXT) \
 @ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.$(OBJEXT)
-@ENABLE_BITTORRENT_TRUE@am__objects_19 =  \
+@ENABLE_BITTORRENT_TRUE@am__objects_25 =  \
 @ENABLE_BITTORRENT_TRUE@	PeerAbstractCommand.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.$(OBJEXT) \
@@ -867,8 +898,11 @@ am__objects_3 =
 @ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	bencode2.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BencodeParser.$(OBJEXT)
-@ENABLE_METALINK_TRUE@am__objects_20 = Metalinker.$(OBJEXT) \
+@ENABLE_BITTORRENT_TRUE@	BencodeParser.$(OBJEXT) \
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.$(OBJEXT) \
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.$(OBJEXT) \
+@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.$(OBJEXT)
+@ENABLE_METALINK_TRUE@am__objects_26 = Metalinker.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkEntry.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkResource.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.$(OBJEXT) \
@@ -881,22 +915,22 @@ am__objects_3 =
 @ENABLE_METALINK_TRUE@	Metalink2RequestGroup.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	metalink_helper.$(OBJEXT)
-@HAVE_ASCTIME_R_FALSE@am__objects_21 = asctime_r.$(OBJEXT)
-@HAVE_BASENAME_FALSE@am__objects_22 = libgen.$(OBJEXT)
-@HAVE_GETADDRINFO_FALSE@am__objects_23 = getaddrinfo.$(OBJEXT)
-@HAVE_GAI_STRERROR_FALSE@am__objects_24 = gai_strerror.$(OBJEXT)
-@HAVE_GETTIMEOFDAY_FALSE@am__objects_25 = gettimeofday.$(OBJEXT)
-@HAVE_LOCALTIME_R_FALSE@am__objects_26 = localtime_r.$(OBJEXT)
-@HAVE_STRPTIME_FALSE@am__objects_27 = strptime.$(OBJEXT)
-@HAVE_TIMEGM_FALSE@am__objects_28 = timegm.$(OBJEXT)
-@HAVE_DAEMON_FALSE@am__objects_29 = daemon.$(OBJEXT)
-@HAVE_TIMEGETTIME_TRUE@am__objects_30 = clock_gettime_mingw.$(OBJEXT)
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_31 =  \
+@HAVE_ASCTIME_R_FALSE@am__objects_27 = asctime_r.$(OBJEXT)
+@HAVE_BASENAME_FALSE@am__objects_28 = libgen.$(OBJEXT)
+@HAVE_GETADDRINFO_FALSE@am__objects_29 = getaddrinfo.$(OBJEXT)
+@HAVE_GAI_STRERROR_FALSE@am__objects_30 = gai_strerror.$(OBJEXT)
+@HAVE_GETTIMEOFDAY_FALSE@am__objects_31 = gettimeofday.$(OBJEXT)
+@HAVE_LOCALTIME_R_FALSE@am__objects_32 = localtime_r.$(OBJEXT)
+@HAVE_STRPTIME_FALSE@am__objects_33 = strptime.$(OBJEXT)
+@HAVE_TIMEGM_FALSE@am__objects_34 = timegm.$(OBJEXT)
+@HAVE_DAEMON_FALSE@am__objects_35 = daemon.$(OBJEXT)
+@HAVE_TIMEGETTIME_TRUE@am__objects_36 = clock_gettime_mingw.$(OBJEXT)
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_37 =  \
 @HAVE_MACH_ABSOLUTE_TIME_TRUE@	clock_gettime_osx.$(OBJEXT)
-@HAVE_POLL_TRUE@am__objects_32 = PollEventPoll.$(OBJEXT)
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_33 = PortEventPoll.$(OBJEXT)
-@HAVE_KQUEUE_TRUE@am__objects_34 = KqueueEventPoll.$(OBJEXT)
-am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
+@HAVE_POLL_TRUE@am__objects_38 = PollEventPoll.$(OBJEXT)
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_39 = PortEventPoll.$(OBJEXT)
+@HAVE_KQUEUE_TRUE@am__objects_40 = KqueueEventPoll.$(OBJEXT)
+am__objects_41 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	AbstractCommand.$(OBJEXT) \
 	InitiateConnectionCommandFactory.$(OBJEXT) \
 	DownloadCommand.$(OBJEXT) \
@@ -999,6 +1033,7 @@ am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	Notifier.$(OBJEXT) XmlRpcRequestParserController.$(OBJEXT) \
 	WrDiskCache.$(OBJEXT) WrDiskCacheEntry.$(OBJEXT) \
 	GroupId.$(OBJEXT) SaveSessionCommand.$(OBJEXT) \
+	BackupIPv4ConnectCommand.$(OBJEXT) ConnectCommand.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
 	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
@@ -1010,8 +1045,10 @@ am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
 	$(am__objects_24) $(am__objects_25) $(am__objects_26) \
 	$(am__objects_27) $(am__objects_28) $(am__objects_29) \
 	$(am__objects_30) $(am__objects_31) $(am__objects_32) \
-	$(am__objects_33) $(am__objects_34)
-am_libaria2c_a_OBJECTS = $(am__objects_35)
+	$(am__objects_33) $(am__objects_34) $(am__objects_35) \
+	$(am__objects_36) $(am__objects_37) $(am__objects_38) \
+	$(am__objects_39) $(am__objects_40)
+am_libaria2c_a_OBJECTS = $(am__objects_41)
 libaria2c_a_OBJECTS = $(am_libaria2c_a_OBJECTS)
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
@@ -1411,6 +1448,10 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
 	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
+	ConnectCommand.cc ConnectCommand.h ControlChain.h \
+	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
+	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
 	$(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5) $(am__append_6) \
 	$(am__append_7) $(am__append_8) $(am__append_9) \
@@ -1422,7 +1463,9 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	$(am__append_25) $(am__append_26) $(am__append_27) \
 	$(am__append_28) $(am__append_29) $(am__append_30) \
 	$(am__append_31) $(am__append_32) $(am__append_33) \
-	$(am__append_34) $(am__append_35)
+	$(am__append_34) $(am__append_35) $(am__append_36) \
+	$(am__append_37) $(am__append_38) $(am__append_39) \
+	$(am__append_40) $(am__append_41)
 noinst_LIBRARIES = libaria2c.a
 libaria2c_a_SOURCES = $(SRCS)
 aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
@@ -1544,10 +1587,15 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveURISelector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceList.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceTier.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleMessageDigestImpl.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleTLSContext.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleTLSSession.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolver.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolverMan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfig.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfigFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoSaveCommand.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BackupIPv4ConnectCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BencodeParser.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BitfieldMan.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAbortOutstandingRequestEvent.Po@am__quote@
@@ -1594,6 +1642,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkChecksum.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkedDecodingStreamFilter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Command.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConsoleStatCalc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContentTypeRequestGroupCriteria.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContextAttribute.Po@am__quote@
@@ -1701,6 +1750,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpTunnelResponseCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipDecodingStreamFilter.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipEncoder.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipFile.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeomStreamPieceSelector.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GroupId.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GrowSegment.Po@am__quote@
@@ -1739,12 +1789,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptMessageDigestImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgmpDHKeyExchange.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgnutlsTLSContext.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgnutlsTLSSession.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleARC4Encryptor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleMessageDigestImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslARC4Encryptor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslDHKeyExchange.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslMessageDigestImpl.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslTLSContext.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslTLSSession.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LogFactory.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LongestSequencePieceSelector.Po@am__quote@
@@ -1772,6 +1824,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiDiskAdaptor.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiFileAllocationIterator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiUrlRequestInfo.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NameResolveCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NameResolver.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetStat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Netrc.Po@am__quote@
@@ -1855,6 +1908,8 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TrackerWatcherCommand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransferStat.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TruncFileAllocationIterator.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UDPTrackerClient.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UDPTrackerRequest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/URIResult.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataDataExtensionMessage.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataExtensionMessage.Po@am__quote@

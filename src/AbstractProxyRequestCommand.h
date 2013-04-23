@@ -54,6 +54,11 @@ protected:
   {
     return httpConnection_;
   }
+
+  const SharedHandle<Request>& getProxyRequest() const
+  {
+    return proxyRequest_;
+  }
 public:
   AbstractProxyRequestCommand(cuid_t cuid,
                               const SharedHandle<Request>& req,
