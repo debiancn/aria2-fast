@@ -1,6 +1,8 @@
 aria2 (1.17.0-1) UNRELEASED; urgency=low
 
-  * New upstream release
+  * New upstream release.
+  * debian/control:
+    + Set priority to optional from extra (Closes: #697659).
 
  -- Kartik Mistry <kartik@debian.org>  Tue, 23 Apr 2013 13:46:56 +0530
 
