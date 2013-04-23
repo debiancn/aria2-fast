@@ -9,11 +9,11 @@ BUILDDIR      = _build
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) -c . @srcdir@
 
 # Configurations for aria2.
 man_MANS = $(BUILDDIR)/man/aria2c.1
-EXTRA_DIST = $(man_MANS) aria2c.rst index.rst
+EXTRA_DIST = $(man_MANS) aria2c.rst index.rst _static/default2.css
 
 $(man_MANS): aria2c.rst
 	$(MAKE) man
@@ -136,3 +136,5 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+clean-local: docclean

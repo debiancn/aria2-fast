@@ -244,7 +244,15 @@ SRCS =  SocketCore.cc SocketCore.h\
 	WrDiskCache.cc WrDiskCache.h\
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h\
 	GroupId.cc GroupId.h\
-	IndexedList.h
+	IndexedList.h\
+	SaveSessionCommand.h SaveSessionCommand.cc\
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc\
+	ConnectCommand.cc ConnectCommand.h\
+	ControlChain.h\
+	HttpRequestConnectChain.h\
+	HttpProxyRequestConnectChain.h\
+	FtpNegotiationConnectChain.h\
+	FtpTunnelRequestConnectChain.h
 
 if MINGW_BUILD
 SRCS += WinConsoleFile.cc WinConsoleFile.h
@@ -292,39 +300,59 @@ SRCS += EpollEventPoll.cc EpollEventPoll.h
 endif # HAVE_EPOLL
 
 if ENABLE_SSL
-SRCS += TLSContext.h
+SRCS += TLSContext.h TLSSession.h
 endif # ENABLE_SSL
 
+if USE_APPLE_MD
+SRCS += AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
+endif # USE_APPLE_MD
+
+if HAVE_APPLETLS
+SRCS += AppleTLSContext.cc AppleTLSContext.h \
+        AppleTLSSession.cc AppleTLSSession.h
+endif # HAVE_APPLETLS
+
 if HAVE_LIBGNUTLS
-SRCS += LibgnutlsTLSContext.cc LibgnutlsTLSContext.h
+SRCS += LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 endif # HAVE_LIBGNUTLS
 
 if HAVE_LIBGCRYPT
-SRCS += LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h\
-	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h\
-	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+SRCS += LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+if USE_LIBGCRYPT_MD
+SRCS += LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
+endif # USE_LIBGCRYPT_MD
 endif # HAVE_LIBGCRYPT
 
 if HAVE_LIBNETTLE
-SRCS += LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h\
-	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+SRCS += LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+if USE_LIBNETTLE_MD
+SRCS += LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
+endif # USE_LIBNETTLE_MD
 endif # HAVE_LIBNETTLE
 
 if HAVE_LIBGMP
-SRCS += a2gmp.cc a2gmp.h\
-	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
+SRCS += a2gmp.cc a2gmp.h \
+        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 endif # HAVE_LIBGMP
 
 if HAVE_OPENSSL
-SRCS += LibsslTLSContext.cc LibsslTLSContext.h\
-	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h\
-	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h\
-	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+SRCS += LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+if !HAVE_APPLETLS
+SRCS += LibsslTLSContext.cc LibsslTLSContext.h \
+        LibsslTLSSession.cc LibsslTLSSession.h
+endif # !HAVE_APPLETLS
+if USE_OPENSSL_MD
+SRCS += LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
+endif
 endif # HAVE_OPENSSL
 
 if HAVE_ZLIB
 SRCS += GZipEncoder.cc GZipEncoder.h\
-	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h
+	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
+	GZipFile.cc GZipFile.h
 endif # HAVE_ZLIB
 
 if HAVE_SQLITE3
@@ -333,7 +361,8 @@ SRCS += Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 endif # HAVE_SQLITE3
 
 if ENABLE_ASYNC_DNS
-SRCS += AsyncNameResolver.cc AsyncNameResolver.h
+SRCS += AsyncNameResolver.cc AsyncNameResolver.h\
+	AsyncNameResolverMan.cc AsyncNameResolverMan.h
 endif # ENABLE_ASYNC_DNS
 
 if ENABLE_MESSAGE_DIGEST
@@ -521,7 +550,10 @@ SRCS += PeerAbstractCommand.cc PeerAbstractCommand.h\
 	ValueBaseBencodeParser.h\
 	BencodeDiskWriter.h\
 	BencodeDiskWriterFactory.h\
-	MemoryBencodePreDownloadHandler.h
+	MemoryBencodePreDownloadHandler.h\
+	UDPTrackerClient.cc UDPTrackerClient.h\
+	UDPTrackerRequest.cc UDPTrackerRequest.h\
+	NameResolveCommand.cc NameResolveCommand.h
 endif # ENABLE_BITTORRENT
 
 if ENABLE_METALINK

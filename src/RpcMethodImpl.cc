@@ -485,7 +485,7 @@ void pauseRequestGroups
 (InputIterator first, InputIterator last, bool reserved, bool forcePause)
 {
   for(; first != last; ++first) {
-    pauseRequestGroup((*first).second, reserved, forcePause);
+    pauseRequestGroup(*first, reserved, forcePause);
   }
 }
 } // namespace
@@ -540,9 +540,9 @@ SharedHandle<ValueBase> UnpauseAllRpcMethod::process
 {
   const RequestGroupList& groups =
     e->getRequestGroupMan()->getReservedGroups();
-  for(RequestGroupList::SeqType::const_iterator i = groups.begin(),
+  for(RequestGroupList::const_iterator i = groups.begin(),
         eoi = groups.end(); i != eoi; ++i) {
-    (*i).second->setPauseRequested(false);
+    (*i)->setPauseRequested(false);
   }
   e->getRequestGroupMan()->requestQueueCheck();
   return VLB_OK;
@@ -775,8 +775,7 @@ void gatherProgressBitTorrent
     } else {
       const SharedHandle<PeerStorage>& peerStorage = btObject->peerStorage;
       assert(peerStorage);
-      std::vector<SharedHandle<Peer> > peers;
-      peerStorage->getActivePeers(peers);
+      const PeerSet& peers = peerStorage->getUsedPeers();
       entryDict->put(KEY_NUM_SEEDERS,
                      util::uitos(countSeeder(peers.begin(), peers.end())));
     }
@@ -788,10 +787,12 @@ namespace {
 void gatherPeer
 (const SharedHandle<List>& peers, const SharedHandle<PeerStorage>& ps)
 {
-  std::vector<SharedHandle<Peer> > activePeers;
-  ps->getActivePeers(activePeers);
-  for(std::vector<SharedHandle<Peer> >::const_iterator i =
-        activePeers.begin(), eoi = activePeers.end(); i != eoi; ++i) {
+  const PeerSet& usedPeers = ps->getUsedPeers();
+  for(PeerSet::const_iterator i = usedPeers.begin(), eoi = usedPeers.end();
+      i != eoi; ++i) {
+    if(!(*i)->isActive()) {
+      continue;
+    }
     SharedHandle<Dict> peerEntry = Dict::g();
     peerEntry->put(KEY_PEER_ID, util::torrentPercentEncode((*i)->getPeerId(),
                                                            PEER_ID_LENGTH));
@@ -1038,13 +1039,13 @@ SharedHandle<ValueBase> TellActiveRpcMethod::process
   toStringList(std::back_inserter(keys), keysParam);
   SharedHandle<List> list = List::g();
   const RequestGroupList& groups = e->getRequestGroupMan()->getRequestGroups();
-  for(RequestGroupList::SeqType::const_iterator i = groups.begin(),
+  for(RequestGroupList::const_iterator i = groups.begin(),
         eoi = groups.end(); i != eoi; ++i) {
     SharedHandle<Dict> entryDict = Dict::g();
     if(requested_key(keys, KEY_STATUS)) {
       entryDict->put(KEY_STATUS, VLB_ACTIVE);
     }
-    gatherProgress(entryDict, (*i).second, e, keys);
+    gatherProgress(entryDict, *i, e, keys);
     list->append(entryDict);
   }
   return list;

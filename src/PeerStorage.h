@@ -39,13 +39,18 @@
 
 #include <deque>
 #include <vector>
+#include <set>
 
 #include "SharedHandle.h"
 #include "TransferStat.h"
+#include "Command.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
 class Peer;
+
+typedef std::set<SharedHandle<Peer>, RefLess<Peer> > PeerSet;
 
 class PeerStorage {
 public:
@@ -63,25 +68,14 @@ public:
   virtual void addPeer(const std::vector<SharedHandle<Peer> >& peers) = 0;
 
   /**
-   * Returns internal peer list.
+   * Returns the number of peers, including used and unused ones.
    */
-  virtual const std::deque<SharedHandle<Peer> >& getPeers() = 0;
-
-
-  /**
-   * Returns the number of peers.
-   */
-  virtual size_t countPeer() const = 0;
+  virtual size_t countAllPeer() const = 0;
 
   /**
    * Returns internal dropped peer list.
    */
   virtual const std::deque<SharedHandle<Peer> >& getDroppedPeers() = 0;
-
-  /**
-   * Returns one of the unused peers.
-   */
-  virtual SharedHandle<Peer> getUnusedPeer() = 0;
 
   /**
    * Returns true if at least one unused peer exists.
@@ -90,9 +84,9 @@ public:
   virtual bool isPeerAvailable() = 0;
 
   /**
-   * Returns the list of peers which are currently connected from localhost.
+   * Returns used peer set.
    */
-  virtual void getActivePeers(std::vector<SharedHandle<Peer> >& peers) = 0;
+  virtual const PeerSet& getUsedPeers() = 0;
 
   /**
    * Returns true if peer with ipaddr should be ignored because, for
@@ -104,6 +98,13 @@ public:
    * Adds peer with ipaddr in bad peer set.
    */
   virtual void addBadPeer(const std::string& ipaddr) = 0;
+
+  /**
+   * Moves first peer in unused peer list to used peer set and calls
+   * Peer::usedBy(cuid). If there is no peer available, returns
+   * SharedHandle<Peer>().
+   */
+  virtual SharedHandle<Peer> checkoutPeer(cuid_t cuid) = 0;
 
   /**
    * Tells PeerStorage object that peer is no longer used in the session.

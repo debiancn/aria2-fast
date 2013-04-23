@@ -3,7 +3,6 @@ TESTS = aria2c
 check_PROGRAMS = $(TESTS)
 aria2c_SOURCES = AllTest.cc\
 	TestUtil.cc TestUtil.h\
-	GZipDecoder.cc GZipDecoder.h\
 	SocketCoreTest.cc\
 	array_funTest.cc\
 	Base64Test.cc\
@@ -100,9 +99,11 @@ aria2c_SOURCES += FallocFileAllocationIteratorTest.cc
 endif  # HAVE_SOME_FALLOCATE
 
 if HAVE_ZLIB
-aria2c_SOURCES += GZipDecoderTest.cc\
-	GZipEncoderTest.cc\
-	GZipDecodingStreamFilterTest.cc
+aria2c_SOURCES += \
+	GZipDecoder.cc GZipDecoder.h\
+	GZipDecoderTest.cc GZipEncoderTest.cc\
+	GZipDecodingStreamFilterTest.cc\
+	GZipFileTest.cc
 endif # HAVE_ZLIB
 
 if HAVE_SQLITE3
@@ -214,7 +215,8 @@ aria2c_SOURCES += BtAllowedFastMessageTest.cc\
 	Bencode2Test.cc\
 	PeerConnectionTest.cc\
 	ValueBaseBencodeParserTest.cc\
-	ExtensionMessageRegistryTest.cc
+	ExtensionMessageRegistryTest.cc\
+	UDPTrackerClientTest.cc
 endif # ENABLE_BITTORRENT
 
 if ENABLE_METALINK
@@ -254,6 +256,7 @@ EXTRA_DIST = 4096chunk.txt\
 	file2r.txt\
 	file3r.txt\
 	filelist1.txt\
+	filelist2.txt\
 	gzip_decode_test.gz\
 	load-nonBt.aria2\
 	load-nonBt-v0001.aria2\

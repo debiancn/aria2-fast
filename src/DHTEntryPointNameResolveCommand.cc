@@ -49,8 +49,9 @@
 #include "Logger.h"
 #include "LogFactory.h"
 #include "fmt.h"
+#include "SocketCore.h"
 #ifdef ENABLE_ASYNC_DNS
-#include "AsyncNameResolver.h"
+#include "AsyncNameResolverMan.h"
 #endif // ENABLE_ASYNC_DNS
 
 namespace aria2 {
@@ -60,14 +61,22 @@ DHTEntryPointNameResolveCommand::DHTEntryPointNameResolveCommand
  const std::vector<std::pair<std::string, uint16_t> >& entryPoints):
   Command(cuid),
   e_(e),
+#ifdef ENABLE_ASYNC_DNS
+  asyncNameResolverMan_(new AsyncNameResolverMan()),
+#endif // ENABLE_ASYNC_DNS
   entryPoints_(entryPoints.begin(), entryPoints.end()),
+  numSuccess_(0),
   bootstrapEnabled_(false)
-{}
+{
+#ifdef ENABLE_ASYNC_DNS
+  configureAsyncNameResolverMan(asyncNameResolverMan_.get(), e_->getOption());
+#endif // ENABLE_ASYNC_DNS
+}
 
 DHTEntryPointNameResolveCommand::~DHTEntryPointNameResolveCommand()
 {
 #ifdef ENABLE_ASYNC_DNS
-  disableNameResolverCheck(resolver_);
+  asyncNameResolverMan_->disableNameResolverCheck(e_, this);
 #endif // ENABLE_ASYNC_DNS
 }
 
@@ -76,46 +85,32 @@ bool DHTEntryPointNameResolveCommand::execute()
   if(e_->getRequestGroupMan()->downloadFinished() || e_->isHaltRequested()) {
     return true;
   }
-#ifdef ENABLE_ASYNC_DNS
-  if(!resolver_) {
-    int family;
-    if(e_->getOption()->getAsBool(PREF_ENABLE_ASYNC_DNS6)) {
-      family = AF_UNSPEC;
-    } else {
-      family = AF_INET;
-    }
-    resolver_.reset(new AsyncNameResolver(family
-#ifdef HAVE_ARES_ADDR_NODE
-                                          , e_->getAsyncDNSServers()
-#endif // HAVE_ARES_ADDR_NODE
-                                          ));
-  }
-#endif // ENABLE_ASYNC_DNS
   try {
 #ifdef ENABLE_ASYNC_DNS
     if(e_->getOption()->getAsBool(PREF_ASYNC_DNS)) {
       while(!entryPoints_.empty()) {
         std::string hostname = entryPoints_.front().first;
-        try {
-          if(util::isNumericHost(hostname)) {
-            std::pair<std::string, uint16_t> p
-              (hostname, entryPoints_.front().second);
-            resolvedEntryPoints_.push_back(p);
-            addPingTask(p);
-          } else if(resolveHostname(hostname, resolver_)) {
-            hostname = resolver_->getResolvedAddresses().front();
-            std::pair<std::string, uint16_t> p(hostname,
-                                               entryPoints_.front().second);
-            resolvedEntryPoints_.push_back(p);
-            addPingTask(p);
-          } else {
+        if(util::isNumericHost(hostname)) {
+          ++numSuccess_;
+          std::pair<std::string, uint16_t> p(hostname,
+                                             entryPoints_.front().second);
+          addPingTask(p);
+        } else {
+          std::vector<std::string> res;
+          int rv = resolveHostname(res, hostname);
+          if(rv == 0) {
             e_->addCommand(this);
             return false;
+          } else {
+            if(rv == 1) {
+              ++numSuccess_;
+              std::pair<std::string, uint16_t> p
+                (res.front(), entryPoints_.front().second);
+              addPingTask(p);
+            }
+            asyncNameResolverMan_->reset(e_, this);
           }
-        } catch(RecoverableException& e) {
-          A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
         }
-        resolver_->reset();
         entryPoints_.pop_front();
       }
     } else
@@ -129,9 +124,9 @@ bool DHTEntryPointNameResolveCommand::execute()
             std::vector<std::string> addrs;
             res.resolve(addrs, hostname);
 
+            ++numSuccess_;
             std::pair<std::string, uint16_t> p(addrs.front(),
                                                entryPoints_.front().second);
-            resolvedEntryPoints_.push_back(p);
             addPingTask(p);
           } catch(RecoverableException& e) {
             A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
@@ -139,7 +134,7 @@ bool DHTEntryPointNameResolveCommand::execute()
           entryPoints_.pop_front();
         }
       }
-    if(bootstrapEnabled_ && resolvedEntryPoints_.size()) {
+    if(bootstrapEnabled_ && numSuccess_) {
       taskQueue_->addPeriodicTask1(taskFactory_->createNodeLookupTask
                                    (localNode_->getID()));
       taskQueue_->addPeriodicTask1(taskFactory_->createBucketRefreshTask());
@@ -162,47 +157,39 @@ void DHTEntryPointNameResolveCommand::addPingTask
 
 #ifdef ENABLE_ASYNC_DNS
 
-bool DHTEntryPointNameResolveCommand::resolveHostname
-(const std::string& hostname,
- const SharedHandle<AsyncNameResolver>& resolver)
+int DHTEntryPointNameResolveCommand::resolveHostname
+(std::vector<std::string>& res, const std::string& hostname)
 {
-  switch(resolver->getStatus()) {
-  case AsyncNameResolver::STATUS_READY:
-      A2_LOG_INFO(fmt(MSG_RESOLVING_HOSTNAME,
-                      getCuid(),
-                      hostname.c_str()));
-    resolver->resolve(hostname);
-    setNameResolverCheck(resolver);
-    return false;
-  case AsyncNameResolver::STATUS_SUCCESS:
-    A2_LOG_INFO(fmt(MSG_NAME_RESOLUTION_COMPLETE,
-                    getCuid(),
-                    resolver->getHostname().c_str(),
-                    resolver->getResolvedAddresses().front().c_str()));
-    return true;
-    break;
-  case AsyncNameResolver::STATUS_ERROR:
-    throw DL_ABORT_EX
-      (fmt(MSG_NAME_RESOLUTION_FAILED,
-           getCuid(),
-           hostname.c_str(),
-           resolver->getError().c_str()));
-  default:
-    return false;
+  if(!asyncNameResolverMan_->started()) {
+    asyncNameResolverMan_->startAsync(hostname, e_, this);
+    return 0;
+  } else {
+    switch(asyncNameResolverMan_->getStatus()) {
+    case -1:
+      A2_LOG_INFO
+        (fmt(MSG_NAME_RESOLUTION_FAILED, getCuid(), hostname.c_str(),
+             asyncNameResolverMan_->getLastError().c_str()));
+      return -1;
+    case 0:
+      return 0;
+    case 1:
+      asyncNameResolverMan_->getResolvedAddress(res);
+      if(res.empty()) {
+        A2_LOG_INFO
+          (fmt(MSG_NAME_RESOLUTION_FAILED, getCuid(), hostname.c_str(),
+               "No address returned"));
+        return -1;
+      } else {
+        A2_LOG_INFO(fmt(MSG_NAME_RESOLUTION_COMPLETE,
+                        getCuid(), hostname.c_str(), res.front().c_str()));
+        return 1;
+      }
+    }
   }
+  // Unreachable
+  return 0;
 }
 
-void DHTEntryPointNameResolveCommand::setNameResolverCheck
-(const SharedHandle<AsyncNameResolver>& resolver)
-{
-  e_->addNameResolverCheck(resolver, this);
-}
-
-void DHTEntryPointNameResolveCommand::disableNameResolverCheck
-(const SharedHandle<AsyncNameResolver>& resolver)
-{
-  e_->deleteNameResolverCheck(resolver, this);
-}
 #endif // ENABLE_ASYNC_DNS
 
 void DHTEntryPointNameResolveCommand::setBootstrapEnabled(bool f)

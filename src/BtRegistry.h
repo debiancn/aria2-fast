@@ -51,6 +51,7 @@ class BtRuntime;
 class BtProgressInfoFile;
 class DownloadContext;
 class LpdMessageReceiver;
+class UDPTrackerClient;
 
 struct BtObject {
   SharedHandle<DownloadContext> downloadContext;
@@ -80,7 +81,11 @@ class BtRegistry {
 private:
   std::map<a2_gid_t, SharedHandle<BtObject> > pool_;
   uint16_t tcpPort_;
+  // This is UDP port for DHT and UDP tracker. But currently UDP
+  // tracker is not supported in IPv6.
+  uint16_t udpPort_;
   SharedHandle<LpdMessageReceiver> lpdMessageReceiver_;
+  SharedHandle<UDPTrackerClient> udpTrackerClient_;
 public:
   BtRegistry();
   ~BtRegistry();
@@ -118,10 +123,25 @@ public:
     return tcpPort_;
   }
 
+  void setUdpPort(uint16_t port)
+  {
+    udpPort_ = port;
+  }
+  uint16_t getUdpPort() const
+  {
+    return udpPort_;
+  }
+
   void setLpdMessageReceiver(const SharedHandle<LpdMessageReceiver>& receiver);
   const SharedHandle<LpdMessageReceiver>& getLpdMessageReceiver() const
   {
     return lpdMessageReceiver_;
+  }
+
+  void setUDPTrackerClient(const SharedHandle<UDPTrackerClient>& tracker);
+  const SharedHandle<UDPTrackerClient>& getUDPTrackerClient() const
+  {
+    return udpTrackerClient_;
   }
 };
 

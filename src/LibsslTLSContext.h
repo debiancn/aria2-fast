@@ -46,52 +46,43 @@
 
 namespace aria2 {
 
-class TLSContext {
-private:
-  SSL_CTX* sslCtx_;
-
-  TLSSessionSide side_;
-
-  bool good_;
-
-  bool peerVerificationEnabled_;
+class OpenSSLTLSContext : public TLSContext {
 public:
-  TLSContext(TLSSessionSide side);
+  OpenSSLTLSContext(TLSSessionSide side);
 
-  ~TLSContext();
+  ~OpenSSLTLSContext();
 
   // private key `keyfile' must be decrypted.
-  bool addCredentialFile(const std::string& certfile,
-                         const std::string& keyfile);
+  virtual bool addCredentialFile(const std::string& certfile,
+                                 const std::string& keyfile);
 
-  bool addSystemTrustedCACerts();
+  virtual bool addSystemTrustedCACerts();
 
   // certfile can contain multiple certificates.
-  bool addTrustedCACertFile(const std::string& certfile);
+  virtual bool addTrustedCACertFile(const std::string& certfile);
 
-  bool good() const;
+  virtual bool good() const;
 
-  bool bad() const;
-
-  SSL_CTX* getSSLCtx() const
-  {
-    return sslCtx_;
-  }
-
-  TLSSessionSide getSide() const
-  {
+  virtual TLSSessionSide getSide() const {
     return side_;
   }
 
-  void enablePeerVerification();
-
-  void disablePeerVerification();
-
-  bool peerVerificationEnabled() const
-  {
-    return peerVerificationEnabled_;
+  virtual bool getVerifyPeer() const {
+    return verifyPeer_;
+  }
+  virtual void setVerifyPeer(bool verify) {
+    verifyPeer_ = verify;
   }
 
+  SSL_CTX* getSSLCtx() const {
+    return sslCtx_;
+  }
+
+private:
+  SSL_CTX* sslCtx_;
+  TLSSessionSide side_;
+  bool good_;
+  bool verifyPeer_;
 };
 
 } // namespace aria2

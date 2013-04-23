@@ -34,7 +34,21 @@
 /* copyright --> */
 #include "util.h"
 
-#include <signal.h>
+#ifdef __sun
+// For opensolaris, just include signal.h which includes sys/signal.h
+#ifdef HAVE_SIGNAL_H
+#  include <signal.h>
+#endif // HAVE_SIGNAL_H
+#else // !__sun
+#ifdef HAVE_SYS_SIGNAL_H
+#  include <sys/signal.h>
+#else // HAVE_SYS_SIGNAL_H
+#  ifdef HAVE_SIGNAL_H
+#    include <signal.h>
+#  endif // HAVE_SIGNAL_H
+#endif // HAVE_SYS_SIGNAL_H
+#endif // !__sun
+
 #include <sys/types.h>
 #ifdef HAVE_PWD_H
 #  include <pwd.h>
@@ -1221,12 +1235,13 @@ bool isNumericHost(const std::string& name)
   return true;
 }
 
-void setGlobalSignalHandler(int sig, void (*handler)(int), int flags) {
+void setGlobalSignalHandler(int sig, sigset_t* mask, void (*handler)(int),
+                            int flags) {
 #ifdef HAVE_SIGACTION
   struct sigaction sigact;
   sigact.sa_handler = handler;
   sigact.sa_flags = flags;
-  sigemptyset(&sigact.sa_mask);
+  sigact.sa_mask = *mask;
   sigaction(sig, &sigact, NULL);
 #else
   signal(sig, handler);
@@ -1266,16 +1281,21 @@ std::string getHomeDir()
 
 int64_t getRealSize(const std::string& sizeWithUnit)
 {
-  std::string::size_type p = sizeWithUnit.find_first_of("KM");
+  std::string::size_type p = sizeWithUnit.find_first_of("KMkm");
   std::string size;
   int32_t mult = 1;
   if(p == std::string::npos) {
     size = sizeWithUnit;
   } else {
-    if(sizeWithUnit[p] == 'K') {
+    switch(sizeWithUnit[p]) {
+    case 'K':
+    case 'k':
       mult = 1024;
-    } else if(sizeWithUnit[p] == 'M') {
+      break;
+    case 'M':
+    case 'm':
       mult = 1024*1024;
+      break;
     }
     size.assign(sizeWithUnit.begin(), sizeWithUnit.begin()+p);
   }
@@ -1710,7 +1730,7 @@ void executeHook
            firstFilename.c_str(),
            reinterpret_cast<char*>(0));
     perror(("Could not execute user command: "+command).c_str());
-    exit(EXIT_FAILURE);
+    _exit(EXIT_FAILURE);
   }
 #else
   PROCESS_INFORMATION pi;

@@ -190,6 +190,7 @@ error_code::Value main(int argc, char* argv[])
 #endif // ENABLE_BITTORRENT
   LogFactory::setLogFile(op->get(PREF_LOG));
   LogFactory::setLogLevel(op->get(PREF_LOG_LEVEL));
+  LogFactory::setConsoleLogLevel(op->get(PREF_CONSOLE_LOG_LEVEL));
   if(op->getAsBool(PREF_QUIET)) {
     LogFactory::setConsoleOutput(false);
   }
@@ -207,19 +208,25 @@ error_code::Value main(int argc, char* argv[])
     // when none of network interface has IPv4 address.
     setDefaultAIFlags(0);
   }
+  net::checkAddrconfig();
   // Bind interface
   if(!op->get(PREF_INTERFACE).empty()) {
     std::string iface = op->get(PREF_INTERFACE);
     SocketCore::bindAddress(iface);
   }
-
+  sigset_t mask;
+#ifdef HAVE_SIGACTION
+  sigemptyset(&mask);
+#else // !HAVE_SIGACTION
+  mask = 0;
+#endif // !HAVE_SIGACTION
 #ifdef SIGPIPE
-  util::setGlobalSignalHandler(SIGPIPE, SIG_IGN, 0);
+  util::setGlobalSignalHandler(SIGPIPE, &mask, SIG_IGN, 0);
 #endif
 #ifdef SIGCHLD
   // Avoid to create zombie process when forked child processes are
   // died.
-  util::setGlobalSignalHandler(SIGCHLD, SIG_IGN, 0);
+  util::setGlobalSignalHandler(SIGCHLD, &mask, SIG_IGN, 0);
 #endif // SIGCHILD
   std::vector<SharedHandle<RequestGroup> > requestGroups;
   SharedHandle<UriListParser> uriListParser;
@@ -265,14 +272,16 @@ error_code::Value main(int argc, char* argv[])
   // command-line. If they are left, because op is used as a template
   // for new RequestGroup(such as created in RPC command), they causes
   // unintentional effect.
-  op->remove(PREF_OUT);
-  op->remove(PREF_FORCE_SEQUENTIAL);
-  op->remove(PREF_INPUT_FILE);
-  op->remove(PREF_INDEX_OUT);
-  op->remove(PREF_SELECT_FILE);
-  op->remove(PREF_PAUSE);
-  op->remove(PREF_CHECKSUM);
-  op->remove(PREF_GID);
+  for(SharedHandle<Option> i = op; i; i = i->getParent()) {
+    i->remove(PREF_OUT);
+    i->remove(PREF_FORCE_SEQUENTIAL);
+    i->remove(PREF_INPUT_FILE);
+    i->remove(PREF_INDEX_OUT);
+    i->remove(PREF_SELECT_FILE);
+    i->remove(PREF_PAUSE);
+    i->remove(PREF_CHECKSUM);
+    i->remove(PREF_GID);
+  }
   if(!op->getAsBool(PREF_ENABLE_RPC) && requestGroups.empty() &&
      !uriListParser) {
     global::cout()->printf("%s\n", MSG_NO_FILES_TO_DOWNLOAD);

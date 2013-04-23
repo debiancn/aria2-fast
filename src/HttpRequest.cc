@@ -96,6 +96,8 @@ int64_t HttpRequest::getEndByte() const
       int64_t endByte =
         fileEntry_->gtoloff(segment_->getPosition()+segment_->getLength()-1);
       return std::min(endByte, fileEntry_->getLength()-1);
+    } else if(endOffsetOverride_ > 0) {
+      return endOffsetOverride_ - 1;
     } else {
       return 0;
     }
@@ -197,13 +199,14 @@ std::string HttpRequest::createRequest()
     builtinHds.push_back(std::make_pair("Connection:", "close"));
   }
   if(segment_ && segment_->getLength() > 0 &&
-     (request_->isPipeliningEnabled() || getStartByte() > 0)) {
+     (request_->isPipeliningEnabled() || getStartByte() > 0 ||
+      getEndByte() > 0)) {
     std::string rangeHeader(fmt("bytes=%" PRId64 "-", getStartByte()));
-    if(request_->isPipeliningEnabled()) {
+    if(request_->isPipeliningEnabled() || getEndByte() > 0) {
+      // FTP via http proxy does not support endbytes, but in that
+      // case, request_->isPipeliningEnabled() is false and
+      // getEndByte() is 0.
       rangeHeader += util::itos(getEndByte());
-    } else if(getProtocol() != "ftp" && endOffsetOverride_ > 0) {
-      // FTP via http proxy does not support endbytes
-      rangeHeader += util::itos(endOffsetOverride_-1);
     }
     builtinHds.push_back(std::make_pair("Range:", rangeHeader));
   }

@@ -101,8 +101,6 @@ FtpNegotiationCommand::FtpNegotiationCommand
   if(seq == SEQ_RECV_GREETING) {
     setTimeout(getOption()->getAsInt(PREF_CONNECT_TIMEOUT));
   }
-  disableReadCheckSocket();
-  setWriteCheckSocket(getSocket());
 }
 
 FtpNegotiationCommand::~FtpNegotiationCommand() {}
@@ -145,12 +143,6 @@ bool FtpNegotiationCommand::executeInternal() {
 }
 
 bool FtpNegotiationCommand::recvGreeting() {
-  if(!checkIfConnectionEstablished
-     (getSocket(), getRequest()->getConnectedHostname(),
-      getRequest()->getConnectedAddr(), getRequest()->getConnectedPort())) {
-    sequence_ = SEQ_EXIT;
-    return false;
-  }
   setTimeout(getRequestGroup()->getTimeout());
   //socket->setBlockingMode();
   disableWriteCheckSocket();
@@ -682,7 +674,7 @@ bool FtpNegotiationCommand::preparePasvConnect() {
                     dataAddr.first.c_str(),
                     pasvPort_));
     dataSocket_.reset(new SocketCore());
-    dataSocket_->establishConnection(dataAddr.first, pasvPort_);
+    dataSocket_->establishConnection(dataAddr.first, pasvPort_, false);
     disableReadCheckSocket();
     setWriteCheckSocket(dataSocket_);
     sequence_ = SEQ_SEND_REST_PASV;

@@ -51,6 +51,10 @@
 #include "util.h"
 #include "fmt.h"
 #include "SocketRecvBuffer.h"
+#include "BackupIPv4ConnectCommand.h"
+#include "ConnectCommand.h"
+#include "HttpRequestConnectChain.h"
+#include "HttpProxyRequestConnectChain.h"
 
 namespace aria2 {
 
@@ -84,34 +88,27 @@ Command* HttpInitiateConnectionCommand::createNextCommand
       getSocket()->establishConnection(addr, port);
 
       getRequest()->setConnectedAddrInfo(hostname, addr, port);
+      ConnectCommand* c = new ConnectCommand(getCuid(),
+                                             getRequest(),
+                                             proxyRequest,
+                                             getFileEntry(),
+                                             getRequestGroup(),
+                                             getDownloadEngine(),
+                                             getSocket());
       if(proxyMethod == V_TUNNEL) {
-        HttpProxyRequestCommand* c =
-          new HttpProxyRequestCommand(getCuid(),
-                                      getRequest(),
-                                      getFileEntry(),
-                                      getRequestGroup(),
-                                      getDownloadEngine(),
-                                      proxyRequest,
-                                      getSocket());
-        command = c;
+        SharedHandle<HttpProxyRequestConnectChain> chain
+          (new HttpProxyRequestConnectChain());
+        c->setControlChain(chain);
       } else if(proxyMethod == V_GET) {
-        SharedHandle<SocketRecvBuffer> socketRecvBuffer
-          (new SocketRecvBuffer(getSocket()));
-        SharedHandle<HttpConnection> httpConnection
-          (new HttpConnection(getCuid(), getSocket(), socketRecvBuffer));
-        HttpRequestCommand* c = new HttpRequestCommand(getCuid(),
-                                                       getRequest(),
-                                                       getFileEntry(),
-                                                       getRequestGroup(),
-                                                       httpConnection,
-                                                       getDownloadEngine(),
-                                                       getSocket());
-        c->setProxyRequest(proxyRequest);
-        command = c;
+        SharedHandle<HttpRequestConnectChain> chain
+          (new HttpRequestConnectChain());
+        c->setControlChain(chain);
       } else {
-        // TODO
-        throw DL_ABORT_EX("ERROR");
+        // Unreachable
+        assert(0);
       }
+      setupBackupConnection(hostname, addr, port, c);
+      command = c;
     } else {
       setConnectedAddrInfo(getRequest(), hostname, pooledSocket);
       SharedHandle<SocketRecvBuffer> socketRecvBuffer
@@ -139,22 +136,36 @@ Command* HttpInitiateConnectionCommand::createNextCommand
                       getCuid(), addr.c_str(), port));
       createSocket();
       getSocket()->establishConnection(addr, port);
+
       getRequest()->setConnectedAddrInfo(hostname, addr, port);
+      ConnectCommand* c = new ConnectCommand(getCuid(),
+                                             getRequest(),
+                                             proxyRequest, // must be null
+                                             getFileEntry(),
+                                             getRequestGroup(),
+                                             getDownloadEngine(),
+                                             getSocket());
+      SharedHandle<HttpRequestConnectChain> chain
+        (new HttpRequestConnectChain());
+      c->setControlChain(chain);
+      setupBackupConnection(hostname, addr, port, c);
+      command = c;
     } else {
       setSocket(pooledSocket);
       setConnectedAddrInfo(getRequest(), hostname, pooledSocket);
+
+      SharedHandle<SocketRecvBuffer> socketRecvBuffer
+        (new SocketRecvBuffer(getSocket()));
+      SharedHandle<HttpConnection> httpConnection
+        (new HttpConnection(getCuid(), getSocket(), socketRecvBuffer));
+      command = new HttpRequestCommand(getCuid(),
+                                       getRequest(),
+                                       getFileEntry(),
+                                       getRequestGroup(),
+                                       httpConnection,
+                                       getDownloadEngine(),
+                                       getSocket());
     }
-    SharedHandle<SocketRecvBuffer> socketRecvBuffer
-      (new SocketRecvBuffer(getSocket()));
-    SharedHandle<HttpConnection> httpConnection
-      (new HttpConnection(getCuid(), getSocket(), socketRecvBuffer));
-    HttpRequestCommand* c =
-      new HttpRequestCommand(getCuid(), getRequest(), getFileEntry(),
-                             getRequestGroup(),
-                             httpConnection,
-                             getDownloadEngine(),
-                             getSocket());
-    command = c;
   }
   return command;
 }
