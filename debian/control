@@ -1,6 +1,6 @@
 Source: aria2
 Section: net
-Priority: extra
+Priority: optional
 Maintainer: Patrick Ruckstuhl <patrick@tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
 Build-Depends: debhelper (>= 7),
