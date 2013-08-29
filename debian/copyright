@@ -4,7 +4,7 @@ Upstream-Contact: Tatsuhiro Tsujikawa <tujikawa@rednoah.com>
 Source: http://aria2.sourceforge.net
 
 Files: *
-Copyright: (C) 2006-2011, Tatsuhiro Tsujikawa <tujikawa@rednoah.com>
+Copyright: (C) 2006-2013, Tatsuhiro Tsujikawa <tujikawa@rednoah.com>
 License: GPL-2+ with OpenSSL exception
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software
@@ -52,8 +52,8 @@ License: LGPL-2+
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 Files: debian/*
-Copyright: (C) 2006-2011, Patrick Ruckstuhl <patrick@tario.org>,
-           (C) 2010-2012, Kartik Mistry <kartik@debian.org>
+Copyright: (C) 2006-2013, Patrick Ruckstuhl <patrick@ch.tario.org>,
+           (C) 2010-2013, Kartik Mistry <kartik@debian.org>
 License: GPL-2+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software

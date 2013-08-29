@@ -1,7 +1,7 @@
 Source: aria2
 Section: net
 Priority: optional
-Maintainer: Patrick Ruckstuhl <patrick@tario.org>
+Maintainer: Patrick Ruckstuhl <patrick@ch.tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
 Build-Depends: debhelper (>= 7),
                dpkg-dev (>= 1.16.1~),
