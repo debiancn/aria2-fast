@@ -17,6 +17,10 @@ CFLAGS:=$(shell dpkg-buildflags --get CFLAGS) $(CPPFLAGS)
 CXXFLAGS:=$(shell dpkg-buildflags --get CXXFLAGS) $(CPPFLAGS)
 LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
 
+ifneq (,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
+	NJOBS := -j $(subst parallel=,,$(filter parallel=%,$(subst $(COMMA), ,$(DEB_BUILD_OPTIONS))))
+endif
+
 clean:
 	dh_testdir
 	dh_testroot
@@ -49,7 +53,7 @@ build-indep: build-stamp
 
 build-stamp: config.status
 	dh_testdir
-	$(MAKE)
+	$(MAKE) $(NJOBS)
 	touch $@
 
 install: build

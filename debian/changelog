@@ -1,4 +1,4 @@
-aria2 (1.17.0-2) UNRELEASED; urgency=low
+aria2 (1.17.1-1) UNRELEASED; urgency=low
 
   [ Kartik Mistry ]
   * debian/control:
@@ -6,8 +6,10 @@ aria2 (1.17.0-2) UNRELEASED; urgency=low
 
   [ Patrick Ruckstuhl ]
   * New upstream release. 
+  * debian/control:
+    + Allow parallel building (Closes: #720977)
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 13 May 2013 16:08:45 +0530
+ -- Patrick Ruckstuhl <patrick@ch.tario.org>  Thu, 29 Aug 2013 22:33:04 +0200
 
 aria2 (1.17.0-1) unstable; urgency=low
 
