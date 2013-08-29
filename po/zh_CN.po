@@ -7,31 +7,31 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2013-04-20 23:40+0900\n"
-"PO-Revision-Date: 2012-02-26 11:18+0000\n"
-"Last-Translator: multiSnow <Unknown>\n"
+"POT-Creation-Date: 2013-05-26 16:25+0900\n"
+"PO-Revision-Date: 2013-05-03 14:16+0000\n"
+"Last-Translator: Onion <cug_yangyuancong@hotmail.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-04-20 14:32+0000\n"
-"X-Generator: Launchpad (build 16567)\n"
+"X-Launchpad-Export-Date: 2013-05-26 07:20+0000\n"
+"X-Generator: Launchpad (build 16640)\n"
 
-#: src/DownloadEngine.cc:225
+#: src/DownloadEngine.cc:234
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr "正在关闭程序... 紧急关闭请再按Ctrl-C"
 
-#: src/DownloadEngine.cc:232
+#: src/DownloadEngine.cc:241
 msgid "Emergency shutdown sequence commencing..."
 msgstr "紧急关闭程序..."
 
-#: src/MultiUrlRequestInfo.cc:125
+#: src/MultiUrlRequestInfo.cc:132
 msgid "aria2 will resume download if the transfer is restarted."
 msgstr "重新启动aria2，自动继续下载文件"
 
-#: src/MultiUrlRequestInfo.cc:126
+#: src/MultiUrlRequestInfo.cc:133
 msgid ""
 "If there are any errors, then see the log file. See '-l' option in help/man "
 "page for details."
@@ -39,47 +39,47 @@ msgstr ""
 "如果发生任何错误，请参阅日志文件。要了解详细信息，请在help/man页面中参阅'-"
 "l'选项。"
 
-#: src/MultiUrlRequestInfo.cc:288
+#: src/MultiUrlRequestInfo.cc:298
 #, c-format
 msgid "Serialized session to '%s' successfully."
-msgstr ""
+msgstr "当前会话已成功保存到 '%s' ,下次Aria2启动时将继续保存的会话。"
 
-#: src/MultiUrlRequestInfo.cc:291
+#: src/MultiUrlRequestInfo.cc:301
 #, c-format
 msgid "Failed to serialize session to '%s'."
-msgstr ""
+msgstr "保存到 '%s' 失败。"
 
-#: src/RequestGroupMan.cc:333
+#: src/RequestGroupMan.cc:332
 #, c-format
 msgid "Download GID#%s paused"
-msgstr ""
+msgstr "GID为%s的下载项已暂停"
 
-#: src/RequestGroupMan.cc:381
+#: src/RequestGroupMan.cc:380
 #, c-format
 msgid "Download GID#%s not complete: %s"
-msgstr ""
+msgstr "GID为%s的下载项并未全部完成: %s"
 
-#: src/RequestGroupMan.cc:631
+#: src/RequestGroupMan.cc:630
 msgid "Download Results:"
 msgstr "下载结果："
 
-#: src/RequestGroupMan.cc:680
+#: src/RequestGroupMan.cc:679
 msgid "Status Legend:"
 msgstr "状态标识："
 
-#: src/RequestGroupMan.cc:682
+#: src/RequestGroupMan.cc:681
 msgid "(OK):download completed."
 msgstr "(OK)：完成下载。"
 
-#: src/RequestGroupMan.cc:685
+#: src/RequestGroupMan.cc:684
 msgid "(ERR):error occurred."
 msgstr "(ERR)：发生错误。"
 
-#: src/RequestGroupMan.cc:688
+#: src/RequestGroupMan.cc:687
 msgid "(INPR):download in-progress."
 msgstr "(INPR)：下载中断。"
 
-#: src/RequestGroupMan.cc:691
+#: src/RequestGroupMan.cc:690
 msgid "(RM):download removed."
 msgstr "(RM)：已删除下载。"
 
@@ -162,9 +162,9 @@ msgid ""
 "the\n"
 "                              HTTP server returns 503 response."
 msgstr ""
-" --retry-wait=SEC             设置重试时间隔的秒数。 \n"
-"                              在 SEC > 0 时aria2会在HTTP服务器返回\n"
-"                              503 响应时重试下载"
+" --retry-wait=SEC            设定重试等待时间. 当 SEC > 0时,\n"
+"                               如果HTTP 返回503 错误，aria2会等待 \n"
+"                              SEC 秒然后重试下载."
 
 #: src/usage_text.h:64
 msgid " -t, --timeout=SEC            Set timeout in seconds."
@@ -245,6 +245,10 @@ msgid ""
 "                              given, each request URI is used as a referer.\n"
 "                              This may be useful when used with -P option."
 msgstr ""
+" --referer=REFERER            设置重定向. 此选项对所有URL均适用. 如果 \"*\" "
+"被\n"
+"                              给出, 每个请求都会被重定向.\n"
+"                              当使用-P选项时会有用."
 
 #: src/usage_text.h:101
 msgid " --ftp-user=USER              Set FTP user. This affects all URLs."
@@ -342,6 +346,26 @@ msgid ""
 "file\n"
 "                              to a specified length."
 msgstr ""
+" --file-allocation=METHOD     指定文件分配方式.\n"
+"                              'none' 选项表示不预分配空间. 'prealloc'\n"
+"                              表示在下载真正开始前预先分配空间.\n"
+"                              根据文件的大小，这可能会花费一些时间\n"
+"                              如果你正在使用的是新型文件系统如ext4\n"
+"                              (启用扩展支持的), btrfs, xfs 或 NTFS\n"
+"                              (仅限MinGW环境 ), 'falloc' 是你最好的\n"
+"                              选择. 它几乎能在一瞬间完成很大(几个 GiB) \n"
+"                              文件的预分配. 但请千万注意不要使用 'falloc' \n"
+"                              在比较旧的文件系统上，如ext3 和 FAT32 因为\n"
+"                             在这些文件系统上该选项花费的时间和 'prealloc'\n"
+"                             不相上下并且在分配完成前aria2 会被完全阻塞.\n"
+"                              如果你的系统中不存在posix_fallocate()函数(在"
+"嵌\n"
+"                              入式系统如OpenWRT中该函数一般由uClibc提供)\n"
+"                             'falloc'  选项将不适用,强制使用该选项将不能启动"
+"aria2.\n"
+"                              'trunc' 将调用 ftruncate()或平台指定的相应功"
+"能\n"
+"                              创建一个制定大小的文件。"
 
 #: src/usage_text.h:147
 msgid ""
@@ -371,6 +395,8 @@ msgid ""
 "See\n"
 "                              also --auto-file-renaming option."
 msgstr ""
+" --allow-overwrite[=true|false] 如果没有控制文件，重新开始下载。\n"
+"                                            另见 --auto-file-renaming 选项。"
 
 #: src/usage_text.h:159
 msgid ""
@@ -382,6 +408,15 @@ msgid ""
 "                              proceed but some download progress will be "
 "lost."
 msgstr ""
+" --allow-piece-length-change[=true|false] 如果为 false, 当文件的某一块内\n"
+"                                                   容与控制文件中的描述不同时"
+"aria2 将会停止相\n"
+"                                                   应文件的下载;反之，如果为 "
+"true,遇到文件块内\n"
+"                                                   容与aria2控制文件中的描述"
+"不符时,下载仍将继\n"
+"                                                   续,风险是文件的某些内容可"
+"能会丢失"
 
 #: src/usage_text.h:164
 msgid ""
@@ -470,6 +505,21 @@ msgid ""
 "                              and a hash of entire file are provided, only\n"
 "                              piece hashes are used."
 msgstr ""
+" -V, --check-integrity[=true|false]   通过验证文件块哈希值或整个文\n"
+"                             件哈希值检查文件的完整性。该选项仅生效于 \n"
+"                             BitTorrent, Metalink 下载启用 --checksums 选项"
+"时\n"
+"                             或 HTTP(S)/FTP 下载启用 --checksum 选项时. 如"
+"过\n"
+"                             提供了文件块的哈希校验值，则会在下载过程中就检\n"
+"                             测文件的那部分已损坏并且会重新下载损坏的部分;"
+"如\n"
+"                             果给定的是整个文件的哈希值，那么校验只能在下载\n"
+"                             已经完成的情况下进行 。同时，这也取决于文件的"
+"长\n"
+"                             度，如果哈系校验失败, 则会重新下载.如果整个文件"
+"哈\n"
+"                             希值和块哈希都存在，只有块哈希会被使用。"
 
 #: src/usage_text.h:203
 msgid ""
@@ -497,6 +547,9 @@ msgid ""
 "                              checksum while downloading a file if chunk\n"
 "                              checksums are provided."
 msgstr ""
+" --realtime-chunk-checksum[=true|false]  在下载过程中实时校验文件块\n"
+"                                                                            如"
+"果提供了文件校验值"
 
 #: src/usage_text.h:215
 msgid ""
@@ -576,6 +629,10 @@ msgid ""
 "and\n"
 "                              their expiry values are treated as 0."
 msgstr ""
+" --save-cookies=FILE        以Mozilla/Firefox(1.x/2.x)/\n"
+"                              Netscape的标准格式保存   Cookies 到\n"
+"                             制定文件FILE. 如果FILE已存在，则会覆\n"
+"                             盖. 会话的 Cookies 也会保存，"
 
 #: src/usage_text.h:248
 msgid ""
@@ -584,6 +641,9 @@ msgid ""
 "                              information will be listed in case of torrent\n"
 "                              file."
 msgstr ""
+" -S, --show-files[=true|false] 显示 .torrent, .meta4 和\n"
+"                              .metalink 等类型文件的列表然后退出.\n"
+"                              如果是torrent文件，会给出更详细信息。"
 
 #: src/usage_text.h:253
 msgid ""
@@ -661,6 +721,11 @@ msgid ""
 "                              To limit the upload speed per torrent, use\n"
 "                              --max-upload-limit option."
 msgstr ""
+" --max-overall-upload-limit=SPEED 设置全局最大上传速度为SPEED bytes/sec.\n"
+"                              0 意味着不限制.使用 K 或 M (1K = 1024, 1M = "
+"1024K)也是可\n"
+"                             以的.你也可以使用--max-upload-limit可以为单个"
+"torrent文件限速。"
 
 #: src/usage_text.h:286
 msgid ""
@@ -718,6 +783,12 @@ msgid ""
 "                              byte data are added to make its length 20 "
 "bytes."
 msgstr ""
+" --peer-id-prefix=PEER_ID_PREFIX 使用peer ID前缀. BitTorrent的peer ID\n"
+"                               长度为20字节. 如果制定长度大于20字节，则只会使"
+"用前20\n"
+"                               字节的内容，如果给定的长度小于20自己，则使用随"
+"机值填\n"
+"                               充至20字节"
 
 #: src/usage_text.h:310
 msgid " --enable-peer-exchange[=true|false] Enable Peer Exchange extension."
@@ -2139,27 +2210,27 @@ msgstr ""
 msgid "Refer to man page for more information."
 msgstr ""
 
-#: src/option_processing.cc:86
+#: src/option_processing.cc:87
 #, c-format
 msgid "Caught Error while parsing environment variable '%s'"
 msgstr ""
 
-#: src/option_processing.cc:168
+#: src/option_processing.cc:169
 #, c-format
 msgid "Did you mean:"
 msgstr ""
 
-#: src/option_processing.cc:248 src/option_processing.cc:257
+#: src/option_processing.cc:252 src/option_processing.cc:261
 #, c-format
 msgid "Parse error in %s"
 msgstr ""
 
-#: src/option_processing.cc:252 src/option_processing.cc:290
+#: src/option_processing.cc:256 src/option_processing.cc:301
 #, c-format
 msgid "Usage:"
 msgstr ""
 
-#: src/option_processing.cc:262
+#: src/option_processing.cc:266
 #, c-format
 msgid "Configuration file %s is not found."
 msgstr ""
@@ -2881,7 +2952,7 @@ msgstr "已经获取%d状态，但无提供的位置头信息。"
 
 #: src/message.h:276
 msgid "No file matched with your preference."
-msgstr ""
+msgstr "没有文件能够与你的偏好匹配。"
 
 #: src/message.h:277
 msgid "Exception caught"

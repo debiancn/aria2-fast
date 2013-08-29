@@ -177,6 +177,7 @@ check_PROGRAMS = $(am__EXEEXT_1)
 
 @ENABLE_ASYNC_DNS_TRUE@am__append_8 = AsyncNameResolverTest.cc
 @HAVE_TIMEGM_FALSE@am__append_9 = TimegmTest.cc
+@ENABLE_LIBARIA2_TRUE@am__append_10 = Aria2ApiTest.cc
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -306,7 +307,7 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 	Metalink2RequestGroupTest.cc \
 	MetalinkPostDownloadHandlerTest.cc MetalinkHelperTest.cc \
 	MetalinkParserControllerTest.cc MetalinkProcessorTest.cc \
-	AsyncNameResolverTest.cc TimegmTest.cc
+	AsyncNameResolverTest.cc TimegmTest.cc Aria2ApiTest.cc
 @ENABLE_XML_RPC_TRUE@am__objects_1 = XmlRpcRequestParserControllerTest.$(OBJEXT)
 @HAVE_SOME_FALLOCATE_TRUE@am__objects_2 = FallocFileAllocationIteratorTest.$(OBJEXT)
 @HAVE_ZLIB_TRUE@am__objects_3 = GZipDecoder.$(OBJEXT) \
@@ -411,6 +412,7 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 @ENABLE_ASYNC_DNS_TRUE@am__objects_8 =  \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverTest.$(OBJEXT)
 @HAVE_TIMEGM_FALSE@am__objects_9 = TimegmTest.$(OBJEXT)
+@ENABLE_LIBARIA2_TRUE@am__objects_10 = Aria2ApiTest.$(OBJEXT)
 am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	SocketCoreTest.$(OBJEXT) array_funTest.$(OBJEXT) \
 	Base64Test.$(OBJEXT) Base32Test.$(OBJEXT) \
@@ -460,9 +462,10 @@ am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	GroupIdTest.$(OBJEXT) IndexedListTest.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
 	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8) $(am__objects_9)
+	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
+	$(am__objects_10)
 aria2c_OBJECTS = $(am_aria2c_OBJECTS)
-aria2c_DEPENDENCIES = ../src/libaria2c.a
+aria2c_DEPENDENCIES = ../src/libaria2.la
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
@@ -511,6 +514,9 @@ AWK = @AWK@
 BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
 CATOBJEXT = @CATOBJEXT@
 CC = @CC@
+CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
@@ -561,6 +567,8 @@ INTLOBJS = @INTLOBJS@
 INTL_DEFAULT_VERBOSITY = @INTL_DEFAULT_VERBOSITY@
 INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+JEMALLOC_CFLAGS = @JEMALLOC_CFLAGS@
+JEMALLOC_LIBS = @JEMALLOC_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBCARES_CFLAGS = @LIBCARES_CFLAGS@
@@ -588,6 +596,9 @@ LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
 LTLIBPTH = @LTLIBPTH@
 LTLIBTHREAD = @LTLIBTHREAD@
+LT_AGE = @LT_AGE@
+LT_CURRENT = @LT_CURRENT@
+LT_REVISION = @LT_REVISION@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -617,18 +628,22 @@ POSUB = @POSUB@
 POW_LIB = @POW_LIB@
 PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 RANLIB = @RANLIB@
+RST2HTML = @RST2HTML@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SQLITE3_CFLAGS = @SQLITE3_CFLAGS@
 SQLITE3_LIBS = @SQLITE3_LIBS@
 STRIP = @STRIP@
+TCMALLOC_CFLAGS = @TCMALLOC_CFLAGS@
+TCMALLOC_LIBS = @TCMALLOC_LIBS@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 WINDRES = @WINDRES@
 WOE32 = @WOE32@
 WOE32DLL = @WOE32DLL@
+WSLAY_LIBS = @WSLAY_LIBS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -737,10 +752,11 @@ aria2c_SOURCES = AllTest.cc TestUtil.cc TestUtil.h SocketCoreTest.cc \
 	IndexedListTest.cc $(am__append_1) $(am__append_2) \
 	$(am__append_3) $(am__append_4) $(am__append_5) \
 	$(am__append_6) $(am__append_7) $(am__append_8) \
-	$(am__append_9)
-aria2c_LDADD = ../src/libaria2c.a @LIBINTL@ @CPPUNIT_LIBS@
+	$(am__append_9) $(am__append_10)
+aria2c_LDADD = ../src/libaria2.la @LIBINTL@ @CPPUNIT_LIBS@
 AM_CPPFLAGS = -Wall\
 	-I$(top_srcdir)/src\
+	-I$(top_srcdir)/src/includes -I$(top_builddir)/src/includes\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
         -DLOCALEDIR=\"$(localedir)\"\
 	-DA2_TEST_DIR=\"$(top_srcdir)/test\"\
@@ -839,6 +855,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractCommandTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AllTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceListTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Aria2ApiTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolverTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfigFactoryTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Base32Test.Po@am__quote@

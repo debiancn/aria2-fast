@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "April 20, 2013" "1.17.0" "aria2"
+.TH "ARIA2C" "1" "May 26, 2013" "1.17.1" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -2032,6 +2032,8 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%ftp-user\fP
 .IP \(bu 2
+\fI\%gid\fP
+.IP \(bu 2
 \fI\%hash-check-only\fP
 .IP \(bu 2
 \fI\%header\fP
@@ -2600,8 +2602,7 @@ download has no parent, this key will not be included in the
 response.
 .TP
 .B \fBdir\fP
-Directory to save files. This key is not available for stopped
-downloads.
+Directory to save files.
 .TP
 .B \fBfiles\fP
 Returns the list of files. The element of list is the same struct
@@ -4342,7 +4343,7 @@ Metalink Homepage: \fI\%http://www.metalinker.org/\fP
 The Metalink Download Description Format: \fI\%RFC 5854\fP
 .SH COPYRIGHT
 .sp
-Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2013 Tatsuhiro Tsujikawa
 .sp
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2013-04-20 23:40+0900\n"
+"POT-Creation-Date: 2013-05-26 16:25+0900\n"
 "PO-Revision-Date: 2008-02-13 11:01+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: Hebrew <he@li.org>\n"
@@ -15,69 +15,69 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-04-20 14:32+0000\n"
-"X-Generator: Launchpad (build 16567)\n"
+"X-Launchpad-Export-Date: 2013-05-26 07:21+0000\n"
+"X-Generator: Launchpad (build 16640)\n"
 
-#: src/DownloadEngine.cc:225
+#: src/DownloadEngine.cc:234
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 
-#: src/DownloadEngine.cc:232
+#: src/DownloadEngine.cc:241
 msgid "Emergency shutdown sequence commencing..."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:125
+#: src/MultiUrlRequestInfo.cc:132
 msgid "aria2 will resume download if the transfer is restarted."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:126
+#: src/MultiUrlRequestInfo.cc:133
 msgid ""
 "If there are any errors, then see the log file. See '-l' option in help/man "
 "page for details."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:288
+#: src/MultiUrlRequestInfo.cc:298
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:291
+#: src/MultiUrlRequestInfo.cc:301
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:333
+#: src/RequestGroupMan.cc:332
 #, c-format
 msgid "Download GID#%s paused"
 msgstr ""
 
-#: src/RequestGroupMan.cc:381
+#: src/RequestGroupMan.cc:380
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr ""
 
-#: src/RequestGroupMan.cc:631
+#: src/RequestGroupMan.cc:630
 msgid "Download Results:"
 msgstr ""
 
-#: src/RequestGroupMan.cc:680
+#: src/RequestGroupMan.cc:679
 msgid "Status Legend:"
 msgstr ""
 
-#: src/RequestGroupMan.cc:682
+#: src/RequestGroupMan.cc:681
 msgid "(OK):download completed."
 msgstr ""
 
-#: src/RequestGroupMan.cc:685
+#: src/RequestGroupMan.cc:684
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:688
+#: src/RequestGroupMan.cc:687
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:691
+#: src/RequestGroupMan.cc:690
 msgid "(RM):download removed."
 msgstr ""
 
@@ -1922,27 +1922,27 @@ msgstr ""
 msgid "Refer to man page for more information."
 msgstr ""
 
-#: src/option_processing.cc:86
+#: src/option_processing.cc:87
 #, c-format
 msgid "Caught Error while parsing environment variable '%s'"
 msgstr ""
 
-#: src/option_processing.cc:168
+#: src/option_processing.cc:169
 #, c-format
 msgid "Did you mean:"
 msgstr ""
 
-#: src/option_processing.cc:248 src/option_processing.cc:257
+#: src/option_processing.cc:252 src/option_processing.cc:261
 #, c-format
 msgid "Parse error in %s"
 msgstr ""
 
-#: src/option_processing.cc:252 src/option_processing.cc:290
+#: src/option_processing.cc:256 src/option_processing.cc:301
 #, c-format
 msgid "Usage:"
 msgstr ""
 
-#: src/option_processing.cc:262
+#: src/option_processing.cc:266
 #, c-format
 msgid "Configuration file %s is not found."
 msgstr ""

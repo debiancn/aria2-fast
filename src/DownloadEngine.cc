@@ -69,6 +69,9 @@
 #ifdef ENABLE_BITTORRENT
 # include "BtRegistry.h"
 #endif // ENABLE_BITTORRENT
+#ifdef ENABLE_WEBSOCKET
+# include "WebSocketSessionMan.h"
+#endif // ENABLE_WEBSOCKET
 
 namespace aria2 {
 
@@ -86,8 +89,9 @@ volatile sig_atomic_t globalHaltRequested = 0;
 DownloadEngine::DownloadEngine(const SharedHandle<EventPoll>& eventPoll)
   : eventPoll_(eventPoll),
     haltRequested_(0),
-    noWait_(false),
+    noWait_(true),
     refreshInterval_(DEFAULT_REFRESH_INTERVAL),
+    lastRefresh_(0),
     cookieStorage_(new CookieStorage()),
 #ifdef ENABLE_BITTORRENT
     btRegistry_(new BtRegistry()),
@@ -103,16 +107,19 @@ DownloadEngine::DownloadEngine(const SharedHandle<EventPoll>& eventPoll)
   sessionId_.assign(&sessionId[0], & sessionId[sizeof(sessionId)]);
 }
 
+namespace {
+void cleanQueue(std::deque<Command*>& commands) {
+  std::for_each(commands.begin(), commands.end(), Deleter());
+  commands.clear();
+}
+} // namespace
+
 DownloadEngine::~DownloadEngine() {
-  cleanQueue();
+  cleanQueue(commands_);
+  cleanQueue(routineCommands_);
 #ifdef HAVE_ARES_ADDR_NODE
   setAsyncDNSServers(0);
 #endif // HAVE_ARES_ADDR_NODE
-}
-
-void DownloadEngine::cleanQueue() {
-  std::for_each(commands_.begin(), commands_.end(), Deleter());
-  commands_.clear();
 }
 
 namespace {
@@ -139,29 +146,31 @@ void executeCommand(std::deque<Command*>& commands,
 }
 } // namespace
 
-void DownloadEngine::run()
+int DownloadEngine::run(bool oneshot)
 {
-  Timer cp;
-  cp.reset(0);
   while(!commands_.empty() || !routineCommands_.empty()) {
+    if(!commands_.empty()) {
+      waitData();
+    }
+    noWait_ = false;
     global::wallclock().reset();
     calculateStatistics();
-    if(cp.differenceInMillis(global::wallclock())+A2_DELTA_MILLIS >=
+    if(lastRefresh_.differenceInMillis(global::wallclock())+A2_DELTA_MILLIS >=
        refreshInterval_) {
       refreshInterval_ = DEFAULT_REFRESH_INTERVAL;
-      cp = global::wallclock();
+      lastRefresh_ = global::wallclock();
       executeCommand(commands_, Command::STATUS_ALL);
     } else {
       executeCommand(commands_, Command::STATUS_ACTIVE);
     }
     executeCommand(routineCommands_, Command::STATUS_ALL);
     afterEachIteration();
-    if(!commands_.empty()) {
-      waitData();
+    if(!noWait_ && oneshot) {
+      return 1;
     }
-    noWait_ = false;
   }
   onEndOfRun();
+  return 0;
 }
 
 void DownloadEngine::waitData()
@@ -592,5 +601,13 @@ void DownloadEngine::setAsyncDNSServers(ares_addr_node* asyncDNSServers)
   asyncDNSServers_ = asyncDNSServers;
 }
 #endif // HAVE_ARES_ADDR_NODE
+
+#ifdef ENABLE_WEBSOCKET
+void DownloadEngine::setWebSocketSessionMan
+(const SharedHandle<rpc::WebSocketSessionMan>& wsman)
+{
+  webSocketSessionMan_ = wsman;
+}
+#endif // ENABLE_WEBSOCKET
 
 } // namespace aria2

@@ -211,9 +211,6 @@
    function. */
 #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_SYSTEM_TRUST
 
-/* Define to 1 if you have the `gzbuffer' function. */
-#undef HAVE_GZBUFFER
-
 /* Define to 1 if you have the `gzsetparams' function. */
 #undef HAVE_GZSETPARAMS
 
@@ -271,6 +268,9 @@
 
 /* Define to 1 if you have libnettle. */
 #undef HAVE_LIBNETTLE
+
+/* Define to 1 if you have libuv. */
+#undef HAVE_LIBUV
 
 /* Define to 1 if you have libxml2. */
 #undef HAVE_LIBXML2
@@ -400,6 +400,9 @@
 
 /* Define to 1 if you have the <share.h> header file. */
 #undef HAVE_SHARE_H
+
+/* Define to 1 if you have the `sigaction' function. */
+#undef HAVE_SIGACTION
 
 /* Define to 1 if you have the <signal.h> header file. */
 #undef HAVE_SIGNAL_H

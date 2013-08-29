@@ -1500,6 +1500,7 @@ Let's see an example of how arguments are passed to command:
   $ aria2c --on-download-complete hook.sh http://example.org/file.iso
   Called with [1] [1] [/path/to/file.iso]
 
+.. _exit-status:
 
 EXIT STATUS
 -----------
@@ -1733,6 +1734,8 @@ if you have a torrent or metalink with chunk checksums for the file,
 you can resume the download without a control file by giving -V option
 to aria2c in command-line.
 
+.. _input-file:
+
 Input File
 ~~~~~~~~~~
 
@@ -1804,6 +1807,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`ftp-reuse-connection <--ftp-reuse-connection>`
   * :option:`ftp-type <--ftp-type>`
   * :option:`ftp-user <--ftp-user>`
+  * :option:`gid <--gid>`
   * :option:`hash-check-only <--hash-check-only>`
   * :option:`header <--header>`
   * :option:`http-accept-gzip <--http-accept-gzip>`
@@ -2276,8 +2280,7 @@ All code examples come from Python2.7 interpreter.
     response.
 
   ``dir``
-    Directory to save files. This key is not available for stopped
-    downloads.
+    Directory to save files.
 
   ``files``
     Returns the list of files. The element of list is the same struct
@@ -3865,7 +3868,7 @@ The Metalink Download Description Format: :rfc:`5854`
 
 COPYRIGHT
 ---------
-Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2013 Tatsuhiro Tsujikawa
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

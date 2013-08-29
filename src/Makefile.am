@@ -1,8 +1,10 @@
+SUBDIRS = includes
 bin_PROGRAMS = aria2c
-aria2c_SOURCES = main.cc\
-	option_processing.cc\
-	version_usage.cc
-SRCS =  SocketCore.cc SocketCore.h\
+aria2c_SOURCES = main.cc
+SRCS =  option_processing.cc\
+	version_usage.cc\
+	Context.cc Context.h\
+	SocketCore.cc SocketCore.h\
 	BinaryStream.h\
 	Command.cc Command.h\
 	AbstractCommand.cc AbstractCommand.h\
@@ -129,8 +131,6 @@ SRCS =  SocketCore.cc SocketCore.h\
 	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h\
 	DirectDiskAdaptor.cc DirectDiskAdaptor.h\
 	MultiDiskAdaptor.cc MultiDiskAdaptor.h\
-	PeerSessionResource.cc PeerSessionResource.h\
-	BtRegistry.cc BtRegistry.h\
 	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h\
 	ByteArrayDiskWriter.cc ByteArrayDiskWriter.h\
 	ByteArrayDiskWriterFactory.h\
@@ -229,6 +229,7 @@ SRCS =  SocketCore.cc SocketCore.h\
 	OutputFile.h\
 	NullOutputFile.h\
 	console.cc console.h\
+	IOFile.cc IOFile.h\
 	BufferedFile.cc BufferedFile.h\
 	SegList.h\
 	NullHandle.h\
@@ -253,6 +254,20 @@ SRCS =  SocketCore.cc SocketCore.h\
 	HttpProxyRequestConnectChain.h\
 	FtpNegotiationConnectChain.h\
 	FtpTunnelRequestConnectChain.h
+
+# Android NDK R8e does not provide ftruncate64. Use assembly code from
+# android source code and link it.
+if ANDROID_ARM
+SRCS += android/arm-ftruncate64.S
+endif # ANDROID_ARM
+
+if ANDROID_MIPS
+SRCS += android/mips-ftruncate64.S
+endif # ANDROID_MIPS
+
+if ANDROID_X86
+SRCS += android/x86-ftruncate64.S android/x86-asm.h
+endif # ANDROID_X86
 
 if MINGW_BUILD
 SRCS += WinConsoleFile.cc WinConsoleFile.h
@@ -384,8 +399,10 @@ SRCS += PeerAbstractCommand.cc PeerAbstractCommand.h\
 	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
 	PeerInteractionCommand.cc PeerInteractionCommand.h\
 	Peer.cc Peer.h\
+	PeerSessionResource.cc PeerSessionResource.h\
 	PeerConnection.cc PeerConnection.h\
 	PeerListenCommand.cc PeerListenCommand.h\
+	BtRegistry.cc BtRegistry.h\
 	RequestSlot.cc RequestSlot.h\
 	TrackerWatcherCommand.cc TrackerWatcherCommand.h\
 	PeerChokeCommand.cc PeerChokeCommand.h\
@@ -629,11 +646,32 @@ if HAVE_KQUEUE
 SRCS += KqueueEventPoll.cc KqueueEventPoll.h
 endif # HAVE_KQUEUE
 
+if HAVE_LIBUV
+SRCS += LibuvEventPoll.cc LibuvEventPoll.h
+endif # HAVE_LIBUV
+
 AR = @AR@
-noinst_LIBRARIES = libaria2c.a
-libaria2c_a_SOURCES = $(SRCS)
-aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
+
+if ENABLE_LIBARIA2
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libaria2.pc
+DISTCLEANFILES = $(pkgconfig_DATA)
+
+lib_LTLIBRARIES = libaria2.la
+libaria2_la_SOURCES = $(SRCS) \
+	aria2api.cc aria2api.h \
+	KeepRunningCommand.cc KeepRunningCommand.h \
+	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h
+else # !ENABLE_LIBARIA2
+noinst_LTLIBRARIES = libaria2.la
+libaria2_la_SOURCES = $(SRCS)
+endif # !ENABLE_LIBARIA2
+
+libaria2_la_LIBADD = @WSLAY_LIBS@
+
+LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
 #aria2c_LDFLAGS = -pg
 AM_CPPFLAGS =  -Wall\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
+	-I$(srcdir)/includes -I$(builddir)/includes\
 	-DLOCALEDIR=\"@localedir@\" -DCA_BUNDLE=\"$(ca_bundle)\" @DEFS@ #-pg

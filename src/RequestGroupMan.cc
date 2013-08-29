@@ -107,7 +107,7 @@ RequestGroupMan::RequestGroupMan
     (option->getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT)),
     maxOverallUploadSpeedLimit_(option->getAsInt
                                 (PREF_MAX_OVERALL_UPLOAD_LIMIT)),
-    rpc_(option->getAsBool(PREF_ENABLE_RPC)),
+    keepRunning_(option->getAsBool(PREF_ENABLE_RPC)),
     queueCheck_(true),
     removedErrorResult_(0),
     removedLastErrorResult_(error_code::FINISHED),
@@ -125,7 +125,7 @@ RequestGroupMan::~RequestGroupMan()
 
 bool RequestGroupMan::downloadFinished()
 {
-  if(rpc_) {
+  if(keepRunning_) {
     return false;
   }
   return requestGroups_.empty() && reservedGroups_.empty();
@@ -192,7 +192,7 @@ SharedHandle<RequestGroup> RequestGroupMan::findGroup(a2_gid_t gid) const
 }
 
 size_t RequestGroupMan::changeReservedGroupPosition
-(a2_gid_t gid, int pos, A2_HOW how)
+(a2_gid_t gid, int pos, OffsetMode how)
 {
   ssize_t dest = reservedGroups_.move(gid, pos, how);
   if(dest == -1) {
@@ -211,12 +211,11 @@ bool RequestGroupMan::removeReservedGroup(a2_gid_t gid)
 namespace {
 
 void notifyDownloadEvent
-(const std::string& event, const SharedHandle<RequestGroup>& group)
+(DownloadEvent event, const SharedHandle<RequestGroup>& group)
 {
   // Check NULL to make unit test easier.
-  Notifier* notifier = SingletonHolder<Notifier>::instance();
-  if(notifier) {
-    notifier->notifyDownloadEvent(event, group);
+  if(SingletonHolder<Notifier>::instance()) {
+    SingletonHolder<Notifier>::instance()->notifyDownloadEvent(event, group);
   }
 }
 
@@ -240,12 +239,12 @@ void executeStopHook
     util::executeHookByOptName(group, option, PREF_ON_DOWNLOAD_STOP);
   }
   if(result == error_code::FINISHED) {
-    notifyDownloadEvent(Notifier::ON_DOWNLOAD_COMPLETE, group);
+    notifyDownloadEvent(EVENT_ON_DOWNLOAD_COMPLETE, group);
   } else if(result != error_code::IN_PROGRESS &&
             result != error_code::REMOVED) {
-    notifyDownloadEvent(Notifier::ON_DOWNLOAD_ERROR, group);
+    notifyDownloadEvent(EVENT_ON_DOWNLOAD_ERROR, group);
   } else {
-    notifyDownloadEvent(Notifier::ON_DOWNLOAD_STOP, group);
+    notifyDownloadEvent(EVENT_ON_DOWNLOAD_STOP, group);
   }
 }
 
@@ -393,7 +392,7 @@ public:
         group->setForceHaltRequested(false);
         util::executeHookByOptName(group, e_->getOption(),
                                    PREF_ON_DOWNLOAD_PAUSE);
-        notifyDownloadEvent(Notifier::ON_DOWNLOAD_PAUSE, group);
+        notifyDownloadEvent(EVENT_ON_DOWNLOAD_PAUSE, group);
         // TODO Should we have to prepend spend uris to remaining uris
         // in case PREF_REUSE_URI is disabed?
       } else {
@@ -475,7 +474,7 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
     }
     SharedHandle<RequestGroup> groupToAdd = *reservedGroups_.begin();
     reservedGroups_.pop_front();
-    if((rpc_ && groupToAdd->isPauseRequested()) ||
+    if((keepRunning_ && groupToAdd->isPauseRequested()) ||
        !groupToAdd->isDependencyResolved()) {
       pending.push_back(groupToAdd);
       continue;
@@ -509,7 +508,7 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
 
     util::executeHookByOptName(groupToAdd, e->getOption(),
                                PREF_ON_DOWNLOAD_START);
-    notifyDownloadEvent(Notifier::ON_DOWNLOAD_START, groupToAdd);
+    notifyDownloadEvent(EVENT_ON_DOWNLOAD_START, groupToAdd);
   }
   if(!pending.empty()) {
     reservedGroups_.insert(reservedGroups_.begin(), RequestGroupKeyFunc(),
@@ -578,7 +577,7 @@ RequestGroupMan::DownloadStat RequestGroupMan::getDownloadStat() const
                       lastError);
 }
 
-enum DownloadStatus {
+enum DownloadResultStatus {
   A2_STATUS_OK,
   A2_STATUS_INPR,
   A2_STATUS_RM,
@@ -586,7 +585,7 @@ enum DownloadStatus {
 };
 
 namespace {
-const char* getStatusStr(DownloadStatus status, bool useColor)
+const char* getStatusStr(DownloadResultStatus status, bool useColor)
 {
   // status string is formatted in 4 characters wide.
   switch(status) {

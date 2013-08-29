@@ -10,33 +10,33 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2013-04-20 23:40+0900\n"
-"PO-Revision-Date: 2013-03-19 15:13+0000\n"
+"POT-Creation-Date: 2013-05-26 16:25+0900\n"
+"PO-Revision-Date: 2013-04-20 18:45+0000\n"
 "Last-Translator: ITriskTI <Unknown>\n"
 "Language-Team: <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-04-20 14:32+0000\n"
-"X-Generator: Launchpad (build 16567)\n"
+"X-Launchpad-Export-Date: 2013-05-26 07:20+0000\n"
+"X-Generator: Launchpad (build 16640)\n"
 
-#: src/DownloadEngine.cc:225
+#: src/DownloadEngine.cc:234
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Завершается выполнение программы... Нажмите Ctrl-C для экстренного "
 "завершения."
 
-#: src/DownloadEngine.cc:232
+#: src/DownloadEngine.cc:241
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Экстренное завершение..."
 
-#: src/MultiUrlRequestInfo.cc:125
+#: src/MultiUrlRequestInfo.cc:132
 msgid "aria2 will resume download if the transfer is restarted."
 msgstr "aria2 продолжит загрузку, если передача будет перезапущена."
 
-#: src/MultiUrlRequestInfo.cc:126
+#: src/MultiUrlRequestInfo.cc:133
 msgid ""
 "If there are any errors, then see the log file. See '-l' option in help/man "
 "page for details."
@@ -44,47 +44,47 @@ msgstr ""
 "Если возникли какие-либо ошибки, проверьте log-файл. Для более подробной "
 "информации смотрите описание параметра '-l'."
 
-#: src/MultiUrlRequestInfo.cc:288
+#: src/MultiUrlRequestInfo.cc:298
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "Удачное преобразование сессии '%s'."
 
-#: src/MultiUrlRequestInfo.cc:291
+#: src/MultiUrlRequestInfo.cc:301
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "Неудачное преобразование сессии '%s'."
 
-#: src/RequestGroupMan.cc:333
+#: src/RequestGroupMan.cc:332
 #, c-format
 msgid "Download GID#%s paused"
 msgstr "Загрузка GID#%s приостановлена"
 
-#: src/RequestGroupMan.cc:381
+#: src/RequestGroupMan.cc:380
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr "Загрузка GID#%s не завершена: %s"
 
-#: src/RequestGroupMan.cc:631
+#: src/RequestGroupMan.cc:630
 msgid "Download Results:"
 msgstr "Результаты загрузки:"
 
-#: src/RequestGroupMan.cc:680
+#: src/RequestGroupMan.cc:679
 msgid "Status Legend:"
 msgstr "Использованные обозначения:"
 
-#: src/RequestGroupMan.cc:682
+#: src/RequestGroupMan.cc:681
 msgid "(OK):download completed."
 msgstr "(OK): загрузка завершена."
 
-#: src/RequestGroupMan.cc:685
+#: src/RequestGroupMan.cc:684
 msgid "(ERR):error occurred."
 msgstr "(ERR): произошла ошибка."
 
-#: src/RequestGroupMan.cc:688
+#: src/RequestGroupMan.cc:687
 msgid "(INPR):download in-progress."
 msgstr "(INPR): загрузка в процессе."
 
-#: src/RequestGroupMan.cc:691
+#: src/RequestGroupMan.cc:690
 msgid "(RM):download removed."
 msgstr "(RM): загрузка удаленна."
 
@@ -2883,7 +2883,7 @@ msgstr "Алгоритмы хэширования"
 
 #: src/version_usage.cc:78
 msgid "Libraries"
-msgstr ""
+msgstr "Библиотеки"
 
 #: src/version_usage.cc:81
 #, c-format
@@ -3021,27 +3021,27 @@ msgstr ""
 msgid "Refer to man page for more information."
 msgstr "Обратитесь к странице man для более подробной информации"
 
-#: src/option_processing.cc:86
+#: src/option_processing.cc:87
 #, c-format
 msgid "Caught Error while parsing environment variable '%s'"
 msgstr "Обнаружена ошибка при разборе переменной окружения '%s'"
 
-#: src/option_processing.cc:168
+#: src/option_processing.cc:169
 #, c-format
 msgid "Did you mean:"
 msgstr "Вы имели в виду:"
 
-#: src/option_processing.cc:248 src/option_processing.cc:257
+#: src/option_processing.cc:252 src/option_processing.cc:261
 #, c-format
 msgid "Parse error in %s"
 msgstr "Синтаксическая ошибка в %s"
 
-#: src/option_processing.cc:252 src/option_processing.cc:290
+#: src/option_processing.cc:256 src/option_processing.cc:301
 #, c-format
 msgid "Usage:"
 msgstr "Использование:"
 
-#: src/option_processing.cc:262
+#: src/option_processing.cc:266
 #, c-format
 msgid "Configuration file %s is not found."
 msgstr "Конфигурационный файл %s не найден."

@@ -44,7 +44,7 @@
 namespace aria2 {
 
 GZipFile::GZipFile(const char* filename, const char* mode)
-  : BufferedFile(0), fp_(0), open_(false),
+  : fp_(0),
     buflen_(1024), buf_(reinterpret_cast<char*>(malloc(buflen_)))
 {
   FILE* fp =
@@ -54,22 +54,21 @@ GZipFile::GZipFile(const char* filename, const char* mode)
   a2fopen(filename, mode);
 #endif // !__MINGW32__
 
-  open_  = fp;
-  if (open_) {
+  if (fp) {
     int fd = dup(fileno(fp));
-    if ((open_ = fd) >= 0) {
-      open_ = (fp_ = gzdopen(fd, mode));
-      if (!open_) {
-        ::close(fd);
-      }
-    }
-    if (open_) {
+    if (fd != -1) {
+      fp_ = gzdopen(fd, mode);
+      if (fp_) {
+        // fp_ retains fd and gzclose() will close fd as well.
 #if HAVE_GZBUFFER
-      gzbuffer(fp_, 1<<17);
+        gzbuffer(fp_, 1<<17);
 #endif
 #if HAVE_GZSETPARAMS
-      gzsetparams(fp_, 2, Z_DEFAULT_STRATEGY);
+        gzsetparams(fp_, 2, Z_DEFAULT_STRATEGY);
 #endif
+      } else {
+        ::close(fd);
+      }
     }
     fclose(fp);
   }
@@ -77,16 +76,23 @@ GZipFile::GZipFile(const char* filename, const char* mode)
 
 GZipFile::~GZipFile()
 {
+  close();
   free(buf_);
 }
 
-int GZipFile::close()
+int GZipFile::onClose()
 {
-  if (open_) {
-    open_ = false;
-    return gzclose(fp_);
+  int rv = 0;
+  if (fp_) {
+    rv = gzclose(fp_);
+    fp_ = 0;
   }
-  return 0;
+  return rv;
+}
+
+bool GZipFile::onSupportsColor()
+{
+  return false;
 }
 
 bool GZipFile::isError() const
@@ -96,7 +102,17 @@ bool GZipFile::isError() const
   return (e != 0 && *e != 0) || rv != 0;
 }
 
-size_t GZipFile::read(void* ptr, size_t count)
+bool GZipFile::isEOF() const
+{
+  return gzeof(fp_);
+}
+
+bool GZipFile::isOpen() const
+{
+  return fp_;
+}
+
+size_t GZipFile::onRead(void* ptr, size_t count)
 {
   char *data = reinterpret_cast<char*>(ptr);
   size_t read = 0;
@@ -113,7 +129,7 @@ size_t GZipFile::read(void* ptr, size_t count)
   return read;
 }
 
-size_t GZipFile::write(const void* ptr, size_t count)
+size_t GZipFile::onWrite(const void* ptr, size_t count)
 {
   const char *data = reinterpret_cast<const char*>(ptr);
   size_t written = 0;
@@ -130,17 +146,17 @@ size_t GZipFile::write(const void* ptr, size_t count)
   return written;
 }
 
-char* GZipFile::gets(char* s, int size)
+char* GZipFile::onGets(char* s, int size)
 {
   return gzgets(fp_, s, size);
 }
 
-int GZipFile::flush()
+int GZipFile::onFlush()
 {
   return gzflush(fp_, 0);
 }
 
-int GZipFile::vprintf(const char* format, va_list va)
+int GZipFile::onVprintf(const char* format, va_list va)
 {
   ssize_t len;
 #ifdef __MINGW32__
