@@ -343,9 +343,10 @@ HTTP(S)/FTP is uploaded to the BitTorrent swarm. Using Metalink's
 chunk checksums, aria2 automatically validates chunks of data while
 downloading a file like BitTorrent.</p>
 <p>The project page is located at <a class="reference external" href="http://aria2.sourceforge.net/">http://aria2.sourceforge.net/</a>.</p>
-<p>See <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">aria2 Online Manual</a>
-(<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian translation</a>)
-and <a class="reference external" href="http://sourceforge.net/apps/trac/aria2/wiki/UsageExample">the usage examples</a> to learn how to use aria2.</p>
+<p>See <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">aria2 Online Manual</a> (<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian translation</a>, <a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese
+translation (1.15.2 based)</a>) and <a class="reference external" href="http://sourceforge.net/apps/trac/aria2/wiki/UsageExample">the usage
+examples</a>
+to learn how to use aria2.</p>
 </div>
 <div class="section" id="features">
 <h1>Features</h1>
@@ -375,7 +376,8 @@ and the Mozilla/Firefox
 <li>Persistent Connections support</li>
 <li>FTP through HTTP Proxy</li>
 <li>Download/Upload speed throttling</li>
-<li>BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE, Multi-Tracker</li>
+<li>BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE,
+Multi-Tracker, UDP tracker</li>
 <li>BitTorrent <a class="reference external" href="http://getright.com/seedtorrent.html">WEB-Seeding</a>. aria2
 requests chunks more than piece size to reduce the request
 overhead. It also supports pipelined requests with piece size.</li>
@@ -392,7 +394,7 @@ completely</li>
 <li>Download URIs found in a text file or stdin and the destination directory and
 output filename can be specified optionally</li>
 <li>Parameterized URI support</li>
-<li>IPv6 support</li>
+<li>IPv6 support with Happy Eyeballs</li>
 <li>Disk cache to reduce disk activity</li>
 </ul>
 </div>
@@ -497,6 +499,7 @@ distribution you use):</p>
 <li>libxml2-dev      (Required for Metalink support)</li>
 <li>zlib1g-dev       (Required for gzip, deflate decoding support in HTTP)</li>
 <li>libsqlite3-dev   (Required for Firefox3/Chromium cookie support)</li>
+<li>pkg-config       (Required to detect installed libraries)</li>
 </ul>
 <p>You can use libgcrypt-dev instead of nettle-dev and libgmp-dev:</p>
 <ul class="simple">
@@ -512,7 +515,6 @@ libgnutls-dev, nettle-dev, libgmp-dev, libgpg-error-dev and libgcrypt-dev:</p>
 <ul class="simple">
 <li>libexpat1-dev    (Required for Metalink support)</li>
 </ul>
-<p>You may also need pkg-config to detect the above mentioned libraries.</p>
 <p>On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
 libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel</p>
 <p>If you downloaded source code from git repository, you have to run
@@ -639,6 +641,8 @@ do this:</p>
 <pre class="literal-block">
 $NDK/build/tools/make-standalone-toolchain.sh --platform=android-9 --install-dir=$ANDROID_HOME/toolchain
 </pre>
+<p>You may need to add <tt class="docutils literal"><span class="pre">--system=linux-x86_64</span></tt> to the above
+command-line for x86_64 Linux host.</p>
 </li>
 <li><p class="first">The dependant libraries must be installed under
 <tt class="docutils literal">$ANDROID_HOME/usr/local</tt>.</p>
@@ -656,7 +660,8 @@ documentation. aria2 man pages will be build when you run <tt class="docutils li
 they are not up-to-date.  You can also build HTML version of aria2 man
 page by <tt class="docutils literal">make html</tt>. The HTML version manual is also available at
 <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">online</a> (<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian
-translation</a>).</p>
+translation</a>,
+<a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese translation (1.15.2 based)</a>).</p>
 </div>
 <div class="section" id="bittorrrent">
 <h1>BitTorrrent</h1>
@@ -688,6 +693,12 @@ The number of files to open simultaneously can be controlled by
 for IPv4 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht.dat</span></tt> and the routing
 table for IPv6 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht6.dat</span></tt>. aria2 uses
 same port number to listen on for both IPv4 and IPv6 DHT.</p>
+</div>
+<div class="section" id="udp-tracker">
+<h2>UDP tracker</h2>
+<p>UDP tracker support is enabled when IPv4 DHT is enabled.  The port
+number of UDP tracker is shared with DHT. Use <tt class="docutils literal"><span class="pre">--dht-listen-port</span></tt>
+option to change the port number.</p>
 </div>
 <div class="section" id="other-things-should-be-noted">
 <h2>Other things should be noted</h2>
@@ -759,6 +770,15 @@ correct permissions(600).</p>
 <p>The WebSocket server embedded in aria2 implements the specification
 defined in RFC 6455. The supported protocol version is 13.</p>
 </div>
+<div class="section" id="libaria2">
+<h1>libaria2</h1>
+<p>The libaria2 is a C++ library which offers aria2 functionality to the
+client code. Currently, libaria2 is not built by default. To enable
+libaria2, use <tt class="docutils literal"><span class="pre">--enable-libaria2</span></tt> configure option.  By default,
+only the shared library is built. To build static library, use
+<tt class="docutils literal"><span class="pre">--enable-static</span></tt> configure option as well. See libaria2
+documentation to know how to use API.</p>
+</div>
 <div class="section" id="references">
 <h1>References</h1>
 <ul class="simple">
@@ -778,6 +798,7 @@ defined in RFC 6455. The supported protocol version is 13.</p>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc6265">RFC 6265 HTTP State Management Mechanism</a></li>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc6266">RFC 6266 Use of the Content-Disposition Header Field in the Hypertext Transfer Protocol (HTTP)</a></li>
 <li><a class="reference external" href="http://tools.ietf.org/html/rfc6455">RFC 6455 The WebSocket Protocol</a></li>
+<li><a class="reference external" href="http://tools.ietf.org/html/rfc6555">RFC 6555 Happy Eyeballs: Success with Dual-Stack Hosts</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0003.html">The BitTorrent Protocol Specification</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0005.html">BitTorrent: DHT Protocol</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0006.html">BitTorrent: Fast Extension</a></li>
@@ -785,6 +806,8 @@ defined in RFC 6455. The supported protocol version is 13.</p>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0009.html">BitTorrent: Extension for Peers to Send Metadata Files</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0010.html">BitTorrent: Extension Protocol</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0012.html">BitTorrent: Multitracker Metadata Extension</a></li>
+<li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0015.html">BitTorrent: UDP Tracker Protocol for BitTorrent</a>
+and <a class="reference external" href="http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html">BitTorrent udp-tracker protocol specification</a>.</li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0019.html">BitTorrent: WebSeed - HTTP/FTP Seeding (GetRight style)</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0027.html">BitTorrent: Private Torrents</a></li>
 <li><a class="reference external" href="http://www.bittorrent.org/beps/bep_0032.html">BitTorrent: BitTorrent DHT Extensions for IPv6</a></li>

@@ -88,6 +88,7 @@ extern const std::string V_ERROR;
 extern const std::string V_INORDER;
 extern const std::string V_FEEDBACK;
 extern const std::string V_ADAPTIVE;
+extern const std::string V_LIBUV;
 extern const std::string V_EPOLL;
 extern const std::string V_KQUEUE;
 extern const std::string V_PORT;
@@ -172,8 +173,6 @@ extern const Pref* PREF_AUTO_FILE_RENAMING;
 // value: true | false
 extern const Pref* PREF_PARAMETERIZED_URI;
 // value: true | false
-extern const Pref* PREF_ENABLE_DIRECT_IO;
-// value: true | false
 extern const Pref* PREF_ALLOW_PIECE_LENGTH_CHANGE;
 // value: true | false
 extern const Pref* PREF_NO_CONF;
@@ -189,6 +188,8 @@ extern const Pref* PREF_ASYNC_DNS;
 extern const Pref* PREF_SUMMARY_INTERVAL;
 // value: debug, info, notice, warn, error
 extern const Pref* PREF_LOG_LEVEL;
+// value: debug, info, notice, warn, error
+extern const Pref* PREF_CONSOLE_LOG_LEVEL;
 // value: inorder | feedback | adaptive
 extern const Pref* PREF_URI_SELECTOR;
 // value: 1*digit
@@ -289,6 +290,8 @@ extern const Pref* PREF_FORCE_SAVE;
 extern const Pref* PREF_DISK_CACHE;
 // value: string
 extern const Pref* PREF_GID;
+// values: 1*digit
+extern const Pref* PREF_SAVE_SESSION_INTERVAL;
 
 /**
  * FTP related preferences
@@ -477,8 +480,6 @@ extern const Pref* PREF_METALINK_LANGUAGE;
 extern const Pref* PREF_METALINK_OS;
 // values: a string
 extern const Pref* PREF_METALINK_LOCATION;
-// values: 1*digit
-extern const Pref* PREF_METALINK_SERVERS;
 // values: true | false | mem
 extern const Pref* PREF_FOLLOW_METALINK;
 // values: http | https | ftp | none

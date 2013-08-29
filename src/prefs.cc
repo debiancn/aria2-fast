@@ -153,6 +153,7 @@ const std::string V_ERROR("error");
 const std::string V_INORDER("inorder");
 const std::string V_FEEDBACK("feedback");
 const std::string V_ADAPTIVE("adaptive");
+const std::string V_LIBUV("libuv");
 const std::string V_EPOLL("epoll");
 const std::string V_KQUEUE("kqueue");
 const std::string V_PORT("port");
@@ -237,8 +238,6 @@ const Pref* PREF_AUTO_FILE_RENAMING = makePref("auto-file-renaming");
 // value: true | false
 const Pref* PREF_PARAMETERIZED_URI = makePref("parameterized-uri");
 // value: true | false
-const Pref* PREF_ENABLE_DIRECT_IO = makePref("enable-direct-io");
-// value: true | false
 const Pref* PREF_ALLOW_PIECE_LENGTH_CHANGE = makePref("allow-piece-length-change");
 // value: true | false
 const Pref* PREF_NO_CONF = makePref("no-conf");
@@ -254,6 +253,8 @@ const Pref* PREF_ASYNC_DNS = makePref("async-dns");
 const Pref* PREF_SUMMARY_INTERVAL = makePref("summary-interval");
 // value: debug, info, notice, warn, error
 const Pref* PREF_LOG_LEVEL = makePref("log-level");
+// value: debug, info, notice, warn, error
+const Pref* PREF_CONSOLE_LOG_LEVEL = makePref("console-log-level");
 // value: inorder | feedback | adaptive
 const Pref* PREF_URI_SELECTOR = makePref("uri-selector");
 // value: 1*digit
@@ -354,6 +355,8 @@ const Pref* PREF_FORCE_SAVE = makePref("force-save");
 const Pref* PREF_DISK_CACHE = makePref("disk-cache");
 // value: string
 const Pref* PREF_GID = makePref("gid");
+// values: 1*digit
+const Pref* PREF_SAVE_SESSION_INTERVAL = makePref("save-session-interval");
 
 /**
  * FTP related preferences
@@ -543,8 +546,6 @@ const Pref* PREF_METALINK_LANGUAGE = makePref("metalink-language");
 const Pref* PREF_METALINK_OS = makePref("metalink-os");
 // values: a string
 const Pref* PREF_METALINK_LOCATION = makePref("metalink-location");
-// values: 1*digit
-const Pref* PREF_METALINK_SERVERS = makePref("metalink-servers");
 // values: true | false | mem
 const Pref* PREF_FOLLOW_METALINK = makePref("follow-metalink");
 // values: http | https | ftp | none

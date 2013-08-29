@@ -45,6 +45,8 @@ class DHTMessageReceiver;
 class DHTTaskQueue;
 class DownloadEngine;
 class SocketCore;
+class DHTConnection;
+class UDPTrackerClient;
 
 class DHTInteractionCommand:public Command {
 private:
@@ -53,6 +55,8 @@ private:
   SharedHandle<DHTMessageReceiver> receiver_;
   SharedHandle<DHTTaskQueue> taskQueue_;
   SharedHandle<SocketCore> readCheckSocket_;
+  SharedHandle<DHTConnection> connection_;
+  SharedHandle<UDPTrackerClient> udpTrackerClient_;
 public:
   DHTInteractionCommand(cuid_t cuid, DownloadEngine* e);
 
@@ -69,6 +73,11 @@ public:
   void setMessageReceiver(const SharedHandle<DHTMessageReceiver>& receiver);
 
   void setTaskQueue(const SharedHandle<DHTTaskQueue>& taskQueue);
+
+  void setConnection(const SharedHandle<DHTConnection>& connection);
+
+  void setUDPTrackerClient
+  (const SharedHandle<UDPTrackerClient>& udpTrackerClient);
 };
 
 } // namespace aria2

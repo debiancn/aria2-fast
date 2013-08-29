@@ -48,6 +48,8 @@ namespace aria2 {
 std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
 {
   std::vector<OptionHandler*> handlers;
+  static const std::string logLevels[] =
+    { V_DEBUG, V_INFO, V_NOTICE, V_WARN, V_ERROR };
   // General Options
   {
     OptionHandler* op(new BooleanOptionHandler
@@ -214,6 +216,16 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new ParameterOptionHandler
+                      (PREF_CONSOLE_LOG_LEVEL,
+                       TEXT_CONSOLE_LOG_LEVEL,
+                       V_NOTICE,
+                       std::vector<std::string>
+                       (vbegin(logLevels), vend(logLevels))));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_DEFERRED_INPUT,
                        TEXT_DEFERRED_INPUT,
@@ -278,11 +290,12 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
 #ifdef ENABLE_ASYNC_DNS
   {
-    OptionHandler* op(new BooleanOptionHandler
-                      (PREF_ENABLE_ASYNC_DNS6,
-                       TEXT_ENABLE_ASYNC_DNS6,
-                       A2_V_FALSE,
-                       OptionHandler::OPT_ARG));
+    // TODO Deprecated
+    OptionHandler* op(new DeprecatedOptionHandler(new BooleanOptionHandler
+                                                  (PREF_ENABLE_ASYNC_DNS6,
+                                                   TEXT_ENABLE_ASYNC_DNS6,
+                                                   NO_DEFAULT_VALUE,
+                                                   OptionHandler::OPT_ARG)));
     op->addTag(TAG_ADVANCED);
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);
@@ -290,18 +303,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
 #endif // ENABLE_ASYNC_DNS
-  {
-    // TODO Deprecated
-    OptionHandler* op(new DeprecatedOptionHandler(new BooleanOptionHandler
-                                                  (PREF_ENABLE_DIRECT_IO,
-                                                   TEXT_ENABLE_DIRECT_IO,
-                                                   NO_DEFAULT_VALUE,
-                                                   OptionHandler::OPT_ARG)));
-    op->addTag(TAG_DEPRECATED);
-    op->addTag(TAG_ADVANCED);
-    op->addTag(TAG_FILE);
-    handlers.push_back(op);
-  }
 #if defined HAVE_MMAP || defined __MINGW32__
   {
     OptionHandler* op(new BooleanOptionHandler
@@ -337,6 +338,9 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
 #ifdef HAVE_PORT_ASSOCIATE
       V_PORT,
 #endif // HAVE_PORT_ASSOCIATE
+#ifdef HAVE_LIBUV
+      V_LIBUV,
+#endif // HAVE_LIBUV
 #ifdef HAVE_POLL
       V_POLL,
 #endif // HAVE_POLL
@@ -345,15 +349,19 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     OptionHandler* op(new ParameterOptionHandler
                       (PREF_EVENT_POLL,
                        TEXT_EVENT_POLL,
-#ifdef HAVE_EPOLL
+#if defined(HAVE_EPOLL)
                        V_EPOLL,
-#elif HAVE_KQUEUE
+#elif defined(HAVE_KQUEUE)
                        V_KQUEUE,
-#elif HAVE_PORT_ASSOCIATE
+#elif defined(HAVE_PORT_ASSOCIATE)
                        V_PORT,
-#else
+#elif defined(HAVE_LIBUV)
+                       V_LIBUV,
+#elif defined(HAVE_POLL)
+                       V_POLL,
+#else // defined(HAVE_EPOLL)
                        V_SELECT,
-#endif // !HAVE_EPOLL
+#endif // defined(HAVE_EPOLL)
                        std::vector<std::string>
                        (vbegin(params), vend(params))));
     op->addTag(TAG_ADVANCED);
@@ -472,13 +480,12 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    const std::string params[] = { V_DEBUG, V_INFO, V_NOTICE, V_WARN, V_ERROR };
     OptionHandler* op(new ParameterOptionHandler
                       (PREF_LOG_LEVEL,
                        TEXT_LOG_LEVEL,
                        V_DEBUG,
                        std::vector<std::string>
-                       (vbegin(params), vend(params))));
+                       (vbegin(logLevels), vend(logLevels))));
     op->addTag(TAG_ADVANCED);
     op->setChangeGlobalOption(true);
     handlers.push_back(op);
@@ -718,6 +725,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new NumberOptionHandler
+                      (PREF_SAVE_SESSION_INTERVAL,
+                       TEXT_SAVE_SESSION_INTERVAL,
+                       "0",
+                       0));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_SELECT_LEAST_USED_HOST,
                        NO_DESCRIPTION,
@@ -779,11 +795,20 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new LocalFilePathOptionHandler
+    OptionHandler* op(
+#ifdef HAVE_APPLETLS
+                      new DefaultOptionHandler
+                      (PREF_RPC_CERTIFICATE,
+                       TEXT_RPC_CERTIFICATE,
+                       NO_DEFAULT_VALUE)
+#else // HAVE_APPLETLS
+                      new LocalFilePathOptionHandler
                       (PREF_RPC_CERTIFICATE,
                        TEXT_RPC_CERTIFICATE,
                        NO_DEFAULT_VALUE,
-                       false));
+                       false)
+#endif
+        );
     op->addTag(TAG_RPC);
     handlers.push_back(op);
   }
@@ -1053,7 +1078,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->addTag(TAG_HTTP);
     handlers.push_back(op);
   }
-  OptionHandler* splitHandler;
   {
     OptionHandler* op(new NumberOptionHandler
                       (PREF_SPLIT,
@@ -1067,7 +1091,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);
     op->setChangeOptionForReserved(true);
-    splitHandler = op;
     handlers.push_back(op);
   }
   {
@@ -2197,20 +2220,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);
     op->setChangeOptionForReserved(true);
-    handlers.push_back(op);
-  }
-  {
-    OptionHandler* op
-      (new DeprecatedOptionHandler(new NumberOptionHandler
-                                   (PREF_METALINK_SERVERS,
-                                    TEXT_METALINK_SERVERS,
-                                    NO_DEFAULT_VALUE,
-                                    1, -1,
-                                    'C'),
-                                   splitHandler));
-    op->addTag(TAG_DEPRECATED);
-    op->addTag(TAG_METALINK);
-    op->setInitialOption(true);
     handlers.push_back(op);
   }
   {

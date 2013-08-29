@@ -165,7 +165,7 @@ void RpcMethodTest::testAddUri()
       e_->getRequestGroupMan()->getReservedGroups();
     CPPUNIT_ASSERT_EQUAL((size_t)1, rgs.size());
     CPPUNIT_ASSERT_EQUAL(std::string("http://localhost/"),
-                         (*rgs.begin()).second->getDownloadContext()->
+                         (*rgs.begin())->getDownloadContext()->
                          getFirstFileEntry()->getRemainingUris().front());
   }
   // with options
@@ -915,7 +915,7 @@ void RpcMethodTest::testGatherBitTorrentMetadata()
   SharedHandle<TorrentAttribute> modBtAttrs = bittorrent::getTorrentAttrs(dctx);
   modBtAttrs->comment.clear();
   modBtAttrs->creationDate = 0;
-  modBtAttrs->mode.clear();
+  modBtAttrs->mode = BT_FILE_MODE_NONE;
   modBtAttrs->metadata.clear();
   btDict = Dict::g();
   gatherBitTorrentMetadata(btDict, modBtAttrs);

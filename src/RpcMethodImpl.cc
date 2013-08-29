@@ -422,32 +422,6 @@ SharedHandle<ValueBase> ForceRemoveRpcMethod::process
 }
 
 namespace {
-bool pauseRequestGroup
-(const SharedHandle<RequestGroup>& group, bool reserved,  bool forcePause)
-{
-  if((reserved && !group->isPauseRequested()) ||
-     (!reserved &&
-      !group->isForceHaltRequested() &&
-      ((forcePause && group->isHaltRequested() && group->isPauseRequested()) ||
-       (!group->isHaltRequested() && !group->isPauseRequested())))) {
-    if(!reserved) {
-      // Call setHaltRequested before setPauseRequested because
-      // setHaltRequested calls setPauseRequested(false) internally.
-      if(forcePause) {
-        group->setForceHaltRequested(true, RequestGroup::NONE);
-      } else {
-        group->setHaltRequested(true, RequestGroup::NONE);
-      }
-    }
-    group->setPauseRequested(true);
-    return true;
-  } else {
-    return false;
-  }
-}
-} // namespace
-
-namespace {
 SharedHandle<ValueBase> pauseDownload
 (const RpcRequest& req, DownloadEngine* e, bool forcePause)
 {
@@ -485,7 +459,7 @@ void pauseRequestGroups
 (InputIterator first, InputIterator last, bool reserved, bool forcePause)
 {
   for(; first != last; ++first) {
-    pauseRequestGroup((*first).second, reserved, forcePause);
+    pauseRequestGroup(*first, reserved, forcePause);
   }
 }
 } // namespace
@@ -540,9 +514,9 @@ SharedHandle<ValueBase> UnpauseAllRpcMethod::process
 {
   const RequestGroupList& groups =
     e->getRequestGroupMan()->getReservedGroups();
-  for(RequestGroupList::SeqType::const_iterator i = groups.begin(),
+  for(RequestGroupList::const_iterator i = groups.begin(),
         eoi = groups.end(); i != eoi; ++i) {
-    (*i).second->setPauseRequested(false);
+    (*i)->setPauseRequested(false);
   }
   e->getRequestGroupMan()->requestQueueCheck();
   return VLB_OK;
@@ -732,8 +706,8 @@ void gatherBitTorrentMetadata
   if(torrentAttrs->creationDate) {
     btDict->put(KEY_CREATION_DATE, Integer::g(torrentAttrs->creationDate));
   }
-  if(!torrentAttrs->mode.empty()) {
-    btDict->put(KEY_MODE, torrentAttrs->mode);
+  if(torrentAttrs->mode) {
+    btDict->put(KEY_MODE, bittorrent::getModeString(torrentAttrs->mode));
   }
   SharedHandle<List> destAnnounceList = List::g();
   for(std::vector<std::vector<std::string> >::const_iterator l =
@@ -775,8 +749,7 @@ void gatherProgressBitTorrent
     } else {
       const SharedHandle<PeerStorage>& peerStorage = btObject->peerStorage;
       assert(peerStorage);
-      std::vector<SharedHandle<Peer> > peers;
-      peerStorage->getActivePeers(peers);
+      const PeerSet& peers = peerStorage->getUsedPeers();
       entryDict->put(KEY_NUM_SEEDERS,
                      util::uitos(countSeeder(peers.begin(), peers.end())));
     }
@@ -788,10 +761,12 @@ namespace {
 void gatherPeer
 (const SharedHandle<List>& peers, const SharedHandle<PeerStorage>& ps)
 {
-  std::vector<SharedHandle<Peer> > activePeers;
-  ps->getActivePeers(activePeers);
-  for(std::vector<SharedHandle<Peer> >::const_iterator i =
-        activePeers.begin(), eoi = activePeers.end(); i != eoi; ++i) {
+  const PeerSet& usedPeers = ps->getUsedPeers();
+  for(PeerSet::const_iterator i = usedPeers.begin(), eoi = usedPeers.end();
+      i != eoi; ++i) {
+    if(!(*i)->isActive()) {
+      continue;
+    }
     SharedHandle<Dict> peerEntry = Dict::g();
     peerEntry->put(KEY_PEER_ID, util::torrentPercentEncode((*i)->getPeerId(),
                                                            PEER_ID_LENGTH));
@@ -1038,13 +1013,13 @@ SharedHandle<ValueBase> TellActiveRpcMethod::process
   toStringList(std::back_inserter(keys), keysParam);
   SharedHandle<List> list = List::g();
   const RequestGroupList& groups = e->getRequestGroupMan()->getRequestGroups();
-  for(RequestGroupList::SeqType::const_iterator i = groups.begin(),
+  for(RequestGroupList::const_iterator i = groups.begin(),
         eoi = groups.end(); i != eoi; ++i) {
     SharedHandle<Dict> entryDict = Dict::g();
     if(requested_key(keys, KEY_STATUS)) {
       entryDict->put(KEY_STATUS, VLB_ACTIVE);
     }
-    gatherProgress(entryDict, (*i).second, e, keys);
+    gatherProgress(entryDict, *i, e, keys);
     list->append(entryDict);
   }
   return list;
@@ -1107,85 +1082,6 @@ SharedHandle<ValueBase> RemoveDownloadResultRpcMethod::process
   return VLB_OK;
 }
 
-namespace {
-void changeOption
-(const SharedHandle<RequestGroup>& group,
- const Option& option,
- DownloadEngine* e)
-{
-  const SharedHandle<DownloadContext>& dctx = group->getDownloadContext();
-  const SharedHandle<Option>& grOption = group->getOption();
-  grOption->merge(option);
-  if(option.defined(PREF_CHECKSUM)) {
-    const std::string& checksum = grOption->get(PREF_CHECKSUM);
-    std::pair<Scip, Scip> p;
-    util::divide(p, checksum.begin(), checksum.end(), '=');
-    std::string hashType(p.first.first, p.first.second);
-    util::lowercase(hashType);
-    dctx->setDigest(hashType, util::fromHex(p.second.first, p.second.second));
-  }
-  if(option.defined(PREF_SELECT_FILE)) {
-    SegList<int> sgl;
-    util::parseIntSegments(sgl, grOption->get(PREF_SELECT_FILE));
-    sgl.normalize();
-    dctx->setFileFilter(sgl);
-  }
-  if(option.defined(PREF_SPLIT)) {
-    group->setNumConcurrentCommand(grOption->getAsInt(PREF_SPLIT));
-  }
-  if(option.defined(PREF_MAX_CONNECTION_PER_SERVER)) {
-    int maxConn = grOption->getAsInt(PREF_MAX_CONNECTION_PER_SERVER);
-    const std::vector<SharedHandle<FileEntry> >& files = dctx->getFileEntries();
-    for(std::vector<SharedHandle<FileEntry> >::const_iterator i = files.begin(),
-          eoi = files.end(); i != eoi; ++i) {
-      (*i)->setMaxConnectionPerServer(maxConn);
-    }
-  }
-  if(option.defined(PREF_DIR) || option.defined(PREF_OUT)) {
-    if(dctx->getFileEntries().size() == 1
-#ifdef ENABLE_BITTORRENT
-       && !dctx->hasAttribute(CTX_ATTR_BT)
-#endif // ENABLE_BITTORRENT
-       ) {
-      dctx->getFirstFileEntry()->setPath
-        (grOption->blank(PREF_OUT) ? A2STR::NIL :
-         util::applyDir(grOption->get(PREF_DIR), grOption->get(PREF_OUT)));
-    }
-  }
-#ifdef ENABLE_BITTORRENT
-  if(option.defined(PREF_DIR) || option.defined(PREF_INDEX_OUT)) {
-    if(dctx->hasAttribute(CTX_ATTR_BT)) {
-      std::istringstream indexOutIn(grOption->get(PREF_INDEX_OUT));
-      std::vector<std::pair<size_t, std::string> > indexPaths =
-        util::createIndexPaths(indexOutIn);
-      for(std::vector<std::pair<size_t, std::string> >::const_iterator i =
-            indexPaths.begin(), eoi = indexPaths.end(); i != eoi; ++i) {
-        dctx->setFilePathWithIndex
-          ((*i).first,
-           util::applyDir(grOption->get(PREF_DIR), (*i).second));
-      }
-    }
-  }
-#endif // ENABLE_BITTORRENT
-  if(option.defined(PREF_MAX_DOWNLOAD_LIMIT)) {
-    group->setMaxDownloadSpeedLimit
-      (grOption->getAsInt(PREF_MAX_DOWNLOAD_LIMIT));
-  }
-  if(option.defined(PREF_MAX_UPLOAD_LIMIT)) {
-    group->setMaxUploadSpeedLimit(grOption->getAsInt(PREF_MAX_UPLOAD_LIMIT));
-  }
-#ifdef ENABLE_BITTORRENT
-  const SharedHandle<BtObject>& btObject =
-    e->getBtRegistry()->get(group->getGID());
-  if(btObject) {
-    if(option.defined(PREF_BT_MAX_PEERS)) {
-      btObject->btRuntime->setMaxPeers(grOption->getAsInt(PREF_BT_MAX_PEERS));
-    }
-  }
-#endif // ENABLE_BITTORRENT
-}
-} // namespace
-
 SharedHandle<ValueBase> ChangeOptionRpcMethod::process
 (const RpcRequest& req, DownloadEngine* e)
 {
@@ -1216,37 +1112,7 @@ SharedHandle<ValueBase> ChangeGlobalOptionRpcMethod::process
 
   Option option;
   gatherChangeableGlobalOption(&option, optsParam);
-  e->getOption()->merge(option);
-
-  if(option.defined(PREF_MAX_OVERALL_DOWNLOAD_LIMIT)) {
-    e->getRequestGroupMan()->setMaxOverallDownloadSpeedLimit
-      (option.getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT));
-  }
-  if(option.defined(PREF_MAX_OVERALL_UPLOAD_LIMIT)) {
-    e->getRequestGroupMan()->setMaxOverallUploadSpeedLimit
-      (option.getAsInt(PREF_MAX_OVERALL_UPLOAD_LIMIT));
-  }
-  if(option.defined(PREF_MAX_CONCURRENT_DOWNLOADS)) {
-    e->getRequestGroupMan()->setMaxSimultaneousDownloads
-      (option.getAsInt(PREF_MAX_CONCURRENT_DOWNLOADS));
-    e->getRequestGroupMan()->requestQueueCheck();
-  }
-  if(option.defined(PREF_MAX_DOWNLOAD_RESULT)) {
-    e->getRequestGroupMan()->setMaxDownloadResult
-      (option.getAsInt(PREF_MAX_DOWNLOAD_RESULT));
-  }
-  if(option.defined(PREF_LOG_LEVEL)) {
-    LogFactory::setLogLevel(option.get(PREF_LOG_LEVEL));
-  }
-  if(option.defined(PREF_LOG)) {
-    LogFactory::setLogFile(option.get(PREF_LOG));
-    try {
-      LogFactory::reconfigure();
-    } catch(RecoverableException& e) {
-      // TODO no exception handling
-    }
-  }
-
+  changeGlobalOption(option, e);
   return VLB_OK;
 }
 
@@ -1326,13 +1192,13 @@ SharedHandle<ValueBase> ChangePositionRpcMethod::process
   a2_gid_t gid = str2Gid(gidParam);
   int pos = posParam->i();
   const std::string& howStr = howParam->s();
-  A2_HOW how;
+  OffsetMode how;
   if(howStr == "POS_SET") {
-    how = A2_POS_SET;
+    how = OFFSET_MODE_SET;
   } else if(howStr == "POS_CUR") {
-    how = A2_POS_CUR;
+    how = OFFSET_MODE_CUR;
   } else if(howStr == "POS_END") {
-    how = A2_POS_END;
+    how = OFFSET_MODE_END;
   } else {
     throw DL_ABORT_EX("Illegal argument.");
   }
@@ -1544,5 +1410,139 @@ SharedHandle<ValueBase> NoSuchMethodRpcMethod::process
 }
 
 } // namespace rpc
+
+bool pauseRequestGroup
+(const SharedHandle<RequestGroup>& group, bool reserved,  bool forcePause)
+{
+  if((reserved && !group->isPauseRequested()) ||
+     (!reserved &&
+      !group->isForceHaltRequested() &&
+      ((forcePause && group->isHaltRequested() && group->isPauseRequested()) ||
+       (!group->isHaltRequested() && !group->isPauseRequested())))) {
+    if(!reserved) {
+      // Call setHaltRequested before setPauseRequested because
+      // setHaltRequested calls setPauseRequested(false) internally.
+      if(forcePause) {
+        group->setForceHaltRequested(true, RequestGroup::NONE);
+      } else {
+        group->setHaltRequested(true, RequestGroup::NONE);
+      }
+    }
+    group->setPauseRequested(true);
+    return true;
+  } else {
+    return false;
+  }
+}
+
+void changeOption
+(const SharedHandle<RequestGroup>& group,
+ const Option& option,
+ DownloadEngine* e)
+{
+  const SharedHandle<DownloadContext>& dctx = group->getDownloadContext();
+  const SharedHandle<Option>& grOption = group->getOption();
+  grOption->merge(option);
+  if(option.defined(PREF_CHECKSUM)) {
+    const std::string& checksum = grOption->get(PREF_CHECKSUM);
+    std::pair<Scip, Scip> p;
+    util::divide(p, checksum.begin(), checksum.end(), '=');
+    std::string hashType(p.first.first, p.first.second);
+    util::lowercase(hashType);
+    dctx->setDigest(hashType, util::fromHex(p.second.first, p.second.second));
+  }
+  if(option.defined(PREF_SELECT_FILE)) {
+    SegList<int> sgl;
+    util::parseIntSegments(sgl, grOption->get(PREF_SELECT_FILE));
+    sgl.normalize();
+    dctx->setFileFilter(sgl);
+  }
+  if(option.defined(PREF_SPLIT)) {
+    group->setNumConcurrentCommand(grOption->getAsInt(PREF_SPLIT));
+  }
+  if(option.defined(PREF_MAX_CONNECTION_PER_SERVER)) {
+    int maxConn = grOption->getAsInt(PREF_MAX_CONNECTION_PER_SERVER);
+    const std::vector<SharedHandle<FileEntry> >& files = dctx->getFileEntries();
+    for(std::vector<SharedHandle<FileEntry> >::const_iterator i = files.begin(),
+          eoi = files.end(); i != eoi; ++i) {
+      (*i)->setMaxConnectionPerServer(maxConn);
+    }
+  }
+  if(option.defined(PREF_DIR) || option.defined(PREF_OUT)) {
+    if(dctx->getFileEntries().size() == 1
+#ifdef ENABLE_BITTORRENT
+       && !dctx->hasAttribute(CTX_ATTR_BT)
+#endif // ENABLE_BITTORRENT
+       ) {
+      dctx->getFirstFileEntry()->setPath
+        (grOption->blank(PREF_OUT) ? A2STR::NIL :
+         util::applyDir(grOption->get(PREF_DIR), grOption->get(PREF_OUT)));
+    }
+  }
+#ifdef ENABLE_BITTORRENT
+  if(option.defined(PREF_DIR) || option.defined(PREF_INDEX_OUT)) {
+    if(dctx->hasAttribute(CTX_ATTR_BT)) {
+      std::istringstream indexOutIn(grOption->get(PREF_INDEX_OUT));
+      std::vector<std::pair<size_t, std::string> > indexPaths =
+        util::createIndexPaths(indexOutIn);
+      for(std::vector<std::pair<size_t, std::string> >::const_iterator i =
+            indexPaths.begin(), eoi = indexPaths.end(); i != eoi; ++i) {
+        dctx->setFilePathWithIndex
+          ((*i).first,
+           util::applyDir(grOption->get(PREF_DIR), (*i).second));
+      }
+    }
+  }
+#endif // ENABLE_BITTORRENT
+  if(option.defined(PREF_MAX_DOWNLOAD_LIMIT)) {
+    group->setMaxDownloadSpeedLimit
+      (grOption->getAsInt(PREF_MAX_DOWNLOAD_LIMIT));
+  }
+  if(option.defined(PREF_MAX_UPLOAD_LIMIT)) {
+    group->setMaxUploadSpeedLimit(grOption->getAsInt(PREF_MAX_UPLOAD_LIMIT));
+  }
+#ifdef ENABLE_BITTORRENT
+  const SharedHandle<BtObject>& btObject =
+    e->getBtRegistry()->get(group->getGID());
+  if(btObject) {
+    if(option.defined(PREF_BT_MAX_PEERS)) {
+      btObject->btRuntime->setMaxPeers(grOption->getAsInt(PREF_BT_MAX_PEERS));
+    }
+  }
+#endif // ENABLE_BITTORRENT
+}
+
+void changeGlobalOption(const Option& option, DownloadEngine* e)
+{
+  e->getOption()->merge(option);
+  if(option.defined(PREF_MAX_OVERALL_DOWNLOAD_LIMIT)) {
+    e->getRequestGroupMan()->setMaxOverallDownloadSpeedLimit
+      (option.getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT));
+  }
+  if(option.defined(PREF_MAX_OVERALL_UPLOAD_LIMIT)) {
+    e->getRequestGroupMan()->setMaxOverallUploadSpeedLimit
+      (option.getAsInt(PREF_MAX_OVERALL_UPLOAD_LIMIT));
+  }
+  if(option.defined(PREF_MAX_CONCURRENT_DOWNLOADS)) {
+    e->getRequestGroupMan()->setMaxSimultaneousDownloads
+      (option.getAsInt(PREF_MAX_CONCURRENT_DOWNLOADS));
+    e->getRequestGroupMan()->requestQueueCheck();
+  }
+  if(option.defined(PREF_MAX_DOWNLOAD_RESULT)) {
+    e->getRequestGroupMan()->setMaxDownloadResult
+      (option.getAsInt(PREF_MAX_DOWNLOAD_RESULT));
+  }
+  if(option.defined(PREF_LOG_LEVEL)) {
+    LogFactory::setLogLevel(option.get(PREF_LOG_LEVEL));
+  }
+  if(option.defined(PREF_LOG)) {
+    LogFactory::setLogFile(option.get(PREF_LOG));
+    try {
+      LogFactory::reconfigure();
+    } catch(RecoverableException& e) {
+      // TODO no exception handling
+    }
+  }
+}
 
 } // namespace aria2

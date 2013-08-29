@@ -34,6 +34,34 @@
 /* copyright --> */
 #include "FeatureConfig.h"
 
+#ifdef HAVE_ZLIB
+# include <zlib.h>
+#endif // HAVE_ZLIB
+#ifdef HAVE_LIBXML2
+# include <libxml/xmlversion.h>
+#endif // HAVE_LIBXML2
+#ifdef HAVE_LIBEXPAT
+# include <expat.h>
+#endif // HAVE_LIBEXPAT
+#ifdef HAVE_SQLITE3
+# include <sqlite3.h>
+#endif // HAVE_SQLITE3
+#ifdef HAVE_LIBGNUTLS
+# include <gnutls/gnutls.h>
+#endif // HAVE_LIBGNUTLS
+#ifdef HAVE_OPENSSL
+# include <openssl/opensslv.h>
+#endif // HAVE_OPENSSL
+#ifdef HAVE_LIBGMP
+# include <gmp.h>
+#endif // HAVE_LIBGMP
+#ifdef HAVE_LIBGCRYPT
+# include <gcrypt.h>
+#endif // HAVE_LIBGCRYPT
+#ifdef HAVE_LIBCARES
+# include <ares.h>
+#endif // HAVE_LIBCARES
+
 #include "util.h"
 
 namespace aria2 {
@@ -54,14 +82,19 @@ uint16_t getDefaultPort(const std::string& protocol)
 std::string featureSummary()
 {
   std::string s;
-  for(int i = 0; i < MAX_FEATURE; ++i) {
-    const char* name = strSupportedFeature(i);
-    if(name) {
-      s += name;
-      s += ", ";
+  int first;
+  for(first = 0; first < MAX_FEATURE && !strSupportedFeature(first); ++first);
+  if(first < MAX_FEATURE) {
+    s += strSupportedFeature(first);
+    for(int i = first+1; i < MAX_FEATURE; ++i) {
+      const char* name = strSupportedFeature(i);
+      if(name) {
+        s += ", ";
+        s += name;
+      }
     }
   }
-  return util::strip(s, ", ");
+  return s;
 }
 
 const char* strSupportedFeature(int feature)
@@ -134,6 +167,59 @@ const char* strSupportedFeature(int feature)
   default:
     return 0;
   }
+}
+
+std::string usedLibs()
+{
+  std::string res;
+#ifdef HAVE_ZLIB
+  res += "zlib/"ZLIB_VERSION" ";
+#endif // HAVE_ZLIB
+#ifdef HAVE_LIBXML2
+  res += "libxml2/"LIBXML_DOTTED_VERSION" ";
+#endif // HAVE_LIBXML2
+#ifdef HAVE_LIBEXPAT
+  res += fmt("expat/%d.%d.%d ",
+             XML_MAJOR_VERSION, XML_MINOR_VERSION, XML_MICRO_VERSION);
+#endif // HAVE_LIBEXPAT
+#ifdef HAVE_SQLITE3
+  res += "sqlite3/"SQLITE_VERSION" ";
+#endif // HAVE_SQLITE3
+#ifdef HAVE_APPLETLS
+  res += "appleTLS ";
+#endif // HAVE_APPLETLS
+#ifdef HAVE_LIBGNUTLS
+  res += "GnuTLS/"GNUTLS_VERSION" ";
+#endif // HAVE_LIBGNUTLS
+#ifdef HAVE_OPENSSL
+  res += fmt("OpenSSL/%ld.%ld.%ld",
+             OPENSSL_VERSION_NUMBER >> 28,
+             (OPENSSL_VERSION_NUMBER >> 20) & 0xff,
+             (OPENSSL_VERSION_NUMBER >> 12) & 0xff);
+  if((OPENSSL_VERSION_NUMBER >> 4) & 0xff) {
+    res += 'a' + ((OPENSSL_VERSION_NUMBER >> 4) & 0xff) - 1;
+  }
+  res += " ";
+#endif // HAVE_OPENSSL
+#ifdef HAVE_LIBNETTLE
+  // No library version in header files.
+  res += "nettle ";
+#endif // HAVE_LIBNETTLE
+#ifdef HAVE_LIBGMP
+  res += fmt("GMP/%d.%d.%d ",
+             __GNU_MP_VERSION, __GNU_MP_VERSION_MINOR,
+             __GNU_MP_VERSION_PATCHLEVEL);
+#endif // HAVE_LIBGMP
+#ifdef HAVE_LIBGCRYPT
+  res += "libgcrypt/"GCRYPT_VERSION" ";
+#endif // HAVE_LIBGCRYPT
+#ifdef HAVE_LIBCARES
+  res += "c-ares/"ARES_VERSION_STR" ";
+#endif // HAVE_LIBCARES
+  if(!res.empty()) {
+    res.erase(res.length()-1);
+  }
+  return res;
 }
 
 } // namespace aria2

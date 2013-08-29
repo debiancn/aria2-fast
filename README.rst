@@ -21,9 +21,13 @@ downloading a file like BitTorrent.
 
 The project page is located at http://aria2.sourceforge.net/.
 
-See `aria2 Online Manual <http://aria2.sourceforge.net/manual/en/html/>`_
-(`Russian translation <http://aria2.sourceforge.net/manual/ru/html/>`_)
-and `the usage examples <http://sourceforge.net/apps/trac/aria2/wiki/UsageExample>`_ to learn how to use aria2.
+See `aria2 Online Manual
+<http://aria2.sourceforge.net/manual/en/html/>`_ (`Russian translation
+<http://aria2.sourceforge.net/manual/ru/html/>`_, `Portuguese
+translation (1.15.2 based)
+<http://aria2.sourceforge.net/manual/pt/html/>`_) and `the usage
+examples <http://sourceforge.net/apps/trac/aria2/wiki/UsageExample>`_
+to learn how to use aria2.
 
 Features
 --------
@@ -54,7 +58,8 @@ Here is a list of features:
 * Persistent Connections support
 * FTP through HTTP Proxy
 * Download/Upload speed throttling
-* BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE, Multi-Tracker
+* BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE,
+  Multi-Tracker, UDP tracker
 * BitTorrent `WEB-Seeding <http://getright.com/seedtorrent.html>`_. aria2
   requests chunks more than piece size to reduce the request
   overhead. It also supports pipelined requests with piece size.
@@ -71,7 +76,7 @@ Here is a list of features:
 * Download URIs found in a text file or stdin and the destination directory and
   output filename can be specified optionally
 * Parameterized URI support
-* IPv6 support
+* IPv6 support with Happy Eyeballs
 * Disk cache to reduce disk activity
 
 How to get source code
@@ -154,6 +159,7 @@ distribution you use):
 * libxml2-dev      (Required for Metalink support)
 * zlib1g-dev       (Required for gzip, deflate decoding support in HTTP)
 * libsqlite3-dev   (Required for Firefox3/Chromium cookie support)
+* pkg-config       (Required to detect installed libraries)
 
 You can use libgcrypt-dev instead of nettle-dev and libgmp-dev:
 
@@ -168,8 +174,6 @@ libgnutls-dev, nettle-dev, libgmp-dev, libgpg-error-dev and libgcrypt-dev:
 You can use libexpat1-dev instead of libxml2-dev:
 
 * libexpat1-dev    (Required for Metalink support)
-
-You may also need pkg-config to detect the above mentioned libraries.
 
 On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
 libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel
@@ -312,6 +316,9 @@ environment variable which must fulfill the following conditions:
 
       $NDK/build/tools/make-standalone-toolchain.sh --platform=android-9 --install-dir=$ANDROID_HOME/toolchain
 
+  You may need to add ``--system=linux-x86_64`` to the above
+  command-line for x86_64 Linux host.
+
 * The dependant libraries must be installed under
   ``$ANDROID_HOME/usr/local``.
 
@@ -329,7 +336,9 @@ documentation. aria2 man pages will be build when you run ``make`` if
 they are not up-to-date.  You can also build HTML version of aria2 man
 page by ``make html``. The HTML version manual is also available at
 `online <http://aria2.sourceforge.net/manual/en/html/>`_ (`Russian
-translation <http://aria2.sourceforge.net/manual/ru/html/>`_).
+translation <http://aria2.sourceforge.net/manual/ru/html/>`_,
+`Portuguese translation (1.15.2 based)
+<http://aria2.sourceforge.net/manual/pt/html/>`_).
 
 BitTorrrent
 -----------
@@ -364,6 +373,13 @@ aria2 supports mainline compatible DHT. By default, the routing table
 for IPv4 DHT is saved to ``$HOME/.aria2/dht.dat`` and the routing
 table for IPv6 DHT is saved to ``$HOME/.aria2/dht6.dat``. aria2 uses
 same port number to listen on for both IPv4 and IPv6 DHT.
+
+UDP tracker
+~~~~~~~~~~~
+
+UDP tracker support is enabled when IPv4 DHT is enabled.  The port
+number of UDP tracker is shared with DHT. Use ``--dht-listen-port``
+option to change the port number.
 
 Other things should be noted
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -442,6 +458,16 @@ WebSocket
 The WebSocket server embedded in aria2 implements the specification
 defined in RFC 6455. The supported protocol version is 13.
 
+libaria2
+--------
+
+The libaria2 is a C++ library which offers aria2 functionality to the
+client code. Currently, libaria2 is not built by default. To enable
+libaria2, use ``--enable-libaria2`` configure option.  By default,
+only the shared library is built. To build static library, use
+``--enable-static`` configure option as well. See libaria2
+documentation to know how to use API.
+
 References
 ----------
 
@@ -461,6 +487,7 @@ References
 * `RFC 6265 HTTP State Management Mechanism <http://tools.ietf.org/html/rfc6265>`_
 * `RFC 6266 Use of the Content-Disposition Header Field in the Hypertext Transfer Protocol (HTTP) <http://tools.ietf.org/html/rfc6266>`_
 * `RFC 6455 The WebSocket Protocol <http://tools.ietf.org/html/rfc6455>`_
+* `RFC 6555 Happy Eyeballs: Success with Dual-Stack Hosts <http://tools.ietf.org/html/rfc6555>`_
 
 * `The BitTorrent Protocol Specification <http://www.bittorrent.org/beps/bep_0003.html>`_
 * `BitTorrent: DHT Protocol <http://www.bittorrent.org/beps/bep_0005.html>`_
@@ -469,6 +496,8 @@ References
 * `BitTorrent: Extension for Peers to Send Metadata Files <http://www.bittorrent.org/beps/bep_0009.html>`_
 * `BitTorrent: Extension Protocol <http://www.bittorrent.org/beps/bep_0010.html>`_
 * `BitTorrent: Multitracker Metadata Extension <http://www.bittorrent.org/beps/bep_0012.html>`_
+* `BitTorrent: UDP Tracker Protocol for BitTorrent <http://www.bittorrent.org/beps/bep_0015.html>`_
+  and `BitTorrent udp-tracker protocol specification <http://www.rasterbar.com/products/libtorrent/udp_tracker_protocol.html>`_.
 * `BitTorrent: WebSeed - HTTP/FTP Seeding (GetRight style) <http://www.bittorrent.org/beps/bep_0019.html>`_
 * `BitTorrent: Private Torrents <http://www.bittorrent.org/beps/bep_0027.html>`_
 * `BitTorrent: BitTorrent DHT Extensions for IPv6 <http://www.bittorrent.org/beps/bep_0032.html>`_

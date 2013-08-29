@@ -388,13 +388,13 @@ protected:
     std::vector<std::string> keys;
     toStringList(std::back_inserter(keys), keysParam);
     const ItemListType& items = getItems(e);
-    std::pair<typename ItemListType::SeqType::const_iterator,
-              typename ItemListType::SeqType::const_iterator> range =
+    std::pair<typename ItemListType::const_iterator,
+              typename ItemListType::const_iterator> range =
       getPaginationRange(offset, num, items.begin(), items.end());
     SharedHandle<List> list = List::g();
     for(; range.first != range.second; ++range.first) {
       SharedHandle<Dict> entryDict = Dict::g();
-      createEntry(entryDict, (*range.first).second, e, keys);
+      createEntry(entryDict, *range.first, e, keys);
       list->append(entryDict);
     }
     if(offset < 0) {
@@ -604,6 +604,16 @@ void gatherBitTorrentMetadata
 #endif // ENABLE_BITTORRENT
 
 } // namespace rpc
+
+bool pauseRequestGroup
+(const SharedHandle<RequestGroup>& group, bool reserved,  bool forcePause);
+
+void changeOption
+(const SharedHandle<RequestGroup>& group,
+ const Option& option,
+ DownloadEngine* e);
+
+void changeGlobalOption(const Option& option, DownloadEngine* e);
 
 } // namespace aria2
 

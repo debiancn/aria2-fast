@@ -84,8 +84,9 @@ private:
 
   NetStat netStat_;
 
-  // true if JSON-RPC/XML-RPC is enabled.
-  bool rpc_;
+  // true if download engine should keep running even if there is no
+  // download to perform.
+  bool keepRunning_;
 
   bool queueCheck_;
 
@@ -179,7 +180,7 @@ public:
   // beginning or the end of the queue respectively.  Returns the
   // destination position.
   size_t changeReservedGroupPosition(a2_gid_t gid, int pos,
-                                     A2_HOW how);
+                                     OffsetMode how);
 
   bool removeReservedGroup(a2_gid_t gid);
 
@@ -191,24 +192,18 @@ public:
 
   class DownloadStat {
   private:
-    int completed_;
     int error_;
     int inProgress_;
-    int removed_;
     int waiting_;
     error_code::Value lastErrorResult_;
   public:
-    DownloadStat(int completed,
-                 int error,
+    DownloadStat(int error,
                  int inProgress,
-                 int removed,
                  int waiting,
                  error_code::Value lastErrorResult =
                  error_code::FINISHED):
-      completed_(completed),
       error_(error),
       inProgress_(inProgress),
-      removed_(removed),
       waiting_(waiting),
       lastErrorResult_(lastErrorResult) {}
 
@@ -253,8 +248,6 @@ public:
                                                  const std::string& protocol);
 
   bool addServerStat(const SharedHandle<ServerStat>& serverStat);
-
-  void updateServerStat();
 
   bool loadServerStat(const std::string& filename);
 
@@ -343,6 +336,16 @@ public:
   // Initializes WrDiskCache according to PREF_DISK_CACHE option.  If
   // its value is 0, cache storage will not be initialized.
   void initWrDiskCache();
+
+  void setKeepRunning(bool flag)
+  {
+    keepRunning_ = flag;
+  }
+
+  bool getKeepRunning() const
+  {
+    return keepRunning_;
+  }
 };
 
 } // namespace aria2

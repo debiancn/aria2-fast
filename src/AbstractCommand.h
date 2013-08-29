@@ -59,6 +59,7 @@ class Option;
 class SocketRecvBuffer;
 #ifdef ENABLE_ASYNC_DNS
 class AsyncNameResolver;
+class AsyncNameResolverMan;
 #endif // ENABLE_ASYNC_DNS
 
 class AbstractCommand : public Command {
@@ -75,29 +76,20 @@ private:
   std::vector<SharedHandle<Segment> > segments_;
 
 #ifdef ENABLE_ASYNC_DNS
-  SharedHandle<AsyncNameResolver> asyncNameResolver_;
+  SharedHandle<AsyncNameResolverMan> asyncNameResolverMan_;
 #endif // ENABLE_ASYNC_DNS
 
   bool checkSocketIsReadable_;
   bool checkSocketIsWritable_;
   SharedHandle<SocketCore> readCheckTarget_;
   SharedHandle<SocketCore> writeCheckTarget_;
-  bool nameResolverCheck_;
 
   bool incNumConnection_;
   Timer serverStatTimer_;
 
   int32_t calculateMinSplitSize() const;
   void useFasterRequest(const SharedHandle<Request>& fasterRequest);
-#ifdef ENABLE_ASYNC_DNS
-  void setNameResolverCheck(const SharedHandle<AsyncNameResolver>& resolver);
-
-  void disableNameResolverCheck
-  (const SharedHandle<AsyncNameResolver>& resolver);
-
-  bool nameResolveFinished() const;
-#endif // ENABLE_ASYNC_DNS
-protected:
+public:
   RequestGroup* getRequestGroup() const
   {
     return requestGroup_;
@@ -131,6 +123,11 @@ protected:
     return socket_;
   }
 
+  SharedHandle<SocketCore>& getSocket()
+  {
+    return socket_;
+  }
+
   void setSocket(const SharedHandle<SocketCore>& s);
 
   void createSocket();
@@ -145,16 +142,6 @@ protected:
     return segments_;
   }
 
-#ifdef ENABLE_ASYNC_DNS
-  bool isAsyncNameResolverInitialized() const;
-
-  void initAsyncNameResolver(const std::string& hostname);
-
-  bool asyncResolveHostname();
-
-  const std::vector<std::string>& getResolvedAddresses();
-#endif // ENABLE_ASYNC_DNS
-
   // Resolves hostname.  The resolved addresses are stored in addrs
   // and first element is returned.  If resolve is not finished,
   // return empty string. In this case, call this function with same
@@ -164,9 +151,6 @@ protected:
   (std::vector<std::string>& addrs, const std::string& hostname, uint16_t port);
 
   void tryReserved();
-  virtual bool prepareForRetry(time_t wait);
-  virtual void onAbort();
-  virtual bool executeInternal() = 0;
 
   void setReadCheckSocket(const SharedHandle<SocketCore>& socket);
   void setWriteCheckSocket(const SharedHandle<SocketCore>& socket);
@@ -183,6 +167,10 @@ protected:
    * disableWriteCheckSocket().
    */
   void setWriteCheckSocketIf(const SharedHandle<SocketCore>& socket, bool pred);
+
+  // Swaps socket_ with socket. This disables current read and write
+  // check.
+  void swapSocket(SharedHandle<SocketCore>& socket);
 
   time_t getTimeout() const
   {
@@ -233,6 +221,18 @@ protected:
   }
 
   void checkSocketRecvBuffer();
+
+protected:
+  virtual bool prepareForRetry(time_t wait);
+  virtual void onAbort();
+  virtual bool executeInternal() = 0;
+  // Returns true if the derived class wants to execute
+  // executeInternal() unconditionally
+  virtual bool noCheck()
+  {
+    return false;
+  }
+
 public:
   AbstractCommand
   (cuid_t cuid, const SharedHandle<Request>& req,

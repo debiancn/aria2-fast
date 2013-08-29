@@ -104,17 +104,24 @@ void handler(int signal) {
 } // namespace
 
 MultiUrlRequestInfo::MultiUrlRequestInfo
-(const std::vector<SharedHandle<RequestGroup> >& requestGroups,
+(std::vector<SharedHandle<RequestGroup> >& requestGroups,
  const SharedHandle<Option>& op,
  const SharedHandle<StatCalc>& statCalc,
  const SharedHandle<OutputFile>& summaryOut,
  const SharedHandle<UriListParser>& uriListParser)
-  : requestGroups_(requestGroups),
-    option_(op),
+  : option_(op),
     statCalc_(statCalc),
     summaryOut_(summaryOut),
-    uriListParser_(uriListParser)
-{}
+    uriListParser_(uriListParser),
+    useSignalHandler_(true)
+{
+#ifdef HAVE_SIGACTION
+  sigemptyset(&mask_);
+#else // !HAVE_SIGACTION
+  mask_ = 0;
+#endif // !HAVE_SIGACTION
+  requestGroups_.swap(requestGroups);
+}
 
 MultiUrlRequestInfo::~MultiUrlRequestInfo() {}
 
@@ -126,25 +133,24 @@ void MultiUrlRequestInfo::printMessageForContinue()
      _("If there are any errors, then see the log file. See '-l' option in help/man page for details."));
 }
 
-error_code::Value MultiUrlRequestInfo::execute()
+int MultiUrlRequestInfo::prepare()
 {
-  error_code::Value returnValue = error_code::FINISHED;
+  global::globalHaltRequested = 0;
   try {
-    SharedHandle<rpc::WebSocketSessionMan> wsSessionMan;
-    if(option_->getAsBool(PREF_ENABLE_RPC)) {
-      wsSessionMan.reset(new rpc::WebSocketSessionMan());
-    }
-    Notifier notifier(wsSessionMan);
-    SingletonHolder<Notifier>::instance(&notifier);
+    SharedHandle<Notifier> notifier(new Notifier());
+    SingletonHolder<Notifier>::instance(notifier);
 
 #ifdef ENABLE_SSL
     if(option_->getAsBool(PREF_ENABLE_RPC) &&
        option_->getAsBool(PREF_RPC_SECURE)) {
-      if(!option_->blank(PREF_RPC_CERTIFICATE) &&
-         !option_->blank(PREF_RPC_PRIVATE_KEY)) {
+      if(!option_->blank(PREF_RPC_CERTIFICATE)
+#ifndef HAVE_APPLETLS
+         && !option_->blank(PREF_RPC_PRIVATE_KEY)
+#endif // HAVE_APPLETLS
+         ) {
         // We set server TLS context to the SocketCore before creating
         // DownloadEngine instance.
-        SharedHandle<TLSContext> svTlsContext(new TLSContext(TLS_SERVER));
+        SharedHandle<TLSContext> svTlsContext(TLSContext::make(TLS_SERVER));
         svTlsContext->addCredentialFile(option_->get(PREF_RPC_CERTIFICATE),
                                         option_->get(PREF_RPC_PRIVATE_KEY));
         SocketCore::setServerTLSContext(svTlsContext);
@@ -155,13 +161,26 @@ error_code::Value MultiUrlRequestInfo::execute()
     }
 #endif // ENABLE_SSL
 
-    SharedHandle<DownloadEngine> e =
-      DownloadEngineFactory().newDownloadEngine(option_.get(), requestGroups_);
+    e_ = DownloadEngineFactory().newDownloadEngine(option_.get(),
+                                                   requestGroups_);
+    // Avoid keeping RequestGroups alive longer than necessary
+    requestGroups_.clear();
+
+#ifdef ENABLE_WEBSOCKET
+    if(option_->getAsBool(PREF_ENABLE_RPC)) {
+      SharedHandle<rpc::WebSocketSessionMan> wsSessionMan
+        (new rpc::WebSocketSessionMan());
+      e_->setWebSocketSessionMan(wsSessionMan);
+      SingletonHolder<Notifier>::instance()->addDownloadEventListener
+        (wsSessionMan);
+    }
+#endif // ENABLE_WEBSOCKET
 
     if(!option_->blank(PREF_LOAD_COOKIES)) {
       File cookieFile(option_->get(PREF_LOAD_COOKIES));
       if(cookieFile.isFile() &&
-         e->getCookieStorage()->load(cookieFile.getPath(), Time().getTime())) {
+         e_->getCookieStorage()->load(cookieFile.getPath(),
+                                      Time().getTime())) {
         A2_LOG_INFO(fmt("Loaded cookies from '%s'.",
                         cookieFile.getPath().c_str()));
       } else {
@@ -188,10 +207,10 @@ error_code::Value MultiUrlRequestInfo::execute()
         authConfigFactory->setNetrc(netrc);
       }
     }
-    e->setAuthConfigFactory(authConfigFactory);
+    e_->setAuthConfigFactory(authConfigFactory);
 
 #ifdef ENABLE_SSL
-    SharedHandle<TLSContext> clTlsContext(new TLSContext(TLS_CLIENT));
+    SharedHandle<TLSContext> clTlsContext(TLSContext::make(TLS_CLIENT));
     if(!option_->blank(PREF_CERTIFICATE) &&
        !option_->blank(PREF_PRIVATE_KEY)) {
       clTlsContext->addCredentialFile(option_->get(PREF_CERTIFICATE),
@@ -208,15 +227,13 @@ error_code::Value MultiUrlRequestInfo::execute()
         A2_LOG_INFO(MSG_WARN_NO_CA_CERT);
       }
     }
-    if(option_->getAsBool(PREF_CHECK_CERTIFICATE)) {
-      clTlsContext->enablePeerVerification();
-    }
+    clTlsContext->setVerifyPeer(option_->getAsBool(PREF_CHECK_CERTIFICATE));
     SocketCore::setClientTLSContext(clTlsContext);
 #endif
 #ifdef HAVE_ARES_ADDR_NODE
     ares_addr_node* asyncDNSServers =
       parseAsyncDNSServers(option_->get(PREF_ASYNC_DNS_SERVER));
-    e->setAsyncDNSServers(asyncDNSServers);
+    e_->setAsyncDNSServers(asyncDNSServers);
 #endif // HAVE_ARES_ADDR_NODE
     if(!Timer::monotonicClock()) {
       A2_LOG_WARN("Don't change system time while aria2c is running."
@@ -225,71 +242,143 @@ error_code::Value MultiUrlRequestInfo::execute()
 
     std::string serverStatIf = option_->get(PREF_SERVER_STAT_IF);
     if(!serverStatIf.empty()) {
-      e->getRequestGroupMan()->loadServerStat(serverStatIf);
-      e->getRequestGroupMan()->removeStaleServerStat
+      e_->getRequestGroupMan()->loadServerStat(serverStatIf);
+      e_->getRequestGroupMan()->removeStaleServerStat
         (option_->getAsInt(PREF_SERVER_STAT_TIMEOUT));
     }
-    e->setStatCalc(statCalc_);
+    e_->setStatCalc(statCalc_);
     if(uriListParser_) {
-      e->getRequestGroupMan()->setUriListParser(uriListParser_);
+      e_->getRequestGroupMan()->setUriListParser(uriListParser_);
     }
-#ifdef SIGHUP
-    util::setGlobalSignalHandler(SIGHUP, handler, 0);
-#endif // SIGHUP
-    util::setGlobalSignalHandler(SIGINT, handler, 0);
-    util::setGlobalSignalHandler(SIGTERM, handler, 0);
-
-    e->getRequestGroupMan()->getNetStat().downloadStart();
-    e->run();
-
-    if(!option_->blank(PREF_SAVE_COOKIES)) {
-      e->getCookieStorage()->saveNsFormat(option_->get(PREF_SAVE_COOKIES));
+    if(useSignalHandler_) {
+      setupSignalHandlers();
     }
-
-    const std::string& serverStatOf = option_->get(PREF_SERVER_STAT_OF);
-    if(!serverStatOf.empty()) {
-      e->getRequestGroupMan()->saveServerStat(serverStatOf);
-    }
-    e->getRequestGroupMan()->showDownloadResults
-      (*summaryOut_, option_->get(PREF_DOWNLOAD_RESULT) == A2_V_FULL);
-    summaryOut_->flush();
-
-    RequestGroupMan::DownloadStat s =
-      e->getRequestGroupMan()->getDownloadStat();
-    if(!s.allCompleted()) {
-      printMessageForContinue();
-      if(s.getLastErrorResult() == error_code::FINISHED &&
-         s.getInProgress() > 0) {
-        returnValue = error_code::IN_PROGRESS;
-      } else {
-        returnValue = s.getLastErrorResult();
-      }
-    }
-    SessionSerializer sessionSerializer(e->getRequestGroupMan());
-    // TODO Add option: --save-session-status=error,inprogress,waiting
-    if(!option_->blank(PREF_SAVE_SESSION)) {
-      const std::string& filename = option_->get(PREF_SAVE_SESSION);
-      if(sessionSerializer.save(filename)) {
-        A2_LOG_NOTICE(fmt(_("Serialized session to '%s' successfully."),
-                          filename.c_str()));
-      } else {
-        A2_LOG_NOTICE(fmt(_("Failed to serialize session to '%s'."),
-                          filename.c_str()));
-      }
-    }
+    e_->getRequestGroupMan()->getNetStat().downloadStart();
   } catch(RecoverableException& e) {
-    if(returnValue == error_code::FINISHED) {
-      returnValue = error_code::UNKNOWN_ERROR;
+    SingletonHolder<Notifier>::clear();
+    if(useSignalHandler_) {
+      resetSignalHandlers();
     }
+    return -1;
+  }
+  return 0;
+}
+
+error_code::Value MultiUrlRequestInfo::getResult()
+{
+  error_code::Value returnValue = error_code::FINISHED;
+  if(!option_->blank(PREF_SAVE_COOKIES)) {
+    e_->getCookieStorage()->saveNsFormat(option_->get(PREF_SAVE_COOKIES));
+  }
+
+  const std::string& serverStatOf = option_->get(PREF_SERVER_STAT_OF);
+  if(!serverStatOf.empty()) {
+    e_->getRequestGroupMan()->saveServerStat(serverStatOf);
+  }
+  e_->getRequestGroupMan()->showDownloadResults
+    (*summaryOut_, option_->get(PREF_DOWNLOAD_RESULT) == A2_V_FULL);
+  summaryOut_->flush();
+
+  RequestGroupMan::DownloadStat s =
+    e_->getRequestGroupMan()->getDownloadStat();
+  if(!s.allCompleted()) {
+    printMessageForContinue();
+    if(s.getLastErrorResult() == error_code::FINISHED &&
+       s.getInProgress() > 0) {
+      returnValue = error_code::IN_PROGRESS;
+    } else {
+      returnValue = s.getLastErrorResult();
+    }
+  }
+  SessionSerializer sessionSerializer(e_->getRequestGroupMan());
+  // TODO Add option: --save-session-status=error,inprogress,waiting
+  if(!option_->blank(PREF_SAVE_SESSION)) {
+    const std::string& filename = option_->get(PREF_SAVE_SESSION);
+    if(sessionSerializer.save(filename)) {
+      A2_LOG_NOTICE(fmt(_("Serialized session to '%s' successfully."),
+                        filename.c_str()));
+    } else {
+      A2_LOG_NOTICE(fmt(_("Failed to serialize session to '%s'."),
+                        filename.c_str()));
+    }
+  }
+  SingletonHolder<Notifier>::clear();
+  return returnValue;
+}
+
+error_code::Value MultiUrlRequestInfo::execute()
+{
+  if(prepare() != 0) {
+    return error_code::UNKNOWN_ERROR;
+  }
+  // TODO Enclosed in try..catch block for just in case. Really need
+  // this?
+  try {
+    e_->run();
+  } catch(RecoverableException& e) {
     A2_LOG_ERROR_EX(EX_EXCEPTION_CAUGHT, e);
   }
-  SingletonHolder<Notifier>::instance(0);
-#ifdef SIGHUP
-  util::setGlobalSignalHandler(SIGHUP, SIG_DFL, 0);
-#endif // SIGHUP
-  util::setGlobalSignalHandler(SIGINT, SIG_DFL, 0);
-  util::setGlobalSignalHandler(SIGTERM, SIG_DFL, 0);
+  error_code::Value returnValue = getResult();
+  if(useSignalHandler_) {
+    resetSignalHandlers();
+  }
   return returnValue;
+}
+
+void MultiUrlRequestInfo::setupSignalHandlers()
+{
+#ifdef HAVE_SIGACTION
+    sigemptyset(&mask_);
+#else // !HAVE_SIGACTION
+    mask_ = 0;
+#endif // !HAVE_SIGACTION
+#ifdef SIGPIPE
+    util::setGlobalSignalHandler(SIGPIPE, &mask_, SIG_IGN, 0);
+#endif // SIGPIPE
+#ifdef SIGCHLD
+    // Avoid to create zombie process when forked child processes are
+    // died.
+    util::setGlobalSignalHandler(SIGCHLD, &mask_, SIG_IGN, 0);
+#endif // SIGCHILD
+
+#ifdef HAVE_SIGACTION
+    sigaddset(&mask_, SIGINT);
+    sigaddset(&mask_, SIGTERM);
+# ifdef SIGHUP
+    sigaddset(&mask_, SIGHUP);
+# endif // SIGHUP
+#endif // HAVE_SIGACTION
+
+#ifdef SIGHUP
+    util::setGlobalSignalHandler(SIGHUP, &mask_, handler, 0);
+#endif // SIGHUP
+    util::setGlobalSignalHandler(SIGINT, &mask_, handler, 0);
+    util::setGlobalSignalHandler(SIGTERM, &mask_, handler, 0);
+}
+
+void MultiUrlRequestInfo::resetSignalHandlers()
+{
+#ifdef HAVE_SIGACTION
+  sigemptyset(&mask_);
+#endif // HAVE_SIGACTION
+#ifdef SIGHUP
+  util::setGlobalSignalHandler(SIGHUP, &mask_, SIG_DFL, 0);
+#endif // SIGHUP
+  util::setGlobalSignalHandler(SIGINT, &mask_, SIG_DFL, 0);
+  util::setGlobalSignalHandler(SIGTERM, &mask_, SIG_DFL, 0);
+
+#ifdef SIGCHLD
+    util::setGlobalSignalHandler(SIGCHLD, &mask_, SIG_DFL, 0);
+#endif // SIGCHILD
+#ifdef SIGPIPE
+    util::setGlobalSignalHandler(SIGPIPE, &mask_, SIG_DFL, 0);
+#endif // SIGPIPE
+}
+
+const SharedHandle<DownloadEngine>&
+MultiUrlRequestInfo::getDownloadEngine() const
+{
+  return e_;
 }
 
 } // namespace aria2

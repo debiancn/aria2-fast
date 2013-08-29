@@ -34,6 +34,7 @@ Basic Options
   Additionally, options can be specified after each line of
   URI. This optional line must start with one or more white spaces and have
   one option per single line.
+  The input file can use gzip compression.
   See `Input File`_ subsection for details.
   See also :option:`--deferred-input` option.
 
@@ -429,7 +430,9 @@ HTTP Specific Options
 
 .. option:: --referer=<REFERER>
 
-  Set Referer. This affects all URIs.
+  Set Referer. This affects all URIs.  If ``*`` is given, each request
+  URI is used as a referer.  This may be useful when used with
+  :option:`--parameterized-uri <-P>` option.
 
 .. option:: --enable-http-keep-alive[=true|false]
 
@@ -724,10 +727,10 @@ BitTorrent Specific Options
 
 .. option:: --dht-listen-port=<PORT>...
 
-  Set UDP listening port for both IPv4 and IPv6 DHT.
-  Multiple ports can be specified by using ``,``, for example: ``6881,6885``.
-  You can also use ``-`` to specify a range: ``6881-6999``. ``,`` and ``-`` can be used
-  together.
+  Set UDP listening port used by DHT(IPv4, IPv6) and UDP tracker.
+  Multiple ports can be specified by using ``,``, for example:
+  ``6881,6885``.  You can also use ``-`` to specify a range:
+  ``6881-6999``. ``,`` and ``-`` can be used together.
   Default: ``6881-6999``
 
   .. note::
@@ -740,9 +743,9 @@ BitTorrent Specific Options
 
 .. option:: --enable-dht[=true|false]
 
-  Enable IPv4 DHT functionality. If a private flag is set in a
-  torrent, aria2 doesn't use DHT for that download even if ``true`` is
-  given.  Default: ``true``
+  Enable IPv4 DHT functionality. It also enables UDP tracker
+  support. If a private flag is set in a torrent, aria2 doesn't use
+  DHT for that download even if ``true`` is given.  Default: ``true``
 
 .. option:: --enable-dht6[=true|false]
 
@@ -919,6 +922,14 @@ RPC Options
   in PEM format. Use :option:`--rpc-private-key` option to specify the
   private key. Use :option:`--rpc-secure` option to enable encryption.
 
+  *AppleTLS* users should use the Keychain Access utility to first generate a
+  self-signed SSL-Server certificate, e.g. using the wizard, and get the
+  SHA-1 fingerprint from the Information dialog corresponding to that new
+  certificate.
+  To start aria2c with :option:`--rpc-secure` use
+  `--rpc-certificate=<SHA-1>` and just omit the :option:`--rpc-private-key`
+  option.
+
 .. option:: --rpc-listen-all[=true|false]
 
   Listen incoming JSON-RPC/XML-RPC requests on all network interfaces. If false
@@ -1039,6 +1050,11 @@ Advanced Options
   Change the configuration file path to PATH.
   Default: ``$HOME/.aria2/aria2.conf``
 
+.. option:: --console-log-level=<LEVEL>
+
+  Set log level to output to console.  LEVEL is either ``debug``,
+  ``info``, ``notice``, ``warn`` or ``error``.  Default: ``notice``
+
 .. option:: -D, --daemon[=true|false]
 
   Run as daemon. The current working directory will be changed to ``/``
@@ -1082,12 +1098,6 @@ Advanced Options
   progress and path/URI. The percentage of progress and path/URI are
   printed for each requested file in each row.
   Default: ``default``
-
-.. option:: --enable-async-dns6[=true|false]
-
-  Enable IPv6 name resolution in asynchronous DNS resolver. This
-  option will be ignored when :option:`--async-dns=false. <--async-dns>`
-  Default: ``false``
 
 .. option:: --enable-mmap[=true|false]
 
@@ -1335,7 +1345,9 @@ Advanced Options
 
   Save error/unfinished downloads to FILE on exit.  You can pass this
   output file to aria2c with :option:`--input-file <-i>` option on
-  restart. Please note that downloads added by
+  restart. If you like the output to be gzipped append a .gz extension to
+  the file name.
+  Please note that downloads added by
   :func:`aria2.addTorrent` and :func:`aria2.addMetalink` RPC method
   and whose metadata could not be saved as a file are not saved.
   Downloads removed using :func:`aria2.remove` and
@@ -1358,6 +1370,12 @@ Advanced Options
         GID of torrent download is saved.
     5. local metalink file
         Any meaningful GID is not saved.
+
+.. option:: --save-session-interval=<SEC>
+
+  Save error/unfinished downloads to a file specified by
+  :option:`--save-session` option every SEC seconds. If ``0`` is
+  given, file will be saved only when aria2 exits. Default: ``0``
 
 .. option:: --stop=<SEC>
 
@@ -1382,14 +1400,26 @@ Advanced Options
   Print the version number, copyright and the configuration information and
   exit.
 
-Options That Take An Optional Argument
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Notes for Options
+~~~~~~~~~~~~~~~~~
+
+Optional arguments
+^^^^^^^^^^^^^^^^^^
+
 The options that have its argument surrounded by square brackets([])
 take an optional argument. Usually omiting the argument is evaluated to ``true``.
 If you use short form of these options(such as ``-V``) and give
 an argument, then the option name and its argument should be concatenated(e.g.
 ``-Vfalse``). If any spaces are inserted between the option name and the argument,
 the argument will be treated as URI and usually this is not what you expect.
+
+Units (K and M)
+^^^^^^^^^^^^^^^
+
+Some options takes ``K`` and ``M`` to conveniently represent 1024 and
+1048576 respectively.  aria2 detects these characters in
+case-insensitive way. In other words, ``k`` and ``m`` can be used as
+well as ``K`` and ``M`` respectively.
 
 URI, MAGNET, TORRENT_FILE, METALINK_FILE
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1470,6 +1500,7 @@ Let's see an example of how arguments are passed to command:
   $ aria2c --on-download-complete hook.sh http://example.org/file.iso
   Called with [1] [1] [/path/to/file.iso]
 
+.. _exit-status:
 
 EXIT STATUS
 -----------
@@ -1703,6 +1734,8 @@ if you have a torrent or metalink with chunk checksums for the file,
 you can resume the download without a control file by giving -V option
 to aria2c in command-line.
 
+.. _input-file:
+
 Input File
 ~~~~~~~~~~
 
@@ -1758,7 +1791,6 @@ of URIs. These optional lines must start with white space(s).
   * :option:`continue <-c>`
   * :option:`dir <-d>`
   * :option:`dry-run <--dry-run>`
-  * :option:`enable-async-dns6 <--enable-async-dns6>`
   * :option:`enable-http-keep-alive <--enable-http-keep-alive>`
   * :option:`enable-http-pipelining <--enable-http-pipelining>`
   * :option:`enable-mmap <--enable-mmap>`
@@ -1775,6 +1807,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`ftp-reuse-connection <--ftp-reuse-connection>`
   * :option:`ftp-type <--ftp-type>`
   * :option:`ftp-user <--ftp-user>`
+  * :option:`gid <--gid>`
   * :option:`hash-check-only <--hash-check-only>`
   * :option:`header <--header>`
   * :option:`http-accept-gzip <--http-accept-gzip>`
@@ -2247,8 +2280,7 @@ All code examples come from Python2.7 interpreter.
     response.
 
   ``dir``
-    Directory to save files. This key is not available for stopped
-    downloads.
+    Directory to save files.
 
   ``files``
     Returns the list of files. The element of list is the same struct
@@ -3682,12 +3714,11 @@ Enable IPv6 DHT
 ^^^^^^^^^^^^^^^
 .. code-block:: console
 
-  $ aria2c --enable-dht6 --dht-listen-port=6881 --dht-listen-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR --enable-async-dns6
+  $ aria2c --enable-dht6 --dht-listen-port=6881 --dht-listen-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR
 
 .. note::
 
-  If aria2c is not built with c-ares, :option:`--enable-async-dns6` is
-  unnecessary. aria2 shares same port between IPv4 and IPv6 DHT.
+  aria2 shares same port between IPv4 and IPv6 DHT.
 
 Add and remove tracker URI
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -3837,7 +3868,7 @@ The Metalink Download Description Format: :rfc:`5854`
 
 COPYRIGHT
 ---------
-Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2013 Tatsuhiro Tsujikawa
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

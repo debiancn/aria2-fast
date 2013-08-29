@@ -198,14 +198,18 @@ bool InitiatorMSEHandshakeCommand::executeInternal() {
 void InitiatorMSEHandshakeCommand::tryNewPeer()
 {
   if(peerStorage_->isPeerAvailable() && btRuntime_->lessThanEqMinPeers()) {
-    SharedHandle<Peer> peer = peerStorage_->getUnusedPeer();
-    peer->usedBy(getDownloadEngine()->newCUID());
-    PeerInitiateConnectionCommand* command =
-      new PeerInitiateConnectionCommand(peer->usedBy(), requestGroup_, peer,
-                                        getDownloadEngine(), btRuntime_);
-    command->setPeerStorage(peerStorage_);
-    command->setPieceStorage(pieceStorage_);
-    getDownloadEngine()->addCommand(command);
+    cuid_t ncuid = getDownloadEngine()->newCUID();
+    SharedHandle<Peer> peer = peerStorage_->checkoutPeer(ncuid);
+    // sanity check
+    if(peer) {
+      PeerInitiateConnectionCommand* command;
+      command = new PeerInitiateConnectionCommand(ncuid, requestGroup_, peer,
+                                                  getDownloadEngine(),
+                                                  btRuntime_);
+      command->setPeerStorage(peerStorage_);
+      command->setPieceStorage(pieceStorage_);
+      getDownloadEngine()->addCommand(command);
+    }
   }
 }
 
@@ -238,7 +242,8 @@ bool InitiatorMSEHandshakeCommand::prepareForNextPeer(time_t wait)
 
 void InitiatorMSEHandshakeCommand::onAbort()
 {
-  if(getOption()->getAsBool(PREF_BT_REQUIRE_CRYPTO)) {
+  if(sequence_ == INITIATOR_SEND_KEY ||
+     getOption()->getAsBool(PREF_BT_REQUIRE_CRYPTO)) {
     peerStorage_->returnPeer(getPeer());
   }
 }

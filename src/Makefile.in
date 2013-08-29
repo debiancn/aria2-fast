@@ -16,6 +16,7 @@
 @SET_MAKE@
 
 
+
 VPATH = @srcdir@
 am__make_dryrun = \
   { \
@@ -54,51 +55,67 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 bin_PROGRAMS = aria2c$(EXEEXT)
-@MINGW_BUILD_TRUE@am__append_1 = WinConsoleFile.cc WinConsoleFile.h
-@ENABLE_WEBSOCKET_TRUE@am__append_2 = WebSocketSession.cc WebSocketSession.h\
+
+# Android NDK R8e does not provide ftruncate64. Use assembly code from
+# android source code and link it.
+@ANDROID_ARM_TRUE@am__append_1 = android/arm-ftruncate64.S
+@ANDROID_MIPS_TRUE@am__append_2 = android/mips-ftruncate64.S
+@ANDROID_X86_TRUE@am__append_3 = android/x86-ftruncate64.S android/x86-asm.h
+@MINGW_BUILD_TRUE@am__append_4 = WinConsoleFile.cc WinConsoleFile.h
+@ENABLE_WEBSOCKET_TRUE@am__append_5 = WebSocketSession.cc WebSocketSession.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.cc WebSocketSessionMan.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.cc WebSocketResponseCommand.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h
 
-@ENABLE_WEBSOCKET_FALSE@am__append_3 = NullWebSocketSessionMan.h
-@HAVE_SOME_XMLLIB_TRUE@am__append_4 = XmlAttr.cc XmlAttr.h\
+@ENABLE_WEBSOCKET_FALSE@am__append_6 = NullWebSocketSessionMan.h
+@HAVE_SOME_XMLLIB_TRUE@am__append_7 = XmlAttr.cc XmlAttr.h\
 @HAVE_SOME_XMLLIB_TRUE@	XmlParser.cc XmlParser.h\
 @HAVE_SOME_XMLLIB_TRUE@	ParserStateMachine.h
 
-@HAVE_LIBXML2_TRUE@am__append_5 = Xml2XmlParser.cc Xml2XmlParser.h
-@HAVE_LIBEXPAT_TRUE@am__append_6 = ExpatXmlParser.cc ExpatXmlParser.h
-@ENABLE_XML_RPC_TRUE@am__append_7 = XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
+@HAVE_LIBXML2_TRUE@am__append_8 = Xml2XmlParser.cc Xml2XmlParser.h
+@HAVE_LIBEXPAT_TRUE@am__append_9 = ExpatXmlParser.cc ExpatXmlParser.h
+@ENABLE_XML_RPC_TRUE@am__append_10 = XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserState.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h
 
-@HAVE_SOME_FALLOCATE_TRUE@am__append_8 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
-@HAVE_EPOLL_TRUE@am__append_9 = EpollEventPoll.cc EpollEventPoll.h
-@ENABLE_SSL_TRUE@am__append_10 = TLSContext.h
-@HAVE_LIBGNUTLS_TRUE@am__append_11 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h
-@HAVE_LIBGCRYPT_TRUE@am__append_12 = LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h\
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h\
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+@HAVE_SOME_FALLOCATE_TRUE@am__append_11 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
+@HAVE_EPOLL_TRUE@am__append_12 = EpollEventPoll.cc EpollEventPoll.h
+@ENABLE_SSL_TRUE@am__append_13 = TLSContext.h TLSSession.h
+@USE_APPLE_MD_TRUE@am__append_14 = AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
+@HAVE_APPLETLS_TRUE@am__append_15 = AppleTLSContext.cc AppleTLSContext.h \
+@HAVE_APPLETLS_TRUE@        AppleTLSSession.cc AppleTLSSession.h
 
-@HAVE_LIBNETTLE_TRUE@am__append_13 = LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h\
-@HAVE_LIBNETTLE_TRUE@	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBGNUTLS_TRUE@am__append_16 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+@HAVE_LIBGNUTLS_TRUE@        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 
-@HAVE_LIBGMP_TRUE@am__append_14 = a2gmp.cc a2gmp.h\
-@HAVE_LIBGMP_TRUE@	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
+@HAVE_LIBGCRYPT_TRUE@am__append_17 = LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+@HAVE_LIBGCRYPT_TRUE@        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
 
-@HAVE_OPENSSL_TRUE@am__append_15 = LibsslTLSContext.cc LibsslTLSContext.h\
-@HAVE_OPENSSL_TRUE@	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h\
-@HAVE_OPENSSL_TRUE@	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h\
-@HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_18 = LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
+@HAVE_LIBNETTLE_TRUE@am__append_19 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_20 = LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
+@HAVE_LIBGMP_TRUE@am__append_21 = a2gmp.cc a2gmp.h \
+@HAVE_LIBGMP_TRUE@        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 
-@HAVE_ZLIB_TRUE@am__append_16 = GZipEncoder.cc GZipEncoder.h\
-@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h
+@HAVE_OPENSSL_TRUE@am__append_22 = LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+@HAVE_OPENSSL_TRUE@        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
 
-@HAVE_SQLITE3_TRUE@am__append_17 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_23 = LibsslTLSContext.cc LibsslTLSContext.h \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@        LibsslTLSSession.cc LibsslTLSSession.h
+
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_24 = LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
+@HAVE_ZLIB_TRUE@am__append_25 = GZipEncoder.cc GZipEncoder.h\
+@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
+@HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h
+
+@HAVE_SQLITE3_TRUE@am__append_26 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_18 = AsyncNameResolver.cc AsyncNameResolver.h
-@ENABLE_MESSAGE_DIGEST_TRUE@am__append_19 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
+@ENABLE_ASYNC_DNS_TRUE@am__append_27 = AsyncNameResolver.cc AsyncNameResolver.h\
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.cc AsyncNameResolverMan.h
+
+@ENABLE_MESSAGE_DIGEST_TRUE@am__append_28 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.cc IteratableChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.cc CheckIntegrityDispatcherCommand.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.cc CheckIntegrityCommand.h\
@@ -110,12 +127,14 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestImpl.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	HashFuncEntry.h
 
-@ENABLE_BITTORRENT_TRUE@am__append_20 = PeerAbstractCommand.cc PeerAbstractCommand.h\
+@ENABLE_BITTORRENT_TRUE@am__append_29 = PeerAbstractCommand.cc PeerAbstractCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.cc PeerInteractionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	Peer.cc Peer.h\
+@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.cc PeerSessionResource.h\
 @ENABLE_BITTORRENT_TRUE@	PeerConnection.cc PeerConnection.h\
 @ENABLE_BITTORRENT_TRUE@	PeerListenCommand.cc PeerListenCommand.h\
+@ENABLE_BITTORRENT_TRUE@	BtRegistry.cc BtRegistry.h\
 @ENABLE_BITTORRENT_TRUE@	RequestSlot.cc RequestSlot.h\
 @ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.cc TrackerWatcherCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.cc PeerChokeCommand.h\
@@ -280,9 +299,12 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_BITTORRENT_TRUE@	ValueBaseBencodeParser.h\
 @ENABLE_BITTORRENT_TRUE@	BencodeDiskWriter.h\
 @ENABLE_BITTORRENT_TRUE@	BencodeDiskWriterFactory.h\
-@ENABLE_BITTORRENT_TRUE@	MemoryBencodePreDownloadHandler.h
+@ENABLE_BITTORRENT_TRUE@	MemoryBencodePreDownloadHandler.h\
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.cc UDPTrackerClient.h\
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.cc UDPTrackerRequest.h\
+@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.cc NameResolveCommand.h
 
-@ENABLE_METALINK_TRUE@am__append_21 = Metalinker.cc Metalinker.h\
+@ENABLE_METALINK_TRUE@am__append_30 = Metalinker.cc Metalinker.h\
 @ENABLE_METALINK_TRUE@	MetalinkEntry.cc MetalinkEntry.h\
 @ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.cc MetalinkMetaurl.h\
@@ -296,22 +318,24 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.cc MetalinkPostDownloadHandler.h\
 @ENABLE_METALINK_TRUE@	metalink_helper.cc metalink_helper.h
 
-@HAVE_ASCTIME_R_FALSE@am__append_22 = asctime_r.c asctime_r.h
-@HAVE_BASENAME_FALSE@am__append_23 = libgen.c libgen.h
-@HAVE_GETADDRINFO_FALSE@am__append_24 = getaddrinfo.c getaddrinfo.h
-@HAVE_GAI_STRERROR_FALSE@am__append_25 = gai_strerror.c gai_strerror.h
-@HAVE_GETTIMEOFDAY_FALSE@am__append_26 = gettimeofday.c gettimeofday.h
-@HAVE_LOCALTIME_R_FALSE@am__append_27 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_28 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_29 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_30 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_31 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_32 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_33 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_34 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_35 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_ASCTIME_R_FALSE@am__append_31 = asctime_r.c asctime_r.h
+@HAVE_BASENAME_FALSE@am__append_32 = libgen.c libgen.h
+@HAVE_GETADDRINFO_FALSE@am__append_33 = getaddrinfo.c getaddrinfo.h
+@HAVE_GAI_STRERROR_FALSE@am__append_34 = gai_strerror.c gai_strerror.h
+@HAVE_GETTIMEOFDAY_FALSE@am__append_35 = gettimeofday.c gettimeofday.h
+@HAVE_LOCALTIME_R_FALSE@am__append_36 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_37 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_38 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_39 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_40 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_41 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_42 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_43 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_44 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_LIBUV_TRUE@am__append_45 = LibuvEventPoll.cc LibuvEventPoll.h
 subdir = src
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in alloca.c
+DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
+	$(srcdir)/libaria2.pc.in alloca.c
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/aria2_arg.m4 \
 	$(top_srcdir)/m4/codeset.m4 $(top_srcdir)/m4/cppunit.m4 \
@@ -340,15 +364,43 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = libaria2.pc
 CONFIG_CLEAN_VPATH_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
-ARFLAGS = cru
-libaria2c_a_AR = $(AR) $(ARFLAGS)
-libaria2c_a_LIBADD =
-am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
-	BinaryStream.h Command.cc Command.h AbstractCommand.cc \
-	AbstractCommand.h InitiateConnectionCommandFactory.cc \
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = f=`echo $$p | sed -e 's|^.*/||'`;
+am__install_max = 40
+am__nobase_strip_setup = \
+  srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*|]/\\\\&/g'`
+am__nobase_strip = \
+  for p in $$list; do echo "$$p"; done | sed -e "s|$$srcdirstrip/||"
+am__nobase_list = $(am__nobase_strip_setup); \
+  for p in $$list; do echo "$$p $$p"; done | \
+  sed "s| $$srcdirstrip/| |;"' / .*\//!s/ .*/ ./; s,\( .*\)/[^/]*$$,\1,' | \
+  $(AWK) 'BEGIN { files["."] = "" } { files[$$2] = files[$$2] " " $$1; \
+    if (++n[$$2] == $(am__install_max)) \
+      { print $$2, files[$$2]; n[$$2] = 0; files[$$2] = "" } } \
+    END { for (dir in files) print dir, files[dir] }'
+am__base_list = \
+  sed '$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;$$!N;s/\n/ /g' | \
+  sed '$$!N;$$!N;$$!N;$$!N;s/\n/ /g'
+am__uninstall_files_from_dir = { \
+  test -z "$$files" \
+    || { test ! -d "$$dir" && test ! -f "$$dir" && test ! -r "$$dir"; } \
+    || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
+         $(am__cd) "$$dir" && rm -f $$files; }; \
+  }
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
+	"$(DESTDIR)$(pkgconfigdir)"
+LTLIBRARIES = $(lib_LTLIBRARIES) $(noinst_LTLIBRARIES)
+libaria2_la_DEPENDENCIES =
+am__libaria2_la_SOURCES_DIST = option_processing.cc version_usage.cc \
+	Context.cc Context.h SocketCore.cc SocketCore.h BinaryStream.h \
+	Command.cc Command.h AbstractCommand.cc AbstractCommand.h \
+	InitiateConnectionCommandFactory.cc \
 	InitiateConnectionCommandFactory.h DownloadCommand.cc \
 	DownloadCommand.h HttpInitiateConnectionCommand.cc \
 	HttpInitiateConnectionCommand.h HttpRequestCommand.cc \
@@ -428,15 +480,13 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	IteratableValidator.h DiskAdaptor.cc DiskAdaptor.h \
 	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h \
 	DirectDiskAdaptor.cc DirectDiskAdaptor.h MultiDiskAdaptor.cc \
-	MultiDiskAdaptor.h PeerSessionResource.cc \
-	PeerSessionResource.h BtRegistry.cc BtRegistry.h \
-	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h \
-	ByteArrayDiskWriter.cc ByteArrayDiskWriter.h \
-	ByteArrayDiskWriterFactory.h DownloadContext.cc \
-	DownloadContext.h TimedHaltCommand.cc TimedHaltCommand.h \
-	CUIDCounter.cc CUIDCounter.h DNSCache.cc DNSCache.h \
-	DownloadResult.cc DownloadResult.h PostDownloadHandler.h \
-	PreDownloadHandler.h SingletonHolder.h \
+	MultiDiskAdaptor.h MultiFileAllocationIterator.cc \
+	MultiFileAllocationIterator.h ByteArrayDiskWriter.cc \
+	ByteArrayDiskWriter.h ByteArrayDiskWriterFactory.h \
+	DownloadContext.cc DownloadContext.h TimedHaltCommand.cc \
+	TimedHaltCommand.h CUIDCounter.cc CUIDCounter.h DNSCache.cc \
+	DNSCache.h DownloadResult.cc DownloadResult.h \
+	PostDownloadHandler.h PreDownloadHandler.h SingletonHolder.h \
 	TrueRequestGroupCriteria.h a2algo.h a2functional.h a2io.h \
 	a2netcompat.h a2time.h array_fun.h help_tags.cc help_tags.h \
 	prefs.cc prefs.h usage_text.h ProtocolDetector.cc \
@@ -490,45 +540,56 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	InorderStreamPieceSelector.h GeomStreamPieceSelector.cc \
 	GeomStreamPieceSelector.h MetalinkHttpEntry.cc \
 	MetalinkHttpEntry.h OutputFile.h NullOutputFile.h console.cc \
-	console.h BufferedFile.cc BufferedFile.h SegList.h \
-	NullHandle.h a2iterator.h paramed_string.cc paramed_string.h \
-	rpc_helper.cc rpc_helper.h WatchProcessCommand.cc \
-	WatchProcessCommand.h UnknownOptionException.cc \
-	UnknownOptionException.h Notifier.cc Notifier.h \
-	ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
+	console.h IOFile.cc IOFile.h BufferedFile.cc BufferedFile.h \
+	SegList.h NullHandle.h a2iterator.h paramed_string.cc \
+	paramed_string.h rpc_helper.cc rpc_helper.h \
+	WatchProcessCommand.cc WatchProcessCommand.h \
+	UnknownOptionException.cc UnknownOptionException.h Notifier.cc \
+	Notifier.h ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
 	XmlRpcRequestParserController.cc \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h WinConsoleFile.cc WinConsoleFile.h \
-	WebSocketSession.cc WebSocketSession.h WebSocketSessionMan.cc \
-	WebSocketSessionMan.h WebSocketResponseCommand.cc \
-	WebSocketResponseCommand.h WebSocketInteractionCommand.cc \
-	WebSocketInteractionCommand.h NullWebSocketSessionMan.h \
-	XmlAttr.cc XmlAttr.h XmlParser.cc XmlParser.h \
-	ParserStateMachine.h Xml2XmlParser.cc Xml2XmlParser.h \
-	ExpatXmlParser.cc ExpatXmlParser.h \
+	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
+	ConnectCommand.cc ConnectCommand.h ControlChain.h \
+	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
+	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
+	android/arm-ftruncate64.S android/mips-ftruncate64.S \
+	android/x86-ftruncate64.S android/x86-asm.h WinConsoleFile.cc \
+	WinConsoleFile.h WebSocketSession.cc WebSocketSession.h \
+	WebSocketSessionMan.cc WebSocketSessionMan.h \
+	WebSocketResponseCommand.cc WebSocketResponseCommand.h \
+	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h \
+	NullWebSocketSessionMan.h XmlAttr.cc XmlAttr.h XmlParser.cc \
+	XmlParser.h ParserStateMachine.h Xml2XmlParser.cc \
+	Xml2XmlParser.h ExpatXmlParser.cc ExpatXmlParser.h \
 	XmlRpcRequestParserStateMachine.cc \
 	XmlRpcRequestParserStateMachine.h XmlRpcRequestParserState.h \
 	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h \
 	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h \
 	FallocFileAllocationIterator.cc FallocFileAllocationIterator.h \
-	EpollEventPoll.cc EpollEventPoll.h TLSContext.h \
-	LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
-	LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h \
+	EpollEventPoll.cc EpollEventPoll.h TLSContext.h TLSSession.h \
+	AppleMessageDigestImpl.cc AppleMessageDigestImpl.h \
+	AppleTLSContext.cc AppleTLSContext.h AppleTLSSession.cc \
+	AppleTLSSession.h LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+	LibgnutlsTLSSession.cc LibgnutlsTLSSession.h \
 	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
 	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h \
+	LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h \
+	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h \
 	LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h \
-	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h a2gmp.cc \
-	a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
-	LibsslTLSContext.cc LibsslTLSContext.h \
-	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h \
+	a2gmp.cc a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
 	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
-	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h GZipEncoder.cc \
-	GZipEncoder.h GZipDecodingStreamFilter.cc \
-	GZipDecodingStreamFilter.h Sqlite3CookieParser.cc \
+	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h \
+	LibsslTLSContext.cc LibsslTLSContext.h LibsslTLSSession.cc \
+	LibsslTLSSession.h LibsslMessageDigestImpl.cc \
+	LibsslMessageDigestImpl.h GZipEncoder.cc GZipEncoder.h \
+	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h \
+	GZipFile.cc GZipFile.h Sqlite3CookieParser.cc \
 	Sqlite3CookieParser.h Sqlite3CookieParserImpl.cc \
 	Sqlite3CookieParserImpl.h AsyncNameResolver.cc \
-	AsyncNameResolver.h IteratableChunkChecksumValidator.cc \
+	AsyncNameResolver.h AsyncNameResolverMan.cc \
+	AsyncNameResolverMan.h IteratableChunkChecksumValidator.cc \
 	IteratableChunkChecksumValidator.h \
 	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
 	CheckIntegrityDispatcherCommand.cc \
@@ -541,11 +602,13 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	PeerAbstractCommand.cc PeerAbstractCommand.h \
 	PeerInitiateConnectionCommand.cc \
 	PeerInitiateConnectionCommand.h PeerInteractionCommand.cc \
-	PeerInteractionCommand.h Peer.cc Peer.h PeerConnection.cc \
-	PeerConnection.h PeerListenCommand.cc PeerListenCommand.h \
-	RequestSlot.cc RequestSlot.h TrackerWatcherCommand.cc \
-	TrackerWatcherCommand.h PeerChokeCommand.cc PeerChokeCommand.h \
-	SeedCriteria.h TimeSeedCriteria.cc TimeSeedCriteria.h \
+	PeerInteractionCommand.h Peer.cc Peer.h PeerSessionResource.cc \
+	PeerSessionResource.h PeerConnection.cc PeerConnection.h \
+	PeerListenCommand.cc PeerListenCommand.h BtRegistry.cc \
+	BtRegistry.h RequestSlot.cc RequestSlot.h \
+	TrackerWatcherCommand.cc TrackerWatcherCommand.h \
+	PeerChokeCommand.cc PeerChokeCommand.h SeedCriteria.h \
+	TimeSeedCriteria.cc TimeSeedCriteria.h \
 	ShareRatioSeedCriteria.cc ShareRatioSeedCriteria.h \
 	UnionSeedCriteria.cc UnionSeedCriteria.h SeedCheckCommand.cc \
 	SeedCheckCommand.h AnnounceTier.cc AnnounceTier.h \
@@ -667,6 +730,8 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	bencode2.cc bencode2.h BencodeParser.cc BencodeParser.h \
 	ValueBaseBencodeParser.h BencodeDiskWriter.h \
 	BencodeDiskWriterFactory.h MemoryBencodePreDownloadHandler.h \
+	UDPTrackerClient.cc UDPTrackerClient.h UDPTrackerRequest.cc \
+	UDPTrackerRequest.h NameResolveCommand.cc NameResolveCommand.h \
 	Metalinker.cc Metalinker.h MetalinkEntry.cc MetalinkEntry.h \
 	MetalinkResource.cc MetalinkResource.h MetalinkMetaurl.cc \
 	MetalinkMetaurl.h MetalinkParserController.cc \
@@ -685,342 +750,312 @@ am__libaria2c_a_SOURCES_DIST = SocketCore.cc SocketCore.h \
 	clock_gettime_mingw.cc clock_gettime_mingw.h \
 	clock_gettime_osx.cc clock_gettime_osx.h PollEventPoll.cc \
 	PollEventPoll.h PortEventPoll.cc PortEventPoll.h \
-	KqueueEventPoll.cc KqueueEventPoll.h
-@MINGW_BUILD_TRUE@am__objects_1 = WinConsoleFile.$(OBJEXT)
-@ENABLE_WEBSOCKET_TRUE@am__objects_2 = WebSocketSession.$(OBJEXT) \
-@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.$(OBJEXT) \
-@ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.$(OBJEXT) \
-@ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.$(OBJEXT)
-am__objects_3 =
-@HAVE_SOME_XMLLIB_TRUE@am__objects_4 = XmlAttr.$(OBJEXT) \
-@HAVE_SOME_XMLLIB_TRUE@	XmlParser.$(OBJEXT)
-@HAVE_LIBXML2_TRUE@am__objects_5 = Xml2XmlParser.$(OBJEXT)
-@HAVE_LIBEXPAT_TRUE@am__objects_6 = ExpatXmlParser.$(OBJEXT)
-@ENABLE_XML_RPC_TRUE@am__objects_7 = XmlRpcRequestParserStateMachine.$(OBJEXT) \
-@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.$(OBJEXT) \
-@ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.$(OBJEXT)
-@HAVE_SOME_FALLOCATE_TRUE@am__objects_8 = FallocFileAllocationIterator.$(OBJEXT)
-@HAVE_EPOLL_TRUE@am__objects_9 = EpollEventPoll.$(OBJEXT)
-@HAVE_LIBGNUTLS_TRUE@am__objects_10 = LibgnutlsTLSContext.$(OBJEXT)
-@HAVE_LIBGCRYPT_TRUE@am__objects_11 =  \
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptMessageDigestImpl.$(OBJEXT) \
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptARC4Encryptor.$(OBJEXT) \
-@HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.$(OBJEXT)
-@HAVE_LIBNETTLE_TRUE@am__objects_12 =  \
-@HAVE_LIBNETTLE_TRUE@	LibnettleMessageDigestImpl.$(OBJEXT) \
-@HAVE_LIBNETTLE_TRUE@	LibnettleARC4Encryptor.$(OBJEXT)
-@HAVE_LIBGMP_TRUE@am__objects_13 = a2gmp.$(OBJEXT) \
-@HAVE_LIBGMP_TRUE@	LibgmpDHKeyExchange.$(OBJEXT)
-@HAVE_OPENSSL_TRUE@am__objects_14 = LibsslTLSContext.$(OBJEXT) \
-@HAVE_OPENSSL_TRUE@	LibsslMessageDigestImpl.$(OBJEXT) \
-@HAVE_OPENSSL_TRUE@	LibsslARC4Encryptor.$(OBJEXT) \
-@HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.$(OBJEXT)
-@HAVE_ZLIB_TRUE@am__objects_15 = GZipEncoder.$(OBJEXT) \
-@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.$(OBJEXT)
-@HAVE_SQLITE3_TRUE@am__objects_16 = Sqlite3CookieParser.$(OBJEXT) \
-@HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.$(OBJEXT)
-@ENABLE_ASYNC_DNS_TRUE@am__objects_17 = AsyncNameResolver.$(OBJEXT)
-@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_18 = IteratableChunkChecksumValidator.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	ChecksumCheckIntegrityEntry.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	message_digest_helper.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	ChunkChecksum.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.$(OBJEXT)
-@ENABLE_BITTORRENT_TRUE@am__objects_19 =  \
-@ENABLE_BITTORRENT_TRUE@	PeerAbstractCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	Peer.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerConnection.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerListenCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	RequestSlot.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	TimeSeedCriteria.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	SeedCheckCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	AnnounceTier.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	AnnounceList.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultPeerStorage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtAnnounce.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtAnnounce.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtRuntime.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	AbstractBtMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtCancelMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtChokeMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtHaveAllMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtHaveMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtHaveNoneMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtInterestedMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtKeepAliveMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtNotInterestedMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtPieceMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtPortMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtRejectMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtRequestMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtSuggestPieceMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtUnchokeMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageDispatcher.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageReceiver.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtRequestFactory.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtInteractive.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtDependency.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtSetup.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtFileAllocationEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DefaultExtensionMessageFactory.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	magnet.$(OBJEXT) DHTNode.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTBucket.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcherImpl.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageReceiver.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageTracker.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageTrackerEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTConnectionImpl.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerReplyMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTBucketTree.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTaskCallback.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPingTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTTaskExecutor.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTSetup.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceStorage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTTokenTracker.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTReplaceNodeTask.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableDeserializer.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	DHTRegistry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	MSEHandshake.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtLeecherStateChoke.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtSeederStateChoke.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	IndexBtMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistry.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BtStopDownloadCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	LpdMessageDispatcher.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	LpdMessageReceiver.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	LpdMessage.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	bencode2.$(OBJEXT) \
-@ENABLE_BITTORRENT_TRUE@	BencodeParser.$(OBJEXT)
-@ENABLE_METALINK_TRUE@am__objects_20 = Metalinker.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkEntry.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkResource.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkMetaurl.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserController.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserState.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserStateImpl.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserStateV3Impl.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkParserStateV4Impl.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	Metalink2RequestGroup.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.$(OBJEXT) \
-@ENABLE_METALINK_TRUE@	metalink_helper.$(OBJEXT)
-@HAVE_ASCTIME_R_FALSE@am__objects_21 = asctime_r.$(OBJEXT)
-@HAVE_BASENAME_FALSE@am__objects_22 = libgen.$(OBJEXT)
-@HAVE_GETADDRINFO_FALSE@am__objects_23 = getaddrinfo.$(OBJEXT)
-@HAVE_GAI_STRERROR_FALSE@am__objects_24 = gai_strerror.$(OBJEXT)
-@HAVE_GETTIMEOFDAY_FALSE@am__objects_25 = gettimeofday.$(OBJEXT)
-@HAVE_LOCALTIME_R_FALSE@am__objects_26 = localtime_r.$(OBJEXT)
-@HAVE_STRPTIME_FALSE@am__objects_27 = strptime.$(OBJEXT)
-@HAVE_TIMEGM_FALSE@am__objects_28 = timegm.$(OBJEXT)
-@HAVE_DAEMON_FALSE@am__objects_29 = daemon.$(OBJEXT)
-@HAVE_TIMEGETTIME_TRUE@am__objects_30 = clock_gettime_mingw.$(OBJEXT)
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_31 =  \
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@	clock_gettime_osx.$(OBJEXT)
-@HAVE_POLL_TRUE@am__objects_32 = PollEventPoll.$(OBJEXT)
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_33 = PortEventPoll.$(OBJEXT)
-@HAVE_KQUEUE_TRUE@am__objects_34 = KqueueEventPoll.$(OBJEXT)
-am__objects_35 = SocketCore.$(OBJEXT) Command.$(OBJEXT) \
-	AbstractCommand.$(OBJEXT) \
-	InitiateConnectionCommandFactory.$(OBJEXT) \
-	DownloadCommand.$(OBJEXT) \
-	HttpInitiateConnectionCommand.$(OBJEXT) \
-	HttpRequestCommand.$(OBJEXT) HttpResponseCommand.$(OBJEXT) \
-	HttpProxyRequestCommand.$(OBJEXT) \
-	HttpProxyResponseCommand.$(OBJEXT) \
-	HttpDownloadCommand.$(OBJEXT) HttpHeader.$(OBJEXT) \
-	HttpConnection.$(OBJEXT) FtpConnection.$(OBJEXT) \
-	FtpInitiateConnectionCommand.$(OBJEXT) \
-	FtpNegotiationCommand.$(OBJEXT) FtpDownloadCommand.$(OBJEXT) \
-	FtpTunnelRequestCommand.$(OBJEXT) \
-	FtpTunnelResponseCommand.$(OBJEXT) SleepCommand.$(OBJEXT) \
-	DownloadEngine.$(OBJEXT) GrowSegment.$(OBJEXT) \
-	PiecedSegment.$(OBJEXT) SegmentMan.$(OBJEXT) util.$(OBJEXT) \
-	Request.$(OBJEXT) Exception.$(OBJEXT) FatalException.$(OBJEXT) \
-	RecoverableException.$(OBJEXT) DlAbortEx.$(OBJEXT) \
-	DlRetryEx.$(OBJEXT) DownloadFailureException.$(OBJEXT) \
-	Logger.$(OBJEXT) fmt.$(OBJEXT) AbstractDiskWriter.$(OBJEXT) \
-	DefaultDiskWriter.$(OBJEXT) DefaultDiskWriterFactory.$(OBJEXT) \
-	File.$(OBJEXT) Option.$(OBJEXT) base32.$(OBJEXT) \
-	LogFactory.$(OBJEXT) TimerA2.$(OBJEXT) TimeA2.$(OBJEXT) \
-	SharedHandle.$(OBJEXT) FeatureConfig.$(OBJEXT) \
-	DownloadEngineFactory.$(OBJEXT) SpeedCalc.$(OBJEXT) \
-	PeerStat.$(OBJEXT) NetStat.$(OBJEXT) BitfieldMan.$(OBJEXT) \
-	SimpleRandomizer.$(OBJEXT) HttpResponse.$(OBJEXT) \
-	HttpRequest.$(OBJEXT) Range.$(OBJEXT) \
-	AbstractProxyRequestCommand.$(OBJEXT) \
-	AbstractProxyResponseCommand.$(OBJEXT) Netrc.$(OBJEXT) \
-	AuthConfig.$(OBJEXT) AbstractAuthResolver.$(OBJEXT) \
-	DefaultAuthResolver.$(OBJEXT) NetrcAuthResolver.$(OBJEXT) \
-	AuthConfigFactory.$(OBJEXT) OptionParser.$(OBJEXT) \
-	OptionHandlerFactory.$(OBJEXT) OptionHandler.$(OBJEXT) \
-	OptionHandlerImpl.$(OBJEXT) AbstractOptionHandler.$(OBJEXT) \
-	NameResolver.$(OBJEXT) RequestGroup.$(OBJEXT) \
-	RequestGroupMan.$(OBJEXT) FileAllocationCommand.$(OBJEXT) \
-	FillRequestGroupCommand.$(OBJEXT) \
-	FileAllocationDispatcherCommand.$(OBJEXT) \
-	FileAllocationEntry.$(OBJEXT) \
-	StreamFileAllocationEntry.$(OBJEXT) \
-	MultiUrlRequestInfo.$(OBJEXT) UriListParser.$(OBJEXT) \
-	RealtimeCommand.$(OBJEXT) RequestGroupEntry.$(OBJEXT) \
-	Cookie.$(OBJEXT) HttpHeaderProcessor.$(OBJEXT) \
-	FileEntry.$(OBJEXT) Platform.$(OBJEXT) \
-	TimeBasedCommand.$(OBJEXT) AutoSaveCommand.$(OBJEXT) \
-	DefaultPieceStorage.$(OBJEXT) \
-	UnknownLengthPieceStorage.$(OBJEXT) PieceStatMan.$(OBJEXT) \
-	ConsoleStatCalc.$(OBJEXT) TransferStat.$(OBJEXT) \
-	DefaultBtProgressInfoFile.$(OBJEXT) \
-	SingleFileAllocationIterator.$(OBJEXT) \
-	ContentTypeRequestGroupCriteria.$(OBJEXT) \
-	DownloadHandler.$(OBJEXT) DownloadHandlerConstants.$(OBJEXT) \
-	DownloadHandlerFactory.$(OBJEXT) HaveEraseCommand.$(OBJEXT) \
-	Piece.$(OBJEXT) CheckIntegrityEntry.$(OBJEXT) \
-	PieceHashCheckIntegrityEntry.$(OBJEXT) \
-	StreamCheckIntegrityEntry.$(OBJEXT) DiskAdaptor.$(OBJEXT) \
-	AbstractSingleDiskAdaptor.$(OBJEXT) \
-	DirectDiskAdaptor.$(OBJEXT) MultiDiskAdaptor.$(OBJEXT) \
-	PeerSessionResource.$(OBJEXT) BtRegistry.$(OBJEXT) \
-	MultiFileAllocationIterator.$(OBJEXT) \
-	ByteArrayDiskWriter.$(OBJEXT) DownloadContext.$(OBJEXT) \
-	TimedHaltCommand.$(OBJEXT) CUIDCounter.$(OBJEXT) \
-	DNSCache.$(OBJEXT) DownloadResult.$(OBJEXT) \
-	help_tags.$(OBJEXT) prefs.$(OBJEXT) ProtocolDetector.$(OBJEXT) \
-	HttpSkipResponseCommand.$(OBJEXT) \
-	InitiateConnectionCommand.$(OBJEXT) \
-	FtpFinishDownloadCommand.$(OBJEXT) A2STR.$(OBJEXT) \
-	RarestPieceSelector.$(OBJEXT) Signature.$(OBJEXT) \
-	ServerStat.$(OBJEXT) ServerStatMan.$(OBJEXT) \
-	AdaptiveURISelector.$(OBJEXT) InorderURISelector.$(OBJEXT) \
-	FeedbackURISelector.$(OBJEXT) NsCookieParser.$(OBJEXT) \
-	CookieStorage.$(OBJEXT) SocketBuffer.$(OBJEXT) \
-	SocketRecvBuffer.$(OBJEXT) OptionHandlerException.$(OBJEXT) \
-	URIResult.$(OBJEXT) SelectEventPoll.$(OBJEXT) \
-	LongestSequencePieceSelector.$(OBJEXT) bitfield.$(OBJEXT) \
-	CreateRequestCommand.$(OBJEXT) wallclock.$(OBJEXT) \
-	download_helper.$(OBJEXT) MetadataInfo.$(OBJEXT) \
-	SessionSerializer.$(OBJEXT) ValueBase.$(OBJEXT) \
-	ContextAttribute.$(OBJEXT) TorrentAttribute.$(OBJEXT) \
-	AdaptiveFileAllocationIterator.$(OBJEXT) \
-	TruncFileAllocationIterator.$(OBJEXT) StreamFilter.$(OBJEXT) \
-	SinkStreamFilter.$(OBJEXT) \
-	ChunkedDecodingStreamFilter.$(OBJEXT) \
-	NullSinkStreamFilter.$(OBJEXT) uri.$(OBJEXT) \
-	uri_split.$(OBJEXT) cookie_helper.$(OBJEXT) json.$(OBJEXT) \
-	JsonParser.$(OBJEXT) ValueBaseStructParserStateImpl.$(OBJEXT) \
-	ValueBaseStructParserStateMachine.$(OBJEXT) \
-	HttpServerBodyCommand.$(OBJEXT) RpcRequest.$(OBJEXT) \
-	RpcMethod.$(OBJEXT) RpcMethodImpl.$(OBJEXT) \
-	RpcMethodFactory.$(OBJEXT) RpcResponse.$(OBJEXT) \
-	HttpListenCommand.$(OBJEXT) HttpServerCommand.$(OBJEXT) \
-	HttpServerResponseCommand.$(OBJEXT) \
-	AbstractHttpServerResponseCommand.$(OBJEXT) \
-	HttpServer.$(OBJEXT) DefaultStreamPieceSelector.$(OBJEXT) \
-	InorderStreamPieceSelector.$(OBJEXT) \
-	GeomStreamPieceSelector.$(OBJEXT) MetalinkHttpEntry.$(OBJEXT) \
-	console.$(OBJEXT) BufferedFile.$(OBJEXT) \
-	paramed_string.$(OBJEXT) rpc_helper.$(OBJEXT) \
-	WatchProcessCommand.$(OBJEXT) UnknownOptionException.$(OBJEXT) \
-	Notifier.$(OBJEXT) XmlRpcRequestParserController.$(OBJEXT) \
-	WrDiskCache.$(OBJEXT) WrDiskCacheEntry.$(OBJEXT) \
-	GroupId.$(OBJEXT) $(am__objects_1) $(am__objects_2) \
-	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9) $(am__objects_3) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
-	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
-	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
-	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
-	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
-	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
-	$(am__objects_32) $(am__objects_33) $(am__objects_34)
-am_libaria2c_a_OBJECTS = $(am__objects_35)
-libaria2c_a_OBJECTS = $(am_libaria2c_a_OBJECTS)
-am__installdirs = "$(DESTDIR)$(bindir)"
+	KqueueEventPoll.cc KqueueEventPoll.h LibuvEventPoll.cc \
+	LibuvEventPoll.h aria2api.cc aria2api.h KeepRunningCommand.cc \
+	KeepRunningCommand.h ApiCallbackDownloadEventListener.cc \
+	ApiCallbackDownloadEventListener.h
+@ANDROID_ARM_TRUE@am__objects_1 = arm-ftruncate64.lo
+@ANDROID_MIPS_TRUE@am__objects_2 = mips-ftruncate64.lo
+@ANDROID_X86_TRUE@am__objects_3 = x86-ftruncate64.lo
+@MINGW_BUILD_TRUE@am__objects_4 = WinConsoleFile.lo
+@ENABLE_WEBSOCKET_TRUE@am__objects_5 = WebSocketSession.lo \
+@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.lo \
+@ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.lo \
+@ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.lo
+am__objects_6 =
+@HAVE_SOME_XMLLIB_TRUE@am__objects_7 = XmlAttr.lo XmlParser.lo
+@HAVE_LIBXML2_TRUE@am__objects_8 = Xml2XmlParser.lo
+@HAVE_LIBEXPAT_TRUE@am__objects_9 = ExpatXmlParser.lo
+@ENABLE_XML_RPC_TRUE@am__objects_10 =  \
+@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateMachine.lo \
+@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.lo \
+@ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.lo
+@HAVE_SOME_FALLOCATE_TRUE@am__objects_11 =  \
+@HAVE_SOME_FALLOCATE_TRUE@	FallocFileAllocationIterator.lo
+@HAVE_EPOLL_TRUE@am__objects_12 = EpollEventPoll.lo
+@USE_APPLE_MD_TRUE@am__objects_13 = AppleMessageDigestImpl.lo
+@HAVE_APPLETLS_TRUE@am__objects_14 = AppleTLSContext.lo \
+@HAVE_APPLETLS_TRUE@	AppleTLSSession.lo
+@HAVE_LIBGNUTLS_TRUE@am__objects_15 = LibgnutlsTLSContext.lo \
+@HAVE_LIBGNUTLS_TRUE@	LibgnutlsTLSSession.lo
+@HAVE_LIBGCRYPT_TRUE@am__objects_16 = LibgcryptARC4Encryptor.lo \
+@HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.lo
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_17 = LibgcryptMessageDigestImpl.lo
+@HAVE_LIBNETTLE_TRUE@am__objects_18 = LibnettleARC4Encryptor.lo
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_19 = LibnettleMessageDigestImpl.lo
+@HAVE_LIBGMP_TRUE@am__objects_20 = a2gmp.lo LibgmpDHKeyExchange.lo
+@HAVE_OPENSSL_TRUE@am__objects_21 = LibsslARC4Encryptor.lo \
+@HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.lo
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_22 =  \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSContext.lo \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSSession.lo
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_23 = LibsslMessageDigestImpl.lo
+@HAVE_ZLIB_TRUE@am__objects_24 = GZipEncoder.lo \
+@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.lo GZipFile.lo
+@HAVE_SQLITE3_TRUE@am__objects_25 = Sqlite3CookieParser.lo \
+@HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.lo
+@ENABLE_ASYNC_DNS_TRUE@am__objects_26 = AsyncNameResolver.lo \
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.lo
+@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_27 = IteratableChunkChecksumValidator.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	ChecksumCheckIntegrityEntry.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	message_digest_helper.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.lo ChunkChecksum.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.lo
+@ENABLE_BITTORRENT_TRUE@am__objects_28 = PeerAbstractCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.lo Peer.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerConnection.lo PeerListenCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	BtRegistry.lo RequestSlot.lo \
+@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	TimeSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	SeedCheckCommand.lo AnnounceTier.lo \
+@ENABLE_BITTORRENT_TRUE@	AnnounceList.lo DefaultPeerStorage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtAnnounce.lo DefaultBtAnnounce.lo \
+@ENABLE_BITTORRENT_TRUE@	BtRuntime.lo AbstractBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtCancelMessage.lo BtChokeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHaveAllMessage.lo BtHaveMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHaveNoneMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtInterestedMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtKeepAliveMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtNotInterestedMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPieceMessage.lo BtPortMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtRejectMessage.lo BtRequestMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtSuggestPieceMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtUnchokeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageDispatcher.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageReceiver.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtRequestFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtInteractive.lo \
+@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	BtDependency.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	BtSetup.lo BtFileAllocationEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.lo \
+@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultExtensionMessageFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.lo \
+@ENABLE_BITTORRENT_TRUE@	magnet.lo DHTNode.lo DHTBucket.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.lo DHTMessageEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcherImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageReceiver.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageTrackerEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessage.lo DHTConnectionImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupEntry.lo DHTBucketTree.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTaskCallback.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.lo DHTPingTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.lo DHTTaskExecutor.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.lo DHTSetup.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceStorage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTokenTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTReplaceNodeTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableDeserializer.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.lo DHTRegistry.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	MSEHandshake.lo BtLeecherStateChoke.lo \
+@ENABLE_BITTORRENT_TRUE@	BtSeederStateChoke.lo \
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.lo IndexBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistry.lo \
+@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.lo \
+@ENABLE_BITTORRENT_TRUE@	BtStopDownloadCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdMessageDispatcher.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdMessageReceiver.lo LpdMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	bencode2.lo BencodeParser.lo \
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.lo \
+@ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.lo \
+@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.lo
+@ENABLE_METALINK_TRUE@am__objects_29 = Metalinker.lo MetalinkEntry.lo \
+@ENABLE_METALINK_TRUE@	MetalinkResource.lo MetalinkMetaurl.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserController.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserState.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserStateImpl.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserStateV3Impl.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserStateV4Impl.lo \
+@ENABLE_METALINK_TRUE@	Metalink2RequestGroup.lo \
+@ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.lo \
+@ENABLE_METALINK_TRUE@	metalink_helper.lo
+@HAVE_ASCTIME_R_FALSE@am__objects_30 = asctime_r.lo
+@HAVE_BASENAME_FALSE@am__objects_31 = libgen.lo
+@HAVE_GETADDRINFO_FALSE@am__objects_32 = getaddrinfo.lo
+@HAVE_GAI_STRERROR_FALSE@am__objects_33 = gai_strerror.lo
+@HAVE_GETTIMEOFDAY_FALSE@am__objects_34 = gettimeofday.lo
+@HAVE_LOCALTIME_R_FALSE@am__objects_35 = localtime_r.lo
+@HAVE_STRPTIME_FALSE@am__objects_36 = strptime.lo
+@HAVE_TIMEGM_FALSE@am__objects_37 = timegm.lo
+@HAVE_DAEMON_FALSE@am__objects_38 = daemon.lo
+@HAVE_TIMEGETTIME_TRUE@am__objects_39 = clock_gettime_mingw.lo
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_40 = clock_gettime_osx.lo
+@HAVE_POLL_TRUE@am__objects_41 = PollEventPoll.lo
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_42 = PortEventPoll.lo
+@HAVE_KQUEUE_TRUE@am__objects_43 = KqueueEventPoll.lo
+@HAVE_LIBUV_TRUE@am__objects_44 = LibuvEventPoll.lo
+am__objects_45 = option_processing.lo version_usage.lo Context.lo \
+	SocketCore.lo Command.lo AbstractCommand.lo \
+	InitiateConnectionCommandFactory.lo DownloadCommand.lo \
+	HttpInitiateConnectionCommand.lo HttpRequestCommand.lo \
+	HttpResponseCommand.lo HttpProxyRequestCommand.lo \
+	HttpProxyResponseCommand.lo HttpDownloadCommand.lo \
+	HttpHeader.lo HttpConnection.lo FtpConnection.lo \
+	FtpInitiateConnectionCommand.lo FtpNegotiationCommand.lo \
+	FtpDownloadCommand.lo FtpTunnelRequestCommand.lo \
+	FtpTunnelResponseCommand.lo SleepCommand.lo DownloadEngine.lo \
+	GrowSegment.lo PiecedSegment.lo SegmentMan.lo util.lo \
+	Request.lo Exception.lo FatalException.lo \
+	RecoverableException.lo DlAbortEx.lo DlRetryEx.lo \
+	DownloadFailureException.lo Logger.lo fmt.lo \
+	AbstractDiskWriter.lo DefaultDiskWriter.lo \
+	DefaultDiskWriterFactory.lo File.lo Option.lo base32.lo \
+	LogFactory.lo TimerA2.lo TimeA2.lo SharedHandle.lo \
+	FeatureConfig.lo DownloadEngineFactory.lo SpeedCalc.lo \
+	PeerStat.lo NetStat.lo BitfieldMan.lo SimpleRandomizer.lo \
+	HttpResponse.lo HttpRequest.lo Range.lo \
+	AbstractProxyRequestCommand.lo AbstractProxyResponseCommand.lo \
+	Netrc.lo AuthConfig.lo AbstractAuthResolver.lo \
+	DefaultAuthResolver.lo NetrcAuthResolver.lo \
+	AuthConfigFactory.lo OptionParser.lo OptionHandlerFactory.lo \
+	OptionHandler.lo OptionHandlerImpl.lo AbstractOptionHandler.lo \
+	NameResolver.lo RequestGroup.lo RequestGroupMan.lo \
+	FileAllocationCommand.lo FillRequestGroupCommand.lo \
+	FileAllocationDispatcherCommand.lo FileAllocationEntry.lo \
+	StreamFileAllocationEntry.lo MultiUrlRequestInfo.lo \
+	UriListParser.lo RealtimeCommand.lo RequestGroupEntry.lo \
+	Cookie.lo HttpHeaderProcessor.lo FileEntry.lo Platform.lo \
+	TimeBasedCommand.lo AutoSaveCommand.lo DefaultPieceStorage.lo \
+	UnknownLengthPieceStorage.lo PieceStatMan.lo \
+	ConsoleStatCalc.lo TransferStat.lo \
+	DefaultBtProgressInfoFile.lo SingleFileAllocationIterator.lo \
+	ContentTypeRequestGroupCriteria.lo DownloadHandler.lo \
+	DownloadHandlerConstants.lo DownloadHandlerFactory.lo \
+	HaveEraseCommand.lo Piece.lo CheckIntegrityEntry.lo \
+	PieceHashCheckIntegrityEntry.lo StreamCheckIntegrityEntry.lo \
+	DiskAdaptor.lo AbstractSingleDiskAdaptor.lo \
+	DirectDiskAdaptor.lo MultiDiskAdaptor.lo \
+	MultiFileAllocationIterator.lo ByteArrayDiskWriter.lo \
+	DownloadContext.lo TimedHaltCommand.lo CUIDCounter.lo \
+	DNSCache.lo DownloadResult.lo help_tags.lo prefs.lo \
+	ProtocolDetector.lo HttpSkipResponseCommand.lo \
+	InitiateConnectionCommand.lo FtpFinishDownloadCommand.lo \
+	A2STR.lo RarestPieceSelector.lo Signature.lo ServerStat.lo \
+	ServerStatMan.lo AdaptiveURISelector.lo InorderURISelector.lo \
+	FeedbackURISelector.lo NsCookieParser.lo CookieStorage.lo \
+	SocketBuffer.lo SocketRecvBuffer.lo OptionHandlerException.lo \
+	URIResult.lo SelectEventPoll.lo \
+	LongestSequencePieceSelector.lo bitfield.lo \
+	CreateRequestCommand.lo wallclock.lo download_helper.lo \
+	MetadataInfo.lo SessionSerializer.lo ValueBase.lo \
+	ContextAttribute.lo TorrentAttribute.lo \
+	AdaptiveFileAllocationIterator.lo \
+	TruncFileAllocationIterator.lo StreamFilter.lo \
+	SinkStreamFilter.lo ChunkedDecodingStreamFilter.lo \
+	NullSinkStreamFilter.lo uri.lo uri_split.lo cookie_helper.lo \
+	json.lo JsonParser.lo ValueBaseStructParserStateImpl.lo \
+	ValueBaseStructParserStateMachine.lo HttpServerBodyCommand.lo \
+	RpcRequest.lo RpcMethod.lo RpcMethodImpl.lo \
+	RpcMethodFactory.lo RpcResponse.lo HttpListenCommand.lo \
+	HttpServerCommand.lo HttpServerResponseCommand.lo \
+	AbstractHttpServerResponseCommand.lo HttpServer.lo \
+	DefaultStreamPieceSelector.lo InorderStreamPieceSelector.lo \
+	GeomStreamPieceSelector.lo MetalinkHttpEntry.lo console.lo \
+	IOFile.lo BufferedFile.lo paramed_string.lo rpc_helper.lo \
+	WatchProcessCommand.lo UnknownOptionException.lo Notifier.lo \
+	XmlRpcRequestParserController.lo WrDiskCache.lo \
+	WrDiskCacheEntry.lo GroupId.lo SaveSessionCommand.lo \
+	BackupIPv4ConnectCommand.lo ConnectCommand.lo $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
+	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
+	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
+	$(am__objects_11) $(am__objects_12) $(am__objects_6) \
+	$(am__objects_13) $(am__objects_14) $(am__objects_15) \
+	$(am__objects_16) $(am__objects_17) $(am__objects_18) \
+	$(am__objects_19) $(am__objects_20) $(am__objects_21) \
+	$(am__objects_22) $(am__objects_23) $(am__objects_24) \
+	$(am__objects_25) $(am__objects_26) $(am__objects_27) \
+	$(am__objects_28) $(am__objects_29) $(am__objects_30) \
+	$(am__objects_31) $(am__objects_32) $(am__objects_33) \
+	$(am__objects_34) $(am__objects_35) $(am__objects_36) \
+	$(am__objects_37) $(am__objects_38) $(am__objects_39) \
+	$(am__objects_40) $(am__objects_41) $(am__objects_42) \
+	$(am__objects_43) $(am__objects_44)
+@ENABLE_LIBARIA2_FALSE@am_libaria2_la_OBJECTS = $(am__objects_45)
+@ENABLE_LIBARIA2_TRUE@am_libaria2_la_OBJECTS = $(am__objects_45) \
+@ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo \
+@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo
+libaria2_la_OBJECTS = $(am_libaria2_la_OBJECTS)
+@ENABLE_LIBARIA2_FALSE@am_libaria2_la_rpath =
+@ENABLE_LIBARIA2_TRUE@am_libaria2_la_rpath = -rpath $(libdir)
 PROGRAMS = $(bin_PROGRAMS)
-am_aria2c_OBJECTS = main.$(OBJEXT) option_processing.$(OBJEXT) \
-	version_usage.$(OBJEXT)
+am_aria2c_OBJECTS = main.$(OBJEXT)
 aria2c_OBJECTS = $(am_aria2c_OBJECTS)
-aria2c_DEPENDENCIES = libaria2c.a @ALLOCA@
+aria2c_LDADD = $(LDADD)
+aria2c_DEPENDENCIES = libaria2.la @ALLOCA@
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__depfiles_maybe = depfiles
 am__mv = mv -f
+CPPASCOMPILE = $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
+LTCPPASCOMPILE = $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
+	--mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
+	$(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS)
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 LTCOMPILE = $(LIBTOOL) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
@@ -1039,16 +1074,55 @@ CXXLD = $(CXX)
 CXXLINK = $(LIBTOOL) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) \
 	--mode=link $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) \
 	$(LDFLAGS) -o $@
-SOURCES = $(libaria2c_a_SOURCES) $(aria2c_SOURCES)
-DIST_SOURCES = $(am__libaria2c_a_SOURCES_DIST) $(aria2c_SOURCES)
+SOURCES = $(libaria2_la_SOURCES) $(aria2c_SOURCES)
+DIST_SOURCES = $(am__libaria2_la_SOURCES_DIST) $(aria2c_SOURCES)
+RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
+	html-recursive info-recursive install-data-recursive \
+	install-dvi-recursive install-exec-recursive \
+	install-html-recursive install-info-recursive \
+	install-pdf-recursive install-ps-recursive install-recursive \
+	installcheck-recursive installdirs-recursive pdf-recursive \
+	ps-recursive uninstall-recursive
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(pkgconfig_DATA)
+RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
+  distclean-recursive maintainer-clean-recursive
+AM_RECURSIVE_TARGETS = $(RECURSIVE_TARGETS:-recursive=) \
+	$(RECURSIVE_CLEAN_TARGETS:-recursive=) tags TAGS ctags CTAGS \
+	distdir
 ETAGS = etags
 CTAGS = ctags
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
+am__relativize = \
+  dir0=`pwd`; \
+  sed_first='s,^\([^/]*\)/.*$$,\1,'; \
+  sed_rest='s,^[^/]*/*,,'; \
+  sed_last='s,^.*/\([^/]*\)$$,\1,'; \
+  sed_butlast='s,/*[^/]*$$,,'; \
+  while test -n "$$dir1"; do \
+    first=`echo "$$dir1" | sed -e "$$sed_first"`; \
+    if test "$$first" != "."; then \
+      if test "$$first" = ".."; then \
+        dir2=`echo "$$dir0" | sed -e "$$sed_last"`/"$$dir2"; \
+        dir0=`echo "$$dir0" | sed -e "$$sed_butlast"`; \
+      else \
+        first2=`echo "$$dir2" | sed -e "$$sed_first"`; \
+        if test "$$first2" = "$$first"; then \
+          dir2=`echo "$$dir2" | sed -e "$$sed_rest"`; \
+        else \
+          dir2="../$$dir2"; \
+        fi; \
+        dir0="$$dir0"/"$$first"; \
+      fi; \
+    fi; \
+    dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
+  done; \
+  reldir="$$dir2"
 A2X = @A2X@
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
@@ -1063,6 +1137,9 @@ AWK = @AWK@
 BUILD_INCLUDED_LIBINTL = @BUILD_INCLUDED_LIBINTL@
 CATOBJEXT = @CATOBJEXT@
 CC = @CC@
+CCAS = @CCAS@
+CCASDEPMODE = @CCASDEPMODE@
+CCASFLAGS = @CCASFLAGS@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
 CFLAG_VISIBILITY = @CFLAG_VISIBILITY@
@@ -1113,6 +1190,8 @@ INTLOBJS = @INTLOBJS@
 INTL_DEFAULT_VERBOSITY = @INTL_DEFAULT_VERBOSITY@
 INTL_LIBTOOL_SUFFIX_PREFIX = @INTL_LIBTOOL_SUFFIX_PREFIX@
 INTL_MACOSX_LIBS = @INTL_MACOSX_LIBS@
+JEMALLOC_CFLAGS = @JEMALLOC_CFLAGS@
+JEMALLOC_LIBS = @JEMALLOC_LIBS@
 LD = @LD@
 LDFLAGS = @LDFLAGS@
 LIBCARES_CFLAGS = @LIBCARES_CFLAGS@
@@ -1140,6 +1219,9 @@ LTLIBMULTITHREAD = @LTLIBMULTITHREAD@
 LTLIBOBJS = @LTLIBOBJS@
 LTLIBPTH = @LTLIBPTH@
 LTLIBTHREAD = @LTLIBTHREAD@
+LT_AGE = @LT_AGE@
+LT_CURRENT = @LT_CURRENT@
+LT_REVISION = @LT_REVISION@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -1169,18 +1251,22 @@ POSUB = @POSUB@
 POW_LIB = @POW_LIB@
 PRI_MACROS_BROKEN = @PRI_MACROS_BROKEN@
 RANLIB = @RANLIB@
+RST2HTML = @RST2HTML@
 SED = @SED@
 SET_MAKE = @SET_MAKE@
 SHELL = @SHELL@
 SQLITE3_CFLAGS = @SQLITE3_CFLAGS@
 SQLITE3_LIBS = @SQLITE3_LIBS@
 STRIP = @STRIP@
+TCMALLOC_CFLAGS = @TCMALLOC_CFLAGS@
+TCMALLOC_LIBS = @TCMALLOC_LIBS@
 USE_INCLUDED_LIBINTL = @USE_INCLUDED_LIBINTL@
 USE_NLS = @USE_NLS@
 VERSION = @VERSION@
 WINDRES = @WINDRES@
 WOE32 = @WOE32@
 WOE32DLL = @WOE32DLL@
+WSLAY_LIBS = @WSLAY_LIBS@
 XGETTEXT = @XGETTEXT@
 XGETTEXT_015 = @XGETTEXT_015@
 XGETTEXT_EXTRA_OPTIONS = @XGETTEXT_EXTRA_OPTIONS@
@@ -1251,11 +1337,10 @@ target_vendor = @target_vendor@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-aria2c_SOURCES = main.cc\
-	option_processing.cc\
-	version_usage.cc
-
-SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
+SUBDIRS = includes
+aria2c_SOURCES = main.cc
+SRCS = option_processing.cc version_usage.cc Context.cc Context.h \
+	SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	AbstractCommand.cc AbstractCommand.h \
 	InitiateConnectionCommandFactory.cc \
 	InitiateConnectionCommandFactory.h DownloadCommand.cc \
@@ -1337,15 +1422,13 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	IteratableValidator.h DiskAdaptor.cc DiskAdaptor.h \
 	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h \
 	DirectDiskAdaptor.cc DirectDiskAdaptor.h MultiDiskAdaptor.cc \
-	MultiDiskAdaptor.h PeerSessionResource.cc \
-	PeerSessionResource.h BtRegistry.cc BtRegistry.h \
-	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h \
-	ByteArrayDiskWriter.cc ByteArrayDiskWriter.h \
-	ByteArrayDiskWriterFactory.h DownloadContext.cc \
-	DownloadContext.h TimedHaltCommand.cc TimedHaltCommand.h \
-	CUIDCounter.cc CUIDCounter.h DNSCache.cc DNSCache.h \
-	DownloadResult.cc DownloadResult.h PostDownloadHandler.h \
-	PreDownloadHandler.h SingletonHolder.h \
+	MultiDiskAdaptor.h MultiFileAllocationIterator.cc \
+	MultiFileAllocationIterator.h ByteArrayDiskWriter.cc \
+	ByteArrayDiskWriter.h ByteArrayDiskWriterFactory.h \
+	DownloadContext.cc DownloadContext.h TimedHaltCommand.cc \
+	TimedHaltCommand.h CUIDCounter.cc CUIDCounter.h DNSCache.cc \
+	DNSCache.h DownloadResult.cc DownloadResult.h \
+	PostDownloadHandler.h PreDownloadHandler.h SingletonHolder.h \
 	TrueRequestGroupCriteria.h a2algo.h a2functional.h a2io.h \
 	a2netcompat.h a2time.h array_fun.h help_tags.cc help_tags.h \
 	prefs.cc prefs.h usage_text.h ProtocolDetector.cc \
@@ -1399,16 +1482,21 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	InorderStreamPieceSelector.h GeomStreamPieceSelector.cc \
 	GeomStreamPieceSelector.h MetalinkHttpEntry.cc \
 	MetalinkHttpEntry.h OutputFile.h NullOutputFile.h console.cc \
-	console.h BufferedFile.cc BufferedFile.h SegList.h \
-	NullHandle.h a2iterator.h paramed_string.cc paramed_string.h \
-	rpc_helper.cc rpc_helper.h WatchProcessCommand.cc \
-	WatchProcessCommand.h UnknownOptionException.cc \
-	UnknownOptionException.h Notifier.cc Notifier.h \
-	ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
+	console.h IOFile.cc IOFile.h BufferedFile.cc BufferedFile.h \
+	SegList.h NullHandle.h a2iterator.h paramed_string.cc \
+	paramed_string.h rpc_helper.cc rpc_helper.h \
+	WatchProcessCommand.cc WatchProcessCommand.h \
+	UnknownOptionException.cc UnknownOptionException.h Notifier.cc \
+	Notifier.h ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
 	XmlRpcRequestParserController.cc \
 	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h $(am__append_1) $(am__append_2) $(am__append_3) \
+	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
+	ConnectCommand.cc ConnectCommand.h ControlChain.h \
+	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
+	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
+	$(am__append_1) $(am__append_2) $(am__append_3) \
 	$(am__append_4) $(am__append_5) $(am__append_6) \
 	$(am__append_7) $(am__append_8) $(am__append_9) \
 	$(am__append_10) $(am__append_11) $(am__append_12) \
@@ -1419,19 +1507,33 @@ SRCS = SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
 	$(am__append_25) $(am__append_26) $(am__append_27) \
 	$(am__append_28) $(am__append_29) $(am__append_30) \
 	$(am__append_31) $(am__append_32) $(am__append_33) \
-	$(am__append_34) $(am__append_35)
-noinst_LIBRARIES = libaria2c.a
-libaria2c_a_SOURCES = $(SRCS)
-aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
+	$(am__append_34) $(am__append_35) $(am__append_36) \
+	$(am__append_37) $(am__append_38) $(am__append_39) \
+	$(am__append_40) $(am__append_41) $(am__append_42) \
+	$(am__append_43) $(am__append_44) $(am__append_45)
+@ENABLE_LIBARIA2_TRUE@pkgconfigdir = $(libdir)/pkgconfig
+@ENABLE_LIBARIA2_TRUE@pkgconfig_DATA = libaria2.pc
+@ENABLE_LIBARIA2_TRUE@DISTCLEANFILES = $(pkgconfig_DATA)
+@ENABLE_LIBARIA2_TRUE@lib_LTLIBRARIES = libaria2.la
+@ENABLE_LIBARIA2_FALSE@libaria2_la_SOURCES = $(SRCS)
+@ENABLE_LIBARIA2_TRUE@libaria2_la_SOURCES = $(SRCS) \
+@ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
+@ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h \
+@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h
+
+@ENABLE_LIBARIA2_FALSE@noinst_LTLIBRARIES = libaria2.la
+libaria2_la_LIBADD = @WSLAY_LIBS@
+LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
 #aria2c_LDFLAGS = -pg
 AM_CPPFLAGS = -Wall\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
+	-I$(srcdir)/includes -I$(builddir)/includes\
 	-DLOCALEDIR=\"@localedir@\" -DCA_BUNDLE=\"$(ca_bundle)\" @DEFS@ #-pg
 
-all: all-am
+all: all-recursive
 
 .SUFFIXES:
-.SUFFIXES: .c .cc .lo .o .obj
+.SUFFIXES: .S .c .cc .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -1462,13 +1564,51 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+libaria2.pc: $(top_builddir)/config.status $(srcdir)/libaria2.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
+	@$(NORMAL_INSTALL)
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	list2=; for p in $$list; do \
+	  if test -f $$p; then \
+	    list2="$$list2 $$p"; \
+	  else :; fi; \
+	done; \
+	test -z "$$list2" || { \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
+	}
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libaria2c.a: $(libaria2c_a_OBJECTS) $(libaria2c_a_DEPENDENCIES) $(EXTRA_libaria2c_a_DEPENDENCIES) 
-	-rm -f libaria2c.a
-	$(libaria2c_a_AR) libaria2c.a $(libaria2c_a_OBJECTS) $(libaria2c_a_LIBADD)
-	$(RANLIB) libaria2c.a
+uninstall-libLTLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
+	for p in $$list; do \
+	  $(am__strip_dir) \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
+	done
+
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+
+clean-noinstLTLIBRARIES:
+	-test -z "$(noinst_LTLIBRARIES)" || rm -f $(noinst_LTLIBRARIES)
+	@list='$(noinst_LTLIBRARIES)'; for p in $$list; do \
+	  dir="`echo $$p | sed -e 's|/[^/]*$$||'`"; \
+	  test "$$dir" != "$$p" || dir=.; \
+	  echo "rm -f \"$${dir}/so_locations\""; \
+	  rm -f "$${dir}/so_locations"; \
+	done
+libaria2.la: $(libaria2_la_OBJECTS) $(libaria2_la_DEPENDENCIES) $(EXTRA_libaria2_la_DEPENDENCIES) 
+	$(CXXLINK) $(am_libaria2_la_rpath) $(libaria2_la_OBJECTS) $(libaria2_la_LIBADD) $(LIBS)
 install-binPROGRAMS: $(bin_PROGRAMS)
 	@$(NORMAL_INSTALL)
 	@list='$(bin_PROGRAMS)'; test -n "$(bindir)" || list=; \
@@ -1526,398 +1666,462 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@$(DEPDIR)/alloca.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/A2STR.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractAuthResolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractBtMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractDiskWriter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractHttpServerResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractOptionHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractProxyRequestCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractProxyResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractSingleDiskAdaptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ActivePeerConnectionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveFileAllocationIterator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveURISelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceList.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceTier.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfigFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoSaveCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BencodeParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BitfieldMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAbortOutstandingRequestEvent.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAllowedFastMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAnnounce.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtBitfieldMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtBitfieldMessageValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtCancelMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtCheckIntegrityEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtChokeMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtDependency.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtExtendedMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtFileAllocationEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHandshakeMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHandshakeMessageValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveAllMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveNoneMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtInterestedMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtKeepAliveMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtLeecherStateChoke.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtNotInterestedMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPieceMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPieceMessageValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPortMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPostDownloadHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRegistry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRejectMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRequestMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRuntime.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSeederStateChoke.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSetup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtStopDownloadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSuggestPieceMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtUnchokeMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BufferedFile.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ByteArrayDiskWriter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CUIDCounter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityDispatcherCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Checksum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChecksumCheckIntegrityEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkChecksum.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkedDecodingStreamFilter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Command.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConsoleStatCalc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContentTypeRequestGroupCriteria.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContextAttribute.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cookie.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CookieStorage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CreateRequestCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAbstractMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAbstractTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAnnouncePeerMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAnnouncePeerReplyMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAutoSaveCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucket.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketRefreshCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketRefreshTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketTree.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTConnectionImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTEntryPointNameResolveCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTFindNodeMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTFindNodeReplyMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersReplyMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTInteractionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageDispatcherImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageFactoryImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageReceiver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageTracker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageTrackerEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNode.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupTaskCallback.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceStorage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerLookupTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerLookupTaskCallback.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingReplyMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTQueryMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRegistry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTReplaceNodeTask.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTResponseMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTable.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTableDeserializer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTableSerializer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTSetup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskExecutor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskFactoryImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskQueueImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTokenTracker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTokenUpdateCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTUnknownMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DNSCache.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultAuthResolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtAnnounce.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtInteractive.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageDispatcher.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageReceiver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtProgressInfoFile.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtRequestFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultDiskWriter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultDiskWriterFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultExtensionMessageFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultPeerStorage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultPieceStorage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultStreamPieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectDiskAdaptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiskAdaptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DlAbortEx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DlRetryEx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadContext.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadEngine.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadEngineFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadFailureException.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandlerConstants.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandlerFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadResult.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EpollEventPoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Exception.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExpatXmlParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExtensionMessageRegistry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FallocFileAllocationIterator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FatalException.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FeatureConfig.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FeedbackURISelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/File.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationDispatcherCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FillRequestGroupCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpConnection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpDownloadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpFinishDownloadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpInitiateConnectionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpNegotiationCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpTunnelRequestCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpTunnelResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipDecodingStreamFilter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipEncoder.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeomStreamPieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GroupId.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GrowSegment.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HandshakeExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HaveEraseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpConnection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpDownloadCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeader.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeaderProcessor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpInitiateConnectionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpListenCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpProxyRequestCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpProxyResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequestCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponse.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerBodyCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpSkipResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexBtMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexBtMessageValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiateConnectionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiateConnectionCommandFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiatorMSEHandshakeCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderStreamPieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderURISelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChecksumValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChunkChecksumValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JsonParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KqueueEventPoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptARC4Encryptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptDHKeyExchange.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptMessageDigestImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgmpDHKeyExchange.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgnutlsTLSContext.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleARC4Encryptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleMessageDigestImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslARC4Encryptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslDHKeyExchange.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslMessageDigestImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslTLSContext.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LogFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LongestSequencePieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdDispatchMessageCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessageDispatcher.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessageReceiver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdReceiveMessageCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MSEHandshake.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageDigest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetadataInfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Metalink2RequestGroup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkHttpEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkMetaurl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserController.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserState.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateMachine.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateV3Impl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateV4Impl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkPostDownloadHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkResource.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Metalinker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiDiskAdaptor.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiFileAllocationIterator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiUrlRequestInfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NameResolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetStat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Netrc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetrcAuthResolver.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Notifier.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NsCookieParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NullSinkStreamFilter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Option.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerException.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Peer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerAbstractCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerAddrEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerChokeCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerConnection.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerInitiateConnectionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerInteractionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerListenCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerReceiveHandshakeCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerSessionResource.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerStat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Piece.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieceHashCheckIntegrityEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieceStatMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PiecedSegment.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Platform.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PollEventPoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PortEventPoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PriorityPieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProtocolDetector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Range.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessageValidator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RarestPieceSelector.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RealtimeCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReceiverMSEHandshakeCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RecoverableException.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Request.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroup.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroupEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroupMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestSlot.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethod.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcRequest.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcResponse.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SeedCheckCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SegmentMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SelectEventPoll.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStatMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SessionSerializer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShareRatioSeedCriteria.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SharedHandle.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Signature.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SimpleBtMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SimpleRandomizer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SingleFileAllocationIterator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkStreamFilter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SleepCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketBuffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketCore.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketRecvBuffer.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpeedCalc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sqlite3CookieParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sqlite3CookieParserImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamCheckIntegrityEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamFileAllocationEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamFilter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeA2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeBasedCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeSeedCriteria.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimedHaltCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerA2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TorrentAttribute.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TrackerWatcherCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransferStat.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TruncFileAllocationIterator.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/URIResult.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataDataExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataPostDownloadHandler.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRejectExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestFactory.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestTracker.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTPexExtensionMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnionSeedCriteria.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnknownLengthPieceStorage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnknownOptionException.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UriListParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBase.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseStructParserStateImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseStructParserStateMachine.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WatchProcessCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketInteractionCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketResponseCommand.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSession.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSessionMan.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinConsoleFile.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCache.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheEntry.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Xml2XmlParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlAttr.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlParser.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcDiskWriter.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserController.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserStateImpl.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserStateMachine.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ZeroBtMessage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/a2gmp.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asctime_r.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base32.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bencode2.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitfield.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bittorrent_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock_gettime_mingw.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock_gettime_osx.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cookie_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/download_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmt.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gai_strerror.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getaddrinfo.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/help_tags.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/json.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgen.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localtime_r.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/A2STR.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractAuthResolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractBtMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractDiskWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractHttpServerResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractOptionHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractProxyRequestCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractProxyResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AbstractSingleDiskAdaptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ActivePeerConnectionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveFileAllocationIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveURISelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceList.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceTier.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ApiCallbackDownloadEventListener.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleMessageDigestImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleTLSContext.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AppleTLSSession.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AsyncNameResolverMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AuthConfigFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AutoSaveCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BackupIPv4ConnectCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BencodeParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BitfieldMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAbortOutstandingRequestEvent.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAllowedFastMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtAnnounce.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtBitfieldMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtBitfieldMessageValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtCancelMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtCheckIntegrityEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtChokeMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtDependency.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtExtendedMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtFileAllocationEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHandshakeMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHandshakeMessageValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveAllMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtHaveNoneMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtInterestedMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtKeepAliveMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtLeecherStateChoke.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtNotInterestedMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPieceMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPieceMessageValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPortMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtPostDownloadHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRegistry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRejectMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRequestMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtRuntime.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSeederStateChoke.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSetup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtStopDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtSuggestPieceMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BtUnchokeMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/BufferedFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ByteArrayDiskWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CUIDCounter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityDispatcherCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CheckIntegrityEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Checksum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChecksumCheckIntegrityEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkChecksum.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ChunkedDecodingStreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConnectCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ConsoleStatCalc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContentTypeRequestGroupCriteria.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Context.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ContextAttribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Cookie.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CookieStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/CreateRequestCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAbstractMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAbstractTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAnnouncePeerMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAnnouncePeerReplyMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTAutoSaveCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucket.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketRefreshCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketRefreshTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTBucketTree.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTConnectionImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTEntryPointNameResolveCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTFindNodeMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTFindNodeReplyMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTGetPeersReplyMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTInteractionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageDispatcherImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageFactoryImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageReceiver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageTracker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTMessageTrackerEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNode.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTNodeLookupTaskCallback.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerAnnounceStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerLookupTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPeerLookupTaskCallback.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingReplyMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTPingTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTQueryMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRegistry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTReplaceNodeTask.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTResponseMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTableDeserializer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTRoutingTableSerializer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTSetup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskExecutor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskFactoryImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTaskQueueImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTokenTracker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTTokenUpdateCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DHTUnknownMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DNSCache.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultAuthResolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtAnnounce.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtInteractive.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageDispatcher.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtMessageReceiver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtProgressInfoFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultBtRequestFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultDiskWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultDiskWriterFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultExtensionMessageFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultPeerStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultPieceStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DefaultStreamPieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DirectDiskAdaptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiskAdaptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DlAbortEx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DlRetryEx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadContext.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadEngine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadEngineFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadFailureException.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandlerConstants.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadHandlerFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DownloadResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EpollEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Exception.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExpatXmlParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExtensionMessageRegistry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FallocFileAllocationIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FatalException.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FeatureConfig.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FeedbackURISelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/File.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationDispatcherCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileAllocationEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FileEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FillRequestGroupCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpFinishDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpInitiateConnectionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpNegotiationCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpTunnelRequestCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FtpTunnelResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipDecodingStreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipEncoder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GZipFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GeomStreamPieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GroupId.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GrowSegment.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HandshakeExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HaveEraseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeader.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeaderProcessor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpInitiateConnectionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpListenCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpProxyRequestCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpProxyResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequestCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerBodyCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpSkipResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IOFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexBtMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexBtMessageValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiateConnectionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiateConnectionCommandFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiatorMSEHandshakeCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderStreamPieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderURISelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChecksumValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChunkChecksumValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JsonParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KeepRunningCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/KqueueEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptARC4Encryptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptDHKeyExchange.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgcryptMessageDigestImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgmpDHKeyExchange.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgnutlsTLSContext.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibgnutlsTLSSession.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleARC4Encryptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibnettleMessageDigestImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslARC4Encryptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslDHKeyExchange.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslMessageDigestImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslTLSContext.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibsslTLSSession.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LibuvEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LogFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Logger.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LongestSequencePieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdDispatchMessageCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessageDispatcher.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdMessageReceiver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LpdReceiveMessageCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MSEHandshake.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MessageDigest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetadataInfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Metalink2RequestGroup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkHttpEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkMetaurl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserController.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserState.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateMachine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateV3Impl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkParserStateV4Impl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkPostDownloadHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MetalinkResource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Metalinker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiDiskAdaptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiFileAllocationIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/MultiUrlRequestInfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NameResolveCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NameResolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetStat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Netrc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetrcAuthResolver.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Notifier.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NsCookieParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NullSinkStreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Option.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerException.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Peer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerAbstractCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerAddrEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerChokeCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerInitiateConnectionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerInteractionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerListenCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerReceiveHandshakeCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerSessionResource.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PeerStat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Piece.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieceHashCheckIntegrityEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PieceStatMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PiecedSegment.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Platform.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PollEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PortEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PriorityPieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProtocolDetector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Range.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessageValidator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RarestPieceSelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RealtimeCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ReceiverMSEHandshakeCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RecoverableException.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Request.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroup.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroupEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestGroupMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RequestSlot.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethod.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcRequest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcResponse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SaveSessionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SeedCheckCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SegmentMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SelectEventPoll.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStatMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SessionSerializer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShareRatioSeedCriteria.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SharedHandle.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Signature.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SimpleBtMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SimpleRandomizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SingleFileAllocationIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SinkStreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SleepCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketBuffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketCore.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SocketRecvBuffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SpeedCalc.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sqlite3CookieParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Sqlite3CookieParserImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamCheckIntegrityEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamFileAllocationEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/StreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeA2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeBasedCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimeSeedCriteria.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimedHaltCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TimerA2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TorrentAttribute.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TrackerWatcherCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TransferStat.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TruncFileAllocationIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UDPTrackerClient.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UDPTrackerRequest.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/URIResult.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataDataExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataPostDownloadHandler.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRejectExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestFactory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTMetadataRequestTracker.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UTPexExtensionMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnionSeedCriteria.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnknownLengthPieceStorage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UnknownOptionException.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UriListParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBase.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseStructParserStateImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseStructParserStateMachine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WatchProcessCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketInteractionCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketResponseCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSession.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSessionMan.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinConsoleFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCache.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheEntry.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Xml2XmlParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlAttr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlParser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcDiskWriter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserController.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserStateImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/XmlRpcRequestParserStateMachine.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ZeroBtMessage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/a2gmp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/aria2api.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/arm-ftruncate64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/asctime_r.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/base32.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bencode2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bitfield.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/bittorrent_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock_gettime_mingw.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock_gettime_osx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cookie_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/download_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmt.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gai_strerror.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getaddrinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/help_tags.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/json.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libgen.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localtime_r.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_digest_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metalink_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option_processing.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paramed_string.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prefs.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpc_helper.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strptime.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timegm.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri_split.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_usage.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallclock.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_digest_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metalink_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mips-ftruncate64.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option_processing.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paramed_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prefs.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpc_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strptime.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timegm.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri_split.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_usage.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallclock.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/x86-ftruncate64.Plo@am__quote@
+
+.S.o:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ $<
+
+.S.obj:
+@am__fastdepCCAS_TRUE@	$(CPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ `$(CYGPATH_W) '$<'`
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Po
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(CPPASCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
+
+.S.lo:
+@am__fastdepCCAS_TRUE@	$(LTCPPASCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/$*.Tpo $(DEPDIR)/$*.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LTCPPASCOMPILE) -c -o $@ $<
+
+arm-ftruncate64.lo: android/arm-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT arm-ftruncate64.lo -MD -MP -MF $(DEPDIR)/arm-ftruncate64.Tpo -c -o arm-ftruncate64.lo `test -f 'android/arm-ftruncate64.S' || echo '$(srcdir)/'`android/arm-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/arm-ftruncate64.Tpo $(DEPDIR)/arm-ftruncate64.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='android/arm-ftruncate64.S' object='arm-ftruncate64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o arm-ftruncate64.lo `test -f 'android/arm-ftruncate64.S' || echo '$(srcdir)/'`android/arm-ftruncate64.S
+
+mips-ftruncate64.lo: android/mips-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT mips-ftruncate64.lo -MD -MP -MF $(DEPDIR)/mips-ftruncate64.Tpo -c -o mips-ftruncate64.lo `test -f 'android/mips-ftruncate64.S' || echo '$(srcdir)/'`android/mips-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/mips-ftruncate64.Tpo $(DEPDIR)/mips-ftruncate64.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='android/mips-ftruncate64.S' object='mips-ftruncate64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o mips-ftruncate64.lo `test -f 'android/mips-ftruncate64.S' || echo '$(srcdir)/'`android/mips-ftruncate64.S
+
+x86-ftruncate64.lo: android/x86-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -MT x86-ftruncate64.lo -MD -MP -MF $(DEPDIR)/x86-ftruncate64.Tpo -c -o x86-ftruncate64.lo `test -f 'android/x86-ftruncate64.S' || echo '$(srcdir)/'`android/x86-ftruncate64.S
+@am__fastdepCCAS_TRUE@	$(am__mv) $(DEPDIR)/x86-ftruncate64.Tpo $(DEPDIR)/x86-ftruncate64.Plo
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	source='android/x86-ftruncate64.S' object='x86-ftruncate64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCCAS_FALSE@	DEPDIR=$(DEPDIR) $(CCASDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCCAS_FALSE@	$(LIBTOOL)  $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CCAS) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CCASFLAGS) $(CCASFLAGS) -c -o x86-ftruncate64.lo `test -f 'android/x86-ftruncate64.S' || echo '$(srcdir)/'`android/x86-ftruncate64.S
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -1966,6 +2170,97 @@ mostlyclean-libtool:
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-pkgconfigDATA: $(pkgconfig_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
+	done
+
+uninstall-pkgconfigDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
+
+# This directory's subdirectories are mostly independent; you can cd
+# into them and run `make' without going through this Makefile.
+# To change the values of `make' variables: instead of editing Makefiles,
+# (1) if the variable is set in `config.status', edit `config.status'
+#     (which will cause the Makefiles to be regenerated when you run `make');
+# (2) otherwise, pass the desired values on the `make' command line.
+$(RECURSIVE_TARGETS):
+	@fail= failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	target=`echo $@ | sed s/-recursive//`; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    dot_seen=yes; \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done; \
+	if test "$$dot_seen" = "no"; then \
+	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
+	fi; test -z "$$fail"
+
+$(RECURSIVE_CLEAN_TARGETS):
+	@fail= failcom='exit 1'; \
+	for f in x $$MAKEFLAGS; do \
+	  case $$f in \
+	    *=* | --[!k]*);; \
+	    *k*) failcom='fail=yes';; \
+	  esac; \
+	done; \
+	dot_seen=no; \
+	case "$@" in \
+	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
+	  *) list='$(SUBDIRS)' ;; \
+	esac; \
+	rev=''; for subdir in $$list; do \
+	  if test "$$subdir" = "."; then :; else \
+	    rev="$$subdir $$rev"; \
+	  fi; \
+	done; \
+	rev="$$rev ."; \
+	target=`echo $@ | sed s/-recursive//`; \
+	for subdir in $$rev; do \
+	  echo "Making $$target in $$subdir"; \
+	  if test "$$subdir" = "."; then \
+	    local_target="$$target-am"; \
+	  else \
+	    local_target="$$target"; \
+	  fi; \
+	  ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
+	  || eval $$failcom; \
+	done && test -z "$$fail"
+tags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
+	done
+ctags-recursive:
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  test "$$subdir" = . || ($(am__cd) $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -1977,10 +2272,23 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	set x; \
 	here=`pwd`; \
+	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
+	  include_option=--etags-include; \
+	  empty_fix=.; \
+	else \
+	  include_option=--include; \
+	  empty_fix=; \
+	fi; \
+	list='$(SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    test ! -f $$subdir/TAGS || \
+	      set "$$@" "$$include_option=$$here/$$subdir/TAGS"; \
+	  fi; \
+	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -1999,7 +2307,7 @@ TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	  fi; \
 	fi
 ctags: CTAGS
-CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
@@ -2049,22 +2357,50 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
+	@list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
+	  if test "$$subdir" = .; then :; else \
+	    $(am__make_dryrun) \
+	      || test -d "$(distdir)/$$subdir" \
+	      || $(MKDIR_P) "$(distdir)/$$subdir" \
+	      || exit 1; \
+	    dir1=$$subdir; dir2="$(distdir)/$$subdir"; \
+	    $(am__relativize); \
+	    new_distdir=$$reldir; \
+	    dir1=$$subdir; dir2="$(top_distdir)"; \
+	    $(am__relativize); \
+	    new_top_distdir=$$reldir; \
+	    echo " (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) top_distdir="$$new_top_distdir" distdir="$$new_distdir" \\"; \
+	    echo "     am__remove_distdir=: am__skip_length_check=: am__skip_mode_fix=: distdir)"; \
+	    ($(am__cd) $$subdir && \
+	      $(MAKE) $(AM_MAKEFLAGS) \
+	        top_distdir="$$new_top_distdir" \
+	        distdir="$$new_distdir" \
+		am__remove_distdir=: \
+		am__skip_length_check=: \
+		am__skip_mode_fix=: \
+	        distdir) \
+	      || exit 1; \
+	  fi; \
+	done
 check-am: all-am
-check: check-am
-all-am: Makefile $(LIBRARIES) $(PROGRAMS)
-installdirs:
-	for dir in "$(DESTDIR)$(bindir)"; do \
+check: check-recursive
+all-am: Makefile $(LTLIBRARIES) $(PROGRAMS) $(DATA)
+install-binPROGRAMS: install-libLTLIBRARIES
+
+installdirs: installdirs-recursive
+installdirs-am:
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" "$(DESTDIR)$(pkgconfigdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: install-am
-install-exec: install-exec-am
-install-data: install-data-am
-uninstall: uninstall-am
+install: install-recursive
+install-exec: install-exec-recursive
+install-data: install-data-recursive
+uninstall: uninstall-recursive
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-am
+installcheck: installcheck-recursive
 install-strip:
 	if test -z '$(STRIP)'; then \
 	  $(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
@@ -2082,96 +2418,103 @@ clean-generic:
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
 	-test . = "$(srcdir)" || test -z "$(CONFIG_CLEAN_VPATH_FILES)" || rm -f $(CONFIG_CLEAN_VPATH_FILES)
+	-test -z "$(DISTCLEANFILES)" || rm -f $(DISTCLEANFILES)
 
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-am
+clean: clean-recursive
 
-clean-am: clean-binPROGRAMS clean-generic clean-libtool \
-	clean-noinstLIBRARIES mostlyclean-am
+clean-am: clean-binPROGRAMS clean-generic clean-libLTLIBRARIES \
+	clean-libtool clean-noinstLTLIBRARIES mostlyclean-am
 
-distclean: distclean-am
+distclean: distclean-recursive
 	-rm -rf $(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-am
+dvi: dvi-recursive
 
 dvi-am:
 
-html: html-am
+html: html-recursive
 
 html-am:
 
-info: info-am
+info: info-recursive
 
 info-am:
 
-install-data-am:
+install-data-am: install-pkgconfigDATA
 
-install-dvi: install-dvi-am
+install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-binPROGRAMS
+install-exec-am: install-binPROGRAMS install-libLTLIBRARIES
 
-install-html: install-html-am
+install-html: install-html-recursive
 
 install-html-am:
 
-install-info: install-info-am
+install-info: install-info-recursive
 
 install-info-am:
 
 install-man:
 
-install-pdf: install-pdf-am
+install-pdf: install-pdf-recursive
 
 install-pdf-am:
 
-install-ps: install-ps-am
+install-ps: install-ps-recursive
 
 install-ps-am:
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-am
+maintainer-clean: maintainer-clean-recursive
 	-rm -rf $(DEPDIR) ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-am
+mostlyclean: mostlyclean-recursive
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic \
 	mostlyclean-libtool
 
-pdf: pdf-am
+pdf: pdf-recursive
 
 pdf-am:
 
-ps: ps-am
+ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-binPROGRAMS
+uninstall-am: uninstall-binPROGRAMS uninstall-libLTLIBRARIES \
+	uninstall-pkgconfigDATA
 
-.MAKE: install-am install-strip
+.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) ctags-recursive \
+	install-am install-strip tags-recursive
 
-.PHONY: CTAGS GTAGS all all-am check check-am clean clean-binPROGRAMS \
-	clean-generic clean-libtool clean-noinstLIBRARIES ctags \
-	distclean distclean-compile distclean-generic \
-	distclean-libtool distclean-tags distdir dvi dvi-am html \
-	html-am info info-am install install-am install-binPROGRAMS \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-info install-info-am install-man install-pdf \
-	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs maintainer-clean \
-	maintainer-clean-generic mostlyclean mostlyclean-compile \
-	mostlyclean-generic mostlyclean-libtool pdf pdf-am ps ps-am \
-	tags uninstall uninstall-am uninstall-binPROGRAMS
+.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
+	all all-am check check-am clean clean-binPROGRAMS \
+	clean-generic clean-libLTLIBRARIES clean-libtool \
+	clean-noinstLTLIBRARIES ctags ctags-recursive distclean \
+	distclean-compile distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-binPROGRAMS install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-pdf-am install-pkgconfigDATA install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	installdirs-am maintainer-clean maintainer-clean-generic \
+	mostlyclean mostlyclean-compile mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-recursive \
+	uninstall uninstall-am uninstall-binPROGRAMS \
+	uninstall-libLTLIBRARIES uninstall-pkgconfigDATA
 
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

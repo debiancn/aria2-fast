@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "December 27, 2012" "1.16.1" "aria2"
+.TH "ARIA2C" "1" "May 26, 2013" "1.17.1" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -59,6 +59,7 @@ Reads input from stdin when \fB\-\fP is specified.
 Additionally, options can be specified after each line of
 URI. This optional line must start with one or more white spaces and have
 one option per single line.
+The input file can use gzip compression.
 See \fI\%Input File\fP subsection for details.
 See also \fI\%--deferred-input\fP option.
 .UNINDENT
@@ -493,7 +494,9 @@ See also \fI\%--certificate\fP option.
 .INDENT 0.0
 .TP
 .B \-\-referer=<REFERER>
-Set Referer. This affects all URIs.
+Set Referer. This affects all URIs.  If \fB*\fP is given, each request
+URI is used as a referer.  This may be useful when used with
+\fI\%--parameterized-uri\fP option.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -825,10 +828,10 @@ unicast IPv6 address of the host.
 .INDENT 0.0
 .TP
 .B \-\-dht\-listen\-port=<PORT>...
-Set UDP listening port for both IPv4 and IPv6 DHT.
-Multiple ports can be specified by using \fB,\fP, for example: \fB6881,6885\fP.
-You can also use \fB\-\fP to specify a range: \fB6881\-6999\fP. \fB,\fP and \fB\-\fP can be used
-together.
+Set UDP listening port used by DHT(IPv4, IPv6) and UDP tracker.
+Multiple ports can be specified by using \fB,\fP, for example:
+\fB6881,6885\fP.  You can also use \fB\-\fP to specify a range:
+\fB6881\-6999\fP. \fB,\fP and \fB\-\fP can be used together.
 Default: \fB6881\-6999\fP
 .IP Note
 Make sure that the specified ports are open for incoming UDP traffic.
@@ -842,9 +845,9 @@ Set timeout in seconds. Default: \fB10\fP
 .INDENT 0.0
 .TP
 .B \-\-enable\-dht[=true|false]
-Enable IPv4 DHT functionality. If a private flag is set in a
-torrent, aria2 doesn\(aqt use DHT for that download even if \fBtrue\fP is
-given.  Default: \fBtrue\fP
+Enable IPv4 DHT functionality. It also enables UDP tracker
+support. If a private flag is set in a torrent, aria2 doesn\(aqt use
+DHT for that download even if \fBtrue\fP is given.  Default: \fBtrue\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1038,6 +1041,14 @@ Default: \fBfalse\fP
 Use the certificate in FILE for RPC server. The certificate must be
 in PEM format. Use \fI\%--rpc-private-key\fP option to specify the
 private key. Use \fI\%--rpc-secure\fP option to enable encryption.
+.sp
+\fIAppleTLS\fP users should use the Keychain Access utility to first generate a
+self\-signed SSL\-Server certificate, e.g. using the wizard, and get the
+SHA\-1 fingerprint from the Information dialog corresponding to that new
+certificate.
+To start aria2c with \fI\%--rpc-secure\fP use
+\fI\-\-rpc\-certificate=<SHA\-1>\fP and just omit the \fI\%--rpc-private-key\fP
+option.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1177,6 +1188,12 @@ Default: \fB$HOME/.aria2/aria2.conf\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-console\-log\-level=<LEVEL>
+Set log level to output to console.  LEVEL is either \fBdebug\fP,
+\fBinfo\fP, \fBnotice\fP, \fBwarn\fP or \fBerror\fP.  Default: \fBnotice\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-D, \-\-daemon[=true|false]
 Run as daemon. The current working directory will be changed to \fB/\fP
 and standard input, standard output and standard error will be
@@ -1223,13 +1240,6 @@ requested file is printed and remaining ones are omitted.  If OPT is
 progress and path/URI. The percentage of progress and path/URI are
 printed for each requested file in each row.
 Default: \fBdefault\fP
-.UNINDENT
-.INDENT 0.0
-.TP
-.B \-\-enable\-async\-dns6[=true|false]
-Enable IPv6 name resolution in asynchronous DNS resolver. This
-option will be ignored when \fI\%--async-dns=false.\fP
-Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1502,7 +1512,9 @@ disables resume.
 .B \-\-save\-session=<FILE>
 Save error/unfinished downloads to FILE on exit.  You can pass this
 output file to aria2c with \fI\%--input-file\fP option on
-restart. Please note that downloads added by
+restart. If you like the output to be gzipped append a .gz extension to
+the file name.
+Please note that downloads added by
 \fI\%aria2.addTorrent()\fP and \fI\%aria2.addMetalink()\fP RPC method
 and whose metadata could not be saved as a file are not saved.
 Downloads removed using \fI\%aria2.remove()\fP and
@@ -1548,6 +1560,13 @@ Any meaningful GID is not saved.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-save\-session\-interval=<SEC>
+Save error/unfinished downloads to a file specified by
+\fI\%--save-session\fP option every SEC seconds. If \fB0\fP is
+given, file will be saved only when aria2 exits. Default: \fB0\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-stop=<SEC>
 Stop application after SEC seconds has passed.
 If \fB0\fP is given, this feature is disabled.
@@ -1573,7 +1592,8 @@ Default: \fBtrue\fP
 Print the version number, copyright and the configuration information and
 exit.
 .UNINDENT
-.SS Options That Take An Optional Argument
+.SS Notes for Options
+.SS Optional arguments
 .sp
 The options that have its argument surrounded by square brackets([])
 take an optional argument. Usually omiting the argument is evaluated to \fBtrue\fP.
@@ -1581,6 +1601,12 @@ If you use short form of these options(such as \fB\-V\fP) and give
 an argument, then the option name and its argument should be concatenated(e.g.
 \fB\-Vfalse\fP). If any spaces are inserted between the option name and the argument,
 the argument will be treated as URI and usually this is not what you expect.
+.SS Units (K and M)
+.sp
+Some options takes \fBK\fP and \fBM\fP to conveniently represent 1024 and
+1048576 respectively.  aria2 detects these characters in
+case\-insensitive way. In other words, \fBk\fP and \fBm\fP can be used as
+well as \fBK\fP and \fBM\fP respectively.
 .SS URI, MAGNET, TORRENT_FILE, METALINK_FILE
 .sp
 You can specify multiple URIs in command\-line.  Unless you specify
@@ -1972,11 +1998,9 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%dry-run\fP
 .IP \(bu 2
-\fI\%enable-async-dns6\fP
+\fI\%enable-http-keep-alive\fP
 .UNINDENT
 .INDENT 2.0
-.IP \(bu 2
-\fI\%enable-http-keep-alive\fP
 .IP \(bu 2
 \fI\%enable-http-pipelining\fP
 .IP \(bu 2
@@ -2007,6 +2031,8 @@ of URIs. These optional lines must start with white space(s).
 \fI\%ftp-type\fP
 .IP \(bu 2
 \fI\%ftp-user\fP
+.IP \(bu 2
+\fI\%gid\fP
 .IP \(bu 2
 \fI\%hash-check-only\fP
 .IP \(bu 2
@@ -2576,8 +2602,7 @@ download has no parent, this key will not be included in the
 response.
 .TP
 .B \fBdir\fP
-Directory to save files. This key is not available for stopped
-downloads.
+Directory to save files.
 .TP
 .B \fBfiles\fP
 Returns the list of files. The element of list is the same struct
@@ -4168,12 +4193,11 @@ forwarding, it\(aqs up to you to do it manually.
 .sp
 .nf
 .ft C
-$ aria2c \-\-enable\-dht6 \-\-dht\-listen\-port=6881 \-\-dht\-listen\-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR \-\-enable\-async\-dns6
+$ aria2c \-\-enable\-dht6 \-\-dht\-listen\-port=6881 \-\-dht\-listen\-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR
 .ft P
 .fi
 .IP Note
-If aria2c is not built with c\-ares, \fI\%--enable-async-dns6\fP is
-unnecessary. aria2 shares same port between IPv4 and IPv6 DHT.
+aria2 shares same port between IPv4 and IPv6 DHT.
 .RE
 .SS Add and remove tracker URI
 .sp
@@ -4319,7 +4343,7 @@ Metalink Homepage: \fI\%http://www.metalinker.org/\fP
 The Metalink Download Description Format: \fI\%RFC 5854\fP
 .SH COPYRIGHT
 .sp
-Copyright (C) 2006, 2012 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2013 Tatsuhiro Tsujikawa
 .sp
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

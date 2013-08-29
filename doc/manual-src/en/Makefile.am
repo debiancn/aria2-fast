@@ -9,11 +9,12 @@ BUILDDIR      = _build
 # Internal variables.
 PAPEROPT_a4     = -D latex_paper_size=a4
 PAPEROPT_letter = -D latex_paper_size=letter
-ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) .
+ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) -c . @srcdir@
 
 # Configurations for aria2.
 man_MANS = $(BUILDDIR)/man/aria2c.1
-EXTRA_DIST = $(man_MANS) aria2c.rst index.rst
+EXTRA_DIST = $(man_MANS) aria2c.rst libaria2.rst index.rst README.rst\
+	technical-notes.rst _static/default2.css mkapiref.py
 
 $(man_MANS): aria2c.rst
 	$(MAKE) man
@@ -41,10 +42,14 @@ help:
 	@echo "  linkcheck  to check all external links for integrity"
 	@echo "  doctest    to run all doctests embedded in the documentation (if enabled)"
 
+libaria2api: $(top_builddir)/src/includes/aria2/aria2.h
+	$(builddir)/mkapiref.py $^ > $@
+
 docclean:
+	-rm libaria2api
 	-rm -rf $(BUILDDIR)/*
 
-html:
+html: libaria2api
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."

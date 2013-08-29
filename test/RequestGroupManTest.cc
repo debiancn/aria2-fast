@@ -19,6 +19,7 @@
 #include "util.h"
 #include "DownloadEngine.h"
 #include "SelectEventPoll.h"
+#include "UriListParser.h"
 
 namespace aria2 {
 
@@ -31,6 +32,9 @@ class RequestGroupManTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testSaveServerStat);
   CPPUNIT_TEST(testChangeReservedGroupPosition);
   CPPUNIT_TEST(testFillRequestGroupFromReserver);
+  CPPUNIT_TEST(testFillRequestGroupFromReserver_uriParser);
+  CPPUNIT_TEST(testInsertReservedGroup);
+  CPPUNIT_TEST(testAddDownloadResult);
   CPPUNIT_TEST_SUITE_END();
 private:
   SharedHandle<DownloadEngine> e_;
@@ -59,6 +63,9 @@ public:
   void testSaveServerStat();
   void testChangeReservedGroupPosition();
   void testFillRequestGroupFromReserver();
+  void testFillRequestGroupFromReserver_uriParser();
+  void testInsertReservedGroup();
+  void testAddDownloadResult();
 };
 
 
@@ -151,57 +158,57 @@ void RequestGroupManTest::testChangeReservedGroupPosition()
 
   CPPUNIT_ASSERT_EQUAL
     ((size_t)0, rm.changeReservedGroupPosition(gs[0]->getGID(),
-                                               0, A2_POS_SET));
+                                               0, OFFSET_MODE_SET));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)1, rm.changeReservedGroupPosition(gs[0]->getGID(),
-                                               1, A2_POS_SET));
+                                               1, OFFSET_MODE_SET));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)3, rm.changeReservedGroupPosition(gs[0]->getGID(),
-                                               10,A2_POS_SET));
+                                               10,OFFSET_MODE_SET));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)0, rm.changeReservedGroupPosition(gs[0]->getGID(),
-                                               -10, A2_POS_SET));
+                                               -10, OFFSET_MODE_SET));
 
   CPPUNIT_ASSERT_EQUAL
     ((size_t)1, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               0, A2_POS_CUR));
+                                               0, OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)2, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               1, A2_POS_CUR));
+                                               1, OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)1, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               -1,A2_POS_CUR));
+                                               -1,OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)0, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               -10, A2_POS_CUR));
+                                               -10, OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)1, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               1, A2_POS_CUR));
+                                               1, OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)3, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               10, A2_POS_CUR));
+                                               10, OFFSET_MODE_CUR));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)1, rm.changeReservedGroupPosition(gs[1]->getGID(),
-                                               -2,A2_POS_CUR));
+                                               -2,OFFSET_MODE_CUR));
 
   CPPUNIT_ASSERT_EQUAL
     ((size_t)3, rm.changeReservedGroupPosition(gs[3]->getGID(),
-                                               0, A2_POS_END));
+                                               0, OFFSET_MODE_END));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)2, rm.changeReservedGroupPosition(gs[3]->getGID(),
-                                               -1,A2_POS_END));
+                                               -1,OFFSET_MODE_END));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)0, rm.changeReservedGroupPosition(gs[3]->getGID(),
-                                               -10, A2_POS_END));
+                                               -10, OFFSET_MODE_END));
   CPPUNIT_ASSERT_EQUAL
     ((size_t)3, rm.changeReservedGroupPosition(gs[3]->getGID(),
-                                               10, A2_POS_END));
+                                               10, OFFSET_MODE_END));
 
   CPPUNIT_ASSERT_EQUAL((size_t)4, rm.getReservedGroups().size());
 
   try {
     rm.changeReservedGroupPosition(GroupId::create()->getNumericId(),
-                                   0, A2_POS_CUR);
+                                   0, OFFSET_MODE_CUR);
     CPPUNIT_FAIL("exception must be thrown.");
   } catch(RecoverableException& e) {
     // success
@@ -227,6 +234,74 @@ void RequestGroupManTest::testFillRequestGroupFromReserver()
   rgman_->fillRequestGroupFromReserver(e_.get());
 
   CPPUNIT_ASSERT_EQUAL((size_t)2, rgman_->getReservedGroups().size());
+}
+
+void RequestGroupManTest::testFillRequestGroupFromReserver_uriParser()
+{
+  SharedHandle<RequestGroup> rgs[] = {
+    createRequestGroup(0, 0, "mem1", "http://mem1", util::copy(option_)),
+    createRequestGroup(0, 0, "mem2", "http://mem2", util::copy(option_)),
+  };
+  rgs[0]->setPauseRequested(true);
+  for(SharedHandle<RequestGroup>* i = vbegin(rgs); i != vend(rgs); ++i) {
+    rgman_->addReservedGroup(*i);
+  }
+
+  SharedHandle<UriListParser> flp
+    (new UriListParser(A2_TEST_DIR"/filelist2.txt"));
+  rgman_->setUriListParser(flp);
+
+  rgman_->fillRequestGroupFromReserver(e_.get());
+
+  RequestGroupList::const_iterator itr;
+  CPPUNIT_ASSERT_EQUAL((size_t)1, rgman_->getReservedGroups().size());
+  itr = rgman_->getReservedGroups().begin();
+  CPPUNIT_ASSERT_EQUAL(rgs[0]->getGID(), (*itr)->getGID());
+  CPPUNIT_ASSERT_EQUAL((size_t)3, rgman_->getRequestGroups().size());
+}
+
+void RequestGroupManTest::testInsertReservedGroup()
+{
+  SharedHandle<RequestGroup> rgs1[] = {
+    SharedHandle<RequestGroup>(new RequestGroup(GroupId::create(),
+                                                util::copy(option_))),
+    SharedHandle<RequestGroup>(new RequestGroup(GroupId::create(),
+                                                util::copy(option_)))
+  };
+  SharedHandle<RequestGroup> rgs2[] = {
+    SharedHandle<RequestGroup>(new RequestGroup(GroupId::create(),
+                                                util::copy(option_))),
+    SharedHandle<RequestGroup>(new RequestGroup(GroupId::create(),
+                                                util::copy(option_)))
+  };
+  std::vector<SharedHandle<RequestGroup> > groups(vbegin(rgs1), vend(rgs1));
+  rgman_->insertReservedGroup(0, groups);
+  CPPUNIT_ASSERT_EQUAL((size_t)2, rgman_->getReservedGroups().size());
+  RequestGroupList::const_iterator itr;
+  itr = rgman_->getReservedGroups().begin();
+  CPPUNIT_ASSERT_EQUAL(rgs1[0]->getGID(), (*itr++)->getGID());
+  CPPUNIT_ASSERT_EQUAL(rgs1[1]->getGID(), (*itr++)->getGID());
+
+  groups.assign(vbegin(rgs2), vend(rgs2));
+  rgman_->insertReservedGroup(1, groups);
+  CPPUNIT_ASSERT_EQUAL((size_t)4, rgman_->getReservedGroups().size());
+  itr = rgman_->getReservedGroups().begin();
+  ++itr;
+  CPPUNIT_ASSERT_EQUAL(rgs2[0]->getGID(), (*itr++)->getGID());
+  CPPUNIT_ASSERT_EQUAL(rgs2[1]->getGID(), (*itr++)->getGID());
+}
+
+void RequestGroupManTest::testAddDownloadResult()
+{
+  std::string uri = "http://example.org";
+  rgman_->setMaxDownloadResult(3);
+  rgman_->addDownloadResult(createDownloadResult(error_code::TIME_OUT, uri));
+  rgman_->addDownloadResult(createDownloadResult(error_code::FINISHED, uri));
+  rgman_->addDownloadResult(createDownloadResult(error_code::FINISHED, uri));
+  rgman_->addDownloadResult(createDownloadResult(error_code::FINISHED, uri));
+  rgman_->addDownloadResult(createDownloadResult(error_code::FINISHED, uri));
+  CPPUNIT_ASSERT_EQUAL(error_code::TIME_OUT,
+                       rgman_->getDownloadStat().getLastErrorResult());
 }
 
 } // namespace aria2

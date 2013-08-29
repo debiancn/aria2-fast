@@ -1,8 +1,10 @@
+SUBDIRS = includes
 bin_PROGRAMS = aria2c
-aria2c_SOURCES = main.cc\
-	option_processing.cc\
-	version_usage.cc
-SRCS =  SocketCore.cc SocketCore.h\
+aria2c_SOURCES = main.cc
+SRCS =  option_processing.cc\
+	version_usage.cc\
+	Context.cc Context.h\
+	SocketCore.cc SocketCore.h\
 	BinaryStream.h\
 	Command.cc Command.h\
 	AbstractCommand.cc AbstractCommand.h\
@@ -129,8 +131,6 @@ SRCS =  SocketCore.cc SocketCore.h\
 	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h\
 	DirectDiskAdaptor.cc DirectDiskAdaptor.h\
 	MultiDiskAdaptor.cc MultiDiskAdaptor.h\
-	PeerSessionResource.cc PeerSessionResource.h\
-	BtRegistry.cc BtRegistry.h\
 	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h\
 	ByteArrayDiskWriter.cc ByteArrayDiskWriter.h\
 	ByteArrayDiskWriterFactory.h\
@@ -229,6 +229,7 @@ SRCS =  SocketCore.cc SocketCore.h\
 	OutputFile.h\
 	NullOutputFile.h\
 	console.cc console.h\
+	IOFile.cc IOFile.h\
 	BufferedFile.cc BufferedFile.h\
 	SegList.h\
 	NullHandle.h\
@@ -244,7 +245,29 @@ SRCS =  SocketCore.cc SocketCore.h\
 	WrDiskCache.cc WrDiskCache.h\
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h\
 	GroupId.cc GroupId.h\
-	IndexedList.h
+	IndexedList.h\
+	SaveSessionCommand.h SaveSessionCommand.cc\
+	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc\
+	ConnectCommand.cc ConnectCommand.h\
+	ControlChain.h\
+	HttpRequestConnectChain.h\
+	HttpProxyRequestConnectChain.h\
+	FtpNegotiationConnectChain.h\
+	FtpTunnelRequestConnectChain.h
+
+# Android NDK R8e does not provide ftruncate64. Use assembly code from
+# android source code and link it.
+if ANDROID_ARM
+SRCS += android/arm-ftruncate64.S
+endif # ANDROID_ARM
+
+if ANDROID_MIPS
+SRCS += android/mips-ftruncate64.S
+endif # ANDROID_MIPS
+
+if ANDROID_X86
+SRCS += android/x86-ftruncate64.S android/x86-asm.h
+endif # ANDROID_X86
 
 if MINGW_BUILD
 SRCS += WinConsoleFile.cc WinConsoleFile.h
@@ -292,39 +315,59 @@ SRCS += EpollEventPoll.cc EpollEventPoll.h
 endif # HAVE_EPOLL
 
 if ENABLE_SSL
-SRCS += TLSContext.h
+SRCS += TLSContext.h TLSSession.h
 endif # ENABLE_SSL
 
+if USE_APPLE_MD
+SRCS += AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
+endif # USE_APPLE_MD
+
+if HAVE_APPLETLS
+SRCS += AppleTLSContext.cc AppleTLSContext.h \
+        AppleTLSSession.cc AppleTLSSession.h
+endif # HAVE_APPLETLS
+
 if HAVE_LIBGNUTLS
-SRCS += LibgnutlsTLSContext.cc LibgnutlsTLSContext.h
+SRCS += LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 endif # HAVE_LIBGNUTLS
 
 if HAVE_LIBGCRYPT
-SRCS += LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h\
-	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h\
-	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+SRCS += LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
+if USE_LIBGCRYPT_MD
+SRCS += LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
+endif # USE_LIBGCRYPT_MD
 endif # HAVE_LIBGCRYPT
 
 if HAVE_LIBNETTLE
-SRCS += LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h\
-	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+SRCS += LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+if USE_LIBNETTLE_MD
+SRCS += LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
+endif # USE_LIBNETTLE_MD
 endif # HAVE_LIBNETTLE
 
 if HAVE_LIBGMP
-SRCS += a2gmp.cc a2gmp.h\
-	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
+SRCS += a2gmp.cc a2gmp.h \
+        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 endif # HAVE_LIBGMP
 
 if HAVE_OPENSSL
-SRCS += LibsslTLSContext.cc LibsslTLSContext.h\
-	LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h\
-	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h\
-	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+SRCS += LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
+if !HAVE_APPLETLS
+SRCS += LibsslTLSContext.cc LibsslTLSContext.h \
+        LibsslTLSSession.cc LibsslTLSSession.h
+endif # !HAVE_APPLETLS
+if USE_OPENSSL_MD
+SRCS += LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
+endif
 endif # HAVE_OPENSSL
 
 if HAVE_ZLIB
 SRCS += GZipEncoder.cc GZipEncoder.h\
-	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h
+	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
+	GZipFile.cc GZipFile.h
 endif # HAVE_ZLIB
 
 if HAVE_SQLITE3
@@ -333,7 +376,8 @@ SRCS += Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 endif # HAVE_SQLITE3
 
 if ENABLE_ASYNC_DNS
-SRCS += AsyncNameResolver.cc AsyncNameResolver.h
+SRCS += AsyncNameResolver.cc AsyncNameResolver.h\
+	AsyncNameResolverMan.cc AsyncNameResolverMan.h
 endif # ENABLE_ASYNC_DNS
 
 if ENABLE_MESSAGE_DIGEST
@@ -355,8 +399,10 @@ SRCS += PeerAbstractCommand.cc PeerAbstractCommand.h\
 	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
 	PeerInteractionCommand.cc PeerInteractionCommand.h\
 	Peer.cc Peer.h\
+	PeerSessionResource.cc PeerSessionResource.h\
 	PeerConnection.cc PeerConnection.h\
 	PeerListenCommand.cc PeerListenCommand.h\
+	BtRegistry.cc BtRegistry.h\
 	RequestSlot.cc RequestSlot.h\
 	TrackerWatcherCommand.cc TrackerWatcherCommand.h\
 	PeerChokeCommand.cc PeerChokeCommand.h\
@@ -521,7 +567,10 @@ SRCS += PeerAbstractCommand.cc PeerAbstractCommand.h\
 	ValueBaseBencodeParser.h\
 	BencodeDiskWriter.h\
 	BencodeDiskWriterFactory.h\
-	MemoryBencodePreDownloadHandler.h
+	MemoryBencodePreDownloadHandler.h\
+	UDPTrackerClient.cc UDPTrackerClient.h\
+	UDPTrackerRequest.cc UDPTrackerRequest.h\
+	NameResolveCommand.cc NameResolveCommand.h
 endif # ENABLE_BITTORRENT
 
 if ENABLE_METALINK
@@ -597,11 +646,32 @@ if HAVE_KQUEUE
 SRCS += KqueueEventPoll.cc KqueueEventPoll.h
 endif # HAVE_KQUEUE
 
+if HAVE_LIBUV
+SRCS += LibuvEventPoll.cc LibuvEventPoll.h
+endif # HAVE_LIBUV
+
 AR = @AR@
-noinst_LIBRARIES = libaria2c.a
-libaria2c_a_SOURCES = $(SRCS)
-aria2c_LDADD = libaria2c.a @LIBINTL@ @ALLOCA@ #-lprofiler
+
+if ENABLE_LIBARIA2
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libaria2.pc
+DISTCLEANFILES = $(pkgconfig_DATA)
+
+lib_LTLIBRARIES = libaria2.la
+libaria2_la_SOURCES = $(SRCS) \
+	aria2api.cc aria2api.h \
+	KeepRunningCommand.cc KeepRunningCommand.h \
+	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h
+else # !ENABLE_LIBARIA2
+noinst_LTLIBRARIES = libaria2.la
+libaria2_la_SOURCES = $(SRCS)
+endif # !ENABLE_LIBARIA2
+
+libaria2_la_LIBADD = @WSLAY_LIBS@
+
+LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
 #aria2c_LDFLAGS = -pg
 AM_CPPFLAGS =  -Wall\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
+	-I$(srcdir)/includes -I$(builddir)/includes\
 	-DLOCALEDIR=\"@localedir@\" -DCA_BUNDLE=\"$(ca_bundle)\" @DEFS@ #-pg

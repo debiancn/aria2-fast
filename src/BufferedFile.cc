@@ -43,10 +43,6 @@
 
 namespace aria2 {
 
-const char BufferedFile::READ[] = "rb";
-const char BufferedFile::WRITE[] = "wb";
-const char BufferedFile::APPEND[] = "ab";
-
 BufferedFile::BufferedFile(const char* filename, const char* mode)
   :
 #ifdef __MINGW32__
@@ -54,12 +50,11 @@ BufferedFile::BufferedFile(const char* filename, const char* mode)
 #else // !__MINGW32__
   fp_(a2fopen(filename, mode)),
 #endif // !__MINGW32__
-  open_(fp_),
   supportsColor_(fp_ ? isatty(fileno(fp_)) : false)
 {}
 
 BufferedFile::BufferedFile(FILE* fp)
-  : fp_(fp), open_(true), supportsColor_(fp_ ? isatty(fileno(fp_)) : false)
+  : fp_(fp), supportsColor_(fp_ ? isatty(fileno(fp_)) : false)
 {}
 
 BufferedFile::~BufferedFile()
@@ -67,112 +62,59 @@ BufferedFile::~BufferedFile()
   close();
 }
 
-BufferedFile::operator unspecified_bool_type() const
-{
-  return (!open_ || ferror(fp_)) ? 0 : &BufferedFile::good_state;
-}
-
-size_t BufferedFile::read(void* ptr, size_t count)
+size_t BufferedFile::onRead(void* ptr, size_t count)
 {
   return fread(ptr, 1, count, fp_);
 }
 
-size_t BufferedFile::write(const void* ptr, size_t count)
+size_t BufferedFile::onWrite(const void* ptr, size_t count)
 {
   return fwrite(ptr, 1, count, fp_);
 }
 
-size_t BufferedFile::write(const char* str)
-{
-  return write(str, strlen(str));
-}
-
-char* BufferedFile::gets(char* s, int size)
+char* BufferedFile::onGets(char* s, int size)
 {
   return fgets(s, size, fp_);
 }
 
-char* BufferedFile::getsn(char* s, int size)
+int BufferedFile::onClose()
 {
-  char* ptr = fgets(s, size, fp_);
-  if(ptr) {
-    int len = strlen(ptr);
-    if(ptr[len-1] == '\n') {
-      ptr[len-1] = '\0';
-    }
+  int rv = 0;
+  if (fp_) {
+    rv = fclose(fp_);
+    fp_ = 0;
   }
-  return ptr;
+  return rv;
 }
 
-std::string BufferedFile::getLine()
+int BufferedFile::onVprintf(const char* format, va_list va)
 {
-  std::string res;
-  if(eof()) {
-    return res;
-  }
-  char buf[4096];
-  while(gets(buf, sizeof(buf))) {
-    size_t len = strlen(buf);
-    bool lineBreak = false;
-    if(buf[len-1] == '\n') {
-      --len;
-      lineBreak = true;
-    }
-    res.append(buf, len);
-    if(lineBreak) {
-      break;
-    }
-  }
-  return res;
+  return vfprintf(fp_, format, va);
 }
 
-int BufferedFile::close()
-{
-  if(open_) {
-    open_ = false;
-    return fclose(fp_);
-  } else {
-    return 0;
-  }
-}
-
-bool BufferedFile::eof()
-{
-  return open_ && feof(fp_);
-}
-
-size_t BufferedFile::transfer(std::ostream& out)
-{
-  size_t count = 0;
-  char buf[4096];
-  while(1) {
-    size_t r = this->read(buf, sizeof(buf));
-    out.write(buf, r);
-    count += r;
-    if(r < sizeof(buf)) {
-      break;
-    }
-  }
-  return count;
-}
-
-int BufferedFile::printf(const char* format, ...)
-{
-  va_list ap;
-  va_start(ap, format);
-  int r = vfprintf(fp_, format, ap);
-  va_end(ap);
-  return r;
-}
-
-int BufferedFile::flush()
+int BufferedFile::onFlush()
 {
   return fflush(fp_);
 }
 
-bool BufferedFile::supportsColor()
+bool BufferedFile::onSupportsColor()
 {
   return supportsColor_;
+}
+
+bool BufferedFile::isError() const
+{
+  return ferror(fp_);
+}
+
+bool BufferedFile::isEOF() const
+{
+  return feof(fp_);
+}
+
+bool BufferedFile::isOpen() const
+{
+  return fp_;
 }
 
 } // namespace aria2

@@ -235,7 +235,7 @@ void extractFileEntries
     int64_t length = 0;
     int64_t offset = 0;
     // multi-file mode
-    torrent->mode = MULTI;
+    torrent->mode = BT_FILE_MODE_MULTI;
     for(List::ValueType::const_iterator itr = filesList->begin(),
           eoi = filesList->end(); itr != eoi; ++itr) {
       const Dict* fileDict = downcast<Dict>(*itr);
@@ -251,7 +251,7 @@ void extractFileEntries
         throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, length));
       }
       length += fileLengthData->i();
-      if(fileLengthData->i() > std::numeric_limits<off_t>::max()) {
+      if(fileLengthData->i() > std::numeric_limits<a2_off_t>::max()) {
         throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, length));
       }
       std::string pathKey;
@@ -303,14 +303,14 @@ void extractFileEntries
     }
   } else {
     // single-file mode;
-    torrent->mode = SINGLE;
+    torrent->mode = BT_FILE_MODE_SINGLE;
     const Integer* lengthData = downcast<Integer>(infoDict->get(C_LENGTH));
     if(!lengthData) {
       throw DL_ABORT_EX2(fmt(MSG_MISSING_BT_INFO, C_LENGTH.c_str()),
                          error_code::BITTORRENT_PARSE_ERROR);
     }
     int64_t totalLength = lengthData->i();
-    if(totalLength > std::numeric_limits<off_t>::max()) {
+    if(totalLength > std::numeric_limits<a2_off_t>::max()) {
       throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, totalLength));
     }
     // For each uri in urlList, if it ends with '/', then
@@ -333,7 +333,7 @@ void extractFileEntries
     fileEntries.push_back(fileEntry);
   }
   ctx->setFileEntries(fileEntries.begin(), fileEntries.end());
-  if(torrent->mode == MULTI) {
+  if(torrent->mode == BT_FILE_MODE_MULTI) {
     ctx->setBasePath(util::applyDir(option->get(PREF_DIR),
                                     util::escapePath(utf8Name)));
   }
@@ -731,6 +731,13 @@ uint8_t getId(const unsigned char* msg)
   return msg[0];
 }
 
+uint64_t getLLIntParam(const unsigned char* msg, size_t pos)
+{
+  uint64_t nParam;
+  memcpy(&nParam, msg+pos, sizeof(nParam));
+  return ntoh64(nParam);
+}
+
 uint32_t getIntParam(const unsigned char* msg, size_t pos)
 {
   uint32_t nParam;
@@ -796,6 +803,12 @@ void checkBitfield
   if(bitfield[bitfieldLength-1]&~bitfield::lastByteMask(pieces)) {
     throw DL_ABORT_EX("Invalid bitfield");
   }
+}
+
+void setLLIntParam(unsigned char* dest, uint64_t param)
+{
+  uint64_t nParam = hton64(param);
+  memcpy(dest, &nParam, sizeof(nParam));
 }
 
 void setIntParam(unsigned char* dest, uint32_t param)
@@ -1061,6 +1074,18 @@ void adjustAnnounceUri
               std::back_inserter(addUris), ',', true);
   removeAnnounceUri(attrs, excludeUris);
   addAnnounceUri(attrs, addUris);
+}
+
+const char* getModeString(BtFileMode mode)
+{
+  switch(mode) {
+  case BT_FILE_MODE_SINGLE:
+    return "single";
+  case BT_FILE_MODE_MULTI:
+    return "multi";
+  default:
+    return "";
+  }
 }
 
 } // namespace bittorrent

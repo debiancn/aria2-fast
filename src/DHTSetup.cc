@@ -61,6 +61,8 @@
 #include "DHTRegistry.h"
 #include "DHTBucketRefreshTask.h"
 #include "DHTMessageCallback.h"
+#include "UDPTrackerClient.h"
+#include "BtRegistry.h"
 #include "prefs.h"
 #include "Option.h"
 #include "SocketCore.h"
@@ -110,17 +112,28 @@ void DHTSetup::setup
       localNode.reset(new DHTNode());
     }
 
+    uint16_t port;
     SharedHandle<DHTConnectionImpl> connection(new DHTConnectionImpl(family));
     {
-      SegList<int> sgl;
-      util::parseIntSegments(sgl, e->getOption()->get(PREF_DHT_LISTEN_PORT));
-      sgl.normalize();
-      uint16_t port;
+      port = e->getBtRegistry()->getUdpPort();
       const std::string& addr =
-        e->getOption()->get(family == AF_INET?PREF_DHT_LISTEN_ADDR:
+        e->getOption()->get(family == AF_INET ? PREF_DHT_LISTEN_ADDR:
                             PREF_DHT_LISTEN_ADDR6);
-      if(!connection->bind(port, addr, sgl)) {
-        throw DL_ABORT_EX("Error occurred while binding port for DHT");
+      // If UDP port is already used, use the same port
+      // number. Normally IPv4 port is available, then IPv6 port is
+      // (especially for port >= 1024). We don't loose much by doing
+      // this. We did the same thing in TCP socket. See BtSetup.cc.
+      bool rv;
+      if(port == 0) {
+        SegList<int> sgl;
+        util::parseIntSegments(sgl, e->getOption()->get(PREF_DHT_LISTEN_PORT));
+        sgl.normalize();
+        rv = connection->bind(port, addr, sgl);
+      } else {
+        rv = connection->bind(port, addr);
+      }
+      if(!rv) {
+        throw DL_ABORT_EX("Error occurred while binding UDP port for DHT");
       }
       localNode->setPort(port);
     }
@@ -176,6 +189,8 @@ void DHTSetup::setup
     factory->setTokenTracker(tokenTracker.get());
     factory->setLocalNode(localNode);
 
+    // For now, UDPTrackerClient was enabled along with DHT
+    SharedHandle<UDPTrackerClient> udpTrackerClient(new UDPTrackerClient());
     // assign them into DHTRegistry
     if(family == AF_INET) {
       DHTRegistry::getMutableData().localNode = localNode;
@@ -187,6 +202,7 @@ void DHTSetup::setup
       DHTRegistry::getMutableData().messageDispatcher = dispatcher;
       DHTRegistry::getMutableData().messageReceiver = receiver;
       DHTRegistry::getMutableData().messageFactory = factory;
+      e->getBtRegistry()->setUDPTrackerClient(udpTrackerClient);
     } else {
       DHTRegistry::getMutableData6().localNode = localNode;
       DHTRegistry::getMutableData6().routingTable = routingTable;
@@ -244,6 +260,8 @@ void DHTSetup::setup
       command->setMessageReceiver(receiver);
       command->setTaskQueue(taskQueue);
       command->setReadCheckSocket(connection->getSocket());
+      command->setConnection(connection);
+      command->setUDPTrackerClient(udpTrackerClient);
       tempCommands->push_back(command);
     }
     {
@@ -282,12 +300,18 @@ void DHTSetup::setup
     }
     commands.insert(commands.end(), tempCommands->begin(), tempCommands->end());
     tempCommands->clear();
-  } catch(RecoverableException& e) {
+    if(e->getBtRegistry()->getUdpPort() == 0) {
+      // We assign port last so that no exception gets in the way
+      e->getBtRegistry()->setUdpPort(port);
+    }
+  } catch(RecoverableException& ex) {
     A2_LOG_ERROR_EX(fmt("Exception caught while initializing DHT functionality."
                         " DHT is disabled."),
-                    e);
+                    ex);
     if(family == AF_INET) {
       DHTRegistry::clearData();
+      e->getBtRegistry()->setUDPTrackerClient
+        (SharedHandle<UDPTrackerClient>());
     } else {
       DHTRegistry::clearData6();
     }

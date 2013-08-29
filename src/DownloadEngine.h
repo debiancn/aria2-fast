@@ -68,6 +68,11 @@ class Command;
 #ifdef ENABLE_BITTORRENT
 class BtRegistry;
 #endif // ENABLE_BITTORRENT
+#ifdef ENABLE_WEBSOCKET
+namespace rpc {
+class WebSocketSessionMan;
+} // namespace rpc
+#endif // ENABLE_WEBSOCKET
 
 class DownloadEngine {
 private:
@@ -79,7 +84,7 @@ private:
 
   SharedHandle<StatCalc> statCalc_;
 
-  bool haltRequested_;
+  int haltRequested_;
 
   class SocketPoolEntry {
   private:
@@ -124,6 +129,7 @@ private:
 
   // Milliseconds
   int64_t refreshInterval_;
+  Timer lastRefresh_;
 
   std::deque<Command*> routineCommands_;
 
@@ -142,6 +148,10 @@ private:
   SharedHandle<DNSCache> dnsCache_;
 
   SharedHandle<AuthConfigFactory> authConfigFactory_;
+
+#ifdef ENABLE_WEBSOCKET
+  SharedHandle<rpc::WebSocketSessionMan> webSocketSessionMan_;
+#endif // ENABLE_WEBSOCKET
 
   /**
    * Delegates to StatCalc
@@ -167,9 +177,11 @@ public:
 
   ~DownloadEngine();
 
-  void run();
-
-  void cleanQueue();
+  // If oneshot is true, this function returns after one event polling
+  // and performing action for them. This function returns 1 when
+  // oneshot is true and there are still downloads to be
+  // processed. Otherwise, returns 0.
+  int run(bool oneshot=false);
 
   bool addSocketForReadCheck(const SharedHandle<SocketCore>& socket,
                              Command* command);
@@ -228,6 +240,11 @@ public:
   bool isHaltRequested() const
   {
     return haltRequested_;
+  }
+
+  bool isForceHaltRequested() const
+  {
+    return haltRequested_ >= 2;
   }
 
   void requestHalt();
@@ -339,6 +356,15 @@ public:
     return asyncDNSServers_;
   }
 #endif // HAVE_ARES_ADDR_NODE
+
+#ifdef ENABLE_WEBSOCKET
+  void setWebSocketSessionMan
+  (const SharedHandle<rpc::WebSocketSessionMan>& wsman);
+  const SharedHandle<rpc::WebSocketSessionMan>& getWebSocketSessionMan() const
+  {
+    return webSocketSessionMan_;
+  }
+#endif // ENABLE_WEBSOCKET
 };
 
 } // namespace aria2

@@ -44,6 +44,8 @@
 #include "SocketCore.h"
 #include "DownloadContext.h"
 #include "SocketRecvBuffer.h"
+#include "fmt.h"
+#include "LogFactory.h"
 
 namespace aria2 {
 
@@ -72,11 +74,6 @@ AbstractProxyRequestCommand::~AbstractProxyRequestCommand() {}
 bool AbstractProxyRequestCommand::executeInternal() {
   //socket->setBlockingMode();
   if(httpConnection_->sendBufferIsEmpty()) {
-    if(!checkIfConnectionEstablished
-       (getSocket(), getRequest()->getConnectedHostname(),
-        getRequest()->getConnectedAddr(), getRequest()->getConnectedPort())) {
-      return true;
-    }
     SharedHandle<HttpRequest> httpRequest(new HttpRequest());
     httpRequest->setUserAgent(getOption()->get(PREF_USER_AGENT));
     httpRequest->setRequest(getRequest());

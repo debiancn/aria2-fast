@@ -324,7 +324,7 @@ void AbstractDiskWriter::seek(int64_t offset)
   fileLength.QuadPart = offset;
   if(SetFilePointerEx(fd_, fileLength, 0, FILE_BEGIN) == 0)
 #else // !__MINGW32__
-  if(a2lseek(fd_, offset, SEEK_SET) == (off_t)-1)
+  if(a2lseek(fd_, offset, SEEK_SET) == (a2_off_t)-1)
 #endif // !__MINGW32__
     {
       int errNum = fileError();
@@ -453,7 +453,7 @@ void AbstractDiskWriter::truncate(int64_t length)
   seek(length);
   if(SetEndOfFile(fd_) == 0)
 #else // !__MINGW32__
-  if(ftruncate(fd_, length) == -1)
+  if(a2ftruncate(fd_, length) == -1)
 #endif // !__MINGW32__
     {
       int errNum = fileError();
@@ -463,10 +463,22 @@ void AbstractDiskWriter::truncate(int64_t length)
     }
 }
 
-void AbstractDiskWriter::allocate(int64_t offset, int64_t length)
+void AbstractDiskWriter::allocate(int64_t offset, int64_t length, bool sparse)
 {
   if(fd_ == A2_BAD_FD) {
     throw DL_ABORT_EX("File not yet opened.");
+  }
+  if(sparse) {
+#ifdef __MINGW32__
+    DWORD bytesReturned;
+    if(!DeviceIoControl(fd_, FSCTL_SET_SPARSE, 0, 0, 0, 0,
+                        &bytesReturned, 0)) {
+      A2_LOG_WARN(fmt("Making file sparse failed or pending: %s",
+                      fileStrerror(GetLastError()).c_str()));
+    }
+#endif // __MINGW32__
+    truncate(offset+length);
+    return;
   }
 #ifdef  HAVE_SOME_FALLOCATE
 # ifdef __MINGW32__

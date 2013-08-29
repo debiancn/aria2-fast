@@ -50,6 +50,7 @@
 #include "FillRequestGroupCommand.h"
 #include "FileAllocationDispatcherCommand.h"
 #include "AutoSaveCommand.h"
+#include "SaveSessionCommand.h"
 #include "HaveEraseCommand.h"
 #include "TimedHaltCommand.h"
 #include "WatchProcessCommand.h"
@@ -58,6 +59,9 @@
 #include "a2io.h"
 #include "DownloadContext.h"
 #include "array_fun.h"
+#ifdef HAVE_LIBUV
+# include "LibuvEventPoll.h"
+#endif // HAVE_LIBUV
 #ifdef HAVE_EPOLL
 # include "EpollEventPoll.h"
 #endif // HAVE_EPOLL
@@ -88,6 +92,17 @@ DownloadEngineFactory::newDownloadEngine
     op->getAsInt(PREF_MAX_CONCURRENT_DOWNLOADS);
   SharedHandle<EventPoll> eventPoll;
   const std::string& pollMethod = op->get(PREF_EVENT_POLL);
+#ifdef HAVE_LIBUV
+  if (pollMethod == V_LIBUV) {
+    SharedHandle<LibuvEventPoll> ep(new LibuvEventPoll());
+    if (!ep->good()) {
+      throw DL_ABORT_EX("Initializing LibuvEventPoll failed."
+                        " Try --event-poll=select");
+    }
+    eventPoll = ep;
+  }
+  else
+#endif // HAVE_LIBUV
 #ifdef HAVE_EPOLL
   if(pollMethod == V_EPOLL) {
     SharedHandle<EpollEventPoll> ep(new EpollEventPoll());
@@ -157,6 +172,11 @@ DownloadEngineFactory::newDownloadEngine
     e->addRoutineCommand
       (new AutoSaveCommand(e->newCUID(), e.get(),
                            op->getAsInt(PREF_AUTO_SAVE_INTERVAL)));
+  }
+  if(op->getAsInt(PREF_SAVE_SESSION_INTERVAL) > 0) {
+    e->addRoutineCommand
+      (new SaveSessionCommand(e->newCUID(), e.get(),
+                              op->getAsInt(PREF_SAVE_SESSION_INTERVAL)));
   }
   e->addRoutineCommand(new HaveEraseCommand(e->newCUID(), e.get(), 10));
   {

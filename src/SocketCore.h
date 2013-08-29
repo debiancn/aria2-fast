@@ -43,16 +43,6 @@
 #include <vector>
 
 #include "a2netcompat.h"
-
-#ifdef HAVE_OPENSSL
-// for SSL
-# include <openssl/ssl.h>
-# include <openssl/err.h>
-#endif // HAVE_OPENSSL
-#ifdef HAVE_LIBGNUTLS
-# include <gnutls/gnutls.h>
-#endif // HAVE_LIBGNUTLS
-
 #include "SharedHandle.h"
 #include "a2io.h"
 #include "a2netcompat.h"
@@ -62,6 +52,7 @@ namespace aria2 {
 
 #ifdef ENABLE_SSL
 class TLSContext;
+class TLSSession;
 #endif // ENABLE_SSL
 
 class SocketCore {
@@ -89,27 +80,9 @@ private:
   static SharedHandle<TLSContext> clTlsContext_;
   // TLS context for server side
   static SharedHandle<TLSContext> svTlsContext_;
-#endif // ENABLE_SSL
 
-#ifdef HAVE_OPENSSL
-  // for SSL
-  SSL* ssl;
+  SharedHandle<TLSSession> tlsSession_;
 
-  int sslHandleEAGAIN(int ret);
-#endif // HAVE_OPENSSL
-#ifdef HAVE_LIBGNUTLS
-  gnutls_session_t sslSession_;
-
-  void gnutlsRecordCheckDirection();
-#endif // HAVE_LIBGNUTLS
-
-  void init();
-
-  void bind(const struct sockaddr* addr, socklen_t addrlen);
-
-  void setSockOpt(int level, int optname, void* optval, socklen_t optlen);
-
-#ifdef ENABLE_SSL
   /**
    * Makes this socket secure. The connection must be established
    * before calling this method.
@@ -118,6 +91,12 @@ private:
    */
   bool tlsHandshake(TLSContext* tlsctx, const std::string& hostname);
 #endif // ENABLE_SSL
+
+  void init();
+
+  void bind(const struct sockaddr* addr, socklen_t addrlen);
+
+  void setSockOpt(int level, int optname, void* optval, socklen_t optlen);
 
   SocketCore(sock_t sockfd, int sockType);
 public:
@@ -207,8 +186,10 @@ public:
    * the connection is established.
    * @param host hostname or ip address to connect to
    * @param port service port number to connect to
+   * @param tcpNodelay true to disable Nagle algorithm
    */
-  void establishConnection(const std::string& host, uint16_t port);
+  void establishConnection(const std::string& host, uint16_t port,
+                           bool tcpNodelay = true);
 
   void setNonBlockingMode();
 
@@ -252,25 +233,16 @@ public:
    * @param data data to write
    * @param len length of data
    */
-  ssize_t writeData(const char* data, size_t len);
+  ssize_t writeData(const void* data, size_t len);
   ssize_t writeData(const std::string& msg)
   {
     return writeData(msg.c_str(), msg.size());
   }
-  ssize_t writeData(const unsigned char* data, size_t len)
-  {
-    return writeData(reinterpret_cast<const char*>(data), len);
-  }
 
-  ssize_t writeData(const char* data, size_t len,
+  ssize_t writeData(const void* data, size_t len,
                     const std::string& host, uint16_t port);
 
-  ssize_t writeData(const unsigned char* data, size_t len,
-                    const std::string& host,
-                    uint16_t port)
-  {
-    return writeData(reinterpret_cast<const char*>(data), len, host, port);
-  }
+  ssize_t writeVector(a2iovec *iov, size_t iovcnt);
 
   /**
    * Reads up to len bytes from this socket.
@@ -288,23 +260,11 @@ public:
    * @param len the maximum size data can store. This method assigns
    * the number of bytes read to len.
    */
-  void readData(char* data, size_t& len);
+  void readData(void* data, size_t& len);
 
-  void readData(unsigned char* data, size_t& len)
-  {
-    readData(reinterpret_cast<char*>(data), len);
-  }
-
-  ssize_t readDataFrom(char* data, size_t len,
+  ssize_t readDataFrom(void* data, size_t len,
                        std::pair<std::string /* numerichost */,
                        uint16_t /* port */>& sender);
-
-  ssize_t readDataFrom(unsigned char* data, size_t len,
-                       std::pair<std::string /* numerichost */,
-                       uint16_t /* port */>& sender)
-  {
-    return readDataFrom(reinterpret_cast<char*>(data), len, sender);
-  }
 
 #ifdef ENABLE_SSL
   // Performs TLS server side handshake. If handshake is completed,
@@ -420,6 +380,12 @@ bool verifyHostname(const std::string& hostname,
                     const std::vector<std::string>& dnsNames,
                     const std::vector<std::string>& ipAddrs,
                     const std::string& commonName);
+// Checks public IP address are configured for each family: IPv4 and
+// IPv6. The result can be obtained using getIpv4AddrConfigured() and
+// getIpv6AddrConfigured() respectively.
+void checkAddrconfig();
+bool getIPv4AddrConfigured();
+bool getIPv6AddrConfigured();
 
 } // namespace net
 

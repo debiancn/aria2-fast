@@ -71,7 +71,6 @@ BtPieceMessage::BtPieceMessage
     index_(index),
     begin_(begin),
     blockLength_(blockLength),
-    msgHdrLen_(0),
     data_(0)
 {
   setUploading(true);
@@ -158,7 +157,7 @@ void BtPieceMessage::doReceivedAction()
 
 size_t BtPieceMessage::MESSAGE_HEADER_LENGTH = 13;
 
-unsigned char* BtPieceMessage::createMessageHeader()
+void BtPieceMessage::createMessageHeader(unsigned char* msgHeader) const
 {
   /**
    * len --- 9+blockLength, 4bytes
@@ -167,12 +166,10 @@ unsigned char* BtPieceMessage::createMessageHeader()
    * begin --- begin, 4bytes
    * total: 13bytes
    */
-  unsigned char* msgHeader = new unsigned char[MESSAGE_HEADER_LENGTH];
   bittorrent::createPeerMessageString(msgHeader, MESSAGE_HEADER_LENGTH,
                                       9+blockLength_, ID);
   bittorrent::setIntParam(&msgHeader[5], index_);
   bittorrent::setIntParam(&msgHeader[9], begin_);
-  return msgHeader;
 }
 
 size_t BtPieceMessage::getMessageHeaderLength()
@@ -180,51 +177,57 @@ size_t BtPieceMessage::getMessageHeaderLength()
   return MESSAGE_HEADER_LENGTH;
 }
 
+namespace {
+struct PieceSendUpdate : public ProgressUpdate {
+  PieceSendUpdate(const SharedHandle<Peer>& peer, size_t headerLength)
+    : peer(peer), headerLength(headerLength) {}
+  virtual void update(size_t length, bool complete)
+  {
+    if(headerLength > 0) {
+      size_t m = std::min(headerLength, length);
+      headerLength -= m;
+      length -= m;
+    }
+    peer->updateUploadLength(length);
+  }
+  SharedHandle<Peer> peer;
+  size_t headerLength;
+};
+} // namespace
+
 void BtPieceMessage::send()
 {
   if(isInvalidate()) {
     return;
   }
-  size_t writtenLength;
-  if(!isSendingInProgress()) {
-    A2_LOG_INFO(fmt(MSG_SEND_PEER_MESSAGE,
-                    getCuid(),
-                    getPeer()->getIPAddress().c_str(),
-                    getPeer()->getPort(),
-                    toString().c_str()));
-    unsigned char* msgHdr = createMessageHeader();
-    msgHdrLen_ = getMessageHeaderLength();
-    A2_LOG_DEBUG(fmt("msglength = %lu bytes",
-                     static_cast<unsigned long>(msgHdrLen_+blockLength_)));
-    getPeerConnection()->pushBytes(msgHdr, msgHdrLen_);
-    int64_t pieceDataOffset =
-      static_cast<int64_t>(index_)*downloadContext_->getPieceLength()+begin_;
-    pushPieceData(pieceDataOffset, blockLength_);
-  }
-  writtenLength = getPeerConnection()->sendPendingData();
-  // Subtract msgHdrLen_ from writtenLength to get the uploaded data
-  // size.
-  if(writtenLength > msgHdrLen_) {
-    writtenLength -= msgHdrLen_;
-    msgHdrLen_ = 0;
-    getPeer()->updateUploadLength(writtenLength);
-    downloadContext_->updateUploadLength(writtenLength);
-  } else {
-    msgHdrLen_ -= writtenLength;
-  }
-  setSendingInProgress(!getPeerConnection()->sendBufferIsEmpty());
+  A2_LOG_INFO(fmt(MSG_SEND_PEER_MESSAGE,
+                  getCuid(),
+                  getPeer()->getIPAddress().c_str(),
+                  getPeer()->getPort(),
+                  toString().c_str()));
+  int64_t pieceDataOffset =
+    static_cast<int64_t>(index_)*downloadContext_->getPieceLength()+begin_;
+  pushPieceData(pieceDataOffset, blockLength_);
 }
 
 void BtPieceMessage::pushPieceData(int64_t offset, int32_t length) const
 {
   assert(length <= 16*1024);
-  array_ptr<unsigned char> buf(new unsigned char[length]);
+  array_ptr<unsigned char> buf
+    (new unsigned char[length+MESSAGE_HEADER_LENGTH]);
+  createMessageHeader(buf);
   ssize_t r;
-  r = getPieceStorage()->getDiskAdaptor()->readData(buf, length, offset);
+  r = getPieceStorage()->getDiskAdaptor()->readData(buf+MESSAGE_HEADER_LENGTH,
+                                                    length, offset);
   if(r == length) {
     unsigned char* dbuf = buf;
     buf.reset(0);
-    getPeerConnection()->pushBytes(dbuf, length);
+    getPeerConnection()->pushBytes(dbuf, length+MESSAGE_HEADER_LENGTH,
+                                   new PieceSendUpdate(getPeer(),
+                                                       MESSAGE_HEADER_LENGTH));
+    // To avoid upload rate overflow, we update the length here at
+    // once.
+    downloadContext_->updateUploadLength(length);
   } else {
     throw DL_ABORT_EX(EX_DATA_READ);
   }
@@ -293,7 +296,6 @@ void BtPieceMessage::onWrongPiece(const SharedHandle<Piece>& piece)
 void BtPieceMessage::onChokingEvent(const BtChokingEvent& event)
 {
   if(!isInvalidate() &&
-     !isSendingInProgress() &&
      !getPeer()->isInAmAllowedIndexSet(index_)) {
     A2_LOG_DEBUG(fmt(MSG_REJECT_PIECE_CHOKED,
                      getCuid(),
@@ -314,7 +316,6 @@ void BtPieceMessage::onCancelSendingPieceEvent
 (const BtCancelSendingPieceEvent& event)
 {
   if(!isInvalidate() &&
-     !isSendingInProgress() &&
      index_ == event.getIndex() &&
      begin_ == event.getBegin() &&
      blockLength_ == event.getLength()) {
