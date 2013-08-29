@@ -6,8 +6,10 @@ aria2 (1.17.1-1) UNRELEASED; urgency=low
 
   [ Patrick Ruckstuhl ]
   * New upstream release. 
-  * debian/control:
+  * debian/rules:
     + Allow parallel building (Closes: #720977)
+  * debian/tests, debian/control:
+    + autopkgtest infrastructure
 
  -- Patrick Ruckstuhl <patrick@ch.tario.org>  Thu, 29 Aug 2013 22:33:04 +0200
 
