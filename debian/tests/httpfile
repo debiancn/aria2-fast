@@ -1,0 +1,1 @@
+aria2c -d /tmp http://www.debian.org
