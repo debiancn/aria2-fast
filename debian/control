@@ -3,14 +3,14 @@ Section: net
 Priority: optional
 Maintainer: Patrick Ruckstuhl <patrick@ch.tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
-Build-Depends: debhelper (>= 7),
+Build-Depends: autotools-dev,
+               debhelper (>= 7),
                dpkg-dev (>= 1.16.1~),
-               autotools-dev,
                libc-ares-dev,
                libgcrypt11-dev (>= 1.5.0-3) | libgcrypt-dev,
                libgnutls-dev,
-               libxml2-dev,
                libsqlite3-dev,
+               libxml2-dev,
                pkg-config,
                zlib1g-dev | libz-dev
 Standards-Version: 3.9.4
@@ -21,7 +21,7 @@ XS-Testsuite: autopkgtest
 
 Package: aria2
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Recommends: ca-certificates
 Description: High speed download utility
  Aria2 is a command line download client with resuming and segmented

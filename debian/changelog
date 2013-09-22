@@ -1,11 +1,12 @@
-aria2 (1.18.0-1) UNRELEASED; urgency=low
+aria2 (1.18.0-1) unstable; urgency=low
 
   [ Kartik Mistry ]
+  * New upstream release.
   * debian/control:
     + (really) Set priority to optional from extra (Closes: #697659).
+    + wrap-and-sort some fields.
 
   [ Patrick Ruckstuhl ]
-  * New upstream release. 
   * debian/rules:
     + Allow parallel building (Closes: #720977)
   * debian/tests, debian/control:
