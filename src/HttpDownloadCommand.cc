@@ -57,16 +57,16 @@ namespace aria2 {
 
 HttpDownloadCommand::HttpDownloadCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const SharedHandle<HttpResponse>& httpResponse,
- const SharedHandle<HttpConnection>& httpConnection,
+ std::unique_ptr<HttpResponse> httpResponse,
+ const std::shared_ptr<HttpConnection>& httpConnection,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket)
+ const std::shared_ptr<SocketCore>& socket)
   : DownloadCommand(cuid, req, fileEntry, requestGroup, e, socket,
                     httpConnection->getSocketRecvBuffer()),
-    httpResponse_(httpResponse),
+    httpResponse_(std::move(httpResponse)),
     httpConnection_(httpConnection)
 {}
 
@@ -75,16 +75,16 @@ HttpDownloadCommand::~HttpDownloadCommand() {}
 bool HttpDownloadCommand::prepareForNextSegment() {
   bool downloadFinished = getRequestGroup()->downloadFinished();
   if(getRequest()->isPipeliningEnabled() && !downloadFinished) {
-    HttpRequestCommand* command =
-      new HttpRequestCommand(getCuid(), getRequest(), getFileEntry(),
-                             getRequestGroup(), httpConnection_,
-                             getDownloadEngine(), getSocket());
+    auto command = make_unique<HttpRequestCommand>
+      (getCuid(), getRequest(), getFileEntry(),
+       getRequestGroup(), httpConnection_,
+       getDownloadEngine(), getSocket());
     // Set proxy request here. aria2 sends the HTTP request specialized for
     // proxy.
     if(resolveProxyMethod(getRequest()->getProtocol()) == V_GET) {
       command->setProxyRequest(createProxyRequest());
     }
-    getDownloadEngine()->addCommand(command);
+    getDownloadEngine()->addCommand(std::move(command));
     return true;
   } else {
     const std::string& streamFilterName = getStreamFilter()->getName();
@@ -115,7 +115,7 @@ bool HttpDownloadCommand::prepareForNextSegment() {
     if(!getRequest()->isPipeliningEnabled() &&
        getRequest()->isPipeliningHint() &&
        !downloadFinished) {
-      const SharedHandle<Segment>& segment = getSegments().front();
+      const std::shared_ptr<Segment>& segment = getSegments().front();
 
       int64_t lastOffset =getFileEntry()->gtoloff
         (std::min(segment->getPosition()+segment->getLength(),

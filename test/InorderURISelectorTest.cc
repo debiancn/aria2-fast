@@ -17,20 +17,16 @@ class InorderURISelectorTest:public CppUnit::TestFixture {
 private:
   FileEntry fileEntry_;
 
-  SharedHandle<InorderURISelector> sel;
+  std::shared_ptr<InorderURISelector> sel;
 
 public:
   void setUp()
   {
-    static const char* urisSrc[] = {
+    fileEntry_.setUris({
       "http://alpha/file",
       "ftp://alpha/file",
       "http://bravo/file"
-    };
-    std::vector<std::string> uris;
-    uris.assign(vbegin(urisSrc), vend(urisSrc));
-
-    fileEntry_.setUris(uris);
+    });
 
     sel.reset(new InorderURISelector());
   }

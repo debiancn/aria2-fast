@@ -54,11 +54,11 @@ namespace aria2 {
 
 NameResolveCommand::NameResolveCommand
 (cuid_t cuid, DownloadEngine* e,
- const SharedHandle<UDPTrackerRequest>& req)
+ const std::shared_ptr<UDPTrackerRequest>& req)
   : Command(cuid),
     e_(e),
 #ifdef ENABLE_ASYNC_DNS
-    asyncNameResolverMan_(new AsyncNameResolverMan()),
+    asyncNameResolverMan_(make_unique<AsyncNameResolverMan>()),
 #endif // ENABLE_ASYNC_DNS
     req_(req)
 {
@@ -95,7 +95,7 @@ bool NameResolveCommand::execute()
 #ifdef ENABLE_ASYNC_DNS
     if(e_->getOption()->getAsBool(PREF_ASYNC_DNS)) {
       if(resolveHostname(res, hostname) == 0) {
-        e_->addCommand(this);
+        e_->addCommand(std::unique_ptr<Command>(this));
         return false;
       }
     } else

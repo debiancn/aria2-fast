@@ -53,7 +53,7 @@ BtSeederStateChoke::BtSeederStateChoke()
 BtSeederStateChoke::~BtSeederStateChoke() {}
 
 BtSeederStateChoke::PeerEntry::PeerEntry
-(const SharedHandle<Peer>& peer):
+(const std::shared_ptr<Peer>& peer):
   peer_(peer),
   outstandingUpload_(peer->countOutstandingUpload()),
   lastAmUnchoking_(peer->getLastAmUnchoking()),
@@ -124,8 +124,8 @@ void BtSeederStateChoke::unchoke
 
   std::sort(peers.begin(), peers.end());
 
-  std::vector<PeerEntry>::iterator r = peers.begin();
-  for(std::vector<PeerEntry>::iterator eoi = peers.end();
+  auto r = peers.begin();
+  for(auto eoi = peers.end();
       r != eoi && count; ++r, --count) {
     (*r).getPeer()->chokingRequired(false);
     A2_LOG_INFO(fmt("RU: %s, ulspd=%d",
@@ -135,10 +135,10 @@ void BtSeederStateChoke::unchoke
 
   if(round_ < 2) {
     std::for_each(peers.begin(), peers.end(),
-                  std::mem_fun_ref(&PeerEntry::disableOptUnchoking));
+                  std::mem_fn(&PeerEntry::disableOptUnchoking));
     if(r != peers.end()) {
       std::random_shuffle(r, peers.end(),
-                          *(SimpleRandomizer::getInstance().get()));
+                          *SimpleRandomizer::getInstance());
       (*r).getPeer()->optUnchoking(true);
       A2_LOG_INFO(fmt("POU: %s", (*r).getPeer()->getIPAddress().c_str()));
     }

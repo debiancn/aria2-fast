@@ -47,6 +47,7 @@
 #include "DownloadContext.h"
 #include "Peer.h"
 #include "BtMessage.h"
+#include "BtHandshakeMessage.h"
 #include "BtRuntime.h"
 #include "PeerStorage.h"
 #include "DefaultBtMessageDispatcher.h"
@@ -82,20 +83,20 @@ namespace aria2 {
 PeerInteractionCommand::PeerInteractionCommand
 (cuid_t cuid,
  RequestGroup* requestGroup,
- const SharedHandle<Peer>& p,
+ const std::shared_ptr<Peer>& p,
  DownloadEngine* e,
- const SharedHandle<BtRuntime>& btRuntime,
- const SharedHandle<PieceStorage>& pieceStorage,
- const SharedHandle<PeerStorage>& peerStorage,
- const SharedHandle<SocketCore>& s,
+ const std::shared_ptr<BtRuntime>& btRuntime,
+ const std::shared_ptr<PieceStorage>& pieceStorage,
+ const std::shared_ptr<PeerStorage>& peerStorage,
+ const std::shared_ptr<SocketCore>& s,
  Seq sequence,
- const SharedHandle<PeerConnection>& passedPeerConnection)
-  :PeerAbstractCommand(cuid, p, e, s),
-   requestGroup_(requestGroup),
-   btRuntime_(btRuntime),
-   pieceStorage_(pieceStorage),
-   peerStorage_(peerStorage),
-   sequence_(sequence)
+ std::unique_ptr<PeerConnection> peerConnection)
+  : PeerAbstractCommand{cuid, p, e, s},
+    requestGroup_{requestGroup},
+    btRuntime_{btRuntime},
+    pieceStorage_{pieceStorage},
+    peerStorage_{peerStorage},
+    sequence_{sequence}
 {
   // TODO move following bunch of processing to separate method, like init()
   if(sequence_ == INITIATOR_SEND_HANDSHAKE) {
@@ -114,66 +115,51 @@ PeerInteractionCommand::PeerInteractionCommand
     family = AF_INET;
   }
 
-  SharedHandle<TorrentAttribute> torrentAttrs =
+  auto torrentAttrs =
     bittorrent::getTorrentAttrs(requestGroup_->getDownloadContext());
   bool metadataGetMode = torrentAttrs->metadata.empty();
 
-  SharedHandle<ExtensionMessageRegistry> exMsgRegistry
-    (new ExtensionMessageRegistry());
+  auto exMsgRegistry = make_unique<ExtensionMessageRegistry>();
   exMsgRegistry->setExtensionMessageID(ExtensionMessageRegistry::UT_PEX, 8);
   // http://www.bittorrent.org/beps/bep_0009.html
   exMsgRegistry->setExtensionMessageID(ExtensionMessageRegistry::UT_METADATA,
                                        9);
 
-  SharedHandle<UTMetadataRequestFactory> utMetadataRequestFactory;
-  SharedHandle<UTMetadataRequestTracker> utMetadataRequestTracker;
-  if(metadataGetMode) {
-    utMetadataRequestFactory.reset(new UTMetadataRequestFactory());
-    utMetadataRequestTracker.reset(new UTMetadataRequestTracker());
-  }
-
-  DefaultExtensionMessageFactory* extensionMessageFactoryPtr
-    (new DefaultExtensionMessageFactory(getPeer(), exMsgRegistry));
-  extensionMessageFactoryPtr->setPeerStorage(peerStorage);
-  extensionMessageFactoryPtr->setDownloadContext
-    (requestGroup_->getDownloadContext());
-  extensionMessageFactoryPtr->setUTMetadataRequestTracker
-    (utMetadataRequestTracker.get());
+  auto extensionMessageFactory =
+    make_unique<DefaultExtensionMessageFactory>(getPeer(),
+                                                exMsgRegistry.get());
+  auto extensionMessageFactoryPtr = extensionMessageFactory.get();
+  extensionMessageFactory->setPeerStorage(peerStorage.get());
+  extensionMessageFactory->setDownloadContext
+    (requestGroup_->getDownloadContext().get());
   // PieceStorage will be set later.
-  SharedHandle<ExtensionMessageFactory> extensionMessageFactory
-    (extensionMessageFactoryPtr);
 
-
-
-  DefaultBtMessageFactory* factoryPtr(new DefaultBtMessageFactory());
-  factoryPtr->setCuid(cuid);
-  factoryPtr->setDownloadContext(requestGroup_->getDownloadContext());
-  factoryPtr->setPieceStorage(pieceStorage);
-  factoryPtr->setPeerStorage(peerStorage);
-  factoryPtr->setExtensionMessageFactory(extensionMessageFactory);
-  factoryPtr->setPeer(getPeer());
+  auto factory = make_unique<DefaultBtMessageFactory>();
+  auto factoryPtr = factory.get();
+  factory->setCuid(cuid);
+  factory->setDownloadContext(requestGroup_->getDownloadContext().get());
+  factory->setPieceStorage(pieceStorage.get());
+  factory->setPeerStorage(peerStorage.get());
+  factory->setExtensionMessageFactory(extensionMessageFactory.get());
+  factory->setPeer(getPeer());
   if(family == AF_INET) {
-    factoryPtr->setLocalNode(DHTRegistry::getData().localNode.get());
-    factoryPtr->setRoutingTable(DHTRegistry::getData().routingTable.get());
-    factoryPtr->setTaskQueue(DHTRegistry::getData().taskQueue.get());
-    factoryPtr->setTaskFactory(DHTRegistry::getData().taskFactory.get());
+    factory->setLocalNode(DHTRegistry::getData().localNode.get());
+    factory->setRoutingTable(DHTRegistry::getData().routingTable.get());
+    factory->setTaskQueue(DHTRegistry::getData().taskQueue.get());
+    factory->setTaskFactory(DHTRegistry::getData().taskFactory.get());
   } else {
-    factoryPtr->setLocalNode(DHTRegistry::getData6().localNode.get());
-    factoryPtr->setRoutingTable(DHTRegistry::getData6().routingTable.get());
-    factoryPtr->setTaskQueue(DHTRegistry::getData6().taskQueue.get());
-    factoryPtr->setTaskFactory(DHTRegistry::getData6().taskFactory.get());
+    factory->setLocalNode(DHTRegistry::getData6().localNode.get());
+    factory->setRoutingTable(DHTRegistry::getData6().routingTable.get());
+    factory->setTaskQueue(DHTRegistry::getData6().taskQueue.get());
+    factory->setTaskFactory(DHTRegistry::getData6().taskFactory.get());
   }
   if(metadataGetMode) {
-    factoryPtr->enableMetadataGetMode();
+    factory->enableMetadataGetMode();
   }
-  SharedHandle<BtMessageFactory> factory(factoryPtr);
 
-
-  SharedHandle<PeerConnection> peerConnection;
-  if(!passedPeerConnection) {
-    peerConnection.reset(new PeerConnection(cuid, getPeer(), getSocket()));
+  if(!peerConnection) {
+    peerConnection = make_unique<PeerConnection>(cuid, getPeer(), getSocket());
   } else {
-    peerConnection = passedPeerConnection;
     if(sequence_ == RECEIVER_WAIT_HANDSHAKE &&
        peerConnection->getBufferLength() > 0) {
       setStatus(Command::STATUS_ONESHOT_REALTIME);
@@ -189,104 +175,109 @@ PeerInteractionCommand::PeerInteractionCommand
     1+(requestGroup_->getDownloadContext()->getNumPieces()+7)/8;
   peerConnection->reserveBuffer(bitfieldPayloadSize);
 
-  DefaultBtMessageDispatcher* dispatcherPtr(new DefaultBtMessageDispatcher());
-  dispatcherPtr->setCuid(cuid);
-  dispatcherPtr->setPeer(getPeer());
-  dispatcherPtr->setDownloadContext(requestGroup_->getDownloadContext());
-  dispatcherPtr->setPieceStorage(pieceStorage);
-  dispatcherPtr->setPeerStorage(peerStorage);
-  dispatcherPtr->setRequestTimeout(getOption()->
+  auto dispatcher = make_unique<DefaultBtMessageDispatcher>();
+  auto dispatcherPtr = dispatcher.get();
+  dispatcher->setCuid(cuid);
+  dispatcher->setPeer(getPeer());
+  dispatcher->setDownloadContext(requestGroup_->getDownloadContext().get());
+  dispatcher->setRequestTimeout(getOption()->
                                    getAsInt(PREF_BT_REQUEST_TIMEOUT));
-  dispatcherPtr->setBtMessageFactory(factoryPtr);
-  dispatcherPtr->setRequestGroupMan
+  dispatcher->setBtMessageFactory(factory.get());
+  dispatcher->setRequestGroupMan
     (getDownloadEngine()->getRequestGroupMan().get());
-  dispatcherPtr->setPeerConnection(peerConnection);
-  SharedHandle<BtMessageDispatcher> dispatcher(dispatcherPtr);
+  dispatcher->setPeerConnection(peerConnection.get());
 
-  DefaultBtMessageReceiver* receiverPtr(new DefaultBtMessageReceiver());
-  receiverPtr->setDownloadContext(requestGroup_->getDownloadContext());
-  receiverPtr->setPeerConnection(peerConnection.get());
-  receiverPtr->setDispatcher(dispatcherPtr);
-  receiverPtr->setBtMessageFactory(factoryPtr);
-  SharedHandle<BtMessageReceiver> receiver(receiverPtr);
+  auto receiver = make_unique<DefaultBtMessageReceiver>();
+  receiver->setDownloadContext(requestGroup_->getDownloadContext().get());
+  receiver->setPeerConnection(peerConnection.get());
+  receiver->setDispatcher(dispatcher.get());
+  receiver->setBtMessageFactory(factory.get());
 
-  DefaultBtRequestFactory* reqFactoryPtr(new DefaultBtRequestFactory());
-  reqFactoryPtr->setPeer(getPeer());
-  reqFactoryPtr->setPieceStorage(pieceStorage);
-  reqFactoryPtr->setBtMessageDispatcher(dispatcherPtr);
-  reqFactoryPtr->setBtMessageFactory(factoryPtr);
-  reqFactoryPtr->setCuid(cuid);
-  SharedHandle<BtRequestFactory> reqFactory(reqFactoryPtr);
+  auto reqFactory = make_unique<DefaultBtRequestFactory>();
+  reqFactory->setPeer(getPeer());
+  reqFactory->setPieceStorage(pieceStorage.get());
+  reqFactory->setBtMessageDispatcher(dispatcher.get());
+  reqFactory->setBtMessageFactory(factory.get());
+  reqFactory->setCuid(cuid);
 
-  DefaultBtInteractive* btInteractivePtr
-    (new DefaultBtInteractive(requestGroup_->getDownloadContext(), getPeer()));
-  btInteractivePtr->setBtRuntime(btRuntime_);
-  btInteractivePtr->setPieceStorage(pieceStorage_);
-  btInteractivePtr->setPeerStorage(peerStorage); // Note: Not a member variable.
-  btInteractivePtr->setCuid(cuid);
-  btInteractivePtr->setBtMessageReceiver(receiver);
-  btInteractivePtr->setDispatcher(dispatcher);
-  btInteractivePtr->setBtRequestFactory(reqFactory);
-  btInteractivePtr->setPeerConnection(peerConnection);
-  btInteractivePtr->setExtensionMessageFactory(extensionMessageFactory);
-  btInteractivePtr->setExtensionMessageRegistry(exMsgRegistry);
-  btInteractivePtr->setKeepAliveInterval
+  // reverse depends
+  factory->setBtMessageDispatcher(dispatcher.get());
+  factory->setBtRequestFactory(reqFactory.get());
+  factory->setPeerConnection(peerConnection.get());
+
+  extensionMessageFactory->setBtMessageDispatcher(dispatcher.get());
+  extensionMessageFactory->setBtMessageFactory(factory.get());
+
+  getPeer()->allocateSessionResource
+    (requestGroup_->getDownloadContext()->getPieceLength(),
+     requestGroup_->getDownloadContext()->getTotalLength());
+  getPeer()->setBtMessageDispatcher(dispatcher.get());
+
+  auto btInteractive = make_unique<DefaultBtInteractive>
+    (requestGroup_->getDownloadContext(), getPeer());
+  btInteractive->setBtRuntime(btRuntime_);
+  btInteractive->setPieceStorage(pieceStorage_);
+  btInteractive->setPeerStorage(peerStorage); // Note: Not a member variable.
+  btInteractive->setCuid(cuid);
+  btInteractive->setBtMessageReceiver(std::move(receiver));
+  btInteractive->setDispatcher(std::move(dispatcher));
+  btInteractive->setBtRequestFactory(std::move(reqFactory));
+  btInteractive->setPeerConnection(std::move(peerConnection));
+  btInteractive->setExtensionMessageFactory
+    (std::move(extensionMessageFactory));
+  btInteractive->setExtensionMessageRegistry(std::move(exMsgRegistry));
+  btInteractive->setKeepAliveInterval
     (getOption()->getAsInt(PREF_BT_KEEP_ALIVE_INTERVAL));
-  btInteractivePtr->setRequestGroupMan
+  btInteractive->setRequestGroupMan
     (getDownloadEngine()->getRequestGroupMan().get());
-  btInteractivePtr->setBtMessageFactory(factory);
+  btInteractive->setBtMessageFactory(std::move(factory));
   if((metadataGetMode || !torrentAttrs->privateTorrent) &&
      !getPeer()->isLocalPeer()) {
     if(getOption()->getAsBool(PREF_ENABLE_PEER_EXCHANGE)) {
-      btInteractivePtr->setUTPexEnabled(true);
+      btInteractive->setUTPexEnabled(true);
     }
     if(family == AF_INET) {
       if(DHTRegistry::isInitialized()) {
-        btInteractivePtr->setDHTEnabled(true);
+        btInteractive->setDHTEnabled(true);
         factoryPtr->setDHTEnabled(true);
-        btInteractivePtr->setLocalNode(DHTRegistry::getData().localNode.get());
+        btInteractive->setLocalNode(DHTRegistry::getData().localNode.get());
       }
     } else {
       if(DHTRegistry::isInitialized6()) {
-        btInteractivePtr->setDHTEnabled(true);
+        btInteractive->setDHTEnabled(true);
         factoryPtr->setDHTEnabled(true);
-        btInteractivePtr->setLocalNode(DHTRegistry::getData6().localNode.get());
+        btInteractive->setLocalNode(DHTRegistry::getData6().localNode.get());
       }
     }
   }
-  btInteractivePtr->setUTMetadataRequestFactory(utMetadataRequestFactory);
-  btInteractivePtr->setUTMetadataRequestTracker(utMetadataRequestTracker);
-  btInteractivePtr->setTcpPort(e->getBtRegistry()->getTcpPort());
-  if(metadataGetMode) {
-    btInteractivePtr->enableMetadataGetMode();
-  }
-  SharedHandle<BtInteractive> btInteractive(btInteractivePtr);
-
-  btInteractive_ = btInteractive;
-
-  // reverse depends
-  factoryPtr->setBtMessageDispatcher(dispatcherPtr);
-  factoryPtr->setBtRequestFactory(reqFactoryPtr);
-  factoryPtr->setPeerConnection(peerConnection.get());
-
-  extensionMessageFactoryPtr->setBtMessageDispatcher(dispatcherPtr);
-  extensionMessageFactoryPtr->setBtMessageFactory(factoryPtr);
 
   if(metadataGetMode) {
+    auto utMetadataRequestFactory = make_unique<UTMetadataRequestFactory>();
+    auto utMetadataRequestTracker = make_unique<UTMetadataRequestTracker>();
+
     utMetadataRequestFactory->setCuid(cuid);
     utMetadataRequestFactory->setDownloadContext
-      (requestGroup_->getDownloadContext());
+      (requestGroup_->getDownloadContext().get());
     utMetadataRequestFactory->setBtMessageDispatcher(dispatcherPtr);
     utMetadataRequestFactory->setBtMessageFactory(factoryPtr);
     utMetadataRequestFactory->setPeer(getPeer());
     utMetadataRequestFactory->setUTMetadataRequestTracker
       (utMetadataRequestTracker.get());
+
+    extensionMessageFactoryPtr->setUTMetadataRequestTracker
+      (utMetadataRequestTracker.get());
+
+    btInteractive->setUTMetadataRequestFactory
+      (std::move(utMetadataRequestFactory));
+    btInteractive->setUTMetadataRequestTracker
+      (std::move(utMetadataRequestTracker));
   }
 
-  getPeer()->allocateSessionResource
-    (requestGroup_->getDownloadContext()->getPieceLength(),
-     requestGroup_->getDownloadContext()->getTotalLength());
-  getPeer()->setBtMessageDispatcher(dispatcherPtr);
+  btInteractive->setTcpPort(e->getBtRegistry()->getTcpPort());
+  if(metadataGetMode) {
+    btInteractive->enableMetadataGetMode();
+  }
+  btInteractive_ = std::move(btInteractive);
 
   btRuntime_->increaseConnections();
   requestGroup_->increaseNumCommand();
@@ -328,8 +319,7 @@ bool PeerInteractionCommand::executeInternal() {
           break;
         }
       }
-      SharedHandle<BtMessage> handshakeMessage =
-        btInteractive_->receiveHandshake();
+      auto handshakeMessage = btInteractive_->receiveHandshake();
       if(!handshakeMessage) {
         done = true;
         break;
@@ -339,8 +329,7 @@ bool PeerInteractionCommand::executeInternal() {
       break;
     }
     case RECEIVER_WAIT_HANDSHAKE: {
-      SharedHandle<BtMessage> handshakeMessage =
-        btInteractive_->receiveAndSendHandshake();
+      auto handshakeMessage = btInteractive_->receiveAndSendHandshake();
       if(!handshakeMessage) {
         done = true;
         break;
@@ -384,7 +373,7 @@ bool PeerInteractionCommand::executeInternal() {
   if(btInteractive_->countPendingMessage() > 0) {
     setNoCheck(true);
   }
-  getDownloadEngine()->addCommand(this);
+  addCommandSelf();
   return false;
 }
 
@@ -392,16 +381,14 @@ bool PeerInteractionCommand::executeInternal() {
 bool PeerInteractionCommand::prepareForNextPeer(time_t wait) {
   if(peerStorage_->isPeerAvailable() && btRuntime_->lessThanEqMinPeers()) {
     cuid_t ncuid = getDownloadEngine()->newCUID();
-    SharedHandle<Peer> peer = peerStorage_->checkoutPeer(ncuid);
+    std::shared_ptr<Peer> peer = peerStorage_->checkoutPeer(ncuid);
     // sanity check
     if(peer) {
-      PeerInitiateConnectionCommand* command;
-      command = new PeerInitiateConnectionCommand(ncuid, requestGroup_, peer,
-                                                  getDownloadEngine(),
-                                                  btRuntime_);
+      auto command = make_unique<PeerInitiateConnectionCommand>
+        (ncuid, requestGroup_, peer, getDownloadEngine(), btRuntime_);
       command->setPeerStorage(peerStorage_);
       command->setPieceStorage(pieceStorage_);
-      getDownloadEngine()->addCommand(command);
+      getDownloadEngine()->addCommand(std::move(command));
     }
   }
   return true;
@@ -424,7 +411,7 @@ bool PeerInteractionCommand::exitBeforeExecute()
   return btRuntime_->isHalt();
 }
 
-const SharedHandle<Option>& PeerInteractionCommand::getOption() const
+const std::shared_ptr<Option>& PeerInteractionCommand::getOption() const
 {
   return requestGroup_->getOption();
 }

@@ -41,11 +41,14 @@ namespace aria2 {
 
 const char BtNotInterestedMessage::NAME[] = "not interested";
 
-BtNotInterestedMessage::BtNotInterestedMessage():ZeroBtMessage(ID, NAME) {}
+BtNotInterestedMessage::BtNotInterestedMessage()
+  : ZeroBtMessage(ID, NAME),
+    peerStorage_(nullptr)
+{}
 
 BtNotInterestedMessage::~BtNotInterestedMessage() {}
 
-BtNotInterestedMessage* BtNotInterestedMessage::create
+std::unique_ptr<BtNotInterestedMessage> BtNotInterestedMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return ZeroBtMessage::create<BtNotInterestedMessage>(data, dataLength);
@@ -69,25 +72,24 @@ bool BtNotInterestedMessage::sendPredicate() const
 
 namespace {
 struct ThisProgressUpdate : public ProgressUpdate {
-  ThisProgressUpdate(const SharedHandle<Peer>& peer)
+  ThisProgressUpdate(const std::shared_ptr<Peer>& peer)
     : peer(peer) {}
-  virtual void update(size_t length, bool complete)
+  virtual void update(size_t length, bool complete) CXX11_OVERRIDE
   {
     if(complete) {
       peer->amInterested(false);
     }
   }
-  SharedHandle<Peer> peer;
+  std::shared_ptr<Peer> peer;
 };
 } // namespace
 
-ProgressUpdate* BtNotInterestedMessage::getProgressUpdate()
+std::unique_ptr<ProgressUpdate> BtNotInterestedMessage::getProgressUpdate()
 {
-  return new ThisProgressUpdate(getPeer());
+  return make_unique<ThisProgressUpdate>(getPeer());
 }
 
-void BtNotInterestedMessage::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+void BtNotInterestedMessage::setPeerStorage(PeerStorage* peerStorage)
 {
   peerStorage_ = peerStorage;
 }

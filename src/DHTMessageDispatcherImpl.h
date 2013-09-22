@@ -45,32 +45,32 @@ struct DHTMessageEntry;
 
 class DHTMessageDispatcherImpl:public DHTMessageDispatcher {
 private:
-  SharedHandle<DHTMessageTracker> tracker_;
+  std::shared_ptr<DHTMessageTracker> tracker_;
 
-  std::deque<SharedHandle<DHTMessageEntry> > messageQueue_;
+  std::deque<std::unique_ptr<DHTMessageEntry>> messageQueue_;
 
   time_t timeout_;
 
-  bool sendMessage(const SharedHandle<DHTMessageEntry>& msg);
+  bool sendMessage(DHTMessageEntry* msg);
 public:
-  DHTMessageDispatcherImpl(const SharedHandle<DHTMessageTracker>& tracker);
-
-  virtual ~DHTMessageDispatcherImpl();
+  DHTMessageDispatcherImpl(const std::shared_ptr<DHTMessageTracker>& tracker);
 
   virtual void
-  addMessageToQueue(const SharedHandle<DHTMessage>& message,
+  addMessageToQueue(std::unique_ptr<DHTMessage> message,
                     time_t timeout,
-                    const SharedHandle<DHTMessageCallback>& callback =
-                    SharedHandle<DHTMessageCallback>());
+                    std::unique_ptr<DHTMessageCallback> callback =
+                    std::unique_ptr<DHTMessageCallback>{})
+    CXX11_OVERRIDE;
 
   virtual void
-  addMessageToQueue(const SharedHandle<DHTMessage>& message,
-                    const SharedHandle<DHTMessageCallback>& callback =
-                    SharedHandle<DHTMessageCallback>());
+  addMessageToQueue(std::unique_ptr<DHTMessage> message,
+                    std::unique_ptr<DHTMessageCallback> callback =
+                    std::unique_ptr<DHTMessageCallback>{})
+    CXX11_OVERRIDE;
 
-  virtual void sendMessages();
+  virtual void sendMessages() CXX11_OVERRIDE;
 
-  virtual size_t countMessageInQueue() const;
+  virtual size_t countMessageInQueue() const CXX11_OVERRIDE;
 
   void setTimeout(time_t timeout)
   {

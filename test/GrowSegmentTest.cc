@@ -24,7 +24,7 @@ CPPUNIT_TEST_SUITE_REGISTRATION( GrowSegmentTest );
 
 void GrowSegmentTest::testUpdateWrittenLength()
 {
-  GrowSegment segment(SharedHandle<Piece>(new Piece()));
+  GrowSegment segment(std::shared_ptr<Piece>(new Piece()));
   segment.updateWrittenLength(32*1024);
 
   CPPUNIT_ASSERT_EQUAL((int64_t)32*1024, segment.getPositionToWrite());
@@ -34,10 +34,10 @@ void GrowSegmentTest::testUpdateWrittenLength()
 
 void GrowSegmentTest::testClear()
 {
-  GrowSegment segment(SharedHandle<Piece>(new Piece()));
+  GrowSegment segment(std::shared_ptr<Piece>(new Piece()));
   segment.updateWrittenLength(32*1024);
   CPPUNIT_ASSERT_EQUAL(32*1024, segment.getWrittenLength());
-  segment.clear(0);
+  segment.clear(nullptr);
   CPPUNIT_ASSERT_EQUAL(0, segment.getWrittenLength());
 }
 

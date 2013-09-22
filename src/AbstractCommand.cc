@@ -48,7 +48,6 @@
 #include "DownloadFailureException.h"
 #include "CreateRequestCommand.h"
 #include "InitiateConnectionCommandFactory.h"
-#include "SleepCommand.h"
 #include "StreamCheckIntegrityEntry.h"
 #include "PieceStorage.h"
 #include "SocketCore.h"
@@ -79,12 +78,12 @@ namespace aria2 {
 
 AbstractCommand::AbstractCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& s,
- const SharedHandle<SocketRecvBuffer>& socketRecvBuffer,
+ const std::shared_ptr<SocketCore>& s,
+ const std::shared_ptr<SocketRecvBuffer>& socketRecvBuffer,
  bool incNumConnection)
   : Command(cuid), checkPoint_(global::wallclock()),
     timeout_(requestGroup->getTimeout()),
@@ -92,7 +91,7 @@ AbstractCommand::AbstractCommand
     req_(req), fileEntry_(fileEntry), e_(e), socket_(s),
     socketRecvBuffer_(socketRecvBuffer),
 #ifdef ENABLE_ASYNC_DNS
-    asyncNameResolverMan_(new AsyncNameResolverMan()),
+    asyncNameResolverMan_(make_unique<AsyncNameResolverMan>()),
 #endif // ENABLE_ASYNC_DNS
     checkSocketIsReadable_(false), checkSocketIsWritable_(false),
     incNumConnection_(incNumConnection),
@@ -125,7 +124,7 @@ AbstractCommand::~AbstractCommand() {
 }
 
 void AbstractCommand::useFasterRequest
-(const SharedHandle<Request>& fasterRequest)
+(const std::shared_ptr<Request>& fasterRequest)
 {
   A2_LOG_INFO(fmt("CUID#%" PRId64 " - Use faster Request hostname=%s, port=%u",
                   getCuid(),
@@ -133,11 +132,10 @@ void AbstractCommand::useFasterRequest
                   fasterRequest->getPort()));
   // Cancel current Request object and use faster one.
   fileEntry_->removeRequest(req_);
-  Command* command =
-    InitiateConnectionCommandFactory::createInitiateConnectionCommand
-    (getCuid(), fasterRequest, fileEntry_, requestGroup_, e_);
   e_->setNoWait(true);
-  e_->addCommand(command);
+  e_->addCommand(InitiateConnectionCommandFactory::
+                 createInitiateConnectionCommand
+                 (getCuid(), fasterRequest, fileEntry_, requestGroup_, e_));
 }
 
 bool AbstractCommand::execute() {
@@ -180,7 +178,7 @@ bool AbstractCommand::execute() {
       if(req_ && fileEntry_->countPooledRequest() > 0 &&
          requestGroup_->getTotalLength()-requestGroup_->getCompletedLength()
          < calculateMinSplitSize()*2) {
-        SharedHandle<Request> fasterRequest = fileEntry_->findFasterRequest(req_);
+        std::shared_ptr<Request> fasterRequest = fileEntry_->findFasterRequest(req_);
         if(fasterRequest) {
           useFasterRequest(fasterRequest);
           return true;
@@ -197,7 +195,7 @@ bool AbstractCommand::execute() {
         if(getOption()->getAsBool(PREF_SELECT_LEAST_USED_HOST)) {
           getDownloadEngine()->getRequestGroupMan()->getUsedHosts(usedHosts);
         }
-        SharedHandle<Request> fasterRequest =
+        std::shared_ptr<Request> fasterRequest =
           fileEntry_->findFasterRequest
           (req_, usedHosts, e_->getRequestGroupMan()->getServerStatMan());
         if(fasterRequest) {
@@ -230,7 +228,7 @@ bool AbstractCommand::execute() {
           size_t maxSegments = req_?req_->getMaxPipelinedRequest():1;
           size_t minSplitSize = calculateMinSplitSize();
           while(segments_.size() < maxSegments) {
-            SharedHandle<Segment> segment =
+            std::shared_ptr<Segment> segment =
               getSegmentMan()->getSegment(getCuid(), minSplitSize);
             if(!segment) {
               break;
@@ -276,7 +274,7 @@ bool AbstractCommand::execute() {
     } else {
       if(checkPoint_.difference(global::wallclock()) >= timeout_) {
         // timeout triggers ServerStat error state.
-        SharedHandle<ServerStat> ss =
+        std::shared_ptr<ServerStat> ss =
           e_->getRequestGroupMan()->getOrCreateServerStat(req_->getHost(),
                                                           req_->getProtocol());
         ss->setError();
@@ -301,7 +299,7 @@ bool AbstractCommand::execute() {
         }
         throw DL_RETRY_EX2(EX_TIME_OUT, error_code::TIME_OUT);
       }
-      e_->addCommand(this);
+      addCommandSelf();
       return false;
     }
   } catch(DlAbortEx& err) {
@@ -375,7 +373,7 @@ bool AbstractCommand::execute() {
 
 void AbstractCommand::tryReserved() {
   if(getDownloadContext()->getFileEntries().size() == 1) {
-    const SharedHandle<FileEntry>& entry =
+    const std::shared_ptr<FileEntry>& entry =
       getDownloadContext()->getFirstFileEntry();
     // Don't create new command if currently file length is unknown
     // and there are no URI left. Because file length is unknown, we
@@ -390,10 +388,10 @@ void AbstractCommand::tryReserved() {
   }
   A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - Trying reserved/pooled request.",
                    getCuid()));
-  std::vector<Command*> commands;
+  std::vector<std::unique_ptr<Command>> commands;
   requestGroup_->createNextCommand(commands, e_, 1);
   e_->setNoWait(true);
-  e_->addCommand(commands);
+  e_->addCommand(std::move(commands));
 }
 
 bool AbstractCommand::prepareForRetry(time_t wait) {
@@ -415,16 +413,16 @@ bool AbstractCommand::prepareForRetry(time_t wait) {
     }
   }
 
-  Command* command = new CreateRequestCommand(getCuid(), requestGroup_, e_);
+  auto command = make_unique<CreateRequestCommand>(getCuid(),
+                                                   requestGroup_, e_);
   if(wait == 0) {
     e_->setNoWait(true);
-    e_->addCommand(command);
   } else {
     // We don't use wait so that Command can be executed by
     // DownloadEngine::setRefreshInterval(0).
     command->setStatus(Command::STATUS_INACTIVE);
-    e_->addCommand(command);
   }
+  e_->addCommand(std::move(command));
   return true;
 }
 
@@ -469,7 +467,7 @@ void AbstractCommand::onAbort() {
           std::vector<std::string> uris;
           uris.reserve(res.size());
           std::transform(res.begin(), res.end(), std::back_inserter(uris),
-                         std::mem_fun_ref(&URIResult::getURI));
+                         std::mem_fn(&URIResult::getURI));
           A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - %lu URIs found.",
                            getCuid(),
                            static_cast<unsigned long int>(uris.size())));
@@ -490,7 +488,7 @@ void AbstractCommand::disableReadCheckSocket() {
 }
 
 void AbstractCommand::setReadCheckSocket
-(const SharedHandle<SocketCore>& socket) {
+(const std::shared_ptr<SocketCore>& socket) {
   if(!socket->isOpen()) {
     disableReadCheckSocket();
   } else {
@@ -509,7 +507,7 @@ void AbstractCommand::setReadCheckSocket
 }
 
 void AbstractCommand::setReadCheckSocketIf
-(const SharedHandle<SocketCore>& socket, bool pred)
+(const std::shared_ptr<SocketCore>& socket, bool pred)
 {
   if(pred) {
     setReadCheckSocket(socket);
@@ -527,7 +525,7 @@ void AbstractCommand::disableWriteCheckSocket() {
 }
 
 void AbstractCommand::setWriteCheckSocket
-(const SharedHandle<SocketCore>& socket) {
+(const std::shared_ptr<SocketCore>& socket) {
   if(!socket->isOpen()) {
     disableWriteCheckSocket();
   } else {
@@ -546,7 +544,7 @@ void AbstractCommand::setWriteCheckSocket
 }
 
 void AbstractCommand::setWriteCheckSocketIf
-(const SharedHandle<SocketCore>& socket, bool pred)
+(const std::shared_ptr<SocketCore>& socket, bool pred)
 {
   if(pred) {
     setWriteCheckSocket(socket);
@@ -555,7 +553,7 @@ void AbstractCommand::setWriteCheckSocketIf
   }
 }
 
-void AbstractCommand::swapSocket(SharedHandle<SocketCore>& socket)
+void AbstractCommand::swapSocket(std::shared_ptr<SocketCore>& socket)
 {
   disableReadCheckSocket();
   disableWriteCheckSocket();
@@ -634,7 +632,7 @@ namespace {
 // Returns true if proxy is defined for the given protocol. Otherwise
 // returns false.
 bool isProxyRequest
-(const std::string& protocol, const SharedHandle<Option>& option)
+(const std::string& protocol, const std::shared_ptr<Option>& option)
 {
   std::string proxyUri = getProxyUri(protocol, option.get());
   return !proxyUri.empty();
@@ -642,7 +640,7 @@ bool isProxyRequest
 } // namespace
 
 namespace {
-bool inNoProxy(const SharedHandle<Request>& req,
+bool inNoProxy(const std::shared_ptr<Request>& req,
                const std::string& noProxy)
 {
   std::vector<Scip> entries;
@@ -685,9 +683,9 @@ bool AbstractCommand::isProxyDefined() const
     !inNoProxy(req_, getOption()->get(PREF_NO_PROXY));
 }
 
-SharedHandle<Request> AbstractCommand::createProxyRequest() const
+std::shared_ptr<Request> AbstractCommand::createProxyRequest() const
 {
-  SharedHandle<Request> proxyRequest;
+  std::shared_ptr<Request> proxyRequest;
   if(inNoProxy(req_, getOption()->get(PREF_NO_PROXY))) {
     return proxyRequest;
   }
@@ -772,18 +770,17 @@ std::string AbstractCommand::resolveHostname
 }
 
 void AbstractCommand::prepareForNextAction
-(const SharedHandle<CheckIntegrityEntry>& checkEntry)
+(std::unique_ptr<CheckIntegrityEntry> checkEntry)
 {
-  std::vector<Command*>* commands = new std::vector<Command*>();
-  auto_delete_container<std::vector<Command*> > commandsDel(commands);
-  requestGroup_->processCheckIntegrityEntry(*commands, checkEntry, e_);
-  e_->addCommand(*commands);
-  commands->clear();
+  std::vector<std::unique_ptr<Command>> commands;
+  requestGroup_->processCheckIntegrityEntry(commands, std::move(checkEntry),
+                                            e_);
+  e_->addCommand(std::move(commands));
   e_->setNoWait(true);
 }
 
 bool AbstractCommand::checkIfConnectionEstablished
-(const SharedHandle<SocketCore>& socket,
+(const std::shared_ptr<SocketCore>& socket,
  const std::string& connectedHostname,
  const std::string& connectedAddr,
  uint16_t connectedPort)
@@ -796,11 +793,10 @@ bool AbstractCommand::checkIfConnectionEstablished
       A2_LOG_INFO(fmt(MSG_CONNECT_FAILED_AND_RETRY,
                       getCuid(),
                       connectedAddr.c_str(), connectedPort));
-      Command* command =
-        InitiateConnectionCommandFactory::createInitiateConnectionCommand
-        (getCuid(), req_, fileEntry_, requestGroup_, e_);
       e_->setNoWait(true);
-      e_->addCommand(command);
+      e_->addCommand(InitiateConnectionCommandFactory::
+                     createInitiateConnectionCommand
+                     (getCuid(), req_, fileEntry_, requestGroup_, e_));
       return false;
     }
     e_->removeCachedIPAddress(connectedHostname, connectedPort);
@@ -827,7 +823,7 @@ const std::string& AbstractCommand::resolveProxyMethod
   }
 }
 
-const SharedHandle<Option>& AbstractCommand::getOption() const
+const std::shared_ptr<Option>& AbstractCommand::getOption() const
 {
   return requestGroup_->getOption();
 }
@@ -846,7 +842,7 @@ int32_t AbstractCommand::calculateMinSplitSize() const
   }
 }
 
-void AbstractCommand::setRequest(const SharedHandle<Request>& request)
+void AbstractCommand::setRequest(const std::shared_ptr<Request>& request)
 {
   req_ = request;
 }
@@ -856,27 +852,27 @@ void AbstractCommand::resetRequest()
   req_.reset();
 }
 
-void AbstractCommand::setFileEntry(const SharedHandle<FileEntry>& fileEntry)
+void AbstractCommand::setFileEntry(const std::shared_ptr<FileEntry>& fileEntry)
 {
   fileEntry_ = fileEntry;
 }
 
-void AbstractCommand::setSocket(const SharedHandle<SocketCore>& s)
+void AbstractCommand::setSocket(const std::shared_ptr<SocketCore>& s)
 {
   socket_ = s;
 }
 
-const SharedHandle<DownloadContext>& AbstractCommand::getDownloadContext() const
+const std::shared_ptr<DownloadContext>& AbstractCommand::getDownloadContext() const
 {
   return requestGroup_->getDownloadContext();
 }
 
-const SharedHandle<SegmentMan>& AbstractCommand::getSegmentMan() const
+const std::shared_ptr<SegmentMan>& AbstractCommand::getSegmentMan() const
 {
   return requestGroup_->getSegmentMan();
 }
 
-const SharedHandle<PieceStorage>& AbstractCommand::getPieceStorage() const
+const std::shared_ptr<PieceStorage>& AbstractCommand::getPieceStorage() const
 {
   return requestGroup_->getPieceStorage();
 }
@@ -887,6 +883,11 @@ void AbstractCommand::checkSocketRecvBuffer()
     setStatus(Command::STATUS_ONESHOT_REALTIME);
     e_->setNoWait(true);
   }
+}
+
+void AbstractCommand::addCommandSelf()
+{
+  e_->addCommand(std::unique_ptr<Command>(this));
 }
 
 } // namespace aria2

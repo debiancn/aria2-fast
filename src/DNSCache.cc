@@ -91,8 +91,7 @@ bool DNSCache::CacheEntry::add(const std::string& addr)
 std::vector<DNSCache::AddrEntry>::iterator DNSCache::CacheEntry::find
 (const std::string& addr)
 {
-  for(std::vector<AddrEntry>::iterator i = addrEntries_.begin(),
-        eoi = addrEntries_.end(); i != eoi; ++i) {
+  for(auto i = addrEntries_.begin(), eoi = addrEntries_.end(); i != eoi; ++i) {
     if((*i).addr_ == addr) {
       return i;
     }
@@ -103,8 +102,7 @@ std::vector<DNSCache::AddrEntry>::iterator DNSCache::CacheEntry::find
 std::vector<DNSCache::AddrEntry>::const_iterator DNSCache::CacheEntry::find
 (const std::string& addr) const
 {
-  for(std::vector<AddrEntry>::const_iterator i = addrEntries_.begin(),
-        eoi = addrEntries_.end(); i != eoi; ++i) {
+  for(auto i = addrEntries_.begin(), eoi = addrEntries_.end(); i != eoi; ++i) {
     if((*i).addr_ == addr) {
       return i;
     }
@@ -119,10 +117,9 @@ bool DNSCache::CacheEntry::contains(const std::string& addr) const
 
 const std::string& DNSCache::CacheEntry::getGoodAddr() const
 {
-  for(std::vector<AddrEntry>::const_iterator i = addrEntries_.begin(),
-        eoi = addrEntries_.end(); i != eoi; ++i) {
-    if((*i).good_) {
-      return (*i).addr_;
+  for(auto & elem : addrEntries_) {
+    if(elem.good_) {
+      return (elem).addr_;
     }
   }
   return A2STR::NIL;
@@ -130,9 +127,9 @@ const std::string& DNSCache::CacheEntry::getGoodAddr() const
 
 void DNSCache::CacheEntry::markBad(const std::string& addr)
 {
-  std::vector<AddrEntry>::iterator i = find(addr);
+  auto i = find(addr);
   if(i != addrEntries_.end()) {
-    (*i).good_ = false;
+    i->good_ = false;
   }
 }
 
@@ -167,7 +164,7 @@ DNSCache& DNSCache::operator=(const DNSCache& c)
 const std::string& DNSCache::find
 (const std::string& hostname, uint16_t port) const
 {
-  SharedHandle<CacheEntry> target(new CacheEntry(hostname, port));
+  std::shared_ptr<CacheEntry> target(new CacheEntry(hostname, port));
   CacheEntrySet::iterator i = entries_.find(target);
   if(i == entries_.end()) {
     return A2STR::NIL;
@@ -179,7 +176,7 @@ const std::string& DNSCache::find
 void DNSCache::put
 (const std::string& hostname, const std::string& ipaddr, uint16_t port)
 {
-  SharedHandle<CacheEntry> target(new CacheEntry(hostname, port));
+  std::shared_ptr<CacheEntry> target(new CacheEntry(hostname, port));
   CacheEntrySet::iterator i = entries_.lower_bound(target);
   if(i != entries_.end() && *(*i) == *target) {
     (*i)->add(ipaddr);
@@ -192,7 +189,7 @@ void DNSCache::put
 void DNSCache::markBad
 (const std::string& hostname, const std::string& ipaddr, uint16_t port)
 {
-  SharedHandle<CacheEntry> target(new CacheEntry(hostname, port));
+  std::shared_ptr<CacheEntry> target(new CacheEntry(hostname, port));
   CacheEntrySet::iterator i = entries_.find(target);
   if(i != entries_.end()) {
     (*i)->markBad(ipaddr);
@@ -201,7 +198,7 @@ void DNSCache::markBad
 
 void DNSCache::remove(const std::string& hostname, uint16_t port)
 {
-  SharedHandle<CacheEntry> target(new CacheEntry(hostname, port));
+  std::shared_ptr<CacheEntry> target(new CacheEntry(hostname, port));
   entries_.erase(target);
 }
 

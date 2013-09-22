@@ -45,23 +45,24 @@ namespace aria2 {
 
 FtpTunnelResponseCommand::FtpTunnelResponseCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const SharedHandle<HttpConnection>& httpConnection,
+ const std::shared_ptr<HttpConnection>& httpConnection,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& s)
+ const std::shared_ptr<SocketCore>& s)
   :AbstractProxyResponseCommand(cuid, req, fileEntry, requestGroup,
                                 httpConnection,e, s)
 {}
 
 FtpTunnelResponseCommand::~FtpTunnelResponseCommand() {}
 
-Command* FtpTunnelResponseCommand::getNextCommand()
+std::unique_ptr<Command> FtpTunnelResponseCommand::getNextCommand()
 {
-  return new FtpNegotiationCommand(getCuid(), getRequest(), getFileEntry(),
-                                   getRequestGroup(), getDownloadEngine(),
-                                   getSocket());
+  return make_unique<FtpNegotiationCommand>
+    (getCuid(), getRequest(), getFileEntry(),
+     getRequestGroup(), getDownloadEngine(),
+     getSocket());
 }
 
 } // namespace aria2

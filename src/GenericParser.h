@@ -36,7 +36,6 @@
 #define D_GENERIC_PARSER_H
 
 #include "common.h"
-#include "SharedHandle.h"
 #include "a2io.h"
 #include "util.h"
 
@@ -46,7 +45,7 @@ template<typename Parser, typename ParserStateMachine>
 class GenericParser {
 public:
   GenericParser()
-    : parser_(&psm_)
+    : parser_{&psm_}
   {}
 
   ~GenericParser()

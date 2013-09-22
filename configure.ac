@@ -2,9 +2,17 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-LT_PREREQ([2.2.6])
-AC_INIT([aria2],[1.17.1],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.18.0],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+
+AC_CANONICAL_HOST
+AC_CANONICAL_TARGET
+
+AM_INIT_AUTOMAKE([subdir-objects])
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
 AC_USE_SYSTEM_EXTENSIONS
+
+LT_PREREQ([2.2.6])
 LT_INIT([disable-static])
 dnl See versioning rule:
 dnl  http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
@@ -13,9 +21,6 @@ AC_SUBST(LT_REVISION, 0)
 AC_SUBST(LT_AGE, 0)
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CANONICAL_HOST
-AC_CANONICAL_TARGET
-AM_INIT_AUTOMAKE()
 AM_PATH_CPPUNIT(1.10.2)
 AC_CONFIG_SRCDIR([src/a2io.h])
 AC_CONFIG_HEADERS([config.h])
@@ -24,6 +29,9 @@ case "$host" in
   *mingw*)
     win_build=yes
     LIBS="$LIBS -lws2_32 -lwsock32 -lgdi32 -lwinmm -liphlpapi -lpsapi"
+    # Deactivate __USE_MINGW_ANSI_STDIO because it causes lots of errors for
+    # PRId64.
+    CPPFLAGS="-D__USE_MINGW_ANSI_STDIO=0 $CPPFLAGS"
     ;;
 esac
 
@@ -52,7 +60,14 @@ ARIA2_ARG_ENABLE([libaria2])
 
 AC_ARG_WITH([ca-bundle],
   AS_HELP_STRING([--with-ca-bundle=FILE],[Use FILE as default CA bundle.]),
-  [ca_bundle=$withval], [ca_bundle=""])
+  [AC_DEFINE_UNQUOTED([CA_BUNDLE], ["$withval"], [Define to choose default CA bundle.])
+   ca_bundle=$withval
+  ], [])
+
+AC_ARG_WITH([disk-cache],
+  AS_HELP_STRING([--with-disk-cache=SIZE],[Use SIZE as the default disk-cache size.]),
+  [AC_DEFINE_UNQUOTED([DEFAULT_DISK_CACHE], ["$withval"], [Define to choose default disk-cache size])],
+  [])
 
 AC_ARG_WITH([bashcompletiondir],
   AS_HELP_STRING([--with-bashcompletiondir=DIR],
@@ -83,6 +98,10 @@ AC_PATH_PROG([ASCIIDOC], [asciidoc])
 AC_SUBST([ASCIIDOC])
 AM_CONDITIONAL([HAVE_ASCIIDOC], [ test "x$ASCIIDOC" != "x" ])
 
+AC_PATH_PROGS([SPHINXBUILD], [sphinx-build])
+AC_SUBST([SPHINXBUILD])
+AM_CONDITIONAL([HAVE_SPHINXBUILD], [ test "x$SPHINXBUILD" != "x" ])
+
 AC_PATH_PROGS([RST2HTML], [rst2html.py rst2html])
 AC_SUBST([RST2HTML])
 AM_CONDITIONAL([HAVE_RST2HTML], [ test "x$RST2HTML" != "x" ])
@@ -92,6 +111,30 @@ AC_LANG([C++])
 
 # Check pkg-config is available
 PKG_PROG_PKG_CONFIG([0.20])
+
+# Check C++ compiler supports C++0x/C++11 feature
+AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+
+# i686-w64-mingw32-g++ 4.6 does not support override keyword. For
+# those compilers, define CXX11_OVERRIDE to empty string. Otherwise
+# define it as override. Use CXX11_OVERRIDE instead of override.
+AC_MSG_CHECKING([whether the C++ compiler supports `override` keyword])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+struct Base {
+virtual void f() = 0;
+};
+struct Derived : Base {
+virtual void f() override {}
+};
+]],
+[[
+Derived x;
+]])],
+    [cxx11_override=override
+     AC_MSG_RESULT([yes])],
+    [AC_MSG_RESULT([no])])
+AC_DEFINE_UNQUOTED([CXX11_OVERRIDE], [$cxx11_override],
+                   [Define `override` keyword if the compiler supports it])
 
 # Check static build is requested
 if test "x$ARIA2_STATIC" = "xyes"; then
@@ -196,6 +239,7 @@ int main() { return uv_poll_init_socket(); }
 
   if test "x$have_libuv" = "xyes"; then
     AC_DEFINE([HAVE_LIBUV], [1], [Define to 1 if you have libuv.])
+    AC_CHECK_FUNCS([uv_last_error])
   elif test "x$with_libuv_requested" = "xyes"; then
     ARIA2_DEP_NOT_MET([libuv])
   fi
@@ -375,7 +419,6 @@ if test "x$have_appletls" = "xyes" || test "x$have_libgnutls" = "xyes" || test "
   have_ssl="yes"
   AC_DEFINE([ENABLE_SSL], [1], [Define to 1 if ssl support is enabled.])
   AM_CONDITIONAL([ENABLE_SSL], true)
-  AC_SUBST([ca_bundle])
 else
   AM_CONDITIONAL([ENABLE_SSL], false)
 fi
@@ -561,7 +604,7 @@ AC_C_BIGENDIAN
 AC_SYS_LARGEFILE
 
 # Checks for library functions.
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
 AM_GNU_GETTEXT_VERSION([0.18])
 AC_FUNC_ERROR_AT_LINE
 AC_PROG_GCC_TRADITIONAL
@@ -861,7 +904,6 @@ AC_CONFIG_FILES([Makefile
 		src/includes/Makefile
 		test/Makefile
 		po/Makefile.in
-		intl/Makefile
 		lib/Makefile
 		doc/Makefile
 		doc/manual-src/Makefile

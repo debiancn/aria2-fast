@@ -72,7 +72,7 @@ const unsigned char* GENERATOR = reinterpret_cast<const unsigned char*>("2");
 
 MSEHandshake::MSEHandshake
 (cuid_t cuid,
- const SharedHandle<SocketCore>& socket,
+ const std::shared_ptr<SocketCore>& socket,
  const Option* op)
   : cuid_(cuid),
     socket_(socket),
@@ -81,12 +81,12 @@ MSEHandshake::MSEHandshake
     rbufLength_(0),
     socketBuffer_(socket),
     negotiatedCryptoType_(CRYPTO_NONE),
-    dh_(0),
+    dh_(nullptr),
     initiator_(true),
     markerIndex_(0),
     padLength_(0),
     iaLength_(0),
-    ia_(0),
+    ia_(nullptr),
     sha1_(MessageDigest::sha1())
 {}
 
@@ -107,11 +107,10 @@ MSEHandshake::HANDSHAKE_TYPE MSEHandshake::identifyHandshakeType()
     A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - This is legacy BitTorrent handshake.",
                      cuid_));
     return HANDSHAKE_LEGACY;
-  } else {
-    A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - This may be encrypted BitTorrent handshake.",
-                     cuid_));
-    return HANDSHAKE_ENCRYPTED;
   }
+  A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - This may be encrypted BitTorrent handshake.",
+                    cuid_));
+  return HANDSHAKE_ENCRYPTED;
 }
 
 void MSEHandshake::initEncryptionFacility(bool initiator)
@@ -128,15 +127,13 @@ void MSEHandshake::sendPublicKey()
 {
   A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - Sending public key.",
                    cuid_));
-  unsigned char* buf = new unsigned char[KEY_LENGTH+MAX_PAD_LENGTH];
-  array_ptr<unsigned char> bufp(buf);
-  dh_->getPublicKey(buf, KEY_LENGTH);
+  auto buf = make_unique<unsigned char[]>(KEY_LENGTH+MAX_PAD_LENGTH);
+  dh_->getPublicKey(buf.get(), KEY_LENGTH);
 
   size_t padLength =
     SimpleRandomizer::getInstance()->getRandomNumber(MAX_PAD_LENGTH+1);
-  dh_->generateNonce(buf+KEY_LENGTH, padLength);
-  socketBuffer_.pushBytes(buf, KEY_LENGTH+padLength);
-  bufp.reset(0);
+  dh_->generateNonce(buf.get()+KEY_LENGTH, padLength);
+  socketBuffer_.pushBytes(buf.release(), KEY_LENGTH+padLength);
 }
 
 void MSEHandshake::read()
@@ -194,16 +191,16 @@ void MSEHandshake::initCipher(const unsigned char* infoHash)
   unsigned char localCipherKey[20];
   sha1_->reset();
   message_digest::digest(localCipherKey, sizeof(localCipherKey),
-                         sha1_, s, sizeof(s));
-  encryptor_.reset(new ARC4Encryptor());
+                         sha1_.get(), s, sizeof(s));
+  encryptor_ = make_unique<ARC4Encryptor>();
   encryptor_->init(localCipherKey, sizeof(localCipherKey));
 
   unsigned char peerCipherKey[20];
   memcpy(s, initiator_?"keyB":"keyA", 4);
   sha1_->reset();
   message_digest::digest(peerCipherKey, sizeof(peerCipherKey),
-                         sha1_, s, sizeof(s));
-  decryptor_.reset(new ARC4Encryptor());
+                         sha1_.get(), s, sizeof(s));
+  decryptor_ = make_unique<ARC4Encryptor>();
   decryptor_->init(peerCipherKey, sizeof(peerCipherKey));
 
   // discard first 1024 bytes ARC4 output.
@@ -234,7 +231,7 @@ void MSEHandshake::createReq1Hash(unsigned char* md) const
   memcpy(buffer, "req1", 4);
   memcpy(buffer+4, secret_, KEY_LENGTH);
   sha1_->reset();
-  message_digest::digest(md, 20, sha1_, buffer, 4+KEY_LENGTH);
+  message_digest::digest(md, 20, sha1_.get(), buffer, 4+KEY_LENGTH);
 }
 
 void MSEHandshake::createReq23Hash(unsigned char* md, const unsigned char* infoHash) const
@@ -244,14 +241,14 @@ void MSEHandshake::createReq23Hash(unsigned char* md, const unsigned char* infoH
   memcpy(x+4, infoHash, INFO_HASH_LENGTH);
   unsigned char xh[20];
   sha1_->reset();
-  message_digest::digest(xh, sizeof(xh), sha1_, x, sizeof(x));
+  message_digest::digest(xh, sizeof(xh), sha1_.get(), x, sizeof(x));
 
   unsigned char y[4+96];
   memcpy(y, "req3", 4);
   memcpy(y+4, secret_, KEY_LENGTH);
   unsigned char yh[20];
   sha1_->reset();
-  message_digest::digest(yh, sizeof(yh), sha1_, y, sizeof(y));
+  message_digest::digest(yh, sizeof(yh), sha1_.get(), y, sizeof(y));
 
   for(size_t i = 0; i < 20; ++i) {
     md[i] = xh[i]^yh[i];
@@ -271,23 +268,23 @@ void MSEHandshake::sendInitiatorStep2()
 {
   A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - Sending negotiation step2.", cuid_));
   // Assuming no exception
-  unsigned char* md = new unsigned char[20];
-  createReq1Hash(md);
-  socketBuffer_.pushBytes(md, 20);
+  auto md = make_unique<unsigned char[]>((size_t)20);
+  createReq1Hash(md.get());
+  socketBuffer_.pushBytes(md.release(), 20);
   // Assuming no exception
-  md = new unsigned char[20];
-  createReq23Hash(md, infoHash_);
-  socketBuffer_.pushBytes(md, 20);
+  md = make_unique<unsigned char[]>((size_t)20);
+  createReq23Hash(md.get(), infoHash_);
+  socketBuffer_.pushBytes(md.release(), 20);
   // buffer is filled in this order:
   //   VC(VC_LENGTH bytes),
   //   crypto_provide(CRYPTO_BITFIELD_LENGTH bytes),
   //   len(padC)(2 bytes),
   //   padC(len(padC) bytes <= MAX_PAD_LENGTH),
   //   len(IA)(2 bytes)
-  unsigned char* buffer = new unsigned char
-    [40+VC_LENGTH+CRYPTO_BITFIELD_LENGTH+2+MAX_PAD_LENGTH+2];
-  array_ptr<unsigned char> bufp(buffer);
-  unsigned char* ptr = buffer;
+  auto buffer = make_unique<unsigned char[]>(40+VC_LENGTH+
+                                             CRYPTO_BITFIELD_LENGTH+2+
+                                             MAX_PAD_LENGTH+2);
+  unsigned char* ptr = buffer.get();
   // VC
   memcpy(ptr, VC, sizeof(VC));
   ptr += sizeof(VC);
@@ -317,8 +314,8 @@ void MSEHandshake::sendInitiatorStep2()
     memcpy(ptr, &iaLengthBE, sizeof(iaLengthBE));
   }
   ptr += 2;
-  encryptAndSendData(buffer, ptr-buffer);
-  bufp.reset(0);
+  size_t buflen = ptr-buffer.get();
+  encryptAndSendData(buffer.release(), buflen);
 }
 
 // This function reads exactly until the end of VC marker is reached.
@@ -422,7 +419,7 @@ bool MSEHandshake::findReceiverHashMarker()
 }
 
 bool MSEHandshake::receiveReceiverHashAndPadCLength
-(const std::vector<SharedHandle<DownloadContext> >& downloadContexts)
+(const std::vector<std::shared_ptr<DownloadContext> >& downloadContexts)
 {
   if(20+VC_LENGTH+CRYPTO_BITFIELD_LENGTH+2/*PadC length*/ > rbufLength_) {
     wantRead_ = true;
@@ -431,18 +428,16 @@ bool MSEHandshake::receiveReceiverHashAndPadCLength
   // resolve info hash
   // pointing to the position of HASH('req2', SKEY) xor HASH('req3', S)
   unsigned char* rbufptr = rbuf_;
-  SharedHandle<DownloadContext> downloadContext;
-  for(std::vector<SharedHandle<DownloadContext> >::const_iterator i =
-        downloadContexts.begin(), eoi = downloadContexts.end();
-      i != eoi; ++i) {
+  std::shared_ptr<DownloadContext> downloadContext;
+  for(auto & ctx : downloadContexts) {
     unsigned char md[20];
-    const unsigned char* infohash = bittorrent::getInfoHash(*i);
+    const auto infohash = bittorrent::getInfoHash(ctx);
     createReq23Hash(md, infohash);
     if(memcmp(md, rbufptr, sizeof(md)) == 0) {
       A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - info hash found: %s",
                        cuid_,
                        util::toHex(infohash, INFO_HASH_LENGTH).c_str()));
-      downloadContext = *i;
+      downloadContext = ctx;
       break;
     }
   }
@@ -522,10 +517,10 @@ void MSEHandshake::sendReceiverStep2()
   //   cryptoSelect(CRYPTO_BITFIELD_LENGTH bytes),
   //   len(padD)(2bytes),
   //   padD(len(padD)bytes <= MAX_PAD_LENGTH)
-  unsigned char* buffer = new unsigned char
-    [VC_LENGTH+CRYPTO_BITFIELD_LENGTH+2+MAX_PAD_LENGTH];
-  array_ptr<unsigned char> bufp(buffer);
-  unsigned char* ptr = buffer;
+  auto buffer = make_unique<unsigned char[]>(VC_LENGTH+
+                                             CRYPTO_BITFIELD_LENGTH+2+
+                                             MAX_PAD_LENGTH);
+  unsigned char* ptr = buffer.get();
   // VC
   memcpy(ptr, VC, sizeof(VC));
   ptr += sizeof(VC);
@@ -542,8 +537,8 @@ void MSEHandshake::sendReceiverStep2()
   // padD, all zeroed
   memset(ptr, 0, padDLength);
   ptr += padDLength;
-  encryptAndSendData(buffer, ptr-buffer);
-  bufp.reset(0);
+  size_t buflen = ptr - buffer.get();
+  encryptAndSendData(buffer.release(), buflen);
 }
 
 uint16_t MSEHandshake::verifyPadLength(const unsigned char* padlenbuf, const char* padName)
@@ -583,6 +578,16 @@ void MSEHandshake::verifyReq1Hash(const unsigned char* req1buf)
 bool MSEHandshake::getWantWrite() const
 {
   return !socketBuffer_.sendBufferIsEmpty();
+}
+
+std::unique_ptr<ARC4Encryptor> MSEHandshake::popEncryptor()
+{
+  return std::move(encryptor_);
+}
+
+std::unique_ptr<ARC4Encryptor> MSEHandshake::popDecryptor()
+{
+  return std::move(decryptor_);
 }
 
 } // namespace aria2

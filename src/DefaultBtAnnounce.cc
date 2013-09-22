@@ -58,9 +58,8 @@
 namespace aria2 {
 
 DefaultBtAnnounce::DefaultBtAnnounce
-(const SharedHandle<DownloadContext>& downloadContext,
- const Option* option)
-  : downloadContext_(downloadContext),
+(DownloadContext* downloadContext, const Option* option)
+  : downloadContext_{downloadContext},
     trackers_(0),
     prevAnnounceTimer_(0),
     interval_(DEFAULT_ANNOUNCE_INTERVAL),
@@ -70,7 +69,7 @@ DefaultBtAnnounce::DefaultBtAnnounce
     incomplete_(0),
     announceList_(bittorrent::getTorrentAttrs(downloadContext)->announceList),
     option_(option),
-    randomizer_(SimpleRandomizer::getInstance()),
+    randomizer_(SimpleRandomizer::getInstance().get()),
     tcpPort_(0)
 {}
 
@@ -202,16 +201,16 @@ std::string DefaultBtAnnounce::getAnnounceUrl() {
   return uri;
 }
 
-SharedHandle<UDPTrackerRequest> DefaultBtAnnounce::createUDPTrackerRequest
+std::shared_ptr<UDPTrackerRequest> DefaultBtAnnounce::createUDPTrackerRequest
 (const std::string& remoteAddr, uint16_t remotePort, uint16_t localPort)
 {
   if(!adjustAnnounceList()) {
-    return SharedHandle<UDPTrackerRequest>();
+    return nullptr;
   }
   NetStat& stat = downloadContext_->getNetStat();
   int64_t left =
     pieceStorage_->getTotalLength()-pieceStorage_->getCompletedLength();
-  SharedHandle<UDPTrackerRequest> req(new UDPTrackerRequest());
+  std::shared_ptr<UDPTrackerRequest> req(new UDPTrackerRequest());
   req->remoteAddr = remoteAddr;
   req->remotePort = remotePort;
   req->action = UDPT_ACT_ANNOUNCE;
@@ -284,8 +283,7 @@ DefaultBtAnnounce::processAnnounceResponse(const unsigned char* trackerResponse,
                                            size_t trackerResponseLength)
 {
   A2_LOG_DEBUG("Now processing tracker response.");
-  SharedHandle<ValueBase> decodedValue =
-    bencode2::decode(trackerResponse, trackerResponseLength);
+  auto decodedValue = bencode2::decode(trackerResponse, trackerResponseLength);
   const Dict* dict = downcast<Dict>(decodedValue);
   if(!dict) {
     throw DL_ABORT_EX(MSG_NULL_TRACKER_RESPONSE);
@@ -328,22 +326,22 @@ DefaultBtAnnounce::processAnnounceResponse(const unsigned char* trackerResponse,
     incomplete_ = incomp->i();
     A2_LOG_DEBUG(fmt("Incomplete:%d", incomplete_));
   }
-  const SharedHandle<ValueBase>& peerData = dict->get(BtAnnounce::PEERS);
+  auto peerData = dict->get(BtAnnounce::PEERS);
   if(!peerData) {
     A2_LOG_INFO(MSG_NO_PEER_LIST_RECEIVED);
   } else {
     if(!btRuntime_->isHalt() && btRuntime_->lessThanMinPeers()) {
-      std::vector<SharedHandle<Peer> > peers;
+      std::vector<std::shared_ptr<Peer> > peers;
       bittorrent::extractPeer(peerData, AF_INET, std::back_inserter(peers));
       peerStorage_->addPeer(peers);
     }
   }
-  const SharedHandle<ValueBase>& peer6Data = dict->get(BtAnnounce::PEERS6);
+  auto peer6Data = dict->get(BtAnnounce::PEERS6);
   if(!peer6Data) {
     A2_LOG_INFO("No peers6 received.");
   } else {
     if(!btRuntime_->isHalt() && btRuntime_->lessThanMinPeers()) {
-      std::vector<SharedHandle<Peer> > peers;
+      std::vector<std::shared_ptr<Peer> > peers;
       bittorrent::extractPeer(peer6Data, AF_INET6, std::back_inserter(peers));
       peerStorage_->addPeer(peers);
     }
@@ -351,9 +349,9 @@ DefaultBtAnnounce::processAnnounceResponse(const unsigned char* trackerResponse,
 }
 
 void DefaultBtAnnounce::processUDPTrackerResponse
-(const SharedHandle<UDPTrackerRequest>& req)
+(const std::shared_ptr<UDPTrackerRequest>& req)
 {
-  const SharedHandle<UDPTrackerReply>& reply = req->reply;
+  const std::shared_ptr<UDPTrackerReply>& reply = req->reply;
   A2_LOG_DEBUG("Now processing UDP tracker response.");
   if(reply->interval > 0) {
     minInterval_ = reply->interval;
@@ -365,11 +363,8 @@ void DefaultBtAnnounce::processUDPTrackerResponse
   incomplete_ = reply->leechers;
   A2_LOG_DEBUG(fmt("Incomplete:%d", reply->leechers));
   if(!btRuntime_->isHalt() && btRuntime_->lessThanMinPeers()) {
-    for(std::vector<std::pair<std::string, uint16_t> >::iterator i =
-          reply->peers.begin(), eoi = reply->peers.end(); i != eoi;
-        ++i) {
-      peerStorage_->addPeer(SharedHandle<Peer>(new Peer((*i).first,
-                                                        (*i).second)));
+    for(auto & elem : reply->peers) {
+      peerStorage_->addPeer(std::make_shared<Peer>(elem.first, elem.second));
     }
   }
 }
@@ -384,24 +379,23 @@ void DefaultBtAnnounce::shuffleAnnounce() {
   announceList_.shuffle();
 }
 
-void DefaultBtAnnounce::setRandomizer
-(const SharedHandle<Randomizer>& randomizer)
+void DefaultBtAnnounce::setRandomizer(Randomizer* randomizer)
 {
   randomizer_ = randomizer;
 }
 
-void DefaultBtAnnounce::setBtRuntime(const SharedHandle<BtRuntime>& btRuntime)
+void DefaultBtAnnounce::setBtRuntime(const std::shared_ptr<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }
 
-void DefaultBtAnnounce::setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage)
+void DefaultBtAnnounce::setPieceStorage(const std::shared_ptr<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
 
 void DefaultBtAnnounce::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+(const std::shared_ptr<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }

@@ -68,9 +68,9 @@ namespace aria2 {
 
 HttpServerBodyCommand::HttpServerBodyCommand
 (cuid_t cuid,
- const SharedHandle<HttpServer>& httpServer,
+ const std::shared_ptr<HttpServer>& httpServer,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket)
+ const std::shared_ptr<SocketCore>& socket)
   : Command(cuid),
     e_(e),
     socket_(socket),
@@ -107,7 +107,7 @@ void HttpServerBodyCommand::sendJsonRpcResponse
   bool gzip = httpServer_->supportsGZip();
   std::string responseData = rpc::toJson(res, callback, gzip);
   if(res.code == 0) {
-    httpServer_->feedResponse(responseData,
+    httpServer_->feedResponse(std::move(responseData),
                               getJsonRpcContentType(!callback.empty()));
   } else {
     httpServer_->disableKeepAlive();
@@ -123,7 +123,7 @@ void HttpServerBodyCommand::sendJsonRpcResponse
       httpCode = 500;
     };
     httpServer_->feedResponse(httpCode, A2STR::NIL,
-                              responseData,
+                              std::move(responseData),
                               getJsonRpcContentType(!callback.empty()));
   }
   addHttpServerResponseCommand();
@@ -135,16 +135,15 @@ void HttpServerBodyCommand::sendJsonRpcBatchResponse
 {
   bool gzip = httpServer_->supportsGZip();
   std::string responseData = rpc::toJsonBatch(results, callback, gzip);
-  httpServer_->feedResponse(responseData,
+  httpServer_->feedResponse(std::move(responseData),
                             getJsonRpcContentType(!callback.empty()));
   addHttpServerResponseCommand();
 }
 
 void HttpServerBodyCommand::addHttpServerResponseCommand()
 {
-  Command* command =
-    new HttpServerResponseCommand(getCuid(), httpServer_, e_, socket_);
-  e_->addCommand(command);
+  e_->addCommand(make_unique<HttpServerResponseCommand>
+                 (getCuid(), httpServer_, e_, socket_));
   e_->setNoWait(true);
 }
 
@@ -184,8 +183,7 @@ bool HttpServerBodyCommand::execute()
         if(httpServer_->getMethod() == "OPTIONS") {
           // Response to Preflight Request.
           // See http://www.w3.org/TR/cors/
-          const SharedHandle<HttpHeader>& header =
-            httpServer_->getRequestHeader();
+          auto& header = httpServer_->getRequestHeader();
           std::string accessControlHeaders;
           if(!header->find(HttpHeader::ORIGIN).empty() &&
              !header->find(HttpHeader::ACCESS_CONTROL_REQUEST_METHOD).empty()
@@ -211,8 +209,8 @@ bool HttpServerBodyCommand::execute()
         switch(httpServer_->getRequestType()) {
         case RPC_TYPE_XML: {
 #ifdef ENABLE_XML_RPC
-          SharedHandle<rpc::XmlRpcDiskWriter> dw =
-            static_pointer_cast<rpc::XmlRpcDiskWriter>(httpServer_->getBody());
+          auto dw = static_cast<rpc::XmlRpcDiskWriter*>
+            (httpServer_->getBody());
           int error;
           error = dw->finalize();
           rpc::RpcRequest req;
@@ -228,13 +226,12 @@ bool HttpServerBodyCommand::execute()
             addHttpServerResponseCommand();
             return true;
           }
-          SharedHandle<rpc::RpcMethod> method =
-            rpc::RpcMethodFactory::create(req.methodName);
           A2_LOG_INFO(fmt("Executing RPC method %s", req.methodName.c_str()));
-          rpc::RpcResponse res = method->execute(req, e_);
+          auto method = rpc::getMethod(req.methodName);
+          auto res = method->execute(std::move(req), e_);
           bool gzip = httpServer_->supportsGZip();
           std::string responseData = rpc::toXml(res, gzip);
-          httpServer_->feedResponse(responseData, "text/xml");
+          httpServer_->feedResponse(std::move(responseData), "text/xml");
           addHttpServerResponseCommand();
 #else // !ENABLE_XML_RPC
           httpServer_->feedResponse(404);
@@ -245,7 +242,7 @@ bool HttpServerBodyCommand::execute()
         case RPC_TYPE_JSON:
         case RPC_TYPE_JSONP: {
           std::string callback;
-          SharedHandle<ValueBase> json;
+          std::unique_ptr<ValueBase> json;
           ssize_t error = 0;
           if(httpServer_->getRequestType() == RPC_TYPE_JSONP) {
             json::JsonGetParam param = json::decodeGetParams(query);
@@ -256,8 +253,8 @@ bool HttpServerBodyCommand::execute()
                param.request.size(),
                error);
           } else {
-            SharedHandle<json::JsonDiskWriter> dw =
-              static_pointer_cast<json::JsonDiskWriter>(httpServer_->getBody());
+            auto dw = static_cast<json::JsonDiskWriter*>
+              (httpServer_->getBody());
             error = dw->finalize();
             if(error == 0) {
               json = dw->getResult();
@@ -274,22 +271,20 @@ bool HttpServerBodyCommand::execute()
             sendJsonRpcResponse(res, callback);
             return true;
           }
-          const Dict* jsondict = downcast<Dict>(json);
+          Dict* jsondict = downcast<Dict>(json);
           if(jsondict) {
             rpc::RpcResponse res = rpc::processJsonRpcRequest(jsondict, e_);
             sendJsonRpcResponse(res, callback);
           } else {
-            const List* jsonlist = downcast<List>(json);
+            List* jsonlist = downcast<List>(json);
             if(jsonlist) {
               // This is batch call
               std::vector<rpc::RpcResponse> results;
               for(List::ValueType::const_iterator i = jsonlist->begin(),
                     eoi = jsonlist->end(); i != eoi; ++i) {
-                const Dict* jsondict = downcast<Dict>(*i);
+                Dict* jsondict = downcast<Dict>(*i);
                 if(jsondict) {
-                  rpc::RpcResponse r =
-                    rpc::processJsonRpcRequest(jsondict, e_);
-                  results.push_back(r);
+                  results.push_back(rpc::processJsonRpcRequest(jsondict, e_));
                 }
               }
               sendJsonRpcBatchResponse(results, callback);
@@ -309,7 +304,7 @@ bool HttpServerBodyCommand::execute()
         }
       } else {
         updateWriteCheck();
-        e_->addCommand(this);
+        e_->addCommand(std::unique_ptr<Command>(this));
         return false;
       }
     } else {
@@ -317,7 +312,7 @@ bool HttpServerBodyCommand::execute()
         A2_LOG_INFO("HTTP request body timeout.");
         return true;
       } else {
-        e_->addCommand(this);
+        e_->addCommand(std::unique_ptr<Command>(this));
         return false;
       }
     }

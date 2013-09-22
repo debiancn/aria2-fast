@@ -123,7 +123,7 @@ bool ActivePeerConnectionCommand::execute() {
       }
     }
   }
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 
@@ -131,42 +131,41 @@ void ActivePeerConnectionCommand::makeNewConnections(int num)
 {
   for(; num && peerStorage_->isPeerAvailable(); --num) {
     cuid_t ncuid = e_->newCUID();
-    SharedHandle<Peer> peer = peerStorage_->checkoutPeer(ncuid);
+    std::shared_ptr<Peer> peer = peerStorage_->checkoutPeer(ncuid);
     // sanity check
     if(!peer) {
       break;
     }
-    PeerInitiateConnectionCommand* command;
-    command = new PeerInitiateConnectionCommand(ncuid, requestGroup_, peer, e_,
-                                                btRuntime_);
+    auto command = make_unique<PeerInitiateConnectionCommand>
+      (ncuid, requestGroup_, peer, e_, btRuntime_);
     command->setPeerStorage(peerStorage_);
     command->setPieceStorage(pieceStorage_);
-    e_->addCommand(command);
+    e_->addCommand(std::move(command));
     A2_LOG_INFO(fmt(MSG_CONNECTING_TO_PEER, getCuid(),
                     peer->getIPAddress().c_str()));
   }
 }
 
 void ActivePeerConnectionCommand::setBtRuntime
-(const SharedHandle<BtRuntime>& btRuntime)
+(const std::shared_ptr<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }
 
 void ActivePeerConnectionCommand::setPieceStorage
-(const SharedHandle<PieceStorage>& pieceStorage)
+(const std::shared_ptr<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
 
 void ActivePeerConnectionCommand::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+(const std::shared_ptr<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }
 
 void ActivePeerConnectionCommand::setBtAnnounce
-(const SharedHandle<BtAnnounce>& btAnnounce)
+(const std::shared_ptr<BtAnnounce>& btAnnounce)
 {
   btAnnounce_ = btAnnounce;
 }

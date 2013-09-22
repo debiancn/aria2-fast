@@ -36,8 +36,9 @@
 #define D_STREAM_FILTER_H
 
 #include "common.h"
+
 #include <string>
-#include "SharedHandle.h"
+#include <memory>
 
 namespace aria2 {
 
@@ -47,10 +48,9 @@ class Segment;
 // Interface for basic decoding functionality.
 class StreamFilter {
 private:
-  SharedHandle<StreamFilter> delegate_;
+  std::unique_ptr<StreamFilter> delegate_;
 public:
-  StreamFilter
-  (const SharedHandle<StreamFilter>& delegate = SharedHandle<StreamFilter>());
+  StreamFilter(std::unique_ptr<StreamFilter> delegate = nullptr);
 
   virtual ~StreamFilter();
 
@@ -58,8 +58,8 @@ public:
   virtual void init() = 0;
 
   // Returns the number of bytes written to sink
-  virtual ssize_t transform(const SharedHandle<BinaryStream>& out,
-                            const SharedHandle<Segment>& segment,
+  virtual ssize_t transform(const std::shared_ptr<BinaryStream>& out,
+                            const std::shared_ptr<Segment>& segment,
                             const unsigned char* inbuf, size_t inlen) = 0;
 
   virtual bool finished() = 0;
@@ -74,9 +74,9 @@ public:
   // tranfrom() invocation.
   virtual size_t getBytesProcessed() const = 0;
 
-  virtual bool installDelegate(const SharedHandle<StreamFilter>& filter);
+  virtual bool installDelegate(std::unique_ptr<StreamFilter> filter);
 
-  SharedHandle<StreamFilter> getDelegate() const
+  const std::unique_ptr<StreamFilter>& getDelegate() const
   {
     return delegate_;
   }

@@ -4,7 +4,7 @@
 
 #include <cppunit/extensions/HelperMacros.h>
 
-#include "SharedHandle.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
@@ -40,8 +40,7 @@ public:
 
 void SingletonHolderTest::testInstance()
 {
-  SharedHandle<M> m(new M("Hello world."));
-  SingletonHolder<M>::instance(m);
+  SingletonHolder<M>::instance(make_unique<M>("Hello world."));
   CPPUNIT_ASSERT_EQUAL(std::string("Hello world."),
                        SingletonHolder<M>::instance()->greeting());
 

@@ -56,9 +56,9 @@ private:
 
   const char* name_;
 
-  SharedHandle<PieceStorage> pieceStorage_;
+  PieceStorage* pieceStorage_;
 
-  SharedHandle<Peer> peer_;
+  std::shared_ptr<Peer> peer_;
 
   BtMessageDispatcher* dispatcher_;
 
@@ -68,11 +68,11 @@ private:
 
   PeerConnection* peerConnection_;
 
-  SharedHandle<BtMessageValidator> validator_;
+  std::unique_ptr<BtMessageValidator> validator_;
 
   bool metadataGetMode_;
 protected:
-  const SharedHandle<PieceStorage>& getPieceStorage() const
+  PieceStorage* getPieceStorage() const
   {
     return pieceStorage_;
   }
@@ -106,7 +106,7 @@ public:
 
   virtual ~AbstractBtMessage();
 
-  virtual bool isInvalidate() {
+  virtual bool isInvalidate() CXX11_OVERRIDE {
     return invalidate_;
   }
 
@@ -114,7 +114,7 @@ public:
     invalidate_ = invalidate;
   }
 
-  virtual bool isUploading() {
+  virtual bool isUploading() CXX11_OVERRIDE {
     return uploading_;
   }
 
@@ -130,30 +130,30 @@ public:
     cuid_ = cuid;
   }
 
-  const SharedHandle<Peer>& getPeer() const
+  const std::shared_ptr<Peer>& getPeer() const
   {
     return peer_;
   }
 
-  void setPeer(const SharedHandle<Peer>& peer);
+  void setPeer(const std::shared_ptr<Peer>& peer);
 
-  virtual void doReceivedAction() {}
+  virtual void doReceivedAction() CXX11_OVERRIDE {}
 
-  virtual void validate();
+  virtual void validate() CXX11_OVERRIDE;
 
-  virtual void onQueued() {}
+  virtual void onQueued() CXX11_OVERRIDE {}
 
   virtual void onAbortOutstandingRequestEvent
-  (const BtAbortOutstandingRequestEvent& event) {}
+  (const BtAbortOutstandingRequestEvent& event) CXX11_OVERRIDE {}
 
   virtual void onCancelSendingPieceEvent
-  (const BtCancelSendingPieceEvent& event) {}
+  (const BtCancelSendingPieceEvent& event) CXX11_OVERRIDE {}
 
-  virtual void onChokingEvent(const BtChokingEvent& event) {}
+  virtual void onChokingEvent(const BtChokingEvent& event) CXX11_OVERRIDE {}
 
-  void setBtMessageValidator(const SharedHandle<BtMessageValidator>& validator);
+  void setBtMessageValidator(std::unique_ptr<BtMessageValidator> validator);
 
-  void setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage);
+  void setPieceStorage(PieceStorage* pieceStorage);
 
   void setBtMessageDispatcher(BtMessageDispatcher* dispatcher);
 

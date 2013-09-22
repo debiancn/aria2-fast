@@ -64,7 +64,7 @@ enum {
 } // namespace
 
 PeerConnection::PeerConnection
-(cuid_t cuid, const SharedHandle<Peer>& peer, const SharedHandle<SocketCore>& socket)
+(cuid_t cuid, const std::shared_ptr<Peer>& peer, const std::shared_ptr<SocketCore>& socket)
   : cuid_(cuid),
     peer_(peer),
     socket_(socket),
@@ -86,12 +86,12 @@ PeerConnection::~PeerConnection()
 }
 
 void PeerConnection::pushBytes(unsigned char* data, size_t len,
-                               ProgressUpdate* progressUpdate)
+                               std::unique_ptr<ProgressUpdate> progressUpdate)
 {
   if(encryptionEnabled_) {
     encryptor_->encrypt(len, data, data);
   }
-  socketBuffer_.pushBytes(data, len, progressUpdate);
+  socketBuffer_.pushBytes(data, len, std::move(progressUpdate));
 }
 
 bool PeerConnection::receiveMessage(unsigned char* data, size_t& dataLength)
@@ -232,11 +232,11 @@ void PeerConnection::readData
 }
 
 void PeerConnection::enableEncryption
-(const SharedHandle<ARC4Encryptor>& encryptor,
- const SharedHandle<ARC4Encryptor>& decryptor)
+(std::unique_ptr<ARC4Encryptor> encryptor,
+ std::unique_ptr<ARC4Encryptor> decryptor)
 {
-  encryptor_ = encryptor;
-  decryptor_ = decryptor;
+  encryptor_ = std::move(encryptor);
+  decryptor_ = std::move(decryptor);
 
   encryptionEnabled_ = true;
 }
@@ -274,7 +274,7 @@ void PeerConnection::reserveBuffer(size_t minSize)
 {
   if(bufferCapacity_ < minSize) {
     bufferCapacity_ = minSize;
-    unsigned char *buf = new unsigned char[bufferCapacity_];
+    auto buf = new unsigned char[bufferCapacity_];
     memcpy(buf, resbuf_, resbufLength_);
     delete [] resbuf_;
     resbuf_ = buf;

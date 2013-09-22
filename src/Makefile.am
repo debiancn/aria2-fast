@@ -24,7 +24,6 @@ SRCS =  option_processing.cc\
 	FtpDownloadCommand.cc FtpDownloadCommand.h\
 	FtpTunnelRequestCommand.cc FtpTunnelRequestCommand.h\
 	FtpTunnelResponseCommand.cc FtpTunnelResponseCommand.h\
-	SleepCommand.cc SleepCommand.h\
 	DownloadEngine.cc DownloadEngine.h\
 	Segment.h\
 	GrowSegment.cc GrowSegment.h\
@@ -54,7 +53,6 @@ SRCS =  option_processing.cc\
 	LogFactory.cc LogFactory.h\
 	TimerA2.cc TimerA2.h\
 	TimeA2.cc TimeA2.h\
-	SharedHandle.cc SharedHandle.h\
 	FeatureConfig.cc FeatureConfig.h\
 	DownloadEngineFactory.cc DownloadEngineFactory.h\
 	SpeedCalc.cc SpeedCalc.h\
@@ -198,7 +196,6 @@ SRCS =  option_processing.cc\
 	NullSinkStreamFilter.cc NullSinkStreamFilter.h\
 	uri.cc uri.h\
 	uri_split.c uri_split.h\
-	Triplet.h\
 	cookie_helper.cc cookie_helper.h\
 	json.cc json.h\
 	JsonParser.cc JsonParser.h\
@@ -253,7 +250,8 @@ SRCS =  option_processing.cc\
 	HttpRequestConnectChain.h\
 	HttpProxyRequestConnectChain.h\
 	FtpNegotiationConnectChain.h\
-	FtpTunnelRequestConnectChain.h
+	FtpTunnelRequestConnectChain.h\
+	Lock.h
 
 # Android NDK R8e does not provide ftruncate64. Use assembly code from
 # android source code and link it.
@@ -674,4 +672,4 @@ LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
 AM_CPPFLAGS =  -Wall\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
 	-I$(srcdir)/includes -I$(builddir)/includes\
-	-DLOCALEDIR=\"@localedir@\" -DCA_BUNDLE=\"$(ca_bundle)\" @DEFS@ #-pg
+	-DLOCALEDIR=\"@localedir@\" @DEFS@ #-pg

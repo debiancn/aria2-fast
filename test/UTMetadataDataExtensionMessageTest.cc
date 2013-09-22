@@ -65,15 +65,17 @@ void UTMetadataDataExtensionMessageTest::testToString()
 
 void UTMetadataDataExtensionMessageTest::testDoReceivedAction()
 {
-  SharedHandle<DirectDiskAdaptor> diskAdaptor(new DirectDiskAdaptor());
-  SharedHandle<ByteArrayDiskWriter> diskWriter(new ByteArrayDiskWriter());
-  diskAdaptor->setDiskWriter(diskWriter);
-  SharedHandle<MockPieceStorage> pieceStorage(new MockPieceStorage());
+  auto diskAdaptor = std::make_shared<DirectDiskAdaptor>();
+  ByteArrayDiskWriter* diskWriter;
+  {
+    auto dw = make_unique<ByteArrayDiskWriter>();
+    diskWriter = dw.get();
+    diskAdaptor->setDiskWriter(std::move(dw));
+  }
+  auto pieceStorage = make_unique<MockPieceStorage>();
   pieceStorage->setDiskAdaptor(diskAdaptor);
-  SharedHandle<UTMetadataRequestTracker> tracker
-    (new UTMetadataRequestTracker());
-  SharedHandle<DownloadContext> dctx(new DownloadContext());
-  SharedHandle<TorrentAttribute> attrs(new TorrentAttribute());
+  auto tracker = make_unique<UTMetadataRequestTracker>();
+  auto dctx = make_unique<DownloadContext>();
 
   std::string piece0 = std::string(METADATA_PIECE_SIZE, '0');
   std::string piece1 = std::string(METADATA_PIECE_SIZE, '1');
@@ -81,15 +83,17 @@ void UTMetadataDataExtensionMessageTest::testDoReceivedAction()
 
   unsigned char infoHash[INFO_HASH_LENGTH];
   message_digest::digest(infoHash, INFO_HASH_LENGTH,
-                         MessageDigest::sha1(),
+                         MessageDigest::sha1().get(),
                          metadata.data(), metadata.size());
-  attrs->infoHash = std::string(&infoHash[0], &infoHash[20]);
-  dctx->setAttribute(CTX_ATTR_BT, attrs);
-
+  {
+    auto attrs = make_unique<TorrentAttribute>();
+    attrs->infoHash = std::string(&infoHash[0], &infoHash[20]);
+    dctx->setAttribute(CTX_ATTR_BT, std::move(attrs));
+  }
   UTMetadataDataExtensionMessage m(1);
-  m.setPieceStorage(pieceStorage);
+  m.setPieceStorage(pieceStorage.get());
   m.setUTMetadataRequestTracker(tracker.get());
-  m.setDownloadContext(dctx);
+  m.setDownloadContext(dctx.get());
 
   m.setIndex(1);
   m.setData(piece1);

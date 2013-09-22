@@ -38,9 +38,9 @@
 #include "common.h"
 
 #include <vector>
+#include <memory>
 
 #include <aria2/aria2.h>
-#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -55,18 +55,17 @@ class Notifier {
 public:
   Notifier();
   ~Notifier();
-  void addDownloadEventListener
-  (const SharedHandle<DownloadEventListener>& listener);
+  void addDownloadEventListener(DownloadEventListener* listener);
   // Notifies the download event to all listeners.
   void notifyDownloadEvent(DownloadEvent event, const RequestGroup* group);
 
   void notifyDownloadEvent(DownloadEvent event,
-                           const SharedHandle<RequestGroup>& group)
+                           const std::shared_ptr<RequestGroup>& group)
   {
     notifyDownloadEvent(event, group.get());
   }
 private:
-  std::vector<SharedHandle<DownloadEventListener> > listeners_;
+  std::vector<DownloadEventListener*> listeners_;
 };
 
 } // namespace aria2

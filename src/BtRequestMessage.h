@@ -55,15 +55,15 @@ public:
   size_t getBlockIndex() const { return blockIndex_; }
   void setBlockIndex(size_t blockIndex) { blockIndex_ = blockIndex; }
 
-  static BtRequestMessage* create
+  static std::unique_ptr<BtRequestMessage> create
   (const unsigned char* data, size_t dataLength);
 
-  virtual void doReceivedAction();
+  virtual void doReceivedAction() CXX11_OVERRIDE;
 
-  virtual void onQueued();
+  virtual void onQueued() CXX11_OVERRIDE;
 
   virtual void onAbortOutstandingRequestEvent
-  (const BtAbortOutstandingRequestEvent& event);
+  (const BtAbortOutstandingRequestEvent& event) CXX11_OVERRIDE;
 };
 
 } // namespace aria2

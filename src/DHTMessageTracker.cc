@@ -51,17 +51,25 @@
 
 namespace aria2 {
 
-DHTMessageTracker::DHTMessageTracker() {}
+DHTMessageTracker::DHTMessageTracker()
+  : routingTable_{nullptr},
+    factory_{nullptr}
+{}
 
-DHTMessageTracker::~DHTMessageTracker() {}
-
-void DHTMessageTracker::addMessage(const SharedHandle<DHTMessage>& message, time_t timeout, const SharedHandle<DHTMessageCallback>& callback)
+void DHTMessageTracker::addMessage
+(DHTMessage* message,
+ time_t timeout,
+ std::unique_ptr<DHTMessageCallback> callback)
 {
-  SharedHandle<DHTMessageTrackerEntry> e(new DHTMessageTrackerEntry(message, timeout, callback));
-  entries_.push_back(e);
+  entries_.push_back(make_unique<DHTMessageTrackerEntry>
+                     (message->getRemoteNode(),
+                      message->getTransactionID(),
+                      message->getMessageType(),
+                      timeout, std::move(callback)));
 }
 
-std::pair<SharedHandle<DHTResponseMessage>, SharedHandle<DHTMessageCallback> >
+std::pair<std::unique_ptr<DHTResponseMessage>,
+          std::unique_ptr<DHTMessageCallback>>
 DHTMessageTracker::messageArrived
 (const Dict* dict, const std::string& ipaddr, uint16_t port)
 {
@@ -73,15 +81,14 @@ DHTMessageTracker::messageArrived
   A2_LOG_DEBUG(fmt("Searching tracker entry for TransactionID=%s, Remote=%s:%u",
                    util::toHex(tid->s()).c_str(),
                    ipaddr.c_str(), port));
-  for(std::deque<SharedHandle<DHTMessageTrackerEntry> >::iterator i =
-        entries_.begin(), eoi = entries_.end(); i != eoi; ++i) {
+  for(auto i = std::begin(entries_), eoi = std::end(entries_); i != eoi; ++i) {
     if((*i)->match(tid->s(), ipaddr, port)) {
-      SharedHandle<DHTMessageTrackerEntry> entry = *i;
+      auto entry = std::move(*i);
       entries_.erase(i);
       A2_LOG_DEBUG("Tracker entry found.");
-      SharedHandle<DHTNode> targetNode = entry->getTargetNode();
+      auto& targetNode = entry->getTargetNode();
       try {
-        SharedHandle<DHTResponseMessage> message =
+        auto message =
           factory_->createResponseMessage(entry->getMessageType(), dict,
                                           targetNode->getIPAddress(),
                                           targetNode->getPort());
@@ -89,8 +96,7 @@ DHTMessageTracker::messageArrived
         int64_t rtt = entry->getElapsedMillis();
         A2_LOG_DEBUG(fmt("RTT is %" PRId64 "", rtt));
         message->getRemoteNode()->updateRTT(rtt);
-        SharedHandle<DHTMessageCallback> callback = entry->getCallback();
-        if(!(*targetNode == *message->getRemoteNode())) {
+        if(*targetNode != *message->getRemoteNode()) {
           // Node ID has changed. Drop previous node ID from
           // DHTRoutingTable
           A2_LOG_DEBUG
@@ -100,23 +106,22 @@ DHTMessageTracker::messageArrived
                              DHT_ID_LENGTH).c_str()));
           routingTable_->dropNode(targetNode);
         }
-        return std::make_pair(message, callback);
+        return std::make_pair(std::move(message), entry->popCallback());
       } catch(RecoverableException& e) {
-        handleTimeoutEntry(entry);
+        handleTimeoutEntry(entry.get());
         throw;
       }
     }
   }
   A2_LOG_DEBUG("Tracker entry not found.");
-  return std::pair<SharedHandle<DHTResponseMessage>,
-                   SharedHandle<DHTMessageCallback> >();
+  return std::pair<std::unique_ptr<DHTResponseMessage>,
+                   std::unique_ptr<DHTMessageCallback>>{};
 }
 
-void DHTMessageTracker::handleTimeoutEntry
-(const SharedHandle<DHTMessageTrackerEntry>& entry)
+void DHTMessageTracker::handleTimeoutEntry(DHTMessageTrackerEntry* entry)
 {
   try {
-    SharedHandle<DHTNode> node = entry->getTargetNode();
+    auto& node = entry->getTargetNode();
     A2_LOG_DEBUG(fmt("Message timeout: To:%s:%u",
                      node->getIPAddress().c_str(), node->getPort()));
     node->updateRTT(entry->getElapsedMillis());
@@ -126,7 +131,7 @@ void DHTMessageTracker::handleTimeoutEntry
                        node->getIPAddress().c_str(), node->getPort()));
       routingTable_->dropNode(node);
     }
-    SharedHandle<DHTMessageCallback> callback = entry->getCallback();
+    auto& callback = entry->getCallback();
     if(callback) {
       callback->onTimeout(node);
     }
@@ -135,43 +140,33 @@ void DHTMessageTracker::handleTimeoutEntry
   }
 }
 
-namespace {
-struct HandleTimeout {
-  HandleTimeout(DHTMessageTracker* tracker)
-  : tracker(tracker)
-  {}
-  bool operator()(const SharedHandle<DHTMessageTrackerEntry>& ent) const
-  {
-    if(ent->isTimeout()) {
-      tracker->handleTimeoutEntry(ent);
-      return true;
-    } else {
-      return false;
-    }
-  }
-  DHTMessageTracker* tracker;
-};
-} // namespace
-
 void DHTMessageTracker::handleTimeout()
 {
-  entries_.erase(std::remove_if(entries_.begin(), entries_.end(),
-                                HandleTimeout(this)),
-                 entries_.end());
+  entries_.erase
+    (std::remove_if(std::begin(entries_), std::end(entries_),
+                    [&](const std::unique_ptr<DHTMessageTrackerEntry>& ent)
+                    {
+                      if(ent->isTimeout()) {
+                        handleTimeoutEntry(ent.get());
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    }),
+     std::end(entries_));
 }
 
-SharedHandle<DHTMessageTrackerEntry>
-DHTMessageTracker::getEntryFor(const SharedHandle<DHTMessage>& message) const
+const DHTMessageTrackerEntry*
+DHTMessageTracker::getEntryFor(const DHTMessage* message) const
 {
-  for(std::deque<SharedHandle<DHTMessageTrackerEntry> >::const_iterator i =
-        entries_.begin(), eoi = entries_.end(); i != eoi; ++i) {
-    if((*i)->match(message->getTransactionID(),
-                   message->getRemoteNode()->getIPAddress(),
-                   message->getRemoteNode()->getPort())) {
-      return *i;
+  for(auto& ent : entries_) {
+    if(ent->match(message->getTransactionID(),
+                  message->getRemoteNode()->getIPAddress(),
+                  message->getRemoteNode()->getPort())) {
+      return ent.get();
     }
   }
-  return SharedHandle<DHTMessageTrackerEntry>();
+  return nullptr;
 }
 
 size_t DHTMessageTracker::countEntry() const
@@ -179,14 +174,12 @@ size_t DHTMessageTracker::countEntry() const
   return entries_.size();
 }
 
-void DHTMessageTracker::setRoutingTable
-(const SharedHandle<DHTRoutingTable>& routingTable)
+void DHTMessageTracker::setRoutingTable(DHTRoutingTable* routingTable)
 {
   routingTable_ = routingTable;
 }
 
-void DHTMessageTracker::setMessageFactory
-(const SharedHandle<DHTMessageFactory>& factory)
+void DHTMessageTracker::setMessageFactory(DHTMessageFactory* factory)
 {
   factory_ = factory;
 }

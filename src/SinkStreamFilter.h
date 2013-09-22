@@ -47,35 +47,36 @@ private:
   bool hashUpdate_;
   size_t bytesProcessed_;
 public:
-  SinkStreamFilter(WrDiskCache* wrDiskCache = 0, bool hashUpdate = false);
+  SinkStreamFilter(WrDiskCache* wrDiskCache = nullptr, bool hashUpdate = false);
 
-  virtual void init() {}
+  virtual void init() CXX11_OVERRIDE {}
 
   virtual ssize_t transform
-  (const SharedHandle<BinaryStream>& out,
-   const SharedHandle<Segment>& segment,
-   const unsigned char* inbuf, size_t inlen);
+  (const std::shared_ptr<BinaryStream>& out,
+   const std::shared_ptr<Segment>& segment,
+   const unsigned char* inbuf, size_t inlen) CXX11_OVERRIDE;
 
-  virtual bool finished()
+  virtual bool finished() CXX11_OVERRIDE
   {
     return true;
   }
 
-  virtual void release() {}
+  virtual void release() CXX11_OVERRIDE {}
 
-  virtual const std::string& getName() const
+  virtual const std::string& getName() const CXX11_OVERRIDE
   {
     return NAME;
   }
 
   static const std::string NAME;
 
-  virtual size_t getBytesProcessed() const
+  virtual size_t getBytesProcessed() const CXX11_OVERRIDE
   {
     return bytesProcessed_;
   }
 
-  virtual bool installDelegate(const SharedHandle<StreamFilter>& filter)
+  virtual bool installDelegate(const std::unique_ptr<StreamFilter> filter)
+    CXX11_OVERRIDE
   {
     return false;
   }

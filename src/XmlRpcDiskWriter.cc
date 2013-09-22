@@ -62,18 +62,18 @@ void XmlRpcDiskWriter::writeData(const unsigned char* data, size_t len,
 
 int XmlRpcDiskWriter::finalize()
 {
-  return parser_.parseFinal(0, 0);
+  return parser_.parseFinal(nullptr, 0);
 }
 
-RpcRequest XmlRpcDiskWriter::getResult() const
+RpcRequest XmlRpcDiskWriter::getResult()
 {
-  SharedHandle<List> params;
+  std::unique_ptr<List> params;
   if(downcast<List>(psm_.getCurrentFrameValue())) {
-    params = static_pointer_cast<List>(psm_.getCurrentFrameValue());
+    params.reset(static_cast<List*>(psm_.popCurrentFrameValue().release()));
   } else {
     params = List::g();
   }
-  return RpcRequest(psm_.getMethodName(), params);
+  return RpcRequest{psm_.getMethodName(), std::move(params)};
 }
 
 int XmlRpcDiskWriter::reset()

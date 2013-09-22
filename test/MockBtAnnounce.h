@@ -14,7 +14,7 @@ public:
   MockBtAnnounce() {}
   virtual ~MockBtAnnounce() {}
 
-  virtual bool isAnnounceReady() {
+  virtual bool isAnnounceReady() CXX11_OVERRIDE {
     return announceReady;
   }
 
@@ -22,52 +22,50 @@ public:
     this->announceReady = flag;
   }
 
-  virtual std::string getAnnounceUrl() {
+  virtual std::string getAnnounceUrl() CXX11_OVERRIDE {
     return announceUrl;
   }
 
-  virtual SharedHandle<UDPTrackerRequest>
+  virtual std::shared_ptr<UDPTrackerRequest>
   createUDPTrackerRequest(const std::string& remoteAddr, uint16_t remotePort,
-                          uint16_t localPort) {
-    return SharedHandle<UDPTrackerRequest>();
+                          uint16_t localPort) CXX11_OVERRIDE {
+    return nullptr;
   }
 
   void setAnnounceUrl(const std::string& url) {
     this->announceUrl = url;
   }
 
-  virtual void announceStart() {}
+  virtual void announceStart() CXX11_OVERRIDE {}
 
-  virtual void announceSuccess() {}
+  virtual void announceSuccess() CXX11_OVERRIDE {}
 
-  virtual void announceFailure() {}
+  virtual void announceFailure() CXX11_OVERRIDE {}
 
-  virtual bool isAllAnnounceFailed() {
+  virtual bool isAllAnnounceFailed() CXX11_OVERRIDE {
     return false;
   }
 
-  virtual void resetAnnounce() {}
+  virtual void resetAnnounce() CXX11_OVERRIDE {}
 
   virtual void processAnnounceResponse(const unsigned char* trackerResponse,
-                                       size_t trackerResponseLength) {}
+                                       size_t trackerResponseLength)
+    CXX11_OVERRIDE
+  {}
 
   virtual void processUDPTrackerResponse
-  (const SharedHandle<UDPTrackerRequest>& req) {}
+  (const std::shared_ptr<UDPTrackerRequest>& req) CXX11_OVERRIDE {}
 
-  virtual bool noMoreAnnounce() {
+  virtual bool noMoreAnnounce() CXX11_OVERRIDE {
     return false;
   }
 
-  virtual void shuffleAnnounce() {
+  virtual void shuffleAnnounce() CXX11_OVERRIDE {
   }
 
-  virtual std::string getPeerId() {
-    return peerId;
-  }
+  virtual void overrideMinInterval(time_t interval) CXX11_OVERRIDE {}
 
-  virtual void overrideMinInterval(time_t interval) {}
-
-  virtual void setTcpPort(uint16_t port) {}
+  virtual void setTcpPort(uint16_t port) CXX11_OVERRIDE {}
 
   void setPeerId(const std::string& peerId) {
     this->peerId = peerId;

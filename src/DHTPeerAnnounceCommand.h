@@ -36,7 +36,8 @@
 #define D_DHT_PEER_ANNOUNCE_COMMAND_H
 
 #include "TimeBasedCommand.h"
-#include "SharedHandle.h"
+
+#include <memory>
 
 namespace aria2 {
 
@@ -44,17 +45,17 @@ class DHTPeerAnnounceStorage;
 
 class DHTPeerAnnounceCommand:public TimeBasedCommand {
 private:
-  SharedHandle<DHTPeerAnnounceStorage> peerAnnounceStorage_;
+  DHTPeerAnnounceStorage* peerAnnounceStorage_;
 public:
   DHTPeerAnnounceCommand(cuid_t cuid, DownloadEngine* e, time_t interval);
 
   virtual ~DHTPeerAnnounceCommand();
 
-  virtual void preProcess();
+  virtual void preProcess() CXX11_OVERRIDE;
 
-  virtual void process();
+  virtual void process() CXX11_OVERRIDE;
 
-  void setPeerAnnounceStorage(const SharedHandle<DHTPeerAnnounceStorage>& storage);
+  void setPeerAnnounceStorage(DHTPeerAnnounceStorage* storage);
 };
 
 } // namespace aria2

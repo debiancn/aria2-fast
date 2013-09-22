@@ -45,7 +45,7 @@ const char BtAllowedFastMessage::NAME[] = "allowed fast";
 BtAllowedFastMessage::BtAllowedFastMessage(size_t index):
   IndexBtMessage(ID, NAME, index) {}
 
-BtAllowedFastMessage* BtAllowedFastMessage::create
+std::unique_ptr<BtAllowedFastMessage> BtAllowedFastMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return IndexBtMessage::create<BtAllowedFastMessage>(data, dataLength);
@@ -65,22 +65,22 @@ void BtAllowedFastMessage::doReceivedAction() {
 
 namespace {
 struct ThisProgressUpdate : public ProgressUpdate {
-  ThisProgressUpdate(const SharedHandle<Peer>& peer, size_t index)
+  ThisProgressUpdate(const std::shared_ptr<Peer>& peer, size_t index)
     : peer(peer), index(index) {}
-  virtual void update(size_t length, bool complete)
+  virtual void update(size_t length, bool complete) CXX11_OVERRIDE
   {
     if(complete) {
       peer->addAmAllowedIndex(index);
     }
   }
-  SharedHandle<Peer> peer;
+  std::shared_ptr<Peer> peer;
   size_t index;
 };
 } // namespace
 
-ProgressUpdate* BtAllowedFastMessage::getProgressUpdate()
+std::unique_ptr<ProgressUpdate> BtAllowedFastMessage::getProgressUpdate()
 {
-  return new ThisProgressUpdate(getPeer(), getIndex());
+  return make_unique<ThisProgressUpdate>(getPeer(), getIndex());
 }
 
 } // namespace aria2

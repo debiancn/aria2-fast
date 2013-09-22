@@ -45,9 +45,9 @@ namespace aria2 {
 struct HttpProxyRequestConnectChain : public ControlChain<ConnectCommand*> {
   HttpProxyRequestConnectChain() {}
   virtual ~HttpProxyRequestConnectChain() {}
-  virtual int run(ConnectCommand* t, DownloadEngine* e)
+  virtual int run(ConnectCommand* t, DownloadEngine* e) CXX11_OVERRIDE
   {
-    HttpProxyRequestCommand* c = new HttpProxyRequestCommand
+    auto c = make_unique<HttpProxyRequestCommand>
       (t->getCuid(),
        t->getRequest(),
        t->getFileEntry(),
@@ -57,7 +57,7 @@ struct HttpProxyRequestConnectChain : public ControlChain<ConnectCommand*> {
        t->getSocket());
     c->setStatus(Command::STATUS_ONESHOT_REALTIME);
     e->setNoWait(true);
-    e->addCommand(c);
+    e->addCommand(std::move(c));
     return 0;
   }
 };

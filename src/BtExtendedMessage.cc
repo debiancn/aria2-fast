@@ -51,13 +51,11 @@ namespace aria2 {
 const char BtExtendedMessage::NAME[] = "extended";
 
 BtExtendedMessage::BtExtendedMessage
-(const SharedHandle<ExtensionMessage>& extensionMessage):
+(std::unique_ptr<ExtensionMessage> extensionMessage):
   SimpleBtMessage(ID, NAME),
-  extensionMessage_(extensionMessage),
+  extensionMessage_(std::move(extensionMessage)),
   msgLength_(0)
 {}
-
-BtExtendedMessage::~BtExtendedMessage() {}
 
 unsigned char* BtExtendedMessage::createMessage()
 {
@@ -70,7 +68,7 @@ unsigned char* BtExtendedMessage::createMessage()
    */
   std::string payload = extensionMessage_->getPayload();
   msgLength_ = 6+payload.size();
-  unsigned char* msg = new unsigned char[msgLength_];
+  auto msg = new unsigned char[msgLength_];
   bittorrent::createPeerMessageString(msg, msgLength_, 2+payload.size(), ID);
   *(msg+5) = extensionMessage_->getExtensionMessageID();
   memcpy(msg+6, payload.data(), payload.size());
@@ -96,18 +94,16 @@ std::string BtExtendedMessage::toString() const {
   return s;
 }
 
-BtExtendedMessage*
-BtExtendedMessage::create(const SharedHandle<ExtensionMessageFactory>& factory,
-                          const SharedHandle<Peer>& peer,
+std::unique_ptr<BtExtendedMessage>
+BtExtendedMessage::create(ExtensionMessageFactory* factory,
+                          const std::shared_ptr<Peer>& peer,
                           const unsigned char* data, size_t dataLength)
 {
   bittorrent::assertPayloadLengthGreater(1, dataLength, NAME);
   bittorrent::assertID(ID, data, NAME);
   assert(factory);
-  SharedHandle<ExtensionMessage> extmsg = factory->createMessage(data+1,
-                                                                 dataLength-1);
-  BtExtendedMessage* message(new BtExtendedMessage(extmsg));
-  return message;
+  return make_unique<BtExtendedMessage>
+    (factory->createMessage(data+1, dataLength-1));
 }
 
 void BtExtendedMessage::doReceivedAction()
@@ -115,6 +111,12 @@ void BtExtendedMessage::doReceivedAction()
   if(extensionMessage_) {
     extensionMessage_->doReceivedAction();
   }
+}
+
+const std::unique_ptr<ExtensionMessage>&
+BtExtendedMessage::getExtensionMessage() const
+{
+  return extensionMessage_;
 }
 
 } // namespace aria2

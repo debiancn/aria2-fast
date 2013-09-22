@@ -76,7 +76,7 @@ private:
     uv_poll_t handle_;
 
     static void poll_callback(uv_poll_t* handle, int status, int events) {
-      KPoll* poll = static_cast<KPoll*>(handle->data);
+      auto poll = static_cast<KPoll*>(handle->data);
       poll->eventer_->pollCallback(poll, status, events);
     }
     static void close_callback(uv_handle_t* handle) {
@@ -87,8 +87,8 @@ private:
     inline KPoll(LibuvEventPoll* eventer, KSocketEntry* entry, sock_t sock)
       : eventer_(eventer), entry_(entry)
     {
-        uv_poll_init_socket(eventer->loop_, &handle_, sock);
-        handle_.data = this;
+      uv_poll_init_socket(eventer->loop_, &handle_, sock);
+      handle_.data = this;
     }
     inline void start() {
       uv_poll_start(&handle_, entry_->getEvents() & IEV_RW, poll_callback);
@@ -105,14 +105,14 @@ private:
     }
   };
 
-  typedef std::set<SharedHandle<KSocketEntry>,
-                   DerefLess<SharedHandle<KSocketEntry> > > KSocketEntrySet;
+  typedef std::set<std::shared_ptr<KSocketEntry>,
+                   DerefLess<std::shared_ptr<KSocketEntry> > > KSocketEntrySet;
 
   typedef std::map<sock_t, KPoll*> KPolls;
 
 #ifdef ENABLE_ASYNC_DNS
-  typedef std::set<SharedHandle<KAsyncNameResolverEntry>,
-                   DerefLess<SharedHandle<KAsyncNameResolverEntry> > >
+  typedef std::set<std::shared_ptr<KAsyncNameResolverEntry>,
+                   DerefLess<std::shared_ptr<KAsyncNameResolverEntry> > >
   KAsyncNameResolverEntrySet;
 #endif // ENABLE_ASYNC_DNS
 
@@ -130,9 +130,9 @@ private:
 
 #ifdef ENABLE_ASYNC_DNS
   bool addEvents(sock_t socket, Command* command, int events,
-                 const SharedHandle<AsyncNameResolver>& rs);
+                 const std::shared_ptr<AsyncNameResolver>& rs);
   bool deleteEvents(sock_t socket, Command* command,
-                    const SharedHandle<AsyncNameResolver>& rs);
+                    const std::shared_ptr<AsyncNameResolver>& rs);
 #endif
 
   static int translateEvents(EventPoll::EventType events);
@@ -143,18 +143,21 @@ public:
 
   bool good() const { return loop_; }
 
-  virtual void poll(const struct timeval& tv);
+  virtual void poll(const struct timeval& tv) CXX11_OVERRIDE;
 
   virtual bool addEvents(sock_t socket,
-                         Command* command, EventPoll::EventType events);
+                         Command* command, EventPoll::EventType events)
+    CXX11_OVERRIDE;
   virtual bool deleteEvents(sock_t socket,
-                            Command* command, EventPoll::EventType events);
+                            Command* command, EventPoll::EventType events)
+    CXX11_OVERRIDE;
 
 #ifdef ENABLE_ASYNC_DNS
-  virtual bool addNameResolver(const SharedHandle<AsyncNameResolver>& resolver,
-                               Command* command);
+  virtual bool addNameResolver(const std::shared_ptr<AsyncNameResolver>& resolver,
+                               Command* command) CXX11_OVERRIDE;
   virtual bool deleteNameResolver(
-      const SharedHandle<AsyncNameResolver>& resolver, Command* command);
+      const std::shared_ptr<AsyncNameResolver>& resolver, Command* command)
+    CXX11_OVERRIDE;
 #endif // ENABLE_ASYNC_DNS
 
   static const int IEV_READ = UV_READABLE;

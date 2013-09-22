@@ -33,6 +33,9 @@
  */
 /* copyright --> */
 #include "BencodeParser.h"
+
+#include <cassert>
+
 #include "StructParserStateMachine.h"
 #include "util.h"
 
@@ -161,7 +164,7 @@ ssize_t BencodeParser::parseUpdate(const char* data, size_t size)
         i = j;
         currentState_ = BENCODE_STRING;
         if(strLength_ == 0) {
-          runCharactersCallback(0, 0);
+          runCharactersCallback(nullptr, 0);
           onStringEnd();
         }
       } else {

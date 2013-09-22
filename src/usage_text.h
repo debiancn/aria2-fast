@@ -268,8 +268,9 @@
     "                              mentioned in it.\n"                  \
     "                              If mem is specified, a torrent file is not\n" \
     "                              written to the disk, but is just kept in memory.\n" \
-    "                              If false is specified, the action mentioned above\n" \
-    "                              is not taken.")
+    "                              If false is specified, the .torrent file is\n" \
+    "                              downloaded to the disk, but is not parsed as a\n" \
+    "                              torrent and its contents are not downloaded.")
 #define TEXT_LISTEN_PORT                                                \
   _(" --listen-port=PORT...        Set TCP port number for BitTorrent downloads.\n" \
     "                              Multiple ports can be specified by using ',',\n" \
@@ -387,8 +388,10 @@
     "                              mentioned in it.\n"                  \
     "                              If mem is specified, a metalink file is not\n" \
     "                              written to the disk, but is just kept in memory.\n" \
-    "                              If false is specified, the action mentioned above\n" \
-    "                              is not taken.")
+    "                              If false is specified, the .metalink file is\n" \
+    "                              downloaded to the disk, but is not parsed as a\n" \
+    "                              metalink file and its contents are not\n" \
+    "                              downloaded.")
 #define TEXT_METALINK_ENABLE_UNIQUE_PROTOCOL                            \
   _(" --metalink-enable-unique-protocol[=true|false] If true is given and several\n" \
     "                              protocols are available for a mirror in a metalink\n" \
@@ -918,8 +921,10 @@
 #define TEXT_FORCE_SAVE                         \
   _(" --force-save[=true|false]    Save download with --save-session option even\n" \
     "                              if the download is completed or removed. This\n" \
-    "                              may be useful to save BitTorrent seeding which\n" \
-    "                              is recognized as completed state.")
+    "                              option also saves control file in that\n" \
+    "                              situations. This may be useful to save\n" \
+    "                              BitTorrent seeding which is recognized as\n" \
+    "                              completed state.")
 #define TEXT_DISK_CACHE                         \
   _(" --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk cache\n" \
     "                              is disabled. This feature caches the downloaded\n" \

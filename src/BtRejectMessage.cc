@@ -47,7 +47,7 @@ BtRejectMessage::BtRejectMessage
 (size_t index, int32_t begin, int32_t length):
   RangeBtMessage(ID, NAME, index, begin, length) {}
 
-BtRejectMessage* BtRejectMessage::create
+std::unique_ptr<BtRejectMessage> BtRejectMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return RangeBtMessage::create<BtRejectMessage>(data, dataLength);
@@ -65,13 +65,12 @@ void BtRejectMessage::doReceivedAction()
   }
   // TODO Current implementation does not close a connection even if
   // a request for this reject message has never sent.
-  RequestSlot slot =
-    getBtMessageDispatcher()->getOutstandingRequest
+  auto slot = getBtMessageDispatcher()->getOutstandingRequest
     (getIndex(), getBegin(), getLength());
-  if(RequestSlot::isNull(slot)) {
-    //throw DL_ABORT_EX("reject received, but it is not in the request slots.");
-  } else {
+  if(slot) {
     getBtMessageDispatcher()->removeOutstandingRequest(slot);
+  } else {
+    //throw DL_ABORT_EX("reject received, but it is not in the request slots.");
   }
 
 }

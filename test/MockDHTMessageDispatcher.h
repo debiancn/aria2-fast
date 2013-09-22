@@ -10,17 +10,17 @@ namespace aria2 {
 
 class MockDHTMessageDispatcher:public DHTMessageDispatcher {
 public:
-  class Entry {
-  public:
-    SharedHandle<DHTMessage> message_;
+  struct Entry {
+    std::unique_ptr<DHTMessage> message_;
     time_t timeout_;
-    SharedHandle<DHTMessageCallback> callback_;
+    std::unique_ptr<DHTMessageCallback> callback_;
 
-    Entry(const SharedHandle<DHTMessage>& message, time_t timeout,
-          const SharedHandle<DHTMessageCallback>& callback):
-      message_(message),
-      timeout_(timeout),
-      callback_(callback) {}
+    Entry(std::unique_ptr<DHTMessage> message, time_t timeout,
+          std::unique_ptr<DHTMessageCallback> callback)
+      : message_{std::move(message)},
+        timeout_{timeout},
+        callback_{std::move(callback)}
+    {}
   };
 
   std::deque<Entry> messageQueue_;
@@ -28,28 +28,28 @@ public:
 public:
   MockDHTMessageDispatcher() {}
 
-  virtual ~MockDHTMessageDispatcher() {}
-
   virtual void
-  addMessageToQueue(const SharedHandle<DHTMessage>& message,
+  addMessageToQueue(std::unique_ptr<DHTMessage> message,
                     time_t timeout,
-                    const SharedHandle<DHTMessageCallback>& callback =
-                    SharedHandle<DHTMessageCallback>())
+                    std::unique_ptr<DHTMessageCallback> callback =
+                    std::unique_ptr<DHTMessageCallback>{}) CXX11_OVERRIDE
   {
-    messageQueue_.push_back(Entry(message, timeout, callback));
+    messageQueue_.push_back(Entry(std::move(message), timeout,
+                                  std::move(callback)));
   }
 
   virtual void
-  addMessageToQueue(const SharedHandle<DHTMessage>& message,
-                    const SharedHandle<DHTMessageCallback>& callback =
-                    SharedHandle<DHTMessageCallback>())
+  addMessageToQueue(std::unique_ptr<DHTMessage> message,
+                    std::unique_ptr<DHTMessageCallback> callback =
+                    std::unique_ptr<DHTMessageCallback>{}) CXX11_OVERRIDE
   {
-    messageQueue_.push_back(Entry(message, DHT_MESSAGE_TIMEOUT, callback));
+    messageQueue_.push_back(Entry(std::move(message), DHT_MESSAGE_TIMEOUT,
+                                  std::move(callback)));
   }
 
-  virtual void sendMessages() {}
+  virtual void sendMessages() CXX11_OVERRIDE {}
 
-  virtual size_t countMessageInQueue() const
+  virtual size_t countMessageInQueue() const CXX11_OVERRIDE
   {
     return messageQueue_.size();
   }

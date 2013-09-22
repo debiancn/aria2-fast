@@ -82,11 +82,11 @@ namespace aria2 {
 
 FtpNegotiationCommand::FtpNegotiationCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket,
+ const std::shared_ptr<SocketCore>& socket,
  Seq seq,
  const std::string& baseWorkingDir):
   AbstractCommand(cuid, req, fileEntry, requestGroup, e, socket),
@@ -110,8 +110,7 @@ bool FtpNegotiationCommand::executeInternal() {
   if(sequence_ == SEQ_RETRY) {
     return prepareForRetry(0);
   } else if(sequence_ == SEQ_NEGOTIATION_COMPLETED) {
-    FtpDownloadCommand* command =
-      new FtpDownloadCommand
+    auto command = make_unique<FtpDownloadCommand>
       (getCuid(), getRequest(), getFileEntry(), getRequestGroup(), ftp_,
        getDownloadEngine(), dataSocket_, getSocket());
     command->setStartupIdleTime(getOption()->getAsInt(PREF_STARTUP_IDLE_TIME));
@@ -121,8 +120,8 @@ bool FtpNegotiationCommand::executeInternal() {
       getFileEntry()->removeURIWhoseHostnameIs(getRequest()->getHost());
     }
     getRequestGroup()->getURISelector()->tuneDownloadCommand
-      (getFileEntry()->getRemainingUris(), command);
-    getDownloadEngine()->addCommand(command);
+      (getFileEntry()->getRemainingUris(), command.get());
+    getDownloadEngine()->addCommand(std::move(command));
     return true;
   } else if(sequence_ == SEQ_HEAD_OK ||
             sequence_ == SEQ_DOWNLOAD_ALREADY_COMPLETED) {
@@ -137,7 +136,7 @@ bool FtpNegotiationCommand::executeInternal() {
   } else if(sequence_ == SEQ_EXIT) {
     return true;
   } else {
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     return false;
   }
 }
@@ -401,11 +400,12 @@ bool FtpNegotiationCommand::onFileSizeDetermined(int64_t totalLength)
       getRequestGroup()->initPieceStorage();
       if(getDownloadContext()->isChecksumVerificationNeeded()) {
         A2_LOG_DEBUG("Zero length file exists. Verify checksum.");
-        SharedHandle<ChecksumCheckIntegrityEntry> entry
-          (new ChecksumCheckIntegrityEntry(getRequestGroup()));
+        auto entry = make_unique<ChecksumCheckIntegrityEntry>
+          (getRequestGroup());
         entry->initValidator();
         getPieceStorage()->getDiskAdaptor()->openExistingFile();
-        getDownloadEngine()->getCheckIntegrityMan()->pushEntry(entry);
+        getDownloadEngine()->getCheckIntegrityMan()->pushEntry
+          (std::move(entry));
         sequence_ = SEQ_EXIT;
       } else
 #endif // ENABLE_MESSAGE_DIGEST
@@ -435,10 +435,11 @@ bool FtpNegotiationCommand::onFileSizeDetermined(int64_t totalLength)
       // HttpResponseCommand::handleOtherEncoding()
       if(getDownloadContext()->isChecksumVerificationNeeded()) {
         A2_LOG_DEBUG("Verify checksum for zero-length file");
-        SharedHandle<ChecksumCheckIntegrityEntry> entry
-          (new ChecksumCheckIntegrityEntry(getRequestGroup()));
+        auto entry = make_unique<ChecksumCheckIntegrityEntry>
+          (getRequestGroup());
         entry->initValidator();
-        getDownloadEngine()->getCheckIntegrityMan()->pushEntry(entry);
+        getDownloadEngine()->getCheckIntegrityMan()->pushEntry
+          (std::move(entry));
         sequence_ = SEQ_EXIT;
       } else
 #endif // ENABLE_MESSAGE_DIGEST
@@ -455,9 +456,9 @@ bool FtpNegotiationCommand::onFileSizeDetermined(int64_t totalLength)
     getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
     return true;
   } else {
-    SharedHandle<BtProgressInfoFile> progressInfoFile
+    std::shared_ptr<BtProgressInfoFile> progressInfoFile
       (new DefaultBtProgressInfoFile
-       (getDownloadContext(), SharedHandle<PieceStorage>(), getOption().get()));
+       (getDownloadContext(), std::shared_ptr<PieceStorage>(), getOption().get()));
     getRequestGroup()->adjustFilename(progressInfoFile);
     getRequestGroup()->initPieceStorage();
 
@@ -466,20 +467,19 @@ bool FtpNegotiationCommand::onFileSizeDetermined(int64_t totalLength)
       return false;
     }
 
-    SharedHandle<CheckIntegrityEntry> checkIntegrityEntry =
-      getRequestGroup()->createCheckIntegrityEntry();
+    auto checkIntegrityEntry = getRequestGroup()->createCheckIntegrityEntry();
     if(!checkIntegrityEntry) {
       sequence_ = SEQ_DOWNLOAD_ALREADY_COMPLETED;
       poolConnection();
       return false;
     }
-    checkIntegrityEntry->pushNextCommand(this);
+    checkIntegrityEntry->pushNextCommand(std::unique_ptr<Command>(this));
     // We have to make sure that command that has Request object must
     // have segment after PieceStorage is initialized. See
     // AbstractCommand::execute()
     getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
 
-    prepareForNextAction(checkIntegrityEntry);
+    prepareForNextAction(std::move(checkIntegrityEntry));
 
     disableReadCheckSocket();
   }
@@ -684,7 +684,7 @@ bool FtpNegotiationCommand::preparePasvConnect() {
 
 bool FtpNegotiationCommand::resolveProxy()
 {
-  SharedHandle<Request> proxyReq = createProxyRequest();
+  std::shared_ptr<Request> proxyReq = createProxyRequest();
   std::vector<std::string> addrs;
   proxyAddr_ = resolveHostname
     (addrs, proxyReq->getHost(), proxyReq->getPort());
@@ -698,7 +698,7 @@ bool FtpNegotiationCommand::resolveProxy()
   dataSocket_->establishConnection(proxyAddr_, proxyReq->getPort());
   disableReadCheckSocket();
   setWriteCheckSocket(dataSocket_);
-  SharedHandle<SocketRecvBuffer> socketRecvBuffer
+  std::shared_ptr<SocketRecvBuffer> socketRecvBuffer
     (new SocketRecvBuffer(dataSocket_));
   http_.reset(new HttpConnection(getCuid(), dataSocket_, socketRecvBuffer));
   sequence_ = SEQ_SEND_TUNNEL_REQUEST;
@@ -711,7 +711,7 @@ bool FtpNegotiationCommand::sendTunnelRequest()
     if(dataSocket_->isReadable(0)) {
       std::string error = getSocket()->getSocketError();
       if(!error.empty()) {
-        SharedHandle<Request> proxyReq = createProxyRequest();
+        std::shared_ptr<Request> proxyReq = createProxyRequest();
         getDownloadEngine()->markBadIPAddress(proxyReq->getHost(),
                                               proxyAddr_,proxyReq->getPort());
         std::string nextProxyAddr = getDownloadEngine()->findCachedIPAddress
@@ -735,9 +735,9 @@ bool FtpNegotiationCommand::sendTunnelRequest()
         }
       }
     }
-    SharedHandle<HttpRequest> httpRequest(new HttpRequest());
+    auto httpRequest = make_unique<HttpRequest>();
     httpRequest->setUserAgent(getOption()->get(PREF_USER_AGENT));
-    SharedHandle<Request> req(new Request());
+    std::shared_ptr<Request> req(new Request());
     // Construct fake URI in order to use HttpRequest
     std::pair<std::string, uint16_t> dataAddr;
     uri::UriStruct us;
@@ -750,7 +750,7 @@ bool FtpNegotiationCommand::sendTunnelRequest()
     }
     httpRequest->setRequest(req);
     httpRequest->setProxyRequest(createProxyRequest());
-    http_->sendProxyRequest(httpRequest);
+    http_->sendProxyRequest(std::move(httpRequest));
   } else {
     http_->sendPendingData();
   }
@@ -767,7 +767,7 @@ bool FtpNegotiationCommand::sendTunnelRequest()
 
 bool FtpNegotiationCommand::recvTunnelResponse()
 {
-  SharedHandle<HttpResponse> httpResponse = http_->receiveResponse();
+  std::shared_ptr<HttpResponse> httpResponse = http_->receiveResponse();
   if(!httpResponse) {
     return false;
   }
@@ -778,7 +778,7 @@ bool FtpNegotiationCommand::recvTunnelResponse()
   return true;
 }
 
-bool FtpNegotiationCommand::sendRestPasv(const SharedHandle<Segment>& segment) {
+bool FtpNegotiationCommand::sendRestPasv(const std::shared_ptr<Segment>& segment) {
   //dataSocket_->setBlockingMode();
   // Check connection is made properly
   if(dataSocket_->isReadable(0)) {
@@ -792,7 +792,7 @@ bool FtpNegotiationCommand::sendRestPasv(const SharedHandle<Segment>& segment) {
   return sendRest(segment);
 }
 
-bool FtpNegotiationCommand::sendRest(const SharedHandle<Segment>& segment) {
+bool FtpNegotiationCommand::sendRest(const std::shared_ptr<Segment>& segment) {
   if(ftp_->sendRest(segment)) {
     disableWriteCheckSocket();
     sequence_ = SEQ_RECV_REST;
@@ -802,7 +802,7 @@ bool FtpNegotiationCommand::sendRest(const SharedHandle<Segment>& segment) {
   return false;
 }
 
-bool FtpNegotiationCommand::recvRest(const SharedHandle<Segment>& segment) {
+bool FtpNegotiationCommand::recvRest(const std::shared_ptr<Segment>& segment) {
   int status = ftp_->receiveResponse();
   if(status == 0) {
     return false;
@@ -864,7 +864,7 @@ bool FtpNegotiationCommand::waitConnection()
 }
 
 bool FtpNegotiationCommand::processSequence
-(const SharedHandle<Segment>& segment) {
+(const std::shared_ptr<Segment>& segment) {
   bool doNextSequence = true;
   switch(sequence_) {
   case SEQ_RECV_GREETING:

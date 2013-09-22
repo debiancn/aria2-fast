@@ -39,8 +39,7 @@
 
 #include <string>
 #include <deque>
-
-#include "SharedHandle.h"
+#include <memory>
 
 namespace aria2 {
 
@@ -55,14 +54,11 @@ class SocketBuffer {
 private:
   class BufEntry {
   public:
-    BufEntry(ProgressUpdate* progressUpdate)
-    : progressUpdate_(progressUpdate) {}
-    virtual ~BufEntry()
-    {
-      delete progressUpdate_;
-    }
+    BufEntry(std::unique_ptr<ProgressUpdate> progressUpdate)
+      : progressUpdate_(std::move(progressUpdate)) {}
+    virtual ~BufEntry() {}
     virtual ssize_t send
-    (const SharedHandle<SocketCore>& socket, size_t offset) = 0;
+    (const std::shared_ptr<SocketCore>& socket, size_t offset) = 0;
     virtual bool final(size_t offset) const = 0;
     virtual size_t getLength() const = 0;
     virtual const unsigned char* getData() const = 0;
@@ -73,19 +69,19 @@ private:
       }
     }
   private:
-    ProgressUpdate* progressUpdate_;
+    std::unique_ptr<ProgressUpdate> progressUpdate_;
   };
 
   class ByteArrayBufEntry:public BufEntry {
   public:
     ByteArrayBufEntry(unsigned char* bytes, size_t length,
-                      ProgressUpdate* progressUpdate);
+                      std::unique_ptr<ProgressUpdate> progressUpdate);
     virtual ~ByteArrayBufEntry();
     virtual ssize_t send
-    (const SharedHandle<SocketCore>& socket, size_t offset);
-    virtual bool final(size_t offset) const;
-    virtual size_t getLength() const;
-    virtual const unsigned char* getData() const;
+    (const std::shared_ptr<SocketCore>& socket, size_t offset) CXX11_OVERRIDE;
+    virtual bool final(size_t offset) const CXX11_OVERRIDE;
+    virtual size_t getLength() const CXX11_OVERRIDE;
+    virtual const unsigned char* getData() const CXX11_OVERRIDE;
   private:
     unsigned char* bytes_;
     size_t length_;
@@ -93,29 +89,27 @@ private:
 
   class StringBufEntry:public BufEntry {
   public:
-    StringBufEntry(const std::string& s,
-                   ProgressUpdate* progressUpdate);
-    StringBufEntry();
+    StringBufEntry(std::string s,
+                   std::unique_ptr<ProgressUpdate> progressUpdate);
     virtual ssize_t send
-    (const SharedHandle<SocketCore>& socket, size_t offset);
-    virtual bool final(size_t offset) const;
-    virtual size_t getLength() const;
-    virtual const unsigned char* getData() const;
-    void swap(std::string& s);
+    (const std::shared_ptr<SocketCore>& socket, size_t offset) CXX11_OVERRIDE;
+    virtual bool final(size_t offset) const CXX11_OVERRIDE;
+    virtual size_t getLength() const CXX11_OVERRIDE;
+    virtual const unsigned char* getData() const CXX11_OVERRIDE;
   private:
     std::string str_;
   };
 
-  SharedHandle<SocketCore> socket_;
+  std::shared_ptr<SocketCore> socket_;
 
-  std::deque<SharedHandle<BufEntry> > bufq_;
+  std::deque<std::unique_ptr<BufEntry> > bufq_;
 
   // Offset of data in bufq_[0]. SocketBuffer tries to send bufq_[0],
   // but it cannot always send whole data. In this case, offset points
   // to the data to be sent in the next send() call.
   size_t offset_;
 public:
-  SocketBuffer(const SharedHandle<SocketCore>& socket);
+  SocketBuffer(const std::shared_ptr<SocketCore>& socket);
 
   ~SocketBuffer();
 
@@ -130,13 +124,16 @@ public:
   // each time the data is sent. It will be deleted by this object. It
   // can be null.
   void pushBytes(unsigned char* bytes, size_t len,
-                 ProgressUpdate* progressUpdate = 0);
+                 std::unique_ptr<ProgressUpdate> progressUpdate =
+                 std::unique_ptr<ProgressUpdate>{});
 
   // Feeds data into queue. This function doesn't send data.  If
   // progressUpdate is not null, its update() function will be called
   // each time the data is sent. It will be deleted by this object. It
   // can be null.
-  void pushStr(const std::string& data, ProgressUpdate* progressUpdate = 0);
+  void pushStr(std::string data,
+               std::unique_ptr<ProgressUpdate> progressUpdate =
+               std::unique_ptr<ProgressUpdate>{});
 
   // Sends data in queue.  Returns the number of bytes sent.
   ssize_t send();

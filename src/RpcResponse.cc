@@ -49,7 +49,7 @@ namespace rpc {
 
 namespace {
 template<typename OutputStream>
-void encodeValue(const SharedHandle<ValueBase>& value, OutputStream& o)
+void encodeValue(const ValueBase* value, OutputStream& o)
 {
   class XmlValueBaseVisitor:public ValueBaseVisitor {
   private:
@@ -59,21 +59,21 @@ void encodeValue(const SharedHandle<ValueBase>& value, OutputStream& o)
 
     virtual ~XmlValueBaseVisitor() {}
 
-    virtual void visit(const String& v)
+    virtual void visit(const String& v) CXX11_OVERRIDE
     {
       o_ << "<value><string>" << util::htmlEscape(v.s()) << "</string></value>";
     }
 
-    virtual void visit(const Integer& v)
+    virtual void visit(const Integer& v) CXX11_OVERRIDE
     {
       o_ << "<value><int>" << v.i() << "</int></value>";
     }
 
-    virtual void visit(const Bool& boolValue) {}
+    virtual void visit(const Bool& boolValue) CXX11_OVERRIDE {}
 
-    virtual void visit(const Null& nullValue) {}
+    virtual void visit(const Null& nullValue) CXX11_OVERRIDE {}
 
-    virtual void visit(const List& v)
+    virtual void visit(const List& v) CXX11_OVERRIDE
     {
       o_ << "<value><array><data>";
       for(List::ValueType::const_iterator i = v.begin(), eoi = v.end();
@@ -83,7 +83,7 @@ void encodeValue(const SharedHandle<ValueBase>& value, OutputStream& o)
       o_ << "</data></array></value>";
     }
 
-    virtual void visit(const Dict& v)
+    virtual void visit(const Dict& v) CXX11_OVERRIDE
     {
       o_ << "<value><struct>";
       for(Dict::ValueType::const_iterator i = v.begin(), eoi = v.end();
@@ -104,7 +104,7 @@ void encodeValue(const SharedHandle<ValueBase>& value, OutputStream& o)
 namespace {
 template<typename OutputStream>
 std::string encodeAll
-(OutputStream& o, int code, const SharedHandle<ValueBase>& param)
+(OutputStream& o, int code, const ValueBase* param)
 {
   o << "<?xml version=\"1.0\"?>" << "<methodResponse>";
   if(code == 0) {
@@ -123,27 +123,10 @@ std::string encodeAll
 
 RpcResponse::RpcResponse
 (int code,
- const SharedHandle<ValueBase>& param,
- const SharedHandle<ValueBase>& id)
-  : code(code), param(param), id(id)
+ std::unique_ptr<ValueBase> param,
+ std::unique_ptr<ValueBase> id)
+  : code{code}, param{std::move(param)}, id{std::move(id)}
 {}
-
-RpcResponse::RpcResponse(const RpcResponse& c)
-  : code(c.code),
-    param(c.param),
-    id(c.id)
-{}
-
-RpcResponse::~RpcResponse() {}
-
-RpcResponse& RpcResponse::operator=(const RpcResponse& c)
-{
-  if(this != &c) {
-    code = c.code;
-    param = c.param;
-  }
-  return *this;
-}
 
 std::string toXml(const RpcResponse& res, bool gzip)
 {
@@ -151,13 +134,13 @@ std::string toXml(const RpcResponse& res, bool gzip)
 #ifdef HAVE_ZLIB
     GZipEncoder o;
     o.init();
-    return encodeAll(o, res.code, res.param);
+    return encodeAll(o, res.code, res.param.get());
 #else // !HAVE_ZLIB
     abort();
 #endif // !HAVE_ZLIB
   } else {
     std::stringstream o;
-    return encodeAll(o, res.code, res.param);
+    return encodeAll(o, res.code, res.param.get());
   }
 }
 
@@ -166,22 +149,23 @@ template<typename OutputStream>
 OutputStream& encodeJsonAll
 (OutputStream& o,
  int code,
- const SharedHandle<ValueBase>& param,
- const SharedHandle<ValueBase>& id,
+ const ValueBase* param,
+ const ValueBase* id,
  const std::string& callback = A2STR::NIL)
 {
   if(!callback.empty()) {
     o << callback << "(";
   }
-  SharedHandle<Dict> dict = Dict::g();
-  dict->put("jsonrpc", "2.0");
-  dict->put("id", id);
+  o << "{\"id\":";
+  json::encode(o, id);
+  o << ",\"jsonrpc\":\"2.0\",";
   if(code == 0) {
-    dict->put("result", param);
+    o << "\"result\":";
   } else {
-    dict->put("error", param);
+    o << "\"error\":";
   }
-  json::encode(o, dict);
+  json::encode(o, param);
+  o << "}";
   if(!callback.empty()) {
     o << ")";
   }
@@ -196,13 +180,15 @@ std::string toJson
 #ifdef HAVE_ZLIB
     GZipEncoder o;
     o.init();
-    return encodeJsonAll(o, res.code, res.param, res.id, callback).str();
+    return encodeJsonAll(o, res.code, res.param.get(), res.id.get(),
+                         callback).str();
 #else // !HAVE_ZLIB
     abort();
 #endif // !HAVE_ZLIB
   } else {
     std::stringstream o;
-    return encodeJsonAll(o, res.code, res.param, res.id, callback).str();
+    return encodeJsonAll(o, res.code, res.param.get(), res.id.get(),
+                         callback).str();
   }
 }
 
@@ -218,12 +204,12 @@ OutputStream& encodeJsonBatchAll
   }
   o << "[";
   if(!results.empty()) {
-    encodeJsonAll(o, results[0].code, results[0].param, results[0].id);
+    encodeJsonAll(o, results[0].code, results[0].param.get(),
+                  results[0].id.get());
   }
-  for(std::vector<RpcResponse>::const_iterator i = results.begin()+1,
-        eoi = results.end(); i != eoi; ++i) {
+  for(auto i = std::begin(results)+1, eoi = std::end(results); i != eoi; ++i) {
     o << ",";
-    encodeJsonAll(o, (*i).code, (*i).param, (*i).id);
+    encodeJsonAll(o, (*i).code, (*i).param.get(), (*i).id.get());
   }
   o << "]";
   if(!callback.empty()) {

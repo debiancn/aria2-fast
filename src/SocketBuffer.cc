@@ -42,12 +42,14 @@
 #include "message.h"
 #include "fmt.h"
 #include "LogFactory.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
 SocketBuffer::ByteArrayBufEntry::ByteArrayBufEntry
-(unsigned char* bytes, size_t length, ProgressUpdate* progressUpdate)
-  : BufEntry(progressUpdate), bytes_(bytes), length_(length)
+(unsigned char* bytes, size_t length,
+ std::unique_ptr<ProgressUpdate> progressUpdate)
+  : BufEntry(std::move(progressUpdate)), bytes_(bytes), length_(length)
 {}
 
 SocketBuffer::ByteArrayBufEntry::~ByteArrayBufEntry()
@@ -56,7 +58,7 @@ SocketBuffer::ByteArrayBufEntry::~ByteArrayBufEntry()
 }
 
 ssize_t SocketBuffer::ByteArrayBufEntry::send
-(const SharedHandle<SocketCore>& socket, size_t offset)
+(const std::shared_ptr<SocketCore>& socket, size_t offset)
 {
   return socket->writeData(bytes_+offset, length_-offset);
 }
@@ -76,15 +78,13 @@ const unsigned char* SocketBuffer::ByteArrayBufEntry::getData() const
   return bytes_;
 }
 
-SocketBuffer::StringBufEntry::StringBufEntry(const std::string& s,
-                                             ProgressUpdate* progressUpdate)
-  : BufEntry(progressUpdate), str_(s)
+SocketBuffer::StringBufEntry::StringBufEntry
+(std::string s, std::unique_ptr<ProgressUpdate> progressUpdate)
+  : BufEntry(std::move(progressUpdate)), str_(std::move(s))
 {}
 
-// SocketBuffer::StringBufEntry::StringBufEntry() {}
-
 ssize_t SocketBuffer::StringBufEntry::send
-(const SharedHandle<SocketCore>& socket, size_t offset)
+(const std::shared_ptr<SocketCore>& socket, size_t offset)
 {
   return socket->writeData(str_.data()+offset, str_.size()-offset);
 }
@@ -104,31 +104,26 @@ const unsigned char* SocketBuffer::StringBufEntry::getData() const
   return reinterpret_cast<const unsigned char*>(str_.c_str());
 }
 
-void SocketBuffer::StringBufEntry::swap(std::string& s)
-{
-  str_.swap(s);
-}
-
-SocketBuffer::SocketBuffer(const SharedHandle<SocketCore>& socket):
+SocketBuffer::SocketBuffer(const std::shared_ptr<SocketCore>& socket):
   socket_(socket), offset_(0) {}
 
 SocketBuffer::~SocketBuffer() {}
 
 void SocketBuffer::pushBytes(unsigned char* bytes, size_t len,
-                             ProgressUpdate* progressUpdate)
+                             std::unique_ptr<ProgressUpdate> progressUpdate)
 {
   if(len > 0) {
-    bufq_.push_back(SharedHandle<BufEntry>
-                    (new ByteArrayBufEntry(bytes, len, progressUpdate)));
+    bufq_.push_back(make_unique<ByteArrayBufEntry>
+                    (bytes, len, std::move(progressUpdate)));
   }
 }
 
-void SocketBuffer::pushStr(const std::string& data,
-                           ProgressUpdate* progressUpdate)
+void SocketBuffer::pushStr(std::string data,
+                           std::unique_ptr<ProgressUpdate> progressUpdate)
 {
-  if(data.size() > 0) {
-    bufq_.push_back(SharedHandle<BufEntry>
-                    (new StringBufEntry(data, progressUpdate)));
+  if(!data.empty()) {
+    bufq_.push_back(make_unique<StringBufEntry>
+                    (std::move(data), std::move(progressUpdate)));
   }
 }
 
@@ -138,21 +133,23 @@ ssize_t SocketBuffer::send()
   size_t totalslen = 0;
   while(!bufq_.empty()) {
     size_t num;
+    size_t bufqlen = bufq_.size();
     ssize_t amount = 24*1024;
-    ssize_t firstlen = bufq_[0]->getLength() - offset_;
+    ssize_t firstlen = bufq_.front()->getLength() - offset_;
     amount -= firstlen;
     iov[0].A2IOVEC_BASE =
       reinterpret_cast<char*>(const_cast<unsigned char*>
-                              (bufq_[0]->getData() + offset_));
+                              (bufq_.front()->getData() + offset_));
     iov[0].A2IOVEC_LEN = firstlen;
-
-    for(num = 1; num < A2_IOV_MAX && num < bufq_.size() && amount > 0; ++num) {
-      const SharedHandle<BufEntry>& buf = bufq_[num];
-      ssize_t len = buf->getLength();
+    num = 1;
+    for(auto i = std::begin(bufq_)+1, eoi = std::end(bufq_);
+        i != eoi && num < A2_IOV_MAX && num < bufqlen && amount > 0;
+        ++i, ++num) {
+      ssize_t len = (*i)->getLength();
       if(amount >= len) {
         amount -= len;
         iov[num].A2IOVEC_BASE =
-          reinterpret_cast<char*>(const_cast<unsigned char*>(buf->getData()));
+          reinterpret_cast<char*>(const_cast<unsigned char*>((*i)->getData()));
         iov[num].A2IOVEC_LEN = len;
       } else {
         break;
@@ -168,24 +165,24 @@ ssize_t SocketBuffer::send()
 
     if(firstlen > slen) {
       offset_ += slen;
-      bufq_[0]->progressUpdate(slen, false);
+      bufq_.front()->progressUpdate(slen, false);
       goto fin;
     } else {
       slen -= firstlen;
-      bufq_[0]->progressUpdate(firstlen, true);
+      bufq_.front()->progressUpdate(firstlen, true);
       bufq_.pop_front();
       offset_ = 0;
       for(size_t i = 1; i < num; ++i) {
-        const SharedHandle<BufEntry>& buf = bufq_[0];
+        const std::unique_ptr<BufEntry>& buf = bufq_.front();
         ssize_t len = buf->getLength();
         if(len > slen) {
           offset_ = slen;
-          bufq_[0]->progressUpdate(slen, false);
+          bufq_.front()->progressUpdate(slen, false);
           goto fin;
           break;
         } else {
           slen -= len;
-          bufq_[0]->progressUpdate(len, true);
+          bufq_.front()->progressUpdate(len, true);
           bufq_.pop_front();
         }
       }

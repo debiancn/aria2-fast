@@ -84,6 +84,7 @@
 #include "BufferedFile.h"
 #include "SocketCore.h"
 #include "prefs.h"
+#include "Lock.h"
 
 #ifdef ENABLE_MESSAGE_DIGEST
 # include "MessageDigest.h"
@@ -129,16 +130,15 @@ int wCharToAnsi(char* out, size_t outLength, const wchar_t* src)
 std::wstring utf8ToWChar(const char* src)
 {
   int len = utf8ToWChar(0, 0, src);
-  if(len == 0) {
+  if(len <= 0) {
     abort();
   }
-  array_ptr<wchar_t> buf(new wchar_t[len]);
-  len = utf8ToWChar(buf, len, src);
-  if(len == 0) {
+  auto buf = make_unique<wchar_t[]>((size_t)len);
+  len = utf8ToWChar(buf.get(), len, src);
+  if(len <= 0) {
     abort();
   } else {
-    std::wstring dest(buf);
-    return dest;
+    return buf.get();
   }
 }
 
@@ -151,47 +151,45 @@ std::string utf8ToNative(const std::string& src)
 {
   std::wstring wsrc = utf8ToWChar(src);
   int len = wCharToAnsi(0, 0, wsrc.c_str());
-  if(len == 0) {
+  if(len <= 0) {
     abort();
   }
-  array_ptr<char> buf(new char[len]);
-  len = wCharToAnsi(buf, len, wsrc.c_str());
-  if(len == 0) {
+  auto buf = make_unique<char[]>((size_t)len);
+  len = wCharToAnsi(buf.get(), len, wsrc.c_str());
+  if(len <= 0) {
     abort();
   } else {
-    std::string dest(buf);
-    return dest;
+    return buf.get();
   }
 }
 
 std::string wCharToUtf8(const std::wstring& wsrc)
 {
   int len = wCharToUtf8(0, 0, wsrc.c_str());
-  if(len == 0) {
+  if(len <= 0) {
     abort();
   }
-  array_ptr<char> buf(new char[len]);
-  len = wCharToUtf8(buf, len, wsrc.c_str());
-  if(len == 0) {
+  auto buf = make_unique<char[]>((size_t)len);
+  len = wCharToUtf8(buf.get(), len, wsrc.c_str());
+  if(len <= 0) {
     abort();
   } else {
-    std::string dest(buf);
-    return dest;
+    return buf.get();
   }
 }
 
 std::string nativeToUtf8(const std::string& src)
 {
   int len = ansiToWChar(0, 0, src.c_str());
-  if(len == 0) {
+  if(len <= 0) {
     abort();
   }
-  array_ptr<wchar_t> buf(new wchar_t[len]);
-  len = ansiToWChar(buf, len, src.c_str());
-  if(len == 0) {
+  auto buf = make_unique<wchar_t[]>((size_t)len);
+  len = ansiToWChar(buf.get(), len, src.c_str());
+  if(len <= 0) {
     abort();
   } else {
-    return wCharToUtf8(std::wstring(buf));
+    return wCharToUtf8(std::wstring(buf.get()));
   }
 }
 #endif // __MINGW32__
@@ -295,14 +293,16 @@ bool inRFC3986ReservedChars(const char c)
     ':' , '/' , '?' , '#' , '[' , ']' , '@',
     '!' , '$' , '&' , '\'' , '(' , ')',
     '*' , '+' , ',' , ';' , '=' };
-  return std::find(vbegin(reserved), vend(reserved), c) != vend(reserved);
+  return std::find(std::begin(reserved), std::end(reserved), c)
+    != std::end(reserved);
 }
 
 bool inRFC3986UnreservedChars(const char c)
 {
   static const char unreserved[] = { '-', '.', '_', '~' };
   return isAlpha(c) || isDigit(c) ||
-    std::find(vbegin(unreserved), vend(unreserved), c) != vend(unreserved);
+    std::find(std::begin(unreserved), std::end(unreserved), c)
+    != std::end(unreserved);
 }
 
 bool inRFC2978MIMECharset(const char c)
@@ -313,7 +313,7 @@ bool inRFC2978MIMECharset(const char c)
     '`', '{', '}', '~'
   };
   return isAlpha(c) || isDigit(c) ||
-    std::find(vbegin(chars), vend(chars), c) != vend(chars);
+    std::find(std::begin(chars), std::end(chars), c) != std::end(chars);
 }
 
 bool inRFC2616HttpToken(const char c)
@@ -323,7 +323,7 @@ bool inRFC2616HttpToken(const char c)
     '^', '_', '`', '|', '~'
   };
   return isAlpha(c) || isDigit(c) ||
-    std::find(vbegin(chars), vend(chars), c) != vend(chars);
+    std::find(std::begin(chars), std::end(chars), c) != std::end(chars);
 }
 
 bool inRFC5987AttrChar(const char c)
@@ -347,10 +347,21 @@ bool isCRLF(const char c)
 }
 
 namespace {
+
+inline static
 bool isUtf8Tail(unsigned char ch)
 {
   return in(ch, 0x80u, 0xbfu);
 }
+
+inline static
+bool inPercentEncodeMini(const unsigned char c)
+{
+  return c > 0x20 && c < 0x7fu &&
+    // Chromium escapes following characters. Firefox4 escapes more.
+    c != '"' && c != '<' && c != '>';
+}
+
 } // namespace
 
 bool isUtf8(const std::string& str)
@@ -433,21 +444,23 @@ std::string percentEncode(const unsigned char* target, size_t len)
 
 std::string percentEncode(const std::string& target)
 {
+  if (std::find_if_not(target.begin(), target.end(),
+                       inRFC3986UnreservedChars) == target.end()) {
+    return target;
+  }
   return percentEncode(reinterpret_cast<const unsigned char*>(target.c_str()),
                        target.size());
 }
 
 std::string percentEncodeMini(const std::string& src)
 {
+  if (std::find_if_not(src.begin(), src.end(), inPercentEncodeMini) ==
+      src.end()) {
+    return src;
+  }
   std::string result;
-  for(std::string::const_iterator i = src.begin(), eoi = src.end(); i != eoi;
-      ++i) {
-    // Non-Printable ASCII and non-ASCII chars + some ASCII chars.
-    unsigned char c = *i;
-    if(in(c, 0x00u, 0x20u) || c >= 0x7fu ||
-       // Chromium escapes following characters. Firefox4 escapes
-       // more.
-       c == '"' || c == '<' || c == '>') {
+  for (const auto& c: src) {
+    if(!inPercentEncodeMini(c)) {
       result += fmt("%%%02X", c);
     } else {
       result += c;
@@ -656,15 +669,14 @@ void parseIntSegments(SegList<int>& sgl, const std::string& src)
 namespace {
 void computeHeadPieces
 (std::vector<size_t>& indexes,
- const std::vector<SharedHandle<FileEntry> >& fileEntries,
+ const std::vector<std::shared_ptr<FileEntry> >& fileEntries,
  size_t pieceLength,
  int64_t head)
 {
   if(head == 0) {
     return;
   }
-  for(std::vector<SharedHandle<FileEntry> >::const_iterator fi =
-        fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
+  for(auto fi = fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
     if((*fi)->getLength() == 0) {
       continue;
     }
@@ -681,15 +693,14 @@ void computeHeadPieces
 namespace {
 void computeTailPieces
 (std::vector<size_t>& indexes,
- const std::vector<SharedHandle<FileEntry> >& fileEntries,
+ const std::vector<std::shared_ptr<FileEntry> >& fileEntries,
  size_t pieceLength,
  int64_t tail)
 {
   if(tail == 0) {
     return;
   }
-  for(std::vector<SharedHandle<FileEntry> >::const_iterator fi =
-        fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
+  for(auto fi = fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
     if((*fi)->getLength() == 0) {
       continue;
     }
@@ -706,7 +717,7 @@ void computeTailPieces
 
 void parsePrioritizePieceRange
 (std::vector<size_t>& result, const std::string& src,
- const std::vector<SharedHandle<FileEntry> >& fileEntries,
+ const std::vector<std::shared_ptr<FileEntry> >& fileEntries,
  size_t pieceLength,
  int64_t defaultSize)
 {
@@ -867,7 +878,7 @@ ssize_t parse_content_disposition(char *dest, size_t destlen,
                                   const char **charsetp, size_t *charsetlenp,
                                   const char *in, size_t len)
 {
-  const char *p = in, *eop = in + len, *mark_first = NULL, *mark_last = NULL;
+  const char *p = in, *eop = in + len, *mark_first = nullptr, *mark_last = nullptr;
   int state = CD_BEFORE_DISPOSITION_TYPE;
   int in_file_parm = 0;
   int flags = 0;
@@ -880,7 +891,7 @@ ssize_t parse_content_disposition(char *dest, size_t destlen,
   uint32_t dfa_code = 0;
   uint8_t pctval = 0;
 
-  *charsetp = NULL;
+  *charsetp = nullptr;
   *charsetlenp = 0;
 
   for(; p != eop; ++p) {
@@ -1182,16 +1193,15 @@ std::string getContentDispositionFilename(const std::string& header)
   }
 }
 
-std::string toUpper(const std::string& src) {
-  std::string temp = src;
-  uppercase(temp);
-  return temp;
+std::string toUpper(std::string src)
+{
+  uppercase(src);
+  return src;
 }
 
-std::string toLower(const std::string& src) {
-  std::string temp = src;
-  lowercase(temp);
-  return temp;
+std::string toLower(std::string src) {
+  lowercase(src);
+  return src;
 }
 
 void uppercase(std::string& s)
@@ -1227,21 +1237,96 @@ bool isNumericHost(const std::string& name)
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = AF_UNSPEC;
   hints.ai_flags = AI_NUMERICHOST;
-  if(getaddrinfo(name.c_str(), 0, &hints, &res)) {
+  if(getaddrinfo(name.c_str(), nullptr, &hints, &res)) {
     return false;
   }
   freeaddrinfo(res);
   return true;
 }
 
-void setGlobalSignalHandler(int sig, sigset_t* mask, void (*handler)(int),
+#if _WIN32
+namespace {
+  static Lock win_signal_lock;
+
+  static signal_handler_t win_int_handler = nullptr;
+  static signal_handler_t win_term_handler = nullptr;
+
+  static void win_ign_handler(int) {}
+
+  static BOOL WINAPI HandlerRoutine(DWORD ctrlType)
+  {
+    void(*handler)(int) = nullptr;
+    switch (ctrlType) {
+      case CTRL_C_EVENT:
+      case CTRL_BREAK_EVENT:
+        {
+          // Handler will be called on a new/different thread.
+          LockGuard lg(win_signal_lock);
+          handler = win_int_handler;
+        }
+
+        if (handler) {
+          handler(SIGINT);
+          return TRUE;
+        }
+        return FALSE;
+
+      case CTRL_LOGOFF_EVENT:
+      case CTRL_CLOSE_EVENT:
+      case CTRL_SHUTDOWN_EVENT:
+        {
+          // Handler will be called on a new/different thread.
+          LockGuard lg(win_signal_lock);
+          handler = win_term_handler;;
+        }
+        if (handler) {
+          handler(SIGTERM);
+          return TRUE;
+        }
+        return FALSE;
+    }
+    return FALSE;
+  }
+}
+#endif
+
+void setGlobalSignalHandler(int sig, sigset_t* mask, signal_handler_t handler,
                             int flags) {
+#if _WIN32
+  if (sig == SIGINT || sig == SIGTERM) {
+    // Handler will be called on a new/different thread.
+    LockGuard lg(win_signal_lock);
+
+    if (handler == SIG_DFL) {
+      handler = nullptr;
+    }
+    else if (handler == SIG_IGN) {
+      handler = win_ign_handler;
+    }
+    // Not yet in use: add console handler.
+    if (handler && !win_int_handler && !win_term_handler) {
+      ::SetConsoleCtrlHandler(HandlerRoutine, TRUE);
+    }
+    if (sig == SIGINT) {
+      win_int_handler = handler;
+    }
+    else {
+      win_term_handler = handler;
+    }
+    // No handlers set: remove.
+    if (!win_int_handler && !win_term_handler) {
+      ::SetConsoleCtrlHandler(HandlerRoutine, FALSE);
+    }
+    return;
+  }
+#endif
+
 #ifdef HAVE_SIGACTION
   struct sigaction sigact;
   sigact.sa_handler = handler;
   sigact.sa_flags = flags;
   sigact.sa_mask = *mask;
-  sigaction(sig, &sigact, NULL);
+  sigaction(sig, &sigact, nullptr);
 #else
   signal(sig, handler);
 #endif // HAVE_SIGACTION
@@ -1409,7 +1494,7 @@ void convertBitfield(BitfieldMan* dest, const BitfieldMan* src)
   }
 }
 
-std::string toString(const SharedHandle<BinaryStream>& binaryStream)
+std::string toString(const std::shared_ptr<BinaryStream>& binaryStream)
 {
   std::stringstream strm;
   char data[2048];
@@ -1458,31 +1543,36 @@ getNumericNameInfo(const struct sockaddr* sockaddr, socklen_t len)
 std::string htmlEscape(const std::string& src)
 {
   std::string dest;
-  for(std::string::const_iterator i = src.begin(), eoi = src.end();
-      i != eoi; ++i) {
+  dest.reserve(src.size());
+  auto j = std::begin(src);
+  for(auto i = std::begin(src); i != std::end(src); ++i) {
     char ch = *i;
+    const char *repl;
     if(ch == '<') {
-      dest += "&lt;";
+      repl = "&lt;";
     } else if(ch == '>') {
-      dest += "&gt;";
+      repl = "&gt;";
     } else if(ch == '&') {
-      dest += "&amp;";
+      repl = "&amp;";
     } else if(ch == '\'') {
-      dest += "&#39;";
+      repl = "&#39;";
     } else if(ch == '"') {
-      dest += "&quot;";
+      repl = "&quot;";
     } else {
-      dest += ch;
+      continue;
     }
+    dest.append(j, i);
+    j = i + 1;
+    dest += repl;
   }
+  dest.append(j, std::end(src));
   return dest;
 }
 
 std::pair<size_t, std::string>
 parseIndexPath(const std::string& line)
 {
-  std::pair<Scip, Scip> p;
-  divide(p, line.begin(), line.end(), '=');
+  auto p = divide(std::begin(line), std::end(line), '=');
   uint32_t index;
   if(!parseUIntNoThrow(index, std::string(p.first.first, p.first.second))) {
     throw DL_ABORT_EX("Bad path index");
@@ -1506,7 +1596,7 @@ std::vector<std::pair<size_t, std::string> > createIndexPaths(std::istream& i)
 namespace {
 void generateRandomDataRandom(unsigned char* data, size_t length)
 {
-  const SharedHandle<SimpleRandomizer>& rd = SimpleRandomizer::getInstance();
+  const auto& rd = SimpleRandomizer::getInstance();
   for(size_t i = 0; i < length; ++i) {
     data[i] = static_cast<unsigned long>(rd->getRandomNumber(256));
   }
@@ -1602,7 +1692,8 @@ void generateRandomKey(unsigned char* key)
 #ifdef ENABLE_MESSAGE_DIGEST
   unsigned char bytes[40];
   generateRandomData(bytes, sizeof(bytes));
-  message_digest::digest(key, 20, MessageDigest::sha1(), bytes, sizeof(bytes));
+  message_digest::digest(key, 20, MessageDigest::sha1().get(), bytes,
+                         sizeof(bytes));
 #else // !ENABLE_MESSAGE_DIGEST
   generateRandomData(key, 20);
 #endif // !ENABLE_MESSAGE_DIGEST
@@ -1663,9 +1754,9 @@ std::string escapePath(const std::string& s)
     unsigned char c = *i;
     if(in(c, 0x00u, 0x1fu) || c == 0x7fu
 #ifdef __MINGW32__
-       || std::find(vbegin(WIN_INVALID_PATH_CHARS),
-                    vend(WIN_INVALID_PATH_CHARS),
-                    c) != vend(WIN_INVALID_PATH_CHARS)
+       || std::find(std::begin(WIN_INVALID_PATH_CHARS),
+                    std::end(WIN_INVALID_PATH_CHARS),
+                    c) != std::end(WIN_INVALID_PATH_CHARS)
 #endif // __MINGW32__
        ){
       d += fmt("%%%02X", c);
@@ -1769,17 +1860,17 @@ void executeHook
   }
   int cmdlineLen = utf8ToWChar(0, 0, cmdline.c_str());
   assert(cmdlineLen > 0);
-  array_ptr<wchar_t> wcharCmdline(new wchar_t[cmdlineLen]);
-  cmdlineLen = utf8ToWChar(wcharCmdline, cmdlineLen, cmdline.c_str());
+  auto wcharCmdline = std::unique_ptr<wchar_t[]>(new wchar_t[cmdlineLen]);
+  cmdlineLen = utf8ToWChar(wcharCmdline.get(), cmdlineLen, cmdline.c_str());
   assert(cmdlineLen > 0);
   A2_LOG_INFO(fmt("Executing user command: %s", cmdline.c_str()));
-  DWORD rc = CreateProcessW(batch ? utf8ToWChar(cmdexe).c_str() : NULL,
-                            wcharCmdline,
-                            NULL,
-                            NULL,
+  DWORD rc = CreateProcessW(batch ? utf8ToWChar(cmdexe).c_str() : nullptr,
+                            wcharCmdline.get(),
+                            nullptr,
+                            nullptr,
                             true,
                             0,
-                            NULL,
+                            nullptr,
                             0,
                             &si,
                             &pi);
@@ -1793,7 +1884,7 @@ void executeHook
 } // namespace
 
 void executeHookByOptName
-(const SharedHandle<RequestGroup>& group, const Option* option,
+(const std::shared_ptr<RequestGroup>& group, const Option* option,
  const Pref* pref)
 {
   executeHookByOptName(group.get(), option, pref);
@@ -1804,11 +1895,11 @@ void executeHookByOptName
 {
   const std::string& cmd = option->get(pref);
   if(!cmd.empty()) {
-    const SharedHandle<DownloadContext> dctx = group->getDownloadContext();
+    const std::shared_ptr<DownloadContext> dctx = group->getDownloadContext();
     std::string firstFilename;
     size_t numFiles = 0;
     if(!group->inMemoryDownload()) {
-      SharedHandle<FileEntry> file = dctx->getFirstRequestedFileEntry();
+      std::shared_ptr<FileEntry> file = dctx->getFirstRequestedFileEntry();
       if(file) {
         firstFilename = file->getPath();
       }

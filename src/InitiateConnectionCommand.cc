@@ -58,8 +58,8 @@ namespace aria2 {
 
 InitiateConnectionCommand::InitiateConnectionCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e)
@@ -76,7 +76,7 @@ InitiateConnectionCommand::~InitiateConnectionCommand() {}
 bool InitiateConnectionCommand::executeInternal() {
   std::string hostname;
   uint16_t port;
-  SharedHandle<Request> proxyRequest = createProxyRequest();
+  std::shared_ptr<Request> proxyRequest = createProxyRequest();
   if(!proxyRequest) {
     hostname = getRequest()->getHost();
     port = getRequest()->getPort();
@@ -87,13 +87,12 @@ bool InitiateConnectionCommand::executeInternal() {
   std::vector<std::string> addrs;
   std::string ipaddr = resolveHostname(addrs, hostname, port);
   if(ipaddr.empty()) {
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     return false;
   }
   try {
-    Command* command = createNextCommand(hostname, ipaddr, port,
-                                         addrs, proxyRequest);
-    getDownloadEngine()->addCommand(command);
+    getDownloadEngine()->addCommand(createNextCommand(hostname, ipaddr, port,
+                                                      addrs, proxyRequest));
     return true;
   } catch(RecoverableException& ex) {
     // Catch exception and retry another address.
@@ -106,12 +105,12 @@ bool InitiateConnectionCommand::executeInternal() {
       A2_LOG_INFO(fmt(MSG_CONNECT_FAILED_AND_RETRY,
                       getCuid(),
                       ipaddr.c_str(), port));
-      Command* command =
+      auto command =
         InitiateConnectionCommandFactory::createInitiateConnectionCommand
         (getCuid(), getRequest(), getFileEntry(), getRequestGroup(),
          getDownloadEngine());
       getDownloadEngine()->setNoWait(true);
-      getDownloadEngine()->addCommand(command);
+      getDownloadEngine()->addCommand(std::move(command));
       return true;
     }
     getDownloadEngine()->removeCachedIPAddress(hostname, port);
@@ -120,23 +119,23 @@ bool InitiateConnectionCommand::executeInternal() {
 }
 
 void InitiateConnectionCommand::setConnectedAddrInfo
-(const SharedHandle<Request>& req,
+(const std::shared_ptr<Request>& req,
  const std::string& hostname,
- const SharedHandle<SocketCore>& socket)
+ const std::shared_ptr<SocketCore>& socket)
 {
   std::pair<std::string, uint16_t> peerAddr;
   socket->getPeerInfo(peerAddr);
   req->setConnectedAddrInfo(hostname, peerAddr.first, peerAddr.second);
 }
 
-SharedHandle<BackupConnectInfo>
+std::shared_ptr<BackupConnectInfo>
 InitiateConnectionCommand::createBackupIPv4ConnectCommand
 (const std::string& hostname, const std::string& ipaddr, uint16_t port,
  Command* mainCommand)
 {
   // Prepare IPv4 backup connection attemp in "Happy Eyeballs"
   // fashion.
-  SharedHandle<BackupConnectInfo> info;
+  std::shared_ptr<BackupConnectInfo> info;
   char buf[sizeof(in6_addr)];
   if(inetPton(AF_INET6, ipaddr.c_str(), &buf) == -1) {
     return info;
@@ -149,12 +148,12 @@ InitiateConnectionCommand::createBackupIPv4ConnectCommand
         eoi = addrs.end(); i != eoi; ++i) {
     if(inetPton(AF_INET, (*i).c_str(), &buf) == 0) {
       info.reset(new BackupConnectInfo());
-      BackupIPv4ConnectCommand* command = new BackupIPv4ConnectCommand
+      auto command = make_unique<BackupIPv4ConnectCommand>
         (getDownloadEngine()->newCUID(), *i, port, info, mainCommand,
          getRequestGroup(), getDownloadEngine());
-      A2_LOG_INFO(fmt("Issue backup connection command CUID#%"PRId64
+      A2_LOG_INFO(fmt("Issue backup connection command CUID#%" PRId64
                       ", addr=%s", command->getCuid(), (*i).c_str()));
-      getDownloadEngine()->addCommand(command);
+      getDownloadEngine()->addCommand(std::move(command));
       return info;
     }
   }
@@ -165,7 +164,7 @@ void InitiateConnectionCommand::setupBackupConnection
 (const std::string& hostname, const std::string& addr, uint16_t port,
  ConnectCommand* c)
 {
-  SharedHandle<BackupConnectInfo> backupConnectInfo
+  std::shared_ptr<BackupConnectInfo> backupConnectInfo
     = createBackupIPv4ConnectCommand(hostname, addr, port, c);
   if(backupConnectInfo) {
     c->setBackupConnectInfo(backupConnectInfo);

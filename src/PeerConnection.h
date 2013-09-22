@@ -38,8 +38,8 @@
 #include "common.h"
 
 #include <unistd.h>
+#include <memory>
 
-#include "SharedHandle.h"
 #include "SocketBuffer.h"
 #include "Command.h"
 
@@ -57,8 +57,8 @@ class ARC4Encryptor;
 class PeerConnection {
 private:
   cuid_t cuid_;
-  SharedHandle<Peer> peer_;
-  SharedHandle<SocketCore> socket_;
+  std::shared_ptr<Peer> peer_;
+  std::shared_ptr<SocketCore> socket_;
 
   int msgState_;
   // The capacity of the buffer resbuf_
@@ -77,8 +77,8 @@ private:
   SocketBuffer socketBuffer_;
 
   bool encryptionEnabled_;
-  SharedHandle<ARC4Encryptor> encryptor_;
-  SharedHandle<ARC4Encryptor> decryptor_;
+  std::unique_ptr<ARC4Encryptor> encryptor_;
+  std::unique_ptr<ARC4Encryptor> decryptor_;
 
   bool prevPeek_;
 
@@ -89,17 +89,16 @@ private:
 public:
   PeerConnection
   (cuid_t cuid,
-   const SharedHandle<Peer>& peer,
-   const SharedHandle<SocketCore>& socket);
+   const std::shared_ptr<Peer>& peer,
+   const std::shared_ptr<SocketCore>& socket);
 
   ~PeerConnection();
 
   // Pushes data into send buffer. After this call, this object gets
   // ownership of data, so caller must not delete or alter it.
   void pushBytes(unsigned char* data, size_t len,
-                 ProgressUpdate* progressUpdate = 0);
-
-  void pushStr(const std::string& data);
+                 std::unique_ptr<ProgressUpdate> progressUpdate =
+                 std::unique_ptr<ProgressUpdate>{});
 
   bool receiveMessage(unsigned char* data, size_t& dataLength);
 
@@ -112,8 +111,8 @@ public:
   bool receiveHandshake
   (unsigned char* data, size_t& dataLength, bool peek = false);
 
-  void enableEncryption(const SharedHandle<ARC4Encryptor>& encryptor,
-                        const SharedHandle<ARC4Encryptor>& decryptor);
+  void enableEncryption(std::unique_ptr<ARC4Encryptor> encryptor,
+                        std::unique_ptr<ARC4Encryptor> decryptor);
 
   void presetBuffer(const unsigned char* data, size_t length);
 

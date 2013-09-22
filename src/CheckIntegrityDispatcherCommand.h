@@ -47,11 +47,11 @@ class CheckIntegrityDispatcherCommand :
 public:
   CheckIntegrityDispatcherCommand
   (cuid_t cuid,
-   const SharedHandle<CheckIntegrityMan>& checkMan,
+   CheckIntegrityMan* checkMan,
    DownloadEngine* e);
 protected:
-  virtual Command* createCommand
-  (const SharedHandle<CheckIntegrityEntry>& entry);
+  virtual std::unique_ptr<Command> createCommand(CheckIntegrityEntry* entry)
+    CXX11_OVERRIDE;
 };
 
 } // namespace aria2

@@ -54,57 +54,6 @@ char (&char_array_ref_fun(T (&)[0u]))[0u];
 #define A2_ARRAY_LEN(X) sizeof(char_array_ref_fun(X))
 
 template<typename T, size_t N>
-T* vbegin(T (&a)[N])
-{
-  return a;
-}
-
-template<typename T, size_t N>
-T* vend(T (&a)[N])
-{
-  return a+N;
-}
-
-template<typename T>
-class array_ptr {
-private:
-  T* array_;
-
-  // Copies are not allowed. Let's make them private.
-  array_ptr(const array_ptr& s);
-
-  array_ptr& operator=(const array_ptr& s);
-
-  template<typename S>
-  array_ptr& operator=(const array_ptr<S>& s);
-
-public:
-  array_ptr():array_(0) {}
-
-  explicit array_ptr(T* array):array_(array) {}
-
-  ~array_ptr()
-  {
-    delete [] array_;
-  }
-
-  operator T*()
-  {
-    return array_;
-  }
-
-  operator const T*() const
-  {
-    return array_;
-  }
-
-  void reset(T* array)
-  {
-    array_ = array;
-  }
-};
-
-template<typename T, size_t N>
 class array_wrapper {
 private:
   T array_[N];
@@ -133,7 +82,7 @@ namespace expr {
 
 template<typename L, typename OpTag, typename R>
 struct BinExpr {
-  BinExpr(const L& l, const R& r):l_(l), r_(r) {}
+  BinExpr(L l, R r):l_(l), r_(r) {}
 
   typedef typename OpTag::returnType returnType;
 
@@ -142,13 +91,13 @@ struct BinExpr {
     return OpTag::apply(l_[index], r_[index]);
   }
 
-  const L& l_;
-  const R& r_;
+  const L l_;
+  const R r_;
 };
 
 template<typename OpTag, typename A>
 struct UnExpr {
-  UnExpr(const A& a):a_(a) {}
+  UnExpr(A a):a_(a) {}
 
   typedef typename OpTag::returnType returnType;
 
@@ -157,7 +106,7 @@ struct UnExpr {
     return OpTag::apply(a_[index]);
   }
 
-  const A& a_;
+  const A a_;
 };
 
 template<typename T>

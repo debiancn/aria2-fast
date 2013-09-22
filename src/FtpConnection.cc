@@ -62,9 +62,9 @@ namespace aria2 {
 
 FtpConnection::FtpConnection
 (cuid_t cuid,
- const SharedHandle<SocketCore>& socket,
- const SharedHandle<Request>& req,
- const SharedHandle<AuthConfig>& authConfig,
+ const std::shared_ptr<SocketCore>& socket,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<AuthConfig>& authConfig,
  const Option* op)
   : cuid_(cuid),
     socket_(socket),
@@ -85,7 +85,7 @@ bool FtpConnection::sendUser()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, "USER ********"));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -99,7 +99,7 @@ bool FtpConnection::sendPass()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, "PASS ********"));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -113,7 +113,7 @@ bool FtpConnection::sendType()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_,request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -125,7 +125,7 @@ bool FtpConnection::sendPwd()
     std::string request = "PWD\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_,request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -139,7 +139,7 @@ bool FtpConnection::sendCwd(const std::string& dir)
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_,request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -154,7 +154,7 @@ bool FtpConnection::sendMdtm()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -169,7 +169,7 @@ bool FtpConnection::sendSize()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -181,7 +181,7 @@ bool FtpConnection::sendEpsv()
     std::string request("EPSV\r\n");
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -193,23 +193,23 @@ bool FtpConnection::sendPasv()
     std::string request("PASV\r\n");
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
 }
 
-SharedHandle<SocketCore> FtpConnection::createServerSocket()
+std::shared_ptr<SocketCore> FtpConnection::createServerSocket()
 {
   std::pair<std::string, uint16_t> addrinfo;
   socket_->getAddrInfo(addrinfo);
-  SharedHandle<SocketCore> serverSocket(new SocketCore());
+  std::shared_ptr<SocketCore> serverSocket(new SocketCore());
   serverSocket->bind(addrinfo.first.c_str(), 0, AF_UNSPEC);
   serverSocket->beginListen();
   return serverSocket;
 }
 
-bool FtpConnection::sendEprt(const SharedHandle<SocketCore>& serverSocket)
+bool FtpConnection::sendEprt(const std::shared_ptr<SocketCore>& serverSocket)
 {
   if(socketBuffer_.sendBufferIsEmpty()) {
     sockaddr_union sockaddr;
@@ -223,13 +223,13 @@ bool FtpConnection::sendEprt(const SharedHandle<SocketCore>& serverSocket)
           addrinfo.first.c_str(),
           addrinfo.second);
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST, cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
 }
 
-bool FtpConnection::sendPort(const SharedHandle<SocketCore>& serverSocket)
+bool FtpConnection::sendPort(const std::shared_ptr<SocketCore>& serverSocket)
 {
   if(socketBuffer_.sendBufferIsEmpty()) {
     std::pair<std::string, uint16_t> addrinfo;
@@ -243,13 +243,13 @@ bool FtpConnection::sendPort(const SharedHandle<SocketCore>& serverSocket)
                               addrinfo.second/256, addrinfo.second%256);
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
 }
 
-bool FtpConnection::sendRest(const SharedHandle<Segment>& segment)
+bool FtpConnection::sendRest(const std::shared_ptr<Segment>& segment)
 {
   if(socketBuffer_.sendBufferIsEmpty()) {
     std::string request =
@@ -258,7 +258,7 @@ bool FtpConnection::sendRest(const SharedHandle<Segment>& segment)
           segment->getPositionToWrite() : static_cast<int64_t>(0LL));
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -273,7 +273,7 @@ bool FtpConnection::sendRetr()
     request += "\r\n";
     A2_LOG_INFO(fmt(MSG_SENDING_REQUEST,
                     cuid_, request.c_str()));
-    socketBuffer_.pushStr(request);
+    socketBuffer_.pushStr(std::move(request));
   }
   socketBuffer_.send();
   return socketBuffer_.sendBufferIsEmpty();
@@ -403,8 +403,9 @@ int FtpConnection::receiveSizeResponse(int64_t& size)
   std::pair<int, std::string> response;
   if(bulkReceiveResponse(response)) {
     if(response.first == 213) {
-      std::pair<Sip, Sip> rp;
-      util::divide(rp, response.second.begin(), response.second.end(), ' ');
+      auto rp = util::divide(std::begin(response.second),
+                             std::end(response.second),
+                             ' ');
       if(!util::parseLLIntNoThrow(size, std::string(rp.second.first,
                                                     rp.second.second)) ||
          size < 0) {

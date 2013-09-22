@@ -57,23 +57,26 @@ namespace aria2 {
 
 const std::string HttpRequest::USER_AGENT("aria2");
 
-HttpRequest::HttpRequest():contentEncodingEnabled_(true),
-                           userAgent_(USER_AGENT),
-                           acceptMetalink_(false),
-                           option_(0),
-                           noCache_(true),
-                           acceptGzip_(false),
-                           endOffsetOverride_(0)
+HttpRequest::HttpRequest()
+  : contentEncodingEnabled_(true),
+    userAgent_(USER_AGENT),
+    acceptMetalink_(false),
+    cookieStorage_(nullptr),
+    authConfigFactory_(nullptr),
+    option_(nullptr),
+    noCache_(true),
+    acceptGzip_(false),
+    endOffsetOverride_(0)
 {}
 
 HttpRequest::~HttpRequest() {}
 
-void HttpRequest::setSegment(const SharedHandle<Segment>& segment)
+void HttpRequest::setSegment(const std::shared_ptr<Segment>& segment)
 {
   segment_ = segment;
 }
 
-void HttpRequest::setRequest(const SharedHandle<Request>& request)
+void HttpRequest::setRequest(const std::shared_ptr<Request>& request)
 {
   request_ = request;
 }
@@ -91,17 +94,16 @@ int64_t HttpRequest::getEndByte() const
 {
   if(!segment_ || !request_) {
     return 0;
-  } else {
-    if(request_->isPipeliningEnabled()) {
-      int64_t endByte =
-        fileEntry_->gtoloff(segment_->getPosition()+segment_->getLength()-1);
-      return std::min(endByte, fileEntry_->getLength()-1);
-    } else if(endOffsetOverride_ > 0) {
-      return endOffsetOverride_ - 1;
-    } else {
-      return 0;
-    }
   }
+  if(request_->isPipeliningEnabled()) {
+    int64_t endByte =
+      fileEntry_->gtoloff(segment_->getPosition()+segment_->getLength()-1);
+    return std::min(endByte, fileEntry_->getLength()-1);
+  }
+  if(endOffsetOverride_ > 0) {
+    return endOffsetOverride_ - 1;
+  }
+  return 0;
 }
 
 Range HttpRequest::getRange() const
@@ -109,9 +111,8 @@ Range HttpRequest::getRange() const
   // content-length is always 0
   if(!segment_) {
     return Range();
-  } else {
-    return Range(getStartByte(), getEndByte(), fileEntry_->getLength());
   }
+  return Range(getStartByte(), getEndByte(), fileEntry_->getLength());
 }
 
 bool HttpRequest::isRangeSatisfied(const Range& range) const
@@ -125,9 +126,8 @@ bool HttpRequest::isRangeSatisfied(const Range& range) const
      ((fileEntry_->getLength() == 0) ||
       (fileEntry_->getLength() == range.entityLength))) {
     return true;
-  } else {
-    return false;
   }
+  return false;
 }
 
 namespace {
@@ -231,13 +231,11 @@ std::string HttpRequest::createRequest()
     std::string cookiesValue;
     std::string path = getDir();
     path += getFile();
-    std::vector<Cookie> cookies =
-      cookieStorage_->criteriaFind(getHost(), path,
-                                   Time().getTime(),
-                                   getProtocol() == "https");
-    for(std::vector<Cookie>::const_iterator itr = cookies.begin(),
-          eoi = cookies.end(); itr != eoi; ++itr) {
-      cookiesValue += (*itr).toString();
+    auto cookies = cookieStorage_->criteriaFind(getHost(), path,
+                                                Time().getTime(),
+                                                getProtocol() == "https");
+    for(auto c : cookies) {
+      cookiesValue += c->toString();
       cookiesValue += ";";
     }
     if(!cookiesValue.empty()) {
@@ -327,35 +325,42 @@ void HttpRequest::clearHeader()
   headers_.clear();
 }
 
-void HttpRequest::setCookieStorage
-(const SharedHandle<CookieStorage>& cookieStorage)
+void HttpRequest::setCookieStorage(CookieStorage* cookieStorage)
 {
   cookieStorage_ = cookieStorage;
 }
 
-void HttpRequest::setAuthConfigFactory
-(const SharedHandle<AuthConfigFactory>& factory, const Option* option)
+CookieStorage* HttpRequest::getCookieStorage() const
+{
+  return cookieStorage_;
+}
+
+void HttpRequest::setAuthConfigFactory(AuthConfigFactory* factory)
 {
   authConfigFactory_ = factory;
+}
+
+void HttpRequest::setOption(const Option* option)
+{
   option_ = option;
 }
 
-void HttpRequest::setProxyRequest(const SharedHandle<Request>& proxyRequest)
+void HttpRequest::setProxyRequest(const std::shared_ptr<Request>& proxyRequest)
 {
   proxyRequest_ = proxyRequest;
 }
 
 bool HttpRequest::isProxyRequestSet() const
 {
-  return proxyRequest_;
+  return proxyRequest_.get();
 }
 
 bool HttpRequest::authenticationUsed() const
 {
-  return authConfig_;
+  return authConfig_.get();
 }
 
-const SharedHandle<AuthConfig>& HttpRequest::getAuthConfig() const
+const std::unique_ptr<AuthConfig>& HttpRequest::getAuthConfig() const
 {
   return authConfig_;
 }
@@ -421,7 +426,7 @@ void HttpRequest::setUserAgent(const std::string& userAgent)
   userAgent_ = userAgent;
 }
 
-void HttpRequest::setFileEntry(const SharedHandle<FileEntry>& fileEntry)
+void HttpRequest::setFileEntry(const std::shared_ptr<FileEntry>& fileEntry)
 {
   fileEntry_ = fileEntry;
 }
@@ -436,7 +441,7 @@ bool HttpRequest::conditionalRequest() const
   if(!ifModSinceHeader_.empty()) {
     return true;
   }
-  for(std::vector<std::string>::const_iterator i = headers_.begin(),
+  for(auto i = headers_.begin(),
         eoi = headers_.end(); i != eoi; ++i) {
     if(util::istartsWith(*i, "if-modified-since") ||
        util::istartsWith(*i, "if-none-match")) {

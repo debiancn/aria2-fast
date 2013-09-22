@@ -72,7 +72,7 @@ bool HttpListenCommand::execute()
   }
   try {
     if(serverSocket_->isReadable(0)) {
-      SharedHandle<SocketCore> socket(serverSocket_->acceptConnection());
+      std::shared_ptr<SocketCore> socket(serverSocket_->acceptConnection());
       socket->setTcpNodelay(true);
       std::pair<std::string, uint16_t> peerInfo;
       socket->getPeerInfo(peerInfo);
@@ -80,15 +80,14 @@ bool HttpListenCommand::execute()
       A2_LOG_INFO(fmt("RPC: Accepted the connection from %s:%u.",
                       peerInfo.first.c_str(), peerInfo.second));
 
-      HttpServerCommand* c =
-        new HttpServerCommand(e_->newCUID(), e_, socket, secure_);
       e_->setNoWait(true);
-      e_->addCommand(c);
+      e_->addCommand(make_unique<HttpServerCommand>
+                     (e_->newCUID(), e_, socket, secure_));
     }
   } catch(RecoverableException& e) {
     A2_LOG_DEBUG_EX(fmt(MSG_ACCEPT_FAILURE, getCuid()), e);
   }
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 
@@ -104,7 +103,7 @@ bool HttpListenCommand::bindPort(uint16_t port)
     if(e_->getOption()->getAsBool(PREF_RPC_LISTEN_ALL)) {
       flags = AI_PASSIVE;
     }
-    serverSocket_->bind(0, port, family_, flags);
+    serverSocket_->bind(nullptr, port, family_, flags);
     serverSocket_->beginListen();
     A2_LOG_INFO(fmt(MSG_LISTENING_PORT,
                     getCuid(), port));

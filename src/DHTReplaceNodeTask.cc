@@ -42,12 +42,13 @@
 #include "LogFactory.h"
 #include "DHTPingReplyMessageCallback.h"
 #include "DHTQueryMessage.h"
+#include "DHTPingMessage.h"
 #include "fmt.h"
 
 namespace aria2 {
 
 DHTReplaceNodeTask::DHTReplaceNodeTask
-(const SharedHandle<DHTBucket>& bucket, const SharedHandle<DHTNode>& newNode)
+(const std::shared_ptr<DHTBucket>& bucket, const std::shared_ptr<DHTNode>& newNode)
   : bucket_(bucket),
     newNode_(newNode),
     numRetry_(0),
@@ -63,15 +64,14 @@ void DHTReplaceNodeTask::startup()
 
 void DHTReplaceNodeTask::sendMessage()
 {
-  SharedHandle<DHTNode> questionableNode = bucket_->getLRUQuestionableNode();
+  std::shared_ptr<DHTNode> questionableNode = bucket_->getLRUQuestionableNode();
   if(!questionableNode) {
     setFinished(true);
   } else {
-    SharedHandle<DHTMessage> m =
-      getMessageFactory()->createPingMessage(questionableNode);
-    SharedHandle<DHTMessageCallback> callback
-      (new DHTPingReplyMessageCallback<DHTReplaceNodeTask>(this));
-    getMessageDispatcher()->addMessageToQueue(m, timeout_, callback);
+    getMessageDispatcher()->addMessageToQueue
+      (getMessageFactory()->createPingMessage(questionableNode),
+       timeout_,
+       make_unique<DHTPingReplyMessageCallback<DHTReplaceNodeTask>>(this));
   }
 }
 
@@ -86,7 +86,7 @@ namespace {
 const int MAX_RETRY = 2;
 } //namespace
 
-void DHTReplaceNodeTask::onTimeout(const SharedHandle<DHTNode>& node)
+void DHTReplaceNodeTask::onTimeout(const std::shared_ptr<DHTNode>& node)
 {
   ++numRetry_;
   if(numRetry_ >= MAX_RETRY) {

@@ -37,9 +37,10 @@
 
 #include "ExtensionMessage.h"
 
+#include <memory>
+
 #include "BtConstants.h"
 #include "ExtensionMessageRegistry.h"
-#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -56,31 +57,29 @@ private:
 
   ExtensionMessageRegistry extreg_;
 
-  SharedHandle<DownloadContext> dctx_;
+  DownloadContext* dctx_;
 
-  SharedHandle<Peer> peer_;
+  std::shared_ptr<Peer> peer_;
 public:
   HandshakeExtensionMessage();
 
-  virtual ~HandshakeExtensionMessage();
-
   virtual std::string getPayload();
 
-  virtual uint8_t getExtensionMessageID()
+  virtual uint8_t getExtensionMessageID() const CXX11_OVERRIDE
   {
     return 0;
   }
 
-  virtual const char* getExtensionName() const
+  virtual const char* getExtensionName() const CXX11_OVERRIDE
   {
     return EXTENSION_NAME;
   }
 
   static const char EXTENSION_NAME[];
 
-  virtual std::string toString() const;
+  virtual std::string toString() const CXX11_OVERRIDE;
 
-  virtual void doReceivedAction();
+  virtual void doReceivedAction() CXX11_OVERRIDE;
 
   void setClientVersion(const std::string& version)
   {
@@ -112,7 +111,7 @@ public:
     metadataSize_ = size;
   }
 
-  void setDownloadContext(const SharedHandle<DownloadContext>& dctx)
+  void setDownloadContext(DownloadContext* dctx)
   {
     dctx_ = dctx;
   }
@@ -123,9 +122,9 @@ public:
 
   uint8_t getExtensionMessageID(int key) const;
 
-  void setPeer(const SharedHandle<Peer>& peer);
+  void setPeer(const std::shared_ptr<Peer>& peer);
 
-  static HandshakeExtensionMessage*
+  static std::unique_ptr<HandshakeExtensionMessage>
   create(const unsigned char* data, size_t dataLength);
 };
 

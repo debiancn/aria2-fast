@@ -38,10 +38,12 @@
 
 #include "array_fun.h"
 #include "HashFuncEntry.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
-MessageDigestImpl::MessageDigestImpl(const EVP_MD* hashFunc):hashFunc_(hashFunc)
+MessageDigestImpl::MessageDigestImpl(const EVP_MD* hashFunc)
+  : hashFunc_{hashFunc}
 {
   EVP_MD_CTX_init(&ctx_);
   reset();
@@ -52,9 +54,9 @@ MessageDigestImpl::~MessageDigestImpl()
   EVP_MD_CTX_cleanup(&ctx_);
 }
 
-SharedHandle<MessageDigestImpl> MessageDigestImpl::sha1()
+std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
-  return SharedHandle<MessageDigestImpl>(new MessageDigestImpl(EVP_sha1()));
+  return make_unique<MessageDigestImpl>(EVP_sha1());
 }
 
 typedef HashFuncEntry<const EVP_MD*> CHashFuncEntry;
@@ -79,24 +81,25 @@ CHashFuncEntry hashFuncs[] = {
 };
 } // namespace
 
-SharedHandle<MessageDigestImpl> MessageDigestImpl::create
+std::unique_ptr<MessageDigestImpl> MessageDigestImpl::create
 (const std::string& hashType)
 {
-  const EVP_MD* hashFunc = getHashFunc(vbegin(hashFuncs), vend(hashFuncs),
-                                       hashType);
-  return SharedHandle<MessageDigestImpl>(new MessageDigestImpl(hashFunc));
+  auto hashFunc = getHashFunc(std::begin(hashFuncs), std::end(hashFuncs),
+                              hashType);
+  return make_unique<MessageDigestImpl>(hashFunc);
 }
 
 bool MessageDigestImpl::supports(const std::string& hashType)
 {
-  return vend(hashFuncs) != std::find_if(vbegin(hashFuncs), vend(hashFuncs),
-                                         CFindHashFunc(hashType));
+  return std::end(hashFuncs) != std::find_if(std::begin(hashFuncs),
+                                             std::end(hashFuncs),
+                                             CFindHashFunc(hashType));
 }
 
 size_t MessageDigestImpl::getDigestLength(const std::string& hashType)
 {
-  const EVP_MD* hashFunc = getHashFunc(vbegin(hashFuncs), vend(hashFuncs),
-                                       hashType);
+  auto hashFunc = getHashFunc(std::begin(hashFuncs), std::end(hashFuncs),
+                              hashType);
   return EVP_MD_size(hashFunc);
 }
 

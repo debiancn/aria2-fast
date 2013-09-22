@@ -45,9 +45,9 @@ namespace rpc {
 
 WebSocketResponseCommand::WebSocketResponseCommand
 (cuid_t cuid,
- const SharedHandle<HttpServer>& httpServer,
+ const std::shared_ptr<HttpServer>& httpServer,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket)
+ const std::shared_ptr<SocketCore>& socket)
   : AbstractHttpServerResponseCommand(cuid, httpServer, e, socket)
 {}
 
@@ -55,16 +55,15 @@ WebSocketResponseCommand::~WebSocketResponseCommand()
 {}
 
 void WebSocketResponseCommand::afterSend
-(const SharedHandle<HttpServer>& httpServer,
+(const std::shared_ptr<HttpServer>& httpServer,
  DownloadEngine* e)
 {
-  SharedHandle<WebSocketSession> wsSession
+  std::shared_ptr<WebSocketSession> wsSession
     (new WebSocketSession(httpServer->getSocket(), getDownloadEngine()));
-  WebSocketInteractionCommand* command =
-    new WebSocketInteractionCommand(getCuid(), wsSession, e,
-                                    wsSession->getSocket());
-  wsSession->setCommand(command);
-  e->addCommand(command);
+  auto command = make_unique<WebSocketInteractionCommand>
+    (getCuid(), wsSession, e, wsSession->getSocket());
+  wsSession->setCommand(command.get());
+  e->addCommand(std::move(command));
 }
 
 } // namespace rpc

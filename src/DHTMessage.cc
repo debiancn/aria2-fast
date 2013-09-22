@@ -46,10 +46,12 @@ const std::string DHTMessage::V("v");
 
 const std::string DHTMessage::ID("id");
 
-DHTMessage::DHTMessage(const SharedHandle<DHTNode>& localNode,
-                       const SharedHandle<DHTNode>& remoteNode,
-                       const std::string& transactionID):
-  localNode_(localNode), remoteNode_(remoteNode), transactionID_(transactionID)
+DHTMessage::DHTMessage(const std::shared_ptr<DHTNode>& localNode,
+                       const std::shared_ptr<DHTNode>& remoteNode,
+                       const std::string& transactionID)
+  : localNode_{localNode},
+    remoteNode_{remoteNode},
+    transactionID_{transactionID}
 {
   if(transactionID.empty()) {
     generateTransactionID();

@@ -70,8 +70,8 @@
 
 namespace aria2 {
 
-HTTPAnnRequest::HTTPAnnRequest(const SharedHandle<RequestGroup>& rg)
-  : rg_(rg)
+HTTPAnnRequest::HTTPAnnRequest(std::unique_ptr<RequestGroup> rg)
+  : rg_{std::move(rg)}
 {}
 
 HTTPAnnRequest::~HTTPAnnRequest()
@@ -95,12 +95,10 @@ void HTTPAnnRequest::stop(DownloadEngine* e)
 bool HTTPAnnRequest::issue(DownloadEngine* e)
 {
   try {
-    std::vector<Command*>* commands = new std::vector<Command*>();
-    auto_delete_container<std::vector<Command*> > commandsDel(commands);
-    rg_->createInitialCommand(*commands, e);
-    e->addCommand(*commands);
+    std::vector<std::unique_ptr<Command>> commands;
+    rg_->createInitialCommand(commands, e);
+    e->addCommand(std::move(commands));
     e->setNoWait(true);
-    commands->clear();
     A2_LOG_DEBUG("added tracker request command");
     return true;
   } catch(RecoverableException& ex) {
@@ -110,7 +108,7 @@ bool HTTPAnnRequest::issue(DownloadEngine* e)
 }
 
 bool HTTPAnnRequest::processResponse
-(const SharedHandle<BtAnnounce>& btAnnounce)
+(const std::shared_ptr<BtAnnounce>& btAnnounce)
 {
   try {
     std::stringstream strm;
@@ -134,7 +132,7 @@ bool HTTPAnnRequest::processResponse
   }
 }
 
-UDPAnnRequest::UDPAnnRequest(const SharedHandle<UDPTrackerRequest>& req)
+UDPAnnRequest::UDPAnnRequest(const std::shared_ptr<UDPTrackerRequest>& req)
   : req_(req)
 {}
 
@@ -162,9 +160,7 @@ void UDPAnnRequest::stop(DownloadEngine* e)
 bool UDPAnnRequest::issue(DownloadEngine* e)
 {
   if(req_) {
-    NameResolveCommand* command = new NameResolveCommand
-      (e->newCUID(), e, req_);
-    e->addCommand(command);
+    e->addCommand(make_unique<NameResolveCommand>(e->newCUID(), e, req_));
     e->setNoWait(true);
     return true;
   } else {
@@ -173,7 +169,7 @@ bool UDPAnnRequest::issue(DownloadEngine* e)
 }
 
 bool UDPAnnRequest::processResponse
-(const SharedHandle<BtAnnounce>& btAnnounce)
+(const std::shared_ptr<BtAnnounce>& btAnnounce)
 {
   if(req_) {
     btAnnounce->processUDPTrackerResponse(req_);
@@ -214,7 +210,7 @@ bool TrackerWatcherCommand::execute() {
     } else {
       trackerRequest_->stop(e_);
       e_->setRefreshInterval(0);
-      e_->addCommand(this);
+      e_->addCommand(std::unique_ptr<Command>(this));
       return false;
     }
   }
@@ -253,7 +249,7 @@ bool TrackerWatcherCommand::execute() {
       }
     }
   }
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 
@@ -264,26 +260,24 @@ void TrackerWatcherCommand::addConnection()
       break;
     }
     cuid_t ncuid = e_->newCUID();
-    SharedHandle<Peer> peer = peerStorage_->checkoutPeer(ncuid);
+    std::shared_ptr<Peer> peer = peerStorage_->checkoutPeer(ncuid);
     // sanity check
     if(!peer) {
       break;
     }
-    PeerInitiateConnectionCommand* command;
-    command = new PeerInitiateConnectionCommand(ncuid, requestGroup_, peer,
-                                                e_, btRuntime_);
+    auto command = make_unique<PeerInitiateConnectionCommand>
+      (ncuid, requestGroup_, peer, e_, btRuntime_);
     command->setPeerStorage(peerStorage_);
     command->setPieceStorage(pieceStorage_);
-    e_->addCommand(command);
+    e_->addCommand(std::move(command));
     A2_LOG_DEBUG(fmt("CUID#%" PRId64 " - Adding new command CUID#%" PRId64 "",
                      getCuid(), peer->usedBy()));
   }
 }
 
-SharedHandle<AnnRequest>
+std::unique_ptr<AnnRequest>
 TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
 {
-  SharedHandle<AnnRequest> treq;
   while(!btAnnounce_->isAllAnnounceFailed() &&
         btAnnounce_->isAnnounceReady()) {
     std::string uri = btAnnounce_->getAnnounceUrl();
@@ -292,6 +286,7 @@ TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
     if(uri_split(&res, uri.c_str()) == 0) {
       // Without UDP tracker support, send it to normal tracker flow
       // and make it fail.
+      std::unique_ptr<AnnRequest> treq;
       if(udpTrackerClient_ &&
          uri::getFieldString(res, USR_SCHEME, uri.c_str()) == "udp") {
         uint16_t localPort;
@@ -303,7 +298,7 @@ TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
         treq = createHTTPAnnRequest(btAnnounce_->getAnnounceUrl());
       }
       btAnnounce_->announceStart(); // inside it, trackers++.
-      break;
+      return treq;
     } else {
       btAnnounce_->announceFailure();
     }
@@ -311,25 +306,23 @@ TrackerWatcherCommand::createAnnounce(DownloadEngine* e)
   if(btAnnounce_->isAllAnnounceFailed()) {
     btAnnounce_->resetAnnounce();
   }
-  return treq;
+  return nullptr;
 }
 
-SharedHandle<AnnRequest>
+std::unique_ptr<AnnRequest>
 TrackerWatcherCommand::createUDPAnnRequest(const std::string& host,
                                            uint16_t port,
                                            uint16_t localPort)
 {
-  SharedHandle<UDPTrackerRequest> req =
-    btAnnounce_->createUDPTrackerRequest(host, port, localPort);
-  return SharedHandle<AnnRequest>(new UDPAnnRequest(req));
+  return make_unique<UDPAnnRequest>
+    (btAnnounce_->createUDPTrackerRequest(host, port, localPort));
 }
 
 namespace {
 bool backupTrackerIsAvailable
-(const SharedHandle<DownloadContext>& context)
+(const std::shared_ptr<DownloadContext>& context)
 {
-  SharedHandle<TorrentAttribute> torrentAttrs =
-    bittorrent::getTorrentAttrs(context);
+  auto torrentAttrs = bittorrent::getTorrentAttrs(context);
   if(torrentAttrs->announceList.size() >= 2) {
     return true;
   }
@@ -344,13 +337,13 @@ bool backupTrackerIsAvailable
 }
 } // namespace
 
-SharedHandle<AnnRequest>
+std::unique_ptr<AnnRequest>
 TrackerWatcherCommand::createHTTPAnnRequest(const std::string& uri)
 {
   std::vector<std::string> uris;
   uris.push_back(uri);
-  SharedHandle<Option> option = util::copy(getOption());
-  SharedHandle<RequestGroup> rg(new RequestGroup(GroupId::create(), option));
+  auto option = util::copy(getOption());
+  auto rg = make_unique<RequestGroup>(GroupId::create(), option);
   if(backupTrackerIsAvailable(requestGroup_->getDownloadContext())) {
     A2_LOG_DEBUG("This is multi-tracker announce.");
   } else {
@@ -369,13 +362,13 @@ TrackerWatcherCommand::createHTTPAnnRequest(const std::string& uri)
               option->get(PREF_BT_TRACKER_CONNECT_TIMEOUT));
   option->put(PREF_REUSE_URI, A2_V_FALSE);
   option->put(PREF_SELECT_LEAST_USED_HOST, A2_V_FALSE);
-  SharedHandle<DownloadContext> dctx
-    (new DownloadContext(option->getAsInt(PREF_PIECE_LENGTH),
-                         0,
-                         "[tracker.announce]"));
+  auto dctx = std::make_shared<DownloadContext>
+    (option->getAsInt(PREF_PIECE_LENGTH),
+     0,
+     "[tracker.announce]");
   dctx->getFileEntries().front()->setUris(uris);
   rg->setDownloadContext(dctx);
-  SharedHandle<DiskWriterFactory> dwf(new ByteArrayDiskWriterFactory());
+  auto dwf = std::make_shared<ByteArrayDiskWriterFactory>();
   rg->setDiskWriterFactory(dwf);
   rg->setFileAllocationEnabled(false);
   rg->setPreLocalFileCheckEnabled(false);
@@ -386,34 +379,34 @@ TrackerWatcherCommand::createHTTPAnnRequest(const std::string& uri)
   dctx->setAcceptMetalink(false);
   A2_LOG_INFO(fmt("Creating tracker request group GID#%s",
                   GroupId::toHex(rg->getGID()).c_str()));
-  return SharedHandle<AnnRequest>(new HTTPAnnRequest(rg));
+  return make_unique<HTTPAnnRequest>(std::move(rg));
 }
 
 void TrackerWatcherCommand::setBtRuntime
-(const SharedHandle<BtRuntime>& btRuntime)
+(const std::shared_ptr<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }
 
 void TrackerWatcherCommand::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+(const std::shared_ptr<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }
 
 void TrackerWatcherCommand::setPieceStorage
-(const SharedHandle<PieceStorage>& pieceStorage)
+(const std::shared_ptr<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
 
 void TrackerWatcherCommand::setBtAnnounce
-(const SharedHandle<BtAnnounce>& btAnnounce)
+(const std::shared_ptr<BtAnnounce>& btAnnounce)
 {
   btAnnounce_ = btAnnounce;
 }
 
-const SharedHandle<Option>& TrackerWatcherCommand::getOption() const
+const std::shared_ptr<Option>& TrackerWatcherCommand::getOption() const
 {
   return requestGroup_->getOption();
 }

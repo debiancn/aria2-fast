@@ -294,8 +294,7 @@ TLSSession* TLSSession::make(TLSContext* ctx)
 }
 
 AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
-  : ctx_(ctx),
-    sslCtx_(0),
+  : sslCtx_(nullptr),
     sockfd_(0),
     state_(st_constructed),
     lastError_(noErr),
@@ -326,8 +325,8 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
     state_ = st_error;
     return;
   }
-  for (SSLCipherSuiteList::iterator i = enabled.begin(), e = enabled.end(); i != e; ++i) {
-    A2_LOG_INFO(fmt("AppleTLS: Enabled suite %s", suiteToString(*i)));
+  for (const auto& suite: enabled) {
+    A2_LOG_INFO(fmt("AppleTLS: Enabled suite %s", suiteToString(suite)));
   }
   if (SSLSetEnabledCiphers(sslCtx_, &enabled[0], enabled.size()) != noErr) {
     A2_LOG_ERROR("AppleTLS: Failed to set enabled ciphers list");
@@ -336,37 +335,39 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
   }
 #endif
 
-  if (ctx->getSide() == TLS_SERVER) {
-    SecIdentityRef creds = ctx->getCredentials();
-    if (!creds) {
-      A2_LOG_ERROR("AppleTLS: No credentials");
-      state_ = st_error;
-      return;
-    }
-    CFArrayRef certs = CFArrayCreate(0, (const void**)&creds, 1, 0);
-    if (!certs) {
-      A2_LOG_ERROR("AppleTLS: Failed to setup credentials");
-      state_ = st_error;
-      return;
-    }
-    auto_delete<const void*> del_certs(certs, CFRelease);
-    lastError_ = SSLSetCertificate(sslCtx_, certs);
-    if (lastError_ != noErr) {
-      A2_LOG_ERROR(fmt("AppleTLS: Failed to set credentials: %s", getLastErrorString().c_str()));
-      state_ = st_error;
-      return;
-    }
+  if (ctx->getSide() != TLS_SERVER) {
+    // Done with client-only initialization
+    return;
+  }
+
+  SecIdentityRef creds = ctx->getCredentials();
+  if (!creds) {
+    A2_LOG_ERROR("AppleTLS: No credentials");
+    state_ = st_error;
+    return;
+  }
+  CFArrayRef certs = CFArrayCreate(nullptr, (const void**)&creds, 1, nullptr);
+  if (!certs) {
+    A2_LOG_ERROR("AppleTLS: Failed to setup credentials");
+    state_ = st_error;
+    return;
+  }
+  std::unique_ptr<void, decltype(&CFRelease)> del_certs((void*)certs, CFRelease);
+  lastError_ = SSLSetCertificate(sslCtx_, certs);
+  if (lastError_ != noErr) {
+    A2_LOG_ERROR(fmt("AppleTLS: Failed to set credentials: %s", getLastErrorString().c_str()));
+    state_ = st_error;
+    return;
+  }
 
 #ifndef CIPHER_NO_DHPARAM
-    lastError_ = SSLSetDiffieHellmanParams(sslCtx_, dhparam, sizeof(dhparam));
-    if (lastError_ != noErr) {
-      A2_LOG_WARN(fmt("AppleTLS: Failed to set DHParams: %s", getLastErrorString().c_str()));
-      // Engine will still generate some for us, so this is no problem, except
-      // it will take longer.
-    }
-#endif // CIPHER_NO_DHPARAM
-
+  lastError_ = SSLSetDiffieHellmanParams(sslCtx_, dhparam, sizeof(dhparam));
+  if (lastError_ != noErr) {
+    A2_LOG_WARN(fmt("AppleTLS: Failed to set DHParams: %s", getLastErrorString().c_str()));
+    // Engine will still generate some for us, so this is no problem, except
+    // it will take longer.
   }
+#endif // CIPHER_NO_DHPARAM
 }
 
 AppleTLSSession::~AppleTLSSession()
@@ -374,7 +375,7 @@ AppleTLSSession::~AppleTLSSession()
   closeConnection();
   if (sslCtx_) {
     SSLDisposeContext(sslCtx_);
-    sslCtx_ = 0;
+    sslCtx_ = nullptr;
   }
   state_ = st_error;
 }
@@ -448,7 +449,7 @@ ssize_t AppleTLSSession::writeData(const void* data, size_t len)
   }
   size_t processed = 0;
   if (writeBuffered_) {
-    lastError_ = SSLWrite(sslCtx_, 0, 0, &processed);
+    lastError_ = SSLWrite(sslCtx_, nullptr, 0, &processed);
     switch (lastError_) {
       case noErr:
         processed = writeBuffered_;

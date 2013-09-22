@@ -36,7 +36,9 @@
 #define D_ACTIVE_PEER_CONNECTION_COMMAND_H
 
 #include "Command.h"
-#include "SharedHandle.h"
+
+#include <memory>
+
 #include "TimerA2.h"
 
 namespace aria2 {
@@ -52,10 +54,10 @@ class BtAnnounce;
 class ActivePeerConnectionCommand : public Command {
 private:
   RequestGroup* requestGroup_;
-  SharedHandle<BtRuntime> btRuntime_;
-  SharedHandle<PieceStorage> pieceStorage_;
-  SharedHandle<PeerStorage> peerStorage_;
-  SharedHandle<BtAnnounce> btAnnounce_;
+  std::shared_ptr<BtRuntime> btRuntime_;
+  std::shared_ptr<PieceStorage> pieceStorage_;
+  std::shared_ptr<PeerStorage> peerStorage_;
+  std::shared_ptr<BtAnnounce> btAnnounce_;
 
   time_t interval_; // UNIT: sec
   DownloadEngine* e_;
@@ -69,7 +71,7 @@ public:
 
   virtual ~ActivePeerConnectionCommand();
 
-  virtual bool execute();
+  virtual bool execute() CXX11_OVERRIDE;
 
   void makeNewConnections(int num);
 
@@ -78,13 +80,13 @@ public:
     numNewConnection_ = numNewConnection;
   }
 
-  void setBtRuntime(const SharedHandle<BtRuntime>& btRuntime);
+  void setBtRuntime(const std::shared_ptr<BtRuntime>& btRuntime);
 
-  void setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage);
+  void setPieceStorage(const std::shared_ptr<PieceStorage>& pieceStorage);
 
-  void setPeerStorage(const SharedHandle<PeerStorage>& peerStorage);
+  void setPeerStorage(const std::shared_ptr<PeerStorage>& peerStorage);
 
-  void setBtAnnounce(const SharedHandle<BtAnnounce>& btAnnounce);
+  void setBtAnnounce(const std::shared_ptr<BtAnnounce>& btAnnounce);
 };
 
 } // namespace aria2

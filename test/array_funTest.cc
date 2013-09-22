@@ -11,9 +11,7 @@ class array_funTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testArray_negate);
   CPPUNIT_TEST(testArray_and);
   CPPUNIT_TEST(testArrayLength);
-  CPPUNIT_TEST(testArrayPtr);
   CPPUNIT_TEST(testArrayWrapper);
-  CPPUNIT_TEST(testVbeginVend);
   CPPUNIT_TEST_SUITE_END();
 
 public:
@@ -22,9 +20,7 @@ public:
   void testArray_negate();
   void testArray_and();
   void testArrayLength();
-  void testArrayPtr();
   void testArrayWrapper();
-  void testVbeginVend();
 
   struct X{
     int m;
@@ -73,34 +69,12 @@ void array_funTest::testArrayLength()
 }
 
 namespace {
-// Check operator[] in const context.
-void arrayPtrConst(const array_ptr<struct array_funTest::X>& ax)
-{
-  CPPUNIT_ASSERT_EQUAL(100, ax[3].m);
-  CPPUNIT_ASSERT_EQUAL(99, ax[2].m);
-}
-} // namespace
-
-namespace {
 void arrayPtrCast(struct array_funTest::X* x) {}
 } // namespace
 
 namespace {
 void arrayPtrConstCast(const struct array_funTest::X* x) {}
 } // namespace
-
-void array_funTest::testArrayPtr()
-{
-  array_ptr<struct X> ax(new struct X[10]);
-  ax[3].m = 100;
-  ax[2].m = 99;
-  CPPUNIT_ASSERT_EQUAL(100, ax[3].m);
-  CPPUNIT_ASSERT_EQUAL(99, ax[2].m);
-  arrayPtrConst(ax);
-
-  arrayPtrCast(ax);
-  arrayPtrConstCast(ax);
-}
 
 namespace {
 void arrayWrapperConst(const array_wrapper<int, 10>& array)
@@ -125,13 +99,6 @@ void array_funTest::testArrayWrapper()
   array_wrapper<struct X, 10> x1;
   arrayPtrCast(x1);
   arrayPtrConstCast(x1);
-}
-
-void array_funTest::testVbeginVend()
-{
-  int a[] = {1,2,3};
-  CPPUNIT_ASSERT_EQUAL(&a[0], vbegin(a));
-  CPPUNIT_ASSERT_EQUAL(a+3, vend(a));
 }
 
 } // namespace aria2

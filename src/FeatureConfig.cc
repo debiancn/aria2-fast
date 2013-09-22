@@ -104,7 +104,7 @@ const char* strSupportedFeature(int feature)
 #ifdef ENABLE_ASYNC_DNS
     return "Async DNS";
 #else // !ENABLE_ASYNC_DNS
-    return 0;
+    return nullptr;
 #endif // !ENABLE_ASYNC_DNS
     break;
 
@@ -120,7 +120,7 @@ const char* strSupportedFeature(int feature)
 #ifdef HAVE_SQLITE3
     return "Firefox3 Cookie";
 #else // !HAVE_SQLITE3
-    return 0;
+    return nullptr;
 #endif // !HAVE_SQLITE3
     break;
 
@@ -165,7 +165,7 @@ const char* strSupportedFeature(int feature)
     break;
 
   default:
-    return 0;
+    return nullptr;
   }
 }
 
@@ -173,23 +173,23 @@ std::string usedLibs()
 {
   std::string res;
 #ifdef HAVE_ZLIB
-  res += "zlib/"ZLIB_VERSION" ";
+  res += "zlib/" ZLIB_VERSION " ";
 #endif // HAVE_ZLIB
 #ifdef HAVE_LIBXML2
-  res += "libxml2/"LIBXML_DOTTED_VERSION" ";
+  res += "libxml2/" LIBXML_DOTTED_VERSION " ";
 #endif // HAVE_LIBXML2
 #ifdef HAVE_LIBEXPAT
   res += fmt("expat/%d.%d.%d ",
              XML_MAJOR_VERSION, XML_MINOR_VERSION, XML_MICRO_VERSION);
 #endif // HAVE_LIBEXPAT
 #ifdef HAVE_SQLITE3
-  res += "sqlite3/"SQLITE_VERSION" ";
+  res += "sqlite3/" SQLITE_VERSION " ";
 #endif // HAVE_SQLITE3
 #ifdef HAVE_APPLETLS
   res += "appleTLS ";
 #endif // HAVE_APPLETLS
 #ifdef HAVE_LIBGNUTLS
-  res += "GnuTLS/"GNUTLS_VERSION" ";
+  res += "GnuTLS/" GNUTLS_VERSION " ";
 #endif // HAVE_LIBGNUTLS
 #ifdef HAVE_OPENSSL
   res += fmt("OpenSSL/%ld.%ld.%ld",
@@ -211,10 +211,10 @@ std::string usedLibs()
              __GNU_MP_VERSION_PATCHLEVEL);
 #endif // HAVE_LIBGMP
 #ifdef HAVE_LIBGCRYPT
-  res += "libgcrypt/"GCRYPT_VERSION" ";
+  res += "libgcrypt/" GCRYPT_VERSION " ";
 #endif // HAVE_LIBGCRYPT
 #ifdef HAVE_LIBCARES
-  res += "c-ares/"ARES_VERSION_STR" ";
+  res += "c-ares/" ARES_VERSION_STR " ";
 #endif // HAVE_LIBCARES
   if(!res.empty()) {
     res.erase(res.length()-1);

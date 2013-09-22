@@ -40,11 +40,12 @@
 #include "DHTConstants.h"
 #include "DHTPingReplyMessageCallback.h"
 #include "DHTQueryMessage.h"
+#include "DHTPingMessage.h"
 
 namespace aria2 {
 
 DHTPingTask::DHTPingTask
-(const SharedHandle<DHTNode>& remoteNode, int numMaxRetry):
+(const std::shared_ptr<DHTNode>& remoteNode, int numMaxRetry):
   remoteNode_(remoteNode),
   numMaxRetry_(numMaxRetry),
   numRetry_(0),
@@ -56,11 +57,10 @@ DHTPingTask::~DHTPingTask() {}
 
 void DHTPingTask::addMessage()
 {
-  SharedHandle<DHTMessage> m =
-    getMessageFactory()->createPingMessage(remoteNode_);
-  SharedHandle<DHTMessageCallback> callback
-    (new DHTPingReplyMessageCallback<DHTPingTask>(this));
-  getMessageDispatcher()->addMessageToQueue(m, timeout_, callback);
+  getMessageDispatcher()->addMessageToQueue
+    (getMessageFactory()->createPingMessage(remoteNode_),
+     timeout_,
+     make_unique<DHTPingReplyMessageCallback<DHTPingTask>>(this));
 }
 
 void DHTPingTask::startup()
@@ -74,7 +74,7 @@ void DHTPingTask::onReceived(const DHTPingReplyMessage* message)
   setFinished(true);
 }
 
-void DHTPingTask::onTimeout(const SharedHandle<DHTNode>& node)
+void DHTPingTask::onTimeout(const std::shared_ptr<DHTNode>& node)
 {
   ++numRetry_;
   if(numRetry_ >= numMaxRetry_) {

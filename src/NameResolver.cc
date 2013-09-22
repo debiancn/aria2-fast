@@ -52,13 +52,14 @@ void NameResolver::resolve(std::vector<std::string>& resolvedAddresses,
 {
   struct addrinfo* res;
   int s;
-  s = callGetaddrinfo(&res, hostname.c_str(), 0, family_, socktype_, 0, 0);
+  s = callGetaddrinfo(&res, hostname.c_str(), nullptr, family_, socktype_, 0, 0);
   if(s) {
     throw DL_ABORT_EX2(fmt(EX_RESOLVE_HOSTNAME,
                            hostname.c_str(), gai_strerror(s)),
                        error_code::NAME_RESOLVE_ERROR);
   }
-  WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+  std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+    (res, freeaddrinfo);
   struct addrinfo* rp;
   for(rp = res; rp; rp = rp->ai_next) {
     std::pair<std::string, uint16_t> addressPort

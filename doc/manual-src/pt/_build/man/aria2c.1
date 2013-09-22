@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "26/05/2013" "1.17.1" "aria2"
+.TH "ARIA2C" "1" "10/09/2013" "1.18.0" "aria2"
 .SH NAME
 aria2c \- Utilitário para download super ultra rápido
 .
@@ -28,7 +28,7 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .\" new: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .in \\n[rst2man-indent\\n[rst2man-indent-level]]u
 ..
-.\" Man page generated from reStructeredText.
+.\" Man page generated from reStructuredText.
 .
 .SH SINOPSE
 .sp
@@ -128,7 +128,10 @@ opções \fI\%--http-proxy\fP, \fI\%--https-proxy\fP e \fI\%--ftp-proxy\fP.
 Isto afeta todas as URIs.
 O formato da opção PROXY é \fB[http://][USUÁRIO:SENHA@]SERVIDOR[:PORTA]\fP.
 Ver também seção \fI\%VARIÁVEIS DE AMBIENTE\fP  section.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Se usuário e senha são embutidos na URI do proxy eles também podem ser
 especificados através das opções
 \fI\-\-{http,https,ftp,all}\-proxy\-{usuário,senha}\fP,
@@ -149,7 +152,8 @@ Mais um exemplo: se especificamos na linha de comando:
 \-\-http\-proxy="http://utilizador:acesso@svrproxy"\fP, então obtemos
 o proxy HTTP \fBhttp://svrproxy\fP com o usuário \fButilizador\fP
 e a senha \fBacesso\fP.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -239,7 +243,10 @@ Padrão: \fB20M\fP
 .B \-n, \-\-no\-netrc[=true|false]
 Desabilita suporte netrc.
 Padrão: Suporte a netrc é habilitado por padrão.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 arquivo netrc é lido somente no início se a opção \fI\%--no-netrc\fP é
 \fBfalse\fP.
 Portanto se a opção \fI\%--no-netrc\fP é \fBtrue\fP no início, não haverá
@@ -247,38 +254,51 @@ netrc disponível durante toda a sessão, mesmo que seja utilizada a opção
 \fI\%aria2.changeGlobalOption()\fP para executar a opção :option:
 \fI\-\-no\-netrc=false <\-n>\fP.
 .
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-no\-proxy=<DOMÍNIOS>
 Especifica nomes de servidores, domínios e endereços de redes com ou sem blocos
 CIDR para os quais não serão utilizados proxy.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Para endereço de rede com blocos CIDR, ambos endereços IPv4 ou IPv6 funcionam.
 Implementação atual, não resolve nome host em URI para comparar com endereço
 especificado na opção \fI\%--no-proxy\fP. Portanto só será efetiva se a URI
 possuir números de endereço IP.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-o, \-\-out=<ARQUIVO>
 O nome do arquivo baixado. Quando a opção \fI\%--force-sequential\fP é
 utilizada esta opção será ignorada.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Em um download Metalink ou BitTorrent não poderá ser especificado o nome
 do arquivo. O nome do arquivo especificado aqui é usado quando através
 da linha de comando é informada para o aria2 sem a utilização da opção
 \fI\%--input-file\fP, \fI\%--force-sequential\fP.
 Por exemplo:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-o meuarquivo.zip "http://server1/arquivo.zip" "http://server2/arquivo.zip"
 .ft P
 .fi
-.RE
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -345,12 +365,16 @@ connections to the same host is restricted by
 \fI\%--max-connection-per-server\fP option.
 See also \fI\%--min-split-size\fP option.
 Padrão: \fB5\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Some Metalinks regulate the number of servers to connect.  aria2
 strictly respects them.  This means that if Metalink defines the
 maxconnections attribute lower than N, then aria2 uses the
 value of maxconnections attribute instead of N.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -410,12 +434,16 @@ O certificado precisa estar no formato PEM e pode conter múltiplos
 certificados CA.
 .sp
 Utilizar a opção \fI\%--check-certificate\fP para habilitar a verificação.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Se aria2 foi compilado com OpenSSL ou versão mais recente de GnuTLS a qual
 tem a função \fBgnutls_certificate_set_x509_system_trust()\fP e a biblioteca
 foi adequadamente configurada para localizar o certificado CA existente,
 aria2 irá carregar automaticamente estes certificados no início.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -438,10 +466,14 @@ Padrão: \fBtrue\fP
 Envia cabeçalho requisição \fBAccept: deflate, gzip\fP e faz (inflate) se
 o servidor remoto responder com  \fBContent\-Encoding: gzip\fP ou
 \fBContent\-Encoding: deflate\fP.  Padrão: \fBfalse\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Alguns servidores respondem com \fBContent\-Encoding: gzip\fP para arquivos
 que são gzip. aria2 faz inflate destes por causa do cabeçalho de resposta.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -530,15 +562,21 @@ Padrão: \fBtrue\fP
 .B \-\-enable\-http\-pipelining[=true|false]
 Habilita pipelining para HTTP/1.1.
 Padrão: \fBfalse\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Da perspectiva de performance, não há vantagem em habilitar esta opção.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-header=<HEADER>
 Anexa CABEÇALHOao ao cabeçalho HTTP requisitado.
 Pode usar esta opção várias vezes para especificar múltiplos cabeçalhos:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -546,16 +584,22 @@ $ aria2c \-\-header="X\-A: b78" \-\-header="X\-B: 9J1" "http://servidor/arquivo"
 .ft P
 .fi
 .UNINDENT
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-load\-cookies=<ARQUIVO>
 Carregar Cookies do ARQUIVO usando formato Firefox3 format (SQLite3),
 Chromium / Google Chrome (SQLite3) e formato
 Mozilla / Firefox(1.x/2.x) / Netscape.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Se aria2 é compilado sem libsqlite3, então não havera suporte aos formatos
 de cookie Firefox3 e Chromium / Google Chrome.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -641,13 +685,17 @@ Múltiplos indíces podem ser especificados usando\-se \fB,\fP, por exemplo:
 \fB1\-5\fP.  Ambos podem ser usados juntos \fB,\fP e \fB\-\fP exemplo:
 \fB1\-5,8,9\fP.  Quando usados com a opção \-M, o índice pode variar dependendo
 das opções da query. Ver opções (\fI\-\-metalink\-*\fP).
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Em torrent de múltiplos arquivos, os arquivos adjacentes especificados
 por essa opção também podem ser baixados. Esse é o comportamento esperado
 não é um bug/erro.  Um simples pedaço pode incluir diversos arquivos ou
 partes de arquivos, e aria2 grava o pedaço(s) no(s) arquivo(s)
 apropriado(s).
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -866,10 +914,14 @@ por exemplo: \fB6881,6885\fP.  Também pode ser usado \fB\-\fP para especificar
 intervalo, exemplo: \fB6881\-6999\fP.  Ambos \fB,\fP and \fB\-\fP podem ser
 usados em conjunto.
 Padrão: \fB6881\-6999\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Cerfifique\-se que as portas especificadas estão disponíveis para tráfego UDP
 de entrada.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -932,9 +984,13 @@ Multiplas portas são especificadas usando \fB,\fP,  por exemplo: \fB6881,6885\f
 Também pode usar \fB\-\fP para especificar intervalos: \fB6881\-6999\fP.
 Ambos \fB,\fP and \fB\-\fP podem ser usados em conjunto: \fB6881\-6889,6999\fP.
 Padrão: \fB6881\-6999\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Certifique\-se que as portas estejam habilitadas para tráfego TCP de entrada.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -979,10 +1035,14 @@ Padrão: \fB1.0\fP
 .B \-\-seed\-time=<MINUTES>
 Especificar o tempo de (seeding) em minutos. Ver também a opção
 \fI\%--seed-ratio\fP.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 Especificando \fI\%--seed-time=0\fP desabilita o (seeding)
 após o download ter sido completado.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1272,7 +1332,7 @@ cache is reduce the disk I/O because the data are written in larger
 unit and it is reordered by the offset of the file.  If hash
 checking is involved and the data are cached in memory, we don\(aqt
 need to read them from the disk.  SIZE can include \fBK\fP or \fBM\fP
-(1K = 1024, 1M = 1024K). Default: \fB0\fP
+(1K = 1024, 1M = 1024K). Default: \fB16M\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1374,12 +1434,16 @@ in the console readout. Padrão: \fBtrue\fP
 Bind sockets to given interface. You can specify interface name, IP
 address and hostname.
 Possible Values: interface, IP address, hostname
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 If an interface has multiple addresses, it is highly recommended to
 specify IP address explicitly. See also \fI\%--disable-ipv6\fP.  If your
 system doesn\(aqt have \fIgetifaddrs(3)\fP, this option doesn\(aqt accept interface
 name.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1468,12 +1532,16 @@ aria2 splits a file. All splits occur at multiple of this
 length. This option will be ignored in BitTorrent downloads.  It
 will be also ignored if Metalink file contains piece hashes.
 Padrão: \fB1M\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 The possible usecase of \fI\%--piece-length\fP
 option is change the request range in one HTTP pipelined request.
 To enable HTTP pipelining use
 \fI\%--enable-http-pipelining\fP.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1486,10 +1554,14 @@ Show console readout. Padrão: \fBtrue\fP
 Set interval in seconds to output download progress summary.
 Setting \fB0\fP suppresses the output.
 Padrão: \fB60\fP
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 7.0
+.INDENT 3.5
 In multi file torrent downloads, the files adjacent forward to the specified files
 are also allocated if they share the same piece.
-.RE
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1649,11 +1721,15 @@ Para torrent de um arquivo a URI deve ser completa e apontar inclusive o
 recurso ou se a URI terminar com / o nome do torrent será adicionado. Para
 múltiplos torrents, name e caminho serão adicionados para formar a URI, para
 cada um dos arquivos.
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Certifique\-se que a URI seja delimitada por apóstrofo single(\fB\(aq\fP) ou
 aspas double(\fB"\fP) se a URI contiver \fB&\fP ou qualquer outro caracter que
 tenha significado especial para o shell.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Continuar Download Interrompido
 .sp
 Normalmente pode\-se retomar uma transferência apenas executando\-se o comando
@@ -1687,6 +1763,8 @@ durante o download no HTTP por causa do redirecionamento ou Disposição do
 Conteúdo do Cabeçalho.
 .sp
 Observemos um exemplo de como são passados argumentos para um comando:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -1697,6 +1775,8 @@ $ aria2c \-\-on\-download\-complete hook.sh http://dobrasil.org/arquivo.iso
 chamado com [1] [1] [/caminho/para/arquivo.iso]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SH CÓDIGO DE RETORNO OU SAÍDA
 .sp
 Como aria2 pode manipular múltiplos downloads concomitantemente, podem ser
@@ -1806,10 +1886,14 @@ temporária ou manutenção.
 .B 30
 Se aria2 não pode passar uma requisição JSON\-RPC.
 .UNINDENT
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Um erro ocorrido em um download completado não será reportado como um
 status de saida nem como código de retorno (exit status).
-.RE
+.UNINDENT
+.UNINDENT
 .SH VARIÁVEIS DE AMBIENTE
 .sp
 aria2 reconhece as seguintes variáveis de ambiente.
@@ -1836,11 +1920,15 @@ Especifica o servidor proxy para uso se nenhum protocolo\-específico de proxy
 Sobrepõe o valor all\-proxy do arquivo de configuração.
 A opção linha de comando \fI\%--all-proxy\fP sobrepõe este valor.
 .UNINDENT
-.IP Nota
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Apesar de aria2 aceitar os esquemas \fBftp://\fP e \fBhttps://\fP para proxy de
 URI, aria2 assume que \fBhttp://\fP é especificado e não troca o comportamento
 com base no esquema especificado.
-.RE
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .TP
 .B \fBno_proxy [DOMÍNIO,...]\fP
@@ -1862,6 +1950,8 @@ Em cada linha, deve haver um par (nome\-valor), no formato:
 \fBNOME=VALOR\fP, onde nome é o nome longo da linha de comando sem o prefixo
 \fB\-\-\fP. Pode ser usada a mesma sintaxe da opção da linha de comando.
 Linhas que começam com \fB#\fP são tratados como comentários:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -1873,12 +1963,18 @@ max\-upload\-limit=50K
 ftp\-pasv=true
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Informações confidenciais como usuário/senha podem ser incluídas no arquivo
 de configuração, mas recomenda\-se trocar os bits de seu modo de acesso
 (por exemplo: \fBchmod 600 aria2.conf\fP), dessa maneira nenhum outro usuário
 consegue ver o conteúdo desse arquivo de configuração.
-.RE
+.UNINDENT
+.UNINDENT
 .SS dht.dat
 .sp
 Por padrão, a tabela de rota do IPv4 DHT está em \fB$HOME/.aria2/dht.dat\fP e a
@@ -1892,12 +1988,16 @@ arquivo .netrc precisa ter as permissões corretas (600).
 Se o nome do servidor inicia com \fB.\fP, aria2 executa pesquisa domínio ao
 invés de pesquisa exata. Isto é uma extensão de aria2. Exemplo de pesquisa
 de domínio, imagine as seguinte entrada no arquivo .netrc:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 machine .dobrasil.org login meuid password minhasenha
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBaria2.dobrasil.org\fP pesquisa domínio \fB.dobrasil.org\fP e usa \fBmeuid\fP e
 \fBminhasenha\fP.
@@ -2167,6 +2267,8 @@ linha de comando, mas aplicam\-se apenas a URI a que pertencem.
 Por favor perceba que dentro de um arquivo, elas não terão o prefixo \fB\-\-\fP.
 .sp
 Por exemplo, o conteúdo do arquivo de entrada uri.txt é:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2176,6 +2278,8 @@ http://servidor/arquivo.iso http://espelho/arquivo.iso
 http://fu/ba
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Se aria2 é executado com as opções \fB\-i uri.txt \-d /tmp\fP, então o
 \fBarquivo.iso\fP será salvo como \fB/imagens_iso/arquivo.img\fP e será baixado
@@ -2231,6 +2335,8 @@ Estes campos devem existir em uma linha. A ordem dos campos não importa.
 Podem ser colocados pares; eles serão simplesmente ignorados.
 .sp
 Um exemplo abaixo:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2240,6 +2346,8 @@ host=localhost, protocol=ftp, dl_speed=0, last_updated=1222491632,
 status=ERROR
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SH INTERFACE RPC
 .sp
 aria2 provê o serviço JSON\-RPC sobre HTTP e XML\-RPC sobre HTTP e eles
@@ -2302,6 +2410,8 @@ GID of registered download.
 \fBJSON\-RPC EXEMPLO M010\fP
 .sp
 The following example adds \fBhttp://example.org/file\fP:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2314,10 +2424,14 @@ The following example adds \fBhttp://example.org/file\fP:
 \(aq{"id":"qwer","jsonrpc":"2.0","result":"2089b05ecca3d829"}\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M020\fP
 .sp
 The following example adds \fBhttp://example.org/file\fP:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2327,8 +2441,12 @@ The following example adds \fBhttp://example.org/file\fP:
 \(aq2089b05ecca3d829\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The following example adds 2 sources and some options:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2337,9 +2455,13 @@ The following example adds 2 sources and some options:
 \(aqd2703803b52216d1\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The following example adds a download and insert it to the front of
 waiting downloads:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2347,6 +2469,8 @@ waiting downloads:
 \(aqca3d829cee549a4d\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2378,6 +2502,8 @@ the downloads added by this method are not saved by
 The following examples add local file \fBfile.torrent\fP.
 .sp
 \fBJSON\-RPC EXEMPLO M030\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2390,8 +2516,12 @@ The following examples add local file \fBfile.torrent\fP.
 \(aq{"id":"asdf","jsonrpc":"2.0","result":"2089b05ecca3d829"}\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M040\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2401,6 +2531,8 @@ The following examples add local file \fBfile.torrent\fP.
 \(aq2089b05ecca3d829\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2427,6 +2559,8 @@ the downloads added by this method are not saved by
 The following examples add local file file.meta4.
 .sp
 \fBJSON\-RPC EXEMPLO M050\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2440,8 +2574,12 @@ The following examples add local file file.meta4.
 \(aq{"id":"qwer","jsonrpc":"2.0","result":["2089b05ecca3d829"]}\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M060\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2451,6 +2589,8 @@ The following examples add local file file.meta4.
 [\(aq2089b05ecca3d829\(aq]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2463,6 +2603,8 @@ returns GID of removed download.
 The following examples remove download GID#2089b05ecca3d829.
 .sp
 \fBJSON\-RPC EXEMPLO M070\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2475,8 +2617,12 @@ The following examples remove download GID#2089b05ecca3d829.
 \(aq{"id":"qwer","jsonrpc":"2.0","result":"2089b05ecca3d829"}\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M080\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2486,6 +2632,8 @@ The following examples remove download GID#2089b05ecca3d829.
 \(aq2089b05ecca3d829\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2661,6 +2809,8 @@ name in info dictionary. \fBname.utf\-8\fP is used if available.
 \fBJSON\-RPC EXEMPLO M090\fP
 .sp
 The following example gets information about download GID#2089b05ecca3d829:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2694,9 +2844,13 @@ The following example gets information about download GID#2089b05ecca3d829:
              u\(aquploadSpeed\(aq: u\(aq0\(aq}}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The following example gets information specifying keys you are
 interested in:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2715,10 +2869,14 @@ interested in:
              u\(aqtotalLength\(aq: u\(aq34896138\(aq}}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M100\fP
 .sp
 The following example gets information about download GID#2089b05ecca3d829:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2749,9 +2907,13 @@ The following example gets information about download GID#2089b05ecca3d829:
  \(aquploadSpeed\(aq: \(aq0\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The following example gets information specifying keys you are
 interested in:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2760,6 +2922,8 @@ interested in:
 {\(aqcompletedLength\(aq: \(aq34896138\(aq, \(aqgid\(aq: \(aq2089b05ecca3d829\(aq, \(aqtotalLength\(aq: \(aq34896138\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2778,6 +2942,8 @@ in the queue.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M110\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2794,8 +2960,12 @@ in the queue.
               u\(aquri\(aq: u\(aqhttp://example.org/file\(aq}]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M120\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2807,6 +2977,8 @@ in the queue.
 [{\(aqstatus\(aq: \(aqused\(aq, \(aquri\(aq: \(aqhttp://example.org/file\(aq}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2848,6 +3020,8 @@ same struct used in \fI\%aria2.getUris()\fP method.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M130\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2869,8 +3043,12 @@ same struct used in \fI\%aria2.getUris()\fP method.
                          u\(aquri\(aq: u\(aqhttp://example.org/file\(aq}]}]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M140\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2888,6 +3066,8 @@ same struct used in \fI\%aria2.getUris()\fP method.
             \(aquri\(aq: \(aqhttp://example.org/file\(aq}]}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2930,6 +3110,8 @@ Upload speed(byte/sec) that this client uploads to the peer.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M150\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2962,8 +3144,12 @@ Upload speed(byte/sec) that this client uploads to the peer.
               u\(aquploadSpeed\(aq: u\(aq6890\(aq}]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M160\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -2992,6 +3178,8 @@ Upload speed(byte/sec) that this client uploads to the peer.
   \(aquploadSpeed\(aq: \(aq6890\(aq}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3023,6 +3211,8 @@ Download speed (byte/sec)
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M170\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3041,8 +3231,12 @@ Download speed (byte/sec)
                             u\(aquri\(aq: u\(aqhttp://example.org/file\(aq}]}]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M180\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3057,6 +3251,8 @@ Download speed (byte/sec)
                \(aquri\(aq: \(aqhttp://example.org/file\(aq}]}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3129,6 +3325,8 @@ The following examples move the download GID#2089b05ecca3d829 to the
 front of the waiting queue.
 .sp
 \fBJSON\-RPC EXEMPLO M190\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3142,8 +3340,12 @@ front of the waiting queue.
 {u\(aqid\(aq: u\(aqqwer\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: 0}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M200\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3153,6 +3355,8 @@ front of the waiting queue.
 0
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3180,6 +3384,8 @@ file whose index is \fB1\fP and belongs to the download
 GID#2089b05ecca3d829.
 .sp
 \fBJSON\-RPC EXEMPLO M210\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3194,8 +3400,12 @@ GID#2089b05ecca3d829.
 {u\(aqid\(aq: u\(aqqwer\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: [0, 1]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M220\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3206,6 +3416,8 @@ GID#2089b05ecca3d829.
 [0, 1]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3220,6 +3432,8 @@ The following examples get options of the download
 GID#2089b05ecca3d829.
 .sp
 \fBJSON\-RPC EXEMPLO M230\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3239,8 +3453,12 @@ GID#2089b05ecca3d829.
  ...
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M240\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3256,6 +3474,8 @@ GID#2089b05ecca3d829.
  ....
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3293,6 +3513,8 @@ The following examples set \fI\%max-download-limit\fP option to \fB20K\fP for th
 GID#2089b05ecca3d829.
 .sp
 \fBJSON\-RPC EXEMPLO M250\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3307,8 +3529,12 @@ GID#2089b05ecca3d829.
 {u\(aqid\(aq: u\(aqqwer\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: u\(aqOK\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M260\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3318,6 +3544,8 @@ GID#2089b05ecca3d829.
 \(aqOK\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3397,6 +3625,8 @@ The number of stopped downloads.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M270\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3415,8 +3645,12 @@ The number of stopped downloads.
              u\(aquploadSpeed\(aq: u\(aq0\(aq}}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M280\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3432,6 +3666,8 @@ The number of stopped downloads.
  \(aquploadSpeed\(aq: \(aq0\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3449,6 +3685,8 @@ The following examples remove the download result of the download
 GID#2089b05ecca3d829.
 .sp
 \fBJSON\-RPC EXEMPLO M290\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3462,8 +3700,12 @@ GID#2089b05ecca3d829.
 {u\(aqid\(aq: u\(aqqwer\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: u\(aqOK\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M300\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3473,6 +3715,8 @@ GID#2089b05ecca3d829.
 \(aqOK\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3489,6 +3733,8 @@ List of enabled features. Each feature name is of type string.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M310\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3511,8 +3757,12 @@ List of enabled features. Each feature name is of type string.
              u\(aqversion\(aq: u\(aq1.11.0\(aq}}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M320\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3533,6 +3783,8 @@ List of enabled features. Each feature name is of type string.
 .ft P
 .fi
 .UNINDENT
+.UNINDENT
+.UNINDENT
 .INDENT 0.0
 .TP
 .B aria2.getSessionInfo()
@@ -3545,6 +3797,8 @@ Session ID, which is generated each time when aria2 is invoked.
 .UNINDENT
 .sp
 \fBJSON\-RPC EXEMPLO M330\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3559,8 +3813,12 @@ Session ID, which is generated each time when aria2 is invoked.
  u\(aqresult\(aq: {u\(aqsessionId\(aq: u\(aqcd6a3bc6a1de28eb5bfa181e5f6b916d44af31a9\(aq}}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M340\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3570,6 +3828,8 @@ Session ID, which is generated each time when aria2 is invoked.
 {\(aqsessionId\(aq: \(aqcd6a3bc6a1de28eb5bfa181e5f6b916d44af31a9\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3599,6 +3859,8 @@ In the following examples, we add 2 downloads. First one is
 \fBhttp://example.org/file\fP and second one is \fBfile.torrent\fP.
 .sp
 \fBJSON\-RPC EXEMPLO M350\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3615,8 +3877,12 @@ In the following examples, we add 2 downloads. First one is
 {u\(aqid\(aq: u\(aqqwer\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: [[u\(aq2089b05ecca3d829\(aq], [u\(aqd2703803b52216d1\(aq]]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 JSON\-RPC also supports Batch request described in JSON\-RPC 2.0 Specification:
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3632,8 +3898,12 @@ JSON\-RPC also supports Batch request described in JSON\-RPC 2.0 Specification:
  {u\(aqid\(aq: u\(aqasdf\(aq, u\(aqjsonrpc\(aq: u\(aq2.0\(aq, u\(aqresult\(aq: u\(aqd2703803b52216d1\(aq}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fBXML\-RPC EXEMPLO M360\fP
+.INDENT 7.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3647,6 +3917,8 @@ JSON\-RPC also supports Batch request described in JSON\-RPC 2.0 Specification:
 (\(aq2089b05ecca3d829\(aq, \(aqd2703803b52216d1\(aq)
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .SS Tratamento de Erros
 .sp
@@ -3663,13 +3935,19 @@ Ver subseção \fI\%Arquivo de Entrada\fP para lista completa de opções.
 In the option struct, name element is option name(without preceding
 \fB\-\-\fP) and value element is argument as string.
 .SS EXEMPLO JSON\-RPC M370
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 {\(aqsplit\(aq:\(aq1\(aq, \(aqhttp\-proxy\(aq:\(aqhttp://proxy/\(aq}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS EXEMPLO XML\-RPC M380
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3685,6 +3963,8 @@ In the option struct, name element is option name(without preceding
 </struct>
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 \fI\%header\fP and \fI\%index-out\fP
 option are allowed multiple times in
@@ -3693,13 +3973,19 @@ library implementation uses hash or dict for struct), single string is
 not enough. To overcome this situation, they can take array as value
 as well as string.
 .SS EXEMPLO JSON\-RPC M390
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 {\(aqheader\(aq:[\(aqAccept\-Language: ja\(aq, \(aqAccept\-Charset: utf\-8\(aq]}
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS EXEMPLO XML\-RPC M400
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3718,9 +4004,13 @@ as well as string.
 </struct>
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Following example adds a download with 2 options: dir and header.
 header option has 2 values, so it uses a list:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3733,17 +4023,23 @@ header option has 2 values, so it uses a list:
 \(aq1\(aq
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS JSON\-RPC usando HTTP GET
 .sp
 The JSON\-RPC interface also supports request via HTTP GET.
 The encoding scheme in GET parameters is based on JSON\-RPC over HTTP
 Specification [2008\-1\-15(RC1)]. The encoding of GET parameters are follows:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 /jsonrpc?method=METHOD_NAME&id=ID&params=BASE64_ENCODED_PARAMS
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The \fBmethod\fP and \fBid\fP are always treated as JSON string and their
 encoding must be UTF\-8.
@@ -3751,16 +4047,22 @@ encoding must be UTF\-8.
 For example, The encoded string of
 \fBaria2.tellStatus(\(aq2089b05ecca3d829\(aq)\fP with \fBid=\(aqfoo\(aq\fP looks like
 this:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 /jsonrpc?method=aria2.tellStatus&id=foo&params=WyIyMDg5YjA1ZWNjYTNkODI5Il0%3D
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The \fBparams\fP parameter is Base64\-encoded JSON array which usually
 appears in \fBparams\fP attribute in JSON\-RPC request object.  In the
 above example, the params is \fB["2089b05ecca3d829"]\fP, therefore:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3768,19 +4070,27 @@ above example, the params is \fB["2089b05ecca3d829"]\fP, therefore:
              \-\-(Percent Encode)\-\-> WyIyMDg5YjA1ZWNjYTNkODI5Il0%3D
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 The JSON\-RPC interface supports JSONP. You can specify the callback
 function in \fBjsoncallback\fP parameter:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 /jsonrpc?method=aria2.tellStatus&id=foo&params=WyIyMDg5YjA1ZWNjYTNkODI5Il0%3D&jsoncallback=cb
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 For Batch request, \fBmethod\fP and \fBid\fP parameter must not be specified.
 Whole request must be specified in \fBparams\fP parameter. For example,
 Batch request:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3788,14 +4098,20 @@ Batch request:
  {\(aqjsonrpc\(aq:\(aq2.0\(aq, \(aqid\(aq:\(aqasdf\(aq, \(aqmethod\(aq:\(aqaria2.tellActive\(aq}]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 will be encoded like this:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 /jsonrpc?params=W3sianNvbnJwYyI6ICIyLjAiLCAiaWQiOiAicXdlciIsICJtZXRob2QiOiAiYXJpYTIuZ2V0VmVyc2lvbiJ9LCB7Impzb25ycGMiOiAiMi4wIiwgImlkIjogImFzZGYiLCAibWV0aG9kIjogImFyaWEyLnRlbGxBY3RpdmUifV0%3D
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS JSON\-RPC sobre WebSocket
 .sp
 JSON\-RPC sobre WebSocket utiliza o mesmo método de assinatura e resposta
@@ -3867,6 +4183,8 @@ mesma estrutura do \fIevent\fP do método da função \fI\%aria2.onDownloadStart
 O seguinte script Ruby script adiciona \fBhttp://localhost/aria2.tar.bz2\fP em
 aria2c no servidor em localhost com a opção \fI\%--dir=/downloads\fP e
 imprime a resposta do processamento:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3883,9 +4201,13 @@ result=client.call("aria2.addUri", [ "http://localhost/aria2.tar.bz2" ], options
 pp result
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Se você usa Python, pode usar xmlrpclib (em Python3.x, use xmlrpc.client) para
 interagir com aria2:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -3897,17 +4219,23 @@ r = s.aria2.addUri(["http://localhost/aria2.tar.bz2"], {"dir":"/downloads"})
 pprint(r)
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SH DIVERSOS
 .SS Mensagens na Console
 .sp
 Enquanto executa o download de arquivos, aria2 imprime mensagens na console
 para mostrar o progresso dos downloads. Um exemplo abaixo:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 [#1 SIZE:400.0KiB/33.2MiB(1%) CN:1 SPD:115.7KiBs ETA:4m51s]
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Entenda o que estes números e strings significam.
 .INDENT 0.0
@@ -3955,57 +4283,91 @@ GID, tamanho validado e total em bytes.
 .SH EXEMPLOS DOWNLOAD HTTP / FTP
 .SS Download Segmentado HTTP/FTP
 .SS Download de arquivo
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c "http://servidor/arquivo.zip"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Para parar o download, pressione \fBCtrl\-C\fP. Posteriormente pode ser
 retomado o mesmo download no mesmo diretório. Podem ser modificadas as URIs
 pois elas apontam para o mesmo arquivo.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download de arquivo de 2 servidores HTTP diferentes
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c "http://servidor/arquivo.zip" "http://espelhobrasil/arquivo.zip"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download de arquivo do mesmo servidor HTTP usando 2 conexões
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-x2 \-k1M "http://servidorbrasil/arquivo.zip"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download de arquivo de servidor HTTP e FTP
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c "http://svrbrasil/arquivo.zip" "ftp://servebr/arquivo.zip"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download arquivos especificados num arquivo txt concomitantemente
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-i arquivo.txt \-j2
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 \-j especifica número de downloads paralelos.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Usando proxy
 .sp
 Para HTTP:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-http\-proxy="http://svrproxy:8080" "http://servidor/arquivo"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4016,20 +4378,32 @@ a máscara de rede /16 quer dizer que para toda a rede 192.168 também não
 será usado o servidor proxy
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Para FTP:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-ftp\-proxy="http://svrproxy:8080" "ftp://servidor/arquivo"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Ver \fI\%--http-proxy\fP, \fI\%--https-proxy\fP, \fI\%--ftp-proxy\fP,
 \fI\%--all-proxy\fP e \fI\%--no-proxy\fP para detalhes.  Proxy pode ser
 especificado nas variáveis de ambiente. Ver seção \fI\%VARIÁVEIS DE AMBIENTE\fP .
-.RE
+.UNINDENT
+.UNINDENT
 .SS Proxy com autenticação / autorização
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4037,6 +4411,10 @@ $ aria2c \-\-http\-proxy="http://usuário:senha@svrproxy:8080"
 "http://servidor/arquivo"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4045,115 +4423,191 @@ $ aria2c \-\-http\-proxy="http://svrproxy:8080"
 "http://servidor/arquivo"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download Metalink
 .SS Download arquivos com Metalink remoto
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-follow\-metalink=mem "http://servidor/arquivo.metalink"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download arquivos com Metalink local
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-p \-\-lowest\-speed\-limit=4000 arquivo.metalink
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Para parar o download, pressione \fBCtrl\-C\fP.
 A transferência pode ser retomada executando aria2c com o mesmo argumento
 no mesmo diretório
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download diversos arquivos Metalink local
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-j2 arquivo1.metalink arquivo2.metalink
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download só arquivos selecionados usando index
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-select\-file=1\-4,8 arquivo.metalink
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 O index é exibido na console usando opção \-S.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download um arquivo usando Metalink local com preferência do usuário
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-metalink\-location=pt,us \-\-metalink\-version=1.1 \-\-metalink\-language=pt\-BR arquivo.metalink
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download BitTorrent
 .SS Download arquivos de BitTorrent remotos
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-follow\-torrent=mem "http://servidortorrent/arquivo.torrent"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download usando arquivo torrent local
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-max\-upload\-limit=40K arquivo.torrent
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 \-\-max\-upload\-limit especifica taxa máxima de transmissão (upload).
-.RE
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Para parar o download, pressione \fBCtrl\-C\fP. A transferência pode ser retomada
 ao executar aria2c com os mesmos argumentos no mesmo diretório.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download usando URI BitTorrent Magnet
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c "magnet:?xt=urn:btih:248D0A1CD08284299DE78D5C1ED359BB46717D8C&dn=aria2"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Lembre\-se inserir delimitadores na URI BitTorrent Magnet, pois ela inclui \fB&\fP
 que tem significado de parâmetro. Utilizar apóstrofo(\fB\(aq\fP) ou aspas(\fB"\fP).
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download 2 torrents
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-j2 arquivo1.torrent arquivo2.torrent
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download um arquivo usando torrent e servidor HTTP/FTP
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-T arqfile.torrent "http://serv1/arqfile" "ftp://svr2/arqfile"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Download de arquivos múltiplos torrent com HTTP e FTP não é suportado.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Download arquivos selecionados usando index(chamado "download seletivo")
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-select\-file=1\-4,8 arquivo.torrent
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 O index é exibido na console usando\-se a opção \-S.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Especificar arquivo saída
 .sp
 Para especificar arquivo de saída em Downloads de BitTorrent, faz\-se necessário
 conhecer o index do arquivo no torrent usando a opção \fI\%--show-files\fP.
 Por exemplo, a saída exibirá algo como:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4167,88 +4621,142 @@ idx|path/length
 \-\-\-+\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-\-
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Para salvar \(aqdist/base\-2.6.18.iso\(aq em \(aq/tmp/meudir/base.iso\(aq e
 \(aqdist/driver\-2.6.18.iso\(aq em \(aq/tmp/dir/driver.iso\(aq, use o seguinte comando:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-dir=/tmp \-\-index\-out=1=meudir/base.iso \-\-index\-out=2=dir/driver.iso arquivo.torrent
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Modificar porta escuta para peer de entrada
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-listen\-port=7000\-7001,8000 arquivo.torrent
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Já que aria2 não configura o firewall ou porta de roteamento para portas
 de encaminhamento, isto deve ser explicitado manualmente por você.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Especificar condição para para o programa torrent após término do download
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-seed\-time=120 \-\-seed\-ratio=1.0 arquivo.torrent
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 No exemplo acima, o programa termina após transcorrer 120 minutos após
 término do download ou taxa chegar a 1.0.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Controlar velocidade upload Torrent
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-max\-upload\-limit=100K arquivo.torrent
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Habilitar IPv4 DHT
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-enable\-dht \-\-dht\-listen\-port=6881 arquivo.torrent
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 DHT utiliza a porta udp, como o aria2 não configura firewall nem porta de roteamento
 ou forwarding, por favor executar estas configurações manualmente.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Habilitar IPv6 DHT
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-enable\-dht6 \-\-dht\-listen\-port=6881 \-\-dht\-listen\-addr6=YOUR_GLOBAL_UNICAST_IPV6_ADDR \-\-enable\-async\-dns6
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Se aria2c não foi compilado com c\-ares, a opção \fI\%--enable-async-dns6\fP
 não é necessária. aria2 compartilha a mesma porta ente IPv4 e IPv6 DHT.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Adicionar e remover rastreador URI
 .sp
 Remover todos os rastreadores (tracker) das URIs descritas no arquivo.torrent
 utilize \fBhttp://tracker1/announce\fP e \fBhttp://tracker2/announce\fP
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-bt\-exclude\-tracker="*" \-\-bt\-tracker="http://tracker1/announce,http://tracker2/announce" file.torrent
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Funcionalidades avançadas HTTP
 .SS Carregar cookies
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-load\-cookies=cookies.txt "http://servidor/arquivo.zip"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Podem ser utilizados sem nenhuma modificação coookies dos navegadores:
 Firefox / Mozilla / Chromium.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Continuar download iniciado por navegadores ou outros programas
 .INDENT 0.0
 .INDENT 3.5
@@ -4257,25 +4765,39 @@ interrompido, seja em navegador ou qualquer outro programa utilize
 o aria2c para retomar este download do ponto onde parou.
 .UNINDENT
 .UNINDENT
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-c \-s2 "http://servidor/arquivodedownloadparcial.zip"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Autenticação certificado para Cliente SSL/TLS
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-certificate=/path/para/mycert.pem \-\-private\-key=/path/para/mykey.pem https://servidor/arquivo
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 O arquivo especificado na opção \fI\%--private-key\fP não pode estar
 criptografado.  O comportamento do processo fica indefinido quando o
 arquivo estiver criptografado.
-.RE
+.UNINDENT
+.UNINDENT
 .SS Verificar peer em SSL/TLS usando certificados CA
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4283,65 +4805,101 @@ $ aria2c \-\-ca\-certificate=/path/para/ca\-certificates.crt
 \-\-check\-certificate https://servidor/arquivo
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Funcionalidades avançadas adicionais
 .SS Controlar velocidade de download
 .sp
 Quando for necessário o controle da utilização da banda disponível, pode ser
 utilizado a opção abaixo. Atenção o sufixo K ou M deve ser em letra maiúscula.
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-max\-download\-limit=100K arquivo.metalink
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Reparar um download danificado
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-V arquivo.metalink
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 Reparar downloads danificados pode ser mais eficiente usando
 BitTorrent ou Metalink com a opção verificação (checksums).
-.RE
+.UNINDENT
+.UNINDENT
 .SS Desconectar conexão se a velocidade download for menor que um valor
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-lowest\-speed\-limit=10K file.metalink
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Suporte a URI parametrizada
 .sp
 A URI pode ser especificada como partes de um conjunto:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-P "http://{svr1,svr2,svr3}/arquivo.iso"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .sp
 Também podem ser especificados sequencias de intervalos:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-Z \-P "http://servidor/imagem[000\-100].png"
 .ft P
 .fi
-.IP Nota
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTA:\fP
+.INDENT 0.0
+.INDENT 3.5
 \-Z opção requerida para que todas URIs não apontem para o mesmo arquivo,
 como declarado no código acima.
-.RE
+.UNINDENT
+.UNINDENT
 .sp
 Especificar incrementos para contador:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-Z \-P "http://servidor/imagem[A\-Z:2].png"
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Verificar validação checksum
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
@@ -4349,22 +4907,32 @@ $ aria2c \-\-checksum=sha\-1=0192ba11326fe2298c8cb4de616f4d4140213837
 http://dobrasil.org/arquivo
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS Download Paralelo de uma quantidade arbitrária de URI, Metalink ou Torrent
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-j3 \-Z "http://servidor/arquivo1" arquivo2.torrent arq3.metalink
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SS BitTorrent Criptografado
 .sp
 Criptografar todo conjunto usando ARC4:
+.INDENT 0.0
+.INDENT 3.5
 .sp
 .nf
 .ft C
 $ aria2c \-\-bt\-min\-crypto\-level=arc4 \-\-bt\-require\-crypto=true arquivo.torrent
 .ft P
 .fi
+.UNINDENT
+.UNINDENT
 .SH VER TAMBÉM
 .sp
 Site do Projeto aria2: \fI\%http://aria2.sourceforge.net/\fP
@@ -4414,5 +4982,4 @@ favor refira\-se a versão em inglês resultante do comando man aria2c
 .SH COPYRIGHT
 2013, Tatsuhiro Tsujikawa
 .\" Generated by docutils manpage writer.
-.\" 
 .

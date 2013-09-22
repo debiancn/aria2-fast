@@ -52,8 +52,8 @@
 #include <iomanip>
 #include <algorithm>
 #include <vector>
+#include <memory>
 
-#include "SharedHandle.h"
 #include "a2time.h"
 #include "a2netcompat.h"
 #include "a2functional.h"
@@ -158,20 +158,15 @@ std::string strip
 (const std::string& str, const char* chars = DEFAULT_STRIP_CHARSET);
 
 template<typename InputIterator>
-void divide
-(std::pair<std::pair<InputIterator, InputIterator>,
-           std::pair<InputIterator, InputIterator> >& hp,
- InputIterator first,
- InputIterator last,
- char delim)
+std::pair<std::pair<InputIterator, InputIterator>,
+          std::pair<InputIterator, InputIterator>>
+divide(InputIterator first, InputIterator last, char delim)
 {
-  InputIterator dpos = std::find(first, last, delim);
+  auto dpos = std::find(first, last, delim);
   if(dpos == last) {
-    hp.first = stripIter(first, last);
-    hp.second.first = hp.second.second;
+    return {stripIter(first, last), {last, last}};
   } else {
-    hp.first = stripIter(first, dpos);
-    hp.second = stripIter(dpos+1, last);
+    return {stripIter(first, dpos), stripIter(dpos+1, last)};
   }
 }
 
@@ -296,7 +291,7 @@ void parseIntSegments(SegList<int>& sgl, const std::string& src);
 // sample: head=512K,tail=512K
 void parsePrioritizePieceRange
 (std::vector<size_t>& result, const std::string& src,
- const std::vector<SharedHandle<FileEntry> >& fileEntries,
+ const std::vector<std::shared_ptr<FileEntry> >& fileEntries,
  size_t pieceLength,
  int64_t defaultSize = 1048576 /* 1MiB */);
 
@@ -325,9 +320,9 @@ ssize_t parse_content_disposition(char *dest, size_t destlen,
 
 std::string getContentDispositionFilename(const std::string& header);
 
-std::string toUpper(const std::string& src);
+std::string toUpper(std::string src);
 
-std::string toLower(const std::string& src);
+std::string toLower(std::string src);
 
 void uppercase(std::string& s);
 
@@ -339,8 +334,9 @@ char toLowerChar(char c);
 
 bool isNumericHost(const std::string& name);
 
-void setGlobalSignalHandler(int signal, sigset_t* mask, void (*handler)(int),
-                            int flags);
+typedef void(*signal_handler_t)(int);
+void setGlobalSignalHandler(int signal, sigset_t* mask,
+                            signal_handler_t handler, int flags);
 
 std::string getHomeDir();
 
@@ -430,7 +426,7 @@ void mkdirs(const std::string& dirpath);
 void convertBitfield(BitfieldMan* dest, const BitfieldMan* src);
 
 // binaryStream has to be opened before calling this function.
-std::string toString(const SharedHandle<BinaryStream>& binaryStream);
+std::string toString(const std::shared_ptr<BinaryStream>& binaryStream);
 
 #ifdef HAVE_POSIX_MEMALIGN
 void* allocateAlignedMemory(size_t alignment, size_t size);
@@ -784,7 +780,7 @@ bool inSameCidrBlock
 
 // No throw
 void executeHookByOptName
-(const SharedHandle<RequestGroup>& group, const Option* option,
+(const std::shared_ptr<RequestGroup>& group, const Option* option,
  const Pref* pref);
 
 // No throw
@@ -833,9 +829,9 @@ nextParam
       }
     }
     std::pair<std::string::const_iterator,
-              std::string::const_iterator> namep;
+              std::string::const_iterator> namep = std::make_pair(last, last);
     std::pair<std::string::const_iterator,
-              std::string::const_iterator> valuep;
+              std::string::const_iterator> valuep = std::make_pair(last, last);
     if(parmnameFirst == parmnameLast) {
       if(!eqFound) {
         parmnameFirst = first;
@@ -861,9 +857,9 @@ nextParam
 }
 
 template<typename T>
-SharedHandle<T> copy(const SharedHandle<T>& a)
+std::shared_ptr<T> copy(const std::shared_ptr<T>& a)
 {
-  return SharedHandle<T>(new T(*a.get()));
+  return std::shared_ptr<T>(new T(*a.get()));
 }
 
 // This is a bit different from cookie_helper::domainMatch().  If

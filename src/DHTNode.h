@@ -39,7 +39,6 @@
 
 #include <string>
 
-#include "SharedHandle.h"
 #include "DHTConstants.h"
 #include "TimerA2.h"
 
@@ -115,6 +114,8 @@ public:
   void timeout();
 
   bool operator==(const DHTNode& node) const;
+
+  bool operator!=(const DHTNode& node) const;
 
   bool operator<(const DHTNode& node) const;
 

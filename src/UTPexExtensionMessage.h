@@ -39,9 +39,9 @@
 
 #include <utility>
 #include <vector>
+#include <memory>
 
 #include "a2time.h"
-#include "SharedHandle.h"
 
 namespace aria2 {
 
@@ -52,11 +52,11 @@ class UTPexExtensionMessage:public ExtensionMessage {
 private:
   uint8_t extensionMessageID_;
 
-  std::vector<SharedHandle<Peer> > freshPeers_;
+  std::vector<std::shared_ptr<Peer> > freshPeers_;
 
-  std::vector<SharedHandle<Peer> > droppedPeers_;
+  std::vector<std::shared_ptr<Peer> > droppedPeers_;
 
-  SharedHandle<PeerStorage> peerStorage_;
+  PeerStorage* peerStorage_;
 
   time_t interval_;
 
@@ -65,53 +65,45 @@ private:
   size_t maxDroppedPeer_;
 
   std::pair<std::pair<std::string, std::string>,
-            std::pair<std::string, std::string> >
-  createCompactPeerListAndFlag(const std::vector<SharedHandle<Peer> >& peers);
+            std::pair<std::string, std::string>>
+  createCompactPeerListAndFlag(const std::vector<std::shared_ptr<Peer>>& peers);
 
 public:
   UTPexExtensionMessage(uint8_t extensionMessageID);
 
-  virtual ~UTPexExtensionMessage();
+  virtual std::string getPayload() CXX11_OVERRIDE;
 
-  virtual std::string getPayload();
-
-  virtual uint8_t getExtensionMessageID()
+  virtual uint8_t getExtensionMessageID() const CXX11_OVERRIDE
   {
     return extensionMessageID_;
   }
 
-  virtual const char* getExtensionName() const
+  virtual const char* getExtensionName() const CXX11_OVERRIDE
   {
     return EXTENSION_NAME;
   }
 
   static const char EXTENSION_NAME[];
 
-  virtual std::string toString() const;
+  virtual std::string toString() const CXX11_OVERRIDE;
 
-  virtual void doReceivedAction();
+  virtual void doReceivedAction() CXX11_OVERRIDE;
 
-  bool addFreshPeer(const SharedHandle<Peer>& peer);
+  bool addFreshPeer(const std::shared_ptr<Peer>& peer);
 
-  const std::vector<SharedHandle<Peer> >& getFreshPeers() const
-  {
-    return freshPeers_;
-  }
+  const std::vector<std::shared_ptr<Peer>>& getFreshPeers() const;
 
   bool freshPeersAreFull() const;
 
-  bool addDroppedPeer(const SharedHandle<Peer>& peer);
+  bool addDroppedPeer(const std::shared_ptr<Peer>& peer);
 
-  const std::vector<SharedHandle<Peer> >& getDroppedPeers() const
-  {
-    return droppedPeers_;
-  }
+  const std::vector<std::shared_ptr<Peer>>& getDroppedPeers() const;
 
   bool droppedPeersAreFull() const;
 
-  void setPeerStorage(const SharedHandle<PeerStorage>& peerStorage);
+  void setPeerStorage(PeerStorage* peerStorage);
 
-  static UTPexExtensionMessage*
+  static std::unique_ptr<UTPexExtensionMessage>
   create(const unsigned char* data, size_t len);
 
   void setMaxFreshPeer(size_t maxFreshPeer);

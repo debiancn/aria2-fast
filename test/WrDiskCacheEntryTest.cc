@@ -18,14 +18,15 @@ class WrDiskCacheEntryTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testClear);
   CPPUNIT_TEST_SUITE_END();
 
-  SharedHandle<DirectDiskAdaptor> adaptor_;
-  SharedHandle<ByteArrayDiskWriter> writer_;
+  std::shared_ptr<DirectDiskAdaptor> adaptor_;
+  ByteArrayDiskWriter* writer_;
 public:
   void setUp()
   {
-    adaptor_.reset(new DirectDiskAdaptor());
-    writer_.reset(new ByteArrayDiskWriter());
-    adaptor_->setDiskWriter(writer_);
+    adaptor_ = std::make_shared<DirectDiskAdaptor>();
+    auto dw = make_unique<ByteArrayDiskWriter>();
+    writer_ = dw.get();
+    adaptor_->setDiskWriter(std::move(dw));
   }
 
   void testWriteToDisk();
@@ -48,7 +49,7 @@ void WrDiskCacheEntryTest::testWriteToDisk()
 void WrDiskCacheEntryTest::testAppend()
 {
   WrDiskCacheEntry e(adaptor_);
-  WrDiskCacheEntry::DataCell* cell = new WrDiskCacheEntry::DataCell();
+  auto cell = new WrDiskCacheEntry::DataCell{};
   cell->goff = 0;
   size_t capacity = 6;
   size_t offset = 2;

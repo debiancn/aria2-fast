@@ -39,10 +39,11 @@ class DefaultBtAnnounceTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testProcessUDPTrackerResponse);
   CPPUNIT_TEST_SUITE_END();
 private:
-  SharedHandle<DownloadContext> dctx_;
-  SharedHandle<MockPieceStorage> pieceStorage_;
-  SharedHandle<MockPeerStorage> peerStorage_;
-  SharedHandle<BtRuntime> btRuntime_;
+  std::shared_ptr<DownloadContext> dctx_;
+  std::shared_ptr<MockPieceStorage> pieceStorage_;
+  std::shared_ptr<MockPeerStorage> peerStorage_;
+  std::shared_ptr<BtRuntime> btRuntime_;
+  std::unique_ptr<Randomizer> randomizer_;
   Option* option_;
 public:
   void setUp() {
@@ -60,9 +61,11 @@ public:
     std::string peerId = "-aria2-ultrafastdltl";
 
     dctx_.reset(new DownloadContext(pieceLength, totalLength));
-    SharedHandle<TorrentAttribute> torrentAttrs(new TorrentAttribute());
-    torrentAttrs->infoHash = std::string(vbegin(infoHash), vend(infoHash));
-    dctx_->setAttribute(CTX_ATTR_BT, torrentAttrs);
+    {
+      auto torrentAttrs = make_unique<TorrentAttribute>();
+      torrentAttrs->infoHash.assign(std::begin(infoHash), std::end(infoHash));
+      dctx_->setAttribute(CTX_ATTR_BT, std::move(torrentAttrs));
+    }
     dctx_->getNetStat().updateDownloadLength(pieceLength*5);
     dctx_->getNetStat().updateUploadLength(pieceLength*6);
     bittorrent::setStaticPeerId(peerId);
@@ -73,6 +76,8 @@ public:
 
     peerStorage_.reset(new MockPeerStorage());
     btRuntime_.reset(new BtRuntime());
+
+    randomizer_.reset(new FixedNumberRandomizer());
   }
 
   void tearDown()
@@ -98,10 +103,10 @@ CPPUNIT_TEST_SUITE_REGISTRATION(DefaultBtAnnounceTest);
 
 namespace {
 template<typename InputIterator>
-SharedHandle<List> createAnnounceTier
+std::unique_ptr<List> createAnnounceTier
 (InputIterator first, InputIterator last)
 {
-  SharedHandle<List> announceTier = List::g();
+  auto announceTier = List::g();
   for(; first != last; ++first) {
     announceTier->append(String::g(*first));
   }
@@ -110,29 +115,29 @@ SharedHandle<List> createAnnounceTier
 } // namespace
 
 namespace {
-SharedHandle<List> createAnnounceTier(const std::string& uri)
+std::unique_ptr<List> createAnnounceTier(const std::string& uri)
 {
-  SharedHandle<List> announceTier = List::g();
+  auto announceTier = List::g();
   announceTier->append(String::g(uri));
   return announceTier;
 }
 } // namespace
 
 namespace {
-void setAnnounceList(const SharedHandle<DownloadContext>& dctx,
-                     const SharedHandle<List>& announceList)
+void setAnnounceList(const std::shared_ptr<DownloadContext>& dctx,
+                     const List* announceList)
 {
-  std::vector<std::vector<std::string> > dest;
-  for(List::ValueType::const_iterator tierIter = announceList->begin(),
-        eoi = announceList->end(); tierIter != eoi; ++tierIter) {
+  std::vector<std::vector<std::string>> dest;
+  for(auto tierIter = announceList->begin(), eoi = announceList->end();
+      tierIter != eoi; ++tierIter) {
     std::vector<std::string> ntier;
     const List* tier = downcast<List>(*tierIter);
-    for(List::ValueType::const_iterator uriIter = tier->begin(),
-          eoi2 = tier->end(); uriIter != eoi2; ++uriIter) {
+    for(auto uriIter = tier->begin(), eoi2 = tier->end(); uriIter != eoi2;
+        ++uriIter) {
       const String* uri = downcast<String>(*uriIter);
       ntier.push_back(uri->s());
     }
-    dest.push_back(ntier);
+    dest.push_back(std::move(ntier));
   }
   bittorrent::getTorrentAttrs(dctx)->announceList.swap(dest);
 }
@@ -140,17 +145,17 @@ void setAnnounceList(const SharedHandle<DownloadContext>& dctx,
 
 void DefaultBtAnnounceTest::testNoMoreAnnounce()
 {
-  SharedHandle<List> announceList = List::g();
+  auto announceList = List::g();
   announceList->append(createAnnounceTier("http://localhost/announce"));
   announceList->append(createAnnounceTier("http://backup/announce"));
 
-  setAnnounceList(dctx_, announceList);
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost/announce?info_hash=%01%23Eg%89%AB%CD%EF%01%23Eg%89%AB%CD%EF%01%23Eg&peer_id=%2Daria2%2Dultrafastdltl&uploaded=1572864&downloaded=1310720&left=1572864&compact=1&key=fastdltl&numwant=50&no_peer_id=1&port=6989&event=started&supportcrypto=1"), btAnnounce.getAnnounceUrl());
@@ -190,18 +195,17 @@ void DefaultBtAnnounceTest::testNoMoreAnnounce()
 
 void DefaultBtAnnounceTest::testGetAnnounceUrl()
 {
-
-  SharedHandle<List> announceList = List::g();
+  auto announceList = List::g();
   announceList->append(createAnnounceTier("http://localhost/announce"));
-  setAnnounceList(dctx_, announceList);
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
-  SharedHandle<UDPTrackerRequest> req;
+  std::shared_ptr<UDPTrackerRequest> req;
 
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost/announce?info_hash=%01%23Eg%89%AB%CD%EF%01%23Eg%89%AB%CD%EF%01%23Eg&peer_id=%2Daria2%2Dultrafastdltl&uploaded=1572864&downloaded=1310720&left=1572864&compact=1&key=fastdltl&numwant=50&no_peer_id=1&port=6989&event=started&supportcrypto=1"), btAnnounce.getAnnounceUrl());
   req = btAnnounce.createUDPTrackerRequest("localhost", 80, 6989);
@@ -248,15 +252,15 @@ void DefaultBtAnnounceTest::testGetAnnounceUrl()
 
 void DefaultBtAnnounceTest::testGetAnnounceUrl_withQuery()
 {
-  SharedHandle<List> announceList = List::g();
+  auto announceList = List::g();
   announceList->append(createAnnounceTier("http://localhost/announce?k=v"));
-  setAnnounceList(dctx_, announceList);
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL
@@ -271,16 +275,16 @@ void DefaultBtAnnounceTest::testGetAnnounceUrl_withQuery()
 
 void DefaultBtAnnounceTest::testGetAnnounceUrl_externalIP()
 {
-  SharedHandle<List> announceList = List::g();
+  auto announceList = List::g();
   announceList->append(createAnnounceTier("http://localhost/announce"));
-  setAnnounceList(dctx_, announceList);
+  setAnnounceList(dctx_, announceList.get());
 
   option_->put(PREF_BT_EXTERNAL_IP, "192.168.1.1");
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL
@@ -292,7 +296,7 @@ void DefaultBtAnnounceTest::testGetAnnounceUrl_externalIP()
                  "supportcrypto=1&ip=192.168.1.1"),
      btAnnounce.getAnnounceUrl());
 
-  SharedHandle<UDPTrackerRequest> req;
+  std::shared_ptr<UDPTrackerRequest> req;
   req = btAnnounce.createUDPTrackerRequest("localhost", 80, 6989);
   char host[NI_MAXHOST];
   int rv = inetNtop(AF_INET, &req->ip, host, sizeof(host));
@@ -302,16 +306,16 @@ void DefaultBtAnnounceTest::testGetAnnounceUrl_externalIP()
 
 void DefaultBtAnnounceTest::testIsAllAnnounceFailed()
 {
-  SharedHandle<List> announceList = List::g();
+  auto announceList = List::g();
   announceList->append(createAnnounceTier("http://localhost/announce"));
   announceList->append(createAnnounceTier("http://backup/announce"));
-  setAnnounceList(dctx_, announceList);
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost/announce?info_hash=%01%23Eg%89%AB%CD%EF%01%23Eg%89%AB%CD%EF%01%23Eg&peer_id=%2Daria2%2Dultrafastdltl&uploaded=1572864&downloaded=1310720&left=1572864&compact=1&key=fastdltl&numwant=50&no_peer_id=1&port=6989&event=started&supportcrypto=1"), btAnnounce.getAnnounceUrl());
@@ -336,15 +340,15 @@ void DefaultBtAnnounceTest::testURLOrderInStoppedEvent()
   const char* urls[] = { "http://localhost1/announce",
                          "http://localhost2/announce" };
 
-  SharedHandle<List> announceList = List::g();
-  announceList->append(createAnnounceTier(vbegin(urls), vend(urls)));
-  setAnnounceList(dctx_, announceList);
+  auto announceList = List::g();
+  announceList->append(createAnnounceTier(std::begin(urls), std::end(urls)));
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost1/announce?info_hash=%01%23Eg%89%AB%CD%EF%01%23Eg%89%AB%CD%EF%01%23Eg&peer_id=%2Daria2%2Dultrafastdltl&uploaded=1572864&downloaded=1310720&left=1572864&compact=1&key=fastdltl&numwant=50&no_peer_id=1&port=6989&event=started&supportcrypto=1"), btAnnounce.getAnnounceUrl());
@@ -367,15 +371,15 @@ void DefaultBtAnnounceTest::testURLOrderInCompletedEvent()
   const char* urls[] = { "http://localhost1/announce",
                          "http://localhost2/announce" };
 
-  SharedHandle<List> announceList = List::g();
-  announceList->append(createAnnounceTier(vbegin(urls), vend(urls)));
-  setAnnounceList(dctx_, announceList);
+  auto announceList = List::g();
+  announceList->append(createAnnounceTier(std::begin(urls), std::end(urls)));
+  setAnnounceList(dctx_, announceList.get());
 
-  DefaultBtAnnounce btAnnounce(dctx_, option_);
+  DefaultBtAnnounce btAnnounce(dctx_.get(), option_);
   btAnnounce.setPieceStorage(pieceStorage_);
   btAnnounce.setPeerStorage(peerStorage_);
   btAnnounce.setBtRuntime(btRuntime_);
-  btAnnounce.setRandomizer(SharedHandle<Randomizer>(new FixedNumberRandomizer()));
+  btAnnounce.setRandomizer(randomizer_.get());
   btAnnounce.setTcpPort(6989);
 
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost1/announce?info_hash=%01%23Eg%89%AB%CD%EF%01%23Eg%89%AB%CD%EF%01%23Eg&peer_id=%2Daria2%2Dultrafastdltl&uploaded=1572864&downloaded=1310720&left=1572864&compact=1&key=fastdltl&numwant=50&no_peer_id=1&port=6989&event=started&supportcrypto=1"), btAnnounce.getAnnounceUrl());
@@ -397,7 +401,9 @@ void DefaultBtAnnounceTest::testProcessAnnounceResponse_malformed()
 {
   try {
     std::string res = "i123e";
-    DefaultBtAnnounce(dctx_, option_).processAnnounceResponse(reinterpret_cast<const unsigned char*>(res.c_str()), res.size());
+    DefaultBtAnnounce(dctx_.get(), option_)
+      .processAnnounceResponse
+      (reinterpret_cast<const unsigned char*>(res.c_str()), res.size());
     CPPUNIT_FAIL("exception must be thrown.");
   } catch(Exception& e) {
     std::cerr << e.stackTrace() << std::endl;
@@ -408,7 +414,9 @@ void DefaultBtAnnounceTest::testProcessAnnounceResponse_failureReason()
 {
   try {
     std::string res = "d14:failure reason11:hello worlde";
-    DefaultBtAnnounce(dctx_, option_).processAnnounceResponse(reinterpret_cast<const unsigned char*>(res.c_str()), res.size());
+    DefaultBtAnnounce(dctx_.get(), option_)
+      .processAnnounceResponse
+      (reinterpret_cast<const unsigned char*>(res.c_str()), res.size());
     CPPUNIT_FAIL("exception must be thrown.");
   } catch(Exception& e) {
     std::cerr << e.stackTrace() << std::endl;
@@ -430,7 +438,7 @@ void DefaultBtAnnounceTest::testProcessAnnounceResponse()
   res += fromHex("100210354527354678541237324732171ae1");
   res += "e";
 
-  DefaultBtAnnounce an(dctx_, option_);
+  DefaultBtAnnounce an(dctx_.get(), option_);
   an.setPeerStorage(peerStorage_);
   an.setBtRuntime(btRuntime_);
   an.processAnnounceResponse(reinterpret_cast<const unsigned char*>(res.c_str()), res.size());
@@ -440,7 +448,7 @@ void DefaultBtAnnounceTest::testProcessAnnounceResponse()
   CPPUNIT_ASSERT_EQUAL(100, an.getComplete());
   CPPUNIT_ASSERT_EQUAL(200, an.getIncomplete());
   CPPUNIT_ASSERT_EQUAL((size_t)2, peerStorage_->getUnusedPeers().size());
-  SharedHandle<Peer> peer = peerStorage_->getUnusedPeers()[0];
+  std::shared_ptr<Peer> peer = peerStorage_->getUnusedPeers()[0];
   CPPUNIT_ASSERT_EQUAL(std::string("192.168.0.1"), peer->getIPAddress());
   peer = peerStorage_->getUnusedPeers()[1];
   CPPUNIT_ASSERT_EQUAL(std::string("1002:1035:4527:3546:7854:1237:3247:3217"),
@@ -449,9 +457,9 @@ void DefaultBtAnnounceTest::testProcessAnnounceResponse()
 
 void DefaultBtAnnounceTest::testProcessUDPTrackerResponse()
 {
-  SharedHandle<UDPTrackerRequest> req(new UDPTrackerRequest());
+  std::shared_ptr<UDPTrackerRequest> req(new UDPTrackerRequest());
   req->action = UDPT_ACT_ANNOUNCE;
-  SharedHandle<UDPTrackerReply> reply(new UDPTrackerReply());
+  std::shared_ptr<UDPTrackerReply> reply(new UDPTrackerReply());
   reply->interval = 1800;
   reply->leechers = 200;
   reply->seeders = 100;
@@ -460,7 +468,7 @@ void DefaultBtAnnounceTest::testProcessUDPTrackerResponse()
                                           6890+i));
   }
   req->reply = reply;
-  DefaultBtAnnounce an(dctx_, option_);
+  DefaultBtAnnounce an(dctx_.get(), option_);
   an.setPeerStorage(peerStorage_);
   an.setBtRuntime(btRuntime_);
   an.processUDPTrackerResponse(req);
@@ -470,7 +478,7 @@ void DefaultBtAnnounceTest::testProcessUDPTrackerResponse()
   CPPUNIT_ASSERT_EQUAL(200, an.getIncomplete());
   CPPUNIT_ASSERT_EQUAL((size_t)2, peerStorage_->getUnusedPeers().size());
   for(int i = 0; i < 2; ++i) {
-    SharedHandle<Peer> peer;
+    std::shared_ptr<Peer> peer;
     peer = peerStorage_->getUnusedPeers()[i];
     CPPUNIT_ASSERT_EQUAL("192.168.0."+util::uitos(i+1), peer->getIPAddress());
     CPPUNIT_ASSERT_EQUAL((uint16_t)(6890+i), peer->getPort());

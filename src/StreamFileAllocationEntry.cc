@@ -49,15 +49,15 @@
 
 namespace aria2 {
 
-StreamFileAllocationEntry::StreamFileAllocationEntry(RequestGroup* requestGroup,
-                                                     Command* nextCommand):
-  FileAllocationEntry(requestGroup, nextCommand)
+StreamFileAllocationEntry::StreamFileAllocationEntry
+(RequestGroup* requestGroup, std::unique_ptr<Command> nextCommand):
+  FileAllocationEntry(requestGroup, std::move(nextCommand))
 {}
 
 StreamFileAllocationEntry::~StreamFileAllocationEntry() {}
 
 void StreamFileAllocationEntry::prepareForNextAction
-(std::vector<Command*>& commands,
+(std::vector<std::unique_ptr<Command>>& commands,
  DownloadEngine* e)
 {
   // For DownloadContext::resetDownloadStartTime(), see also
@@ -69,17 +69,14 @@ void StreamFileAllocationEntry::prepareForNextAction
   if(getNextCommand()) {
     // Reset download start time of PeerStat because it is started
     // before file allocation begins.
-    const SharedHandle<DownloadContext>& dctx =
+    const std::shared_ptr<DownloadContext>& dctx =
       getRequestGroup()->getDownloadContext();
-    const std::vector<SharedHandle<FileEntry> >& fileEntries =
+    const std::vector<std::shared_ptr<FileEntry> >& fileEntries =
       dctx->getFileEntries();
-    for(std::vector<SharedHandle<FileEntry> >::const_iterator i =
-          fileEntries.begin(), eoi = fileEntries.end(); i != eoi; ++i) {
-      const FileEntry::InFlightRequestSet& reqs =
-        (*i)->getInFlightRequests();
-      for(FileEntry::InFlightRequestSet::iterator j =
-            reqs.begin(), eoj = reqs.end(); j != eoj; ++j) {
-        const SharedHandle<PeerStat>& peerStat = (*j)->getPeerStat();
+    for(auto & f : fileEntries) {
+      const auto& reqs = f->getInFlightRequests();
+      for(auto & req : reqs) {
+        const std::shared_ptr<PeerStat>& peerStat = req->getPeerStat();
         if(peerStat) {
           peerStat->downloadStart();
         }

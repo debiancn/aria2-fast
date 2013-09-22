@@ -39,6 +39,7 @@
 
 #include <string>
 #include <functional>
+#include <memory>
 
 #include "TimerA2.h"
 
@@ -62,7 +63,7 @@ private:
 
   time_t summaryInterval_;
 
-  SharedHandle<SizeFormatter> sizeFormatter_;
+  std::shared_ptr<SizeFormatter> sizeFormatter_;
   bool readoutVisibility_;
   bool truncate_;
   bool isTTY_;
@@ -71,7 +72,7 @@ public:
 
   virtual ~ConsoleStatCalc() {}
 
-  virtual void calculateStat(const DownloadEngine* e);
+  virtual void calculateStat(const DownloadEngine* e) CXX11_OVERRIDE;
 
   void setReadoutVisibility(bool visibility)
   {
