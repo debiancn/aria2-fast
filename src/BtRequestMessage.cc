@@ -38,6 +38,8 @@
 #include "PieceStorage.h"
 #include "BtMessageDispatcher.h"
 #include "BtMessageFactory.h"
+#include "BtPieceMessage.h"
+#include "BtRejectMessage.h"
 
 namespace aria2 {
 
@@ -48,7 +50,7 @@ BtRequestMessage::BtRequestMessage
   RangeBtMessage(ID, NAME, index, begin, length),
   blockIndex_(blockIndex) {}
 
-BtRequestMessage* BtRequestMessage::create
+std::unique_ptr<BtRequestMessage> BtRequestMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return RangeBtMessage::create<BtRequestMessage>(data, dataLength);
@@ -63,25 +65,23 @@ void BtRequestMessage::doReceivedAction()
      (!getPeer()->amChoking() ||
       (getPeer()->amChoking() &&
        getPeer()->isInAmAllowedIndexSet(getIndex())))) {
-    SharedHandle<BtMessage> msg =
-      getBtMessageFactory()->createPieceMessage
-      (getIndex(), getBegin(), getLength());
-    getBtMessageDispatcher()->addMessageToQueue(msg);
+    getBtMessageDispatcher()->addMessageToQueue
+      (getBtMessageFactory()->createPieceMessage
+       (getIndex(), getBegin(), getLength()));
   } else {
     if(getPeer()->isFastExtensionEnabled()) {
-      SharedHandle<BtMessage> msg =
-        getBtMessageFactory()->createRejectMessage
-        (getIndex(), getBegin(), getLength());
-      getBtMessageDispatcher()->addMessageToQueue(msg);
+      getBtMessageDispatcher()->addMessageToQueue
+        (getBtMessageFactory()->createRejectMessage
+         (getIndex(), getBegin(), getLength()));
     }
   }
 }
 
 void BtRequestMessage::onQueued()
 {
-  RequestSlot requestSlot(getIndex(), getBegin(), getLength(), blockIndex_,
-                          getPieceStorage()->getPiece(getIndex()));
-  getBtMessageDispatcher()->addOutstandingRequest(requestSlot);
+  getBtMessageDispatcher()->addOutstandingRequest
+    (make_unique<RequestSlot>(getIndex(), getBegin(), getLength(), blockIndex_,
+                              getPieceStorage()->getPiece(getIndex())));
 }
 
 void BtRequestMessage::onAbortOutstandingRequestEvent

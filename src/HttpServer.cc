@@ -57,11 +57,11 @@
 
 namespace aria2 {
 
-HttpServer::HttpServer(const SharedHandle<SocketCore>& socket)
+HttpServer::HttpServer(const std::shared_ptr<SocketCore>& socket)
  : socket_(socket),
    socketRecvBuffer_(new SocketRecvBuffer(socket_)),
    socketBuffer_(socket),
-   headerProcessor_(new HttpHeaderProcessor
+   headerProcessor_(make_unique<HttpHeaderProcessor>
                     (HttpHeaderProcessor::SERVER_PARSER)),
    lastContentLength_(0),
    bodyConsumed_(0),
@@ -126,7 +126,7 @@ const char* getStatusString(int status)
 }
 } // namespace
 
-SharedHandle<HttpHeader> HttpServer::receiveRequest()
+bool HttpServer::receiveRequest()
 {
   if(socketRecvBuffer_->bufferEmpty()) {
     if(socketRecvBuffer_->recv() == 0 &&
@@ -134,14 +134,12 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
       throw DL_ABORT_EX(EX_EOF_FROM_PEER);
     }
   }
-  SharedHandle<HttpHeader> header;
   if(headerProcessor_->parse(socketRecvBuffer_->getBuffer(),
                              socketRecvBuffer_->getBufferLength())) {
-    header = headerProcessor_->getResult();
+    lastRequestHeader_ = headerProcessor_->getResult();
     A2_LOG_INFO(fmt("HTTP Server received request\n%s",
                     headerProcessor_->getHeaderString().c_str()));
     socketRecvBuffer_->shiftBuffer(headerProcessor_->getLastBytesProcessed());
-    lastRequestHeader_ = header;
     bodyConsumed_ = 0;
     if(setupResponseRecv() < 0) {
       A2_LOG_INFO("Request path is invaild. Ignore the request body.");
@@ -172,10 +170,11 @@ SharedHandle<HttpHeader> HttpServer::receiveRequest()
         break;
       }
     }
+    return true;
   } else {
     socketRecvBuffer_->shiftBuffer(headerProcessor_->getLastBytesProcessed());
+    return false;
   }
-  return header;
 }
 
 bool HttpServer::receiveBody()
@@ -210,26 +209,27 @@ const std::string& HttpServer::getRequestPath() const
   return lastRequestHeader_->getRequestPath();
 }
 
-void HttpServer::feedResponse(std::string& text, const std::string& contentType)
+void HttpServer::feedResponse(std::string text,
+                              const std::string& contentType)
 {
-  feedResponse(200, "", text, contentType);
+  feedResponse(200, "", std::move(text), contentType);
 }
 
 void HttpServer::feedResponse(int status,
                               const std::string& headers,
-                              const std::string& text,
+                              std::string text,
                               const std::string& contentType)
 {
   std::string httpDate = Time().toHTTPDate();
-  std::string header= fmt("HTTP/1.1 %s\r\n"
-                          "Date: %s\r\n"
-                          "Content-Length: %lu\r\n"
-                          "Expires: %s\r\n"
-                          "Cache-Control: no-cache\r\n",
-                          getStatusString(status),
-                          httpDate.c_str(),
-                          static_cast<unsigned long>(text.size()),
-                          httpDate.c_str());
+  std::string header = fmt("HTTP/1.1 %s\r\n"
+                           "Date: %s\r\n"
+                           "Content-Length: %lu\r\n"
+                           "Expires: %s\r\n"
+                           "Cache-Control: no-cache\r\n",
+                           getStatusString(status),
+                           httpDate.c_str(),
+                           static_cast<unsigned long>(text.size()),
+                           httpDate.c_str());
   if(!contentType.empty()) {
     header += "Content-Type: ";
     header += contentType;
@@ -249,8 +249,8 @@ void HttpServer::feedResponse(int status,
   header += headers;
   header += "\r\n";
   A2_LOG_DEBUG(fmt("HTTP Server sends response:\n%s", header.c_str()));
-  socketBuffer_.pushStr(header);
-  socketBuffer_.pushStr(text);
+  socketBuffer_.pushStr(std::move(header));
+  socketBuffer_.pushStr(std::move(text));
 }
 
 void HttpServer::feedUpgradeResponse(const std::string& protocol,
@@ -264,7 +264,7 @@ void HttpServer::feedUpgradeResponse(const std::string& protocol,
                           protocol.c_str(),
                           headers.c_str());
   A2_LOG_DEBUG(fmt("HTTP Server sends upgrade response:\n%s", header.c_str()));
-  socketBuffer_.pushStr(header);
+  socketBuffer_.pushStr(std::move(header));
 }
 
 ssize_t HttpServer::sendResponse()
@@ -288,14 +288,12 @@ bool HttpServer::authenticate()
   if(authHeader.empty()) {
     return false;
   }
-  std::pair<Scip, Scip> p;
-  util::divide(p, authHeader.begin(), authHeader.end(), ' ');
+  auto p = util::divide(std::begin(authHeader), std::end(authHeader), ' ');
   if(!util::streq(p.first.first, p.first.second, "Basic")) {
     return false;
   }
   std::string userpass = base64::decode(p.second.first, p.second.second);
-  std::pair<Sip, Sip> up;
-  util::divide(up, userpass.begin(), userpass.end(), ':');
+  auto up = util::divide(std::begin(userpass), std::end(userpass), ':');
   return util::streq(up.first.first, up.first.second,
                      username_.begin(), username_.end()) &&
     util::streq(up.second.first, up.second.second,
@@ -379,6 +377,11 @@ std::string HttpServer::createQuery() const
     }
     return reqPath.substr(start, i - start);
   }
+}
+
+DiskWriter* HttpServer::getBody() const
+{
+  return lastBody_.get();
 }
 
 bool HttpServer::supportsPersistentConnection() const

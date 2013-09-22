@@ -24,10 +24,10 @@ The project page is located at http://aria2.sourceforge.net/.
 See `aria2 Online Manual
 <http://aria2.sourceforge.net/manual/en/html/>`_ (`Russian translation
 <http://aria2.sourceforge.net/manual/ru/html/>`_, `Portuguese
-translation (1.15.2 based)
-<http://aria2.sourceforge.net/manual/pt/html/>`_) and `the usage
-examples <http://sourceforge.net/apps/trac/aria2/wiki/UsageExample>`_
-to learn how to use aria2.
+translation <http://aria2.sourceforge.net/manual/pt/html/>`_) and `the
+usage examples
+<http://sourceforge.net/apps/trac/aria2/wiki/UsageExample>`_ to learn
+how to use aria2.
 
 Features
 --------
@@ -148,6 +148,13 @@ In order to enable async DNS support, you need c-ares.
 
 How to build
 ------------
+
+aria2 is primarily written in C++. Initially it was written based on
+C++98/C++03 standard features. We are now migrating aria2 to C++11
+standard. The current source code requires C++11 aware compiler. For
+well-known compilers, such as g++ and clang, flag ``-std=c++11`` or
+``-std=c++0x`` must be supported.
+
 In order to build aria2 from the source package, you need following
 development packages(package name may vary depending on the
 distribution you use):
@@ -176,7 +183,8 @@ You can use libexpat1-dev instead of libxml2-dev:
 * libexpat1-dev    (Required for Metalink support)
 
 On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
-libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel
+libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel,
+gettext-devel, cppunit
 
 If you downloaded source code from git repository, you have to run
 following command to generate configure script and other files
@@ -337,7 +345,7 @@ they are not up-to-date.  You can also build HTML version of aria2 man
 page by ``make html``. The HTML version manual is also available at
 `online <http://aria2.sourceforge.net/manual/en/html/>`_ (`Russian
 translation <http://aria2.sourceforge.net/manual/ru/html/>`_,
-`Portuguese translation (1.15.2 based)
+`Portuguese translation
 <http://aria2.sourceforge.net/manual/pt/html/>`_).
 
 BitTorrrent
@@ -384,7 +392,7 @@ option to change the port number.
 Other things should be noted
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-* -o option is used to change the filename of .torrent file itself,
+* ``-o`` option is used to change the filename of .torrent file itself,
   not a filename of a file in .torrent file. For this purpose, use
   ``--index-out`` option instead.
 * The port numbers that aria2 uses by default are 6881-6999 for TCP

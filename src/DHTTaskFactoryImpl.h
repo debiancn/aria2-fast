@@ -49,7 +49,7 @@ class DHTAbstractTask;
 
 class DHTTaskFactoryImpl:public DHTTaskFactory {
 private:
-  SharedHandle<DHTNode> localNode_;
+  std::shared_ptr<DHTNode> localNode_;
 
   DHTRoutingTable* routingTable_;
 
@@ -61,32 +61,34 @@ private:
 
   time_t timeout_;
 
-  void setCommonProperty(const SharedHandle<DHTAbstractTask>& task);
+  void setCommonProperty(const std::shared_ptr<DHTAbstractTask>& task);
 public:
   DHTTaskFactoryImpl();
 
   virtual ~DHTTaskFactoryImpl();
 
-  virtual SharedHandle<DHTTask>
-  createPingTask(const SharedHandle<DHTNode>& remoteNode,
-                 int numRetry = 0);
+  virtual std::shared_ptr<DHTTask>
+  createPingTask(const std::shared_ptr<DHTNode>& remoteNode,
+                 int numRetry = 0) CXX11_OVERRIDE;
 
-  virtual SharedHandle<DHTTask>
-  createNodeLookupTask(const unsigned char* targetID);
+  virtual std::shared_ptr<DHTTask>
+  createNodeLookupTask(const unsigned char* targetID) CXX11_OVERRIDE;
 
-  virtual SharedHandle<DHTTask> createBucketRefreshTask();
+  virtual std::shared_ptr<DHTTask> createBucketRefreshTask() CXX11_OVERRIDE;
 
-  virtual SharedHandle<DHTTask>
-  createPeerLookupTask(const SharedHandle<DownloadContext>& ctx,
+  virtual std::shared_ptr<DHTTask>
+  createPeerLookupTask(const std::shared_ptr<DownloadContext>& ctx,
                        uint16_t tcpPort,
-                       const SharedHandle<PeerStorage>& peerStorage);
+                       const std::shared_ptr<PeerStorage>& peerStorage)
+    CXX11_OVERRIDE;
 
-  virtual SharedHandle<DHTTask>
-  createPeerAnnounceTask(const unsigned char* infoHash);
+  virtual std::shared_ptr<DHTTask>
+  createPeerAnnounceTask(const unsigned char* infoHash) CXX11_OVERRIDE;
 
-  virtual SharedHandle<DHTTask>
-  createReplaceNodeTask(const SharedHandle<DHTBucket>& bucket,
-                        const SharedHandle<DHTNode>& newNode);
+  virtual std::shared_ptr<DHTTask>
+  createReplaceNodeTask(const std::shared_ptr<DHTBucket>& bucket,
+                        const std::shared_ptr<DHTNode>& newNode)
+    CXX11_OVERRIDE;
 
   void setRoutingTable(DHTRoutingTable* routingTable);
 
@@ -96,7 +98,7 @@ public:
 
   void setTaskQueue(DHTTaskQueue* taskQueue);
 
-  void setLocalNode(const SharedHandle<DHTNode>& localNode);
+  void setLocalNode(const std::shared_ptr<DHTNode>& localNode);
 
   void setTimeout(time_t timeout)
   {

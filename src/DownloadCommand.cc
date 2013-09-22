@@ -81,12 +81,12 @@ const size_t BUFSIZE = 16*1024;
 
 DownloadCommand::DownloadCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& s,
- const SharedHandle<SocketRecvBuffer>& socketRecvBuffer)
+ const std::shared_ptr<SocketCore>& s,
+ const std::shared_ptr<SocketRecvBuffer>& socketRecvBuffer)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e, s, socketRecvBuffer),
     startupIdleTime_(10),
     lowestDownloadSpeedLimit_(0),
@@ -108,9 +108,8 @@ DownloadCommand::DownloadCommand
   peerStat_->downloadStart();
   getSegmentMan()->registerPeerStat(peerStat_);
 
-  WrDiskCache* wrDiskCache = getPieceStorage()->getWrDiskCache();
-  streamFilter_.reset(new SinkStreamFilter(wrDiskCache,
-                                           pieceHashValidationEnabled_));
+  streamFilter_ = make_unique<SinkStreamFilter>
+    (getPieceStorage()->getWrDiskCache(), pieceHashValidationEnabled_);
   streamFilter_->init();
   sinkFilterOnly_ = true;
   checkSocketRecvBuffer();
@@ -123,9 +122,9 @@ DownloadCommand::~DownloadCommand() {
 
 namespace {
 void flushWrDiskCacheEntry(WrDiskCache* wrDiskCache,
-                           const SharedHandle<Segment>& segment)
+                           const std::shared_ptr<Segment>& segment)
 {
-  const SharedHandle<Piece>& piece = segment->getPiece();
+  const std::shared_ptr<Piece>& piece = segment->getPiece();
   if(piece->getWrDiskCacheEntry()) {
     piece->flushWrCache(wrDiskCache);
     if(piece->getWrDiskCacheEntry()->getError() !=
@@ -143,15 +142,15 @@ void flushWrDiskCacheEntry(WrDiskCache* wrDiskCache,
 bool DownloadCommand::executeInternal() {
   if(getDownloadEngine()->getRequestGroupMan()->doesOverallDownloadSpeedExceed()
      || getRequestGroup()->doesDownloadSpeedExceed()) {
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     disableReadCheckSocket();
     return false;
   }
   setReadCheckSocket(getSocket());
 
-  const SharedHandle<DiskAdaptor>& diskAdaptor =
+  const std::shared_ptr<DiskAdaptor>& diskAdaptor =
     getPieceStorage()->getDiskAdaptor();
-  SharedHandle<Segment> segment = getSegments().front();
+  std::shared_ptr<Segment> segment = getSegments().front();
   bool eof = false;
   if(getSocketRecvBuffer()->bufferEmpty()) {
     // Only read from socket when buffer is empty.  Imagine that When
@@ -293,7 +292,7 @@ bool DownloadCommand::executeInternal() {
     checkLowestDownloadSpeed();
     setWriteCheckSocketIf(getSocket(), getSocket()->wantWrite());
     checkSocketRecvBuffer();
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     return false;
   }
 }
@@ -328,12 +327,12 @@ bool DownloadCommand::prepareForNextSegment() {
     }
 #ifdef ENABLE_MESSAGE_DIGEST
     if(getDownloadContext()->getPieceHashType().empty()) {
-      SharedHandle<CheckIntegrityEntry> entry
-        (new ChecksumCheckIntegrityEntry(getRequestGroup()));
+      auto entry = make_unique<ChecksumCheckIntegrityEntry>(getRequestGroup());
       if(entry->isValidationReady()) {
         entry->initValidator();
         entry->cutTrailingGarbage();
-        getDownloadEngine()->getCheckIntegrityMan()->pushEntry(entry);
+        getDownloadEngine()->getCheckIntegrityMan()->pushEntry
+          (std::move(entry));
       }
     }
 #endif // ENABLE_MESSAGE_DIGEST
@@ -346,7 +345,7 @@ bool DownloadCommand::prepareForNextSegment() {
     // The number of segments should be 1 in order to pass through the next
     // segment.
     if(getSegments().size() == 1) {
-      SharedHandle<Segment> tempSegment = getSegments().front();
+      std::shared_ptr<Segment> tempSegment = getSegments().front();
       if(!tempSegment->complete()) {
         return prepareForRetry(0);
       }
@@ -355,7 +354,7 @@ bool DownloadCommand::prepareForNextSegment() {
          (tempSegment->getPosition()+tempSegment->getLength())) {
         return prepareForRetry(0);
       }
-      SharedHandle<Segment> nextSegment = getSegmentMan()->getSegmentWithIndex
+      std::shared_ptr<Segment> nextSegment = getSegmentMan()->getSegmentWithIndex
         (getCuid(), tempSegment->getIndex()+1);
       if(!nextSegment) {
         nextSegment = getSegmentMan()->getCleanSegmentIfOwnerIsIdle
@@ -368,7 +367,7 @@ bool DownloadCommand::prepareForNextSegment() {
         return prepareForRetry(0);
       } else {
         checkSocketRecvBuffer();
-        getDownloadEngine()->addCommand(this);
+        addCommandSelf();
         return false;
       }
     } else {
@@ -379,7 +378,7 @@ bool DownloadCommand::prepareForNextSegment() {
 
 #ifdef ENABLE_MESSAGE_DIGEST
 
-void DownloadCommand::validatePieceHash(const SharedHandle<Segment>& segment,
+void DownloadCommand::validatePieceHash(const std::shared_ptr<Segment>& segment,
                                         const std::string& expectedHash,
                                         const std::string& actualHash)
 {
@@ -403,20 +402,20 @@ void DownloadCommand::validatePieceHash(const SharedHandle<Segment>& segment,
 #endif // ENABLE_MESSAGE_DIGEST
 
 void DownloadCommand::completeSegment(cuid_t cuid,
-                                      const SharedHandle<Segment>& segment)
+                                      const std::shared_ptr<Segment>& segment)
 {
   flushWrDiskCacheEntry(getPieceStorage()->getWrDiskCache(), segment);
   getSegmentMan()->completeSegment(cuid, segment);
 }
 
 void DownloadCommand::installStreamFilter
-(const SharedHandle<StreamFilter>& streamFilter)
+(std::unique_ptr<StreamFilter> streamFilter)
 {
   if(!streamFilter) {
     return;
   }
-  streamFilter->installDelegate(streamFilter_);
-  streamFilter_ = streamFilter;
+  streamFilter->installDelegate(std::move(streamFilter_));
+  streamFilter_ = std::move(streamFilter);
   const std::string& name = streamFilter_->getName();
   sinkFilterOnly_ = util::endsWith(name, SinkStreamFilter::NAME);
 }

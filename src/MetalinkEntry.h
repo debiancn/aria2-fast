@@ -39,8 +39,7 @@
 
 #include <string>
 #include <vector>
-
-#include "SharedHandle.h"
+#include <memory>
 
 namespace aria2 {
 
@@ -55,36 +54,36 @@ class Signature;
 
 class MetalinkEntry {
 public:
-  SharedHandle<FileEntry> file;
+  std::unique_ptr<FileEntry> file;
   std::string version;
   std::vector<std::string> languages;
   std::vector<std::string> oses;
   // True if size is specified in Metalink document.
   bool sizeKnown;
-  std::vector<SharedHandle<MetalinkResource> > resources;
-  std::vector<SharedHandle<MetalinkMetaurl> > metaurls;
+  std::vector<std::unique_ptr<MetalinkResource>> resources;
+  std::vector<std::unique_ptr<MetalinkMetaurl>> metaurls;
   int maxConnections; // Metalink3Spec
 #ifdef ENABLE_MESSAGE_DIGEST
-  SharedHandle<Checksum> checksum;
-  SharedHandle<ChunkChecksum> chunkChecksum;
+  std::unique_ptr<Checksum> checksum;
+  std::unique_ptr<ChunkChecksum> chunkChecksum;
 #endif // ENABLE_MESSAGE_DIGEST
 private:
-  SharedHandle<Signature> signature_;
+  std::unique_ptr<Signature> signature_;
 public:
   MetalinkEntry();
 
   ~MetalinkEntry();
 
-  MetalinkEntry& operator=(const MetalinkEntry& metalinkEntry);
-
   const std::string& getPath() const;
 
   int64_t getLength() const;
 
-  const SharedHandle<FileEntry>& getFile() const
+  const std::unique_ptr<FileEntry>& getFile() const
   {
     return file;
   }
+
+  std::unique_ptr<FileEntry> popFile();
 
   void dropUnsupportedResource();
 
@@ -101,16 +100,17 @@ public:
 
   void setProtocolPriority(const std::string& protocol, int priorityToAdd);
 
-  static void toFileEntry
-  (std::vector<SharedHandle<FileEntry> >& fileEntries,
-   const std::vector<SharedHandle<MetalinkEntry> >& metalinkEntries);
+  static std::vector<std::unique_ptr<FileEntry>> toFileEntry
+  (std::vector<std::unique_ptr<MetalinkEntry>> metalinkEntries);
 
-  void setSignature(const SharedHandle<Signature>& signature);
+  void setSignature(std::unique_ptr<Signature> signature);
 
-  const SharedHandle<Signature>& getSignature() const
+  const std::unique_ptr<Signature>& getSignature() const
   {
     return signature_;
   }
+
+  std::unique_ptr<Signature> popSignature();
 };
 
 } // namespace aria2

@@ -49,14 +49,14 @@ namespace aria2 {
 const char BtBitfieldMessage::NAME[] = "bitfield";
 
 BtBitfieldMessage::BtBitfieldMessage():SimpleBtMessage(ID, NAME),
-                                       bitfield_(0),
+                                       bitfield_(nullptr),
                                        bitfieldLength_(0)
 {}
 
 BtBitfieldMessage::BtBitfieldMessage
 (const unsigned char* bitfield, size_t bitfieldLength):
   SimpleBtMessage(ID, NAME),
-  bitfield_(0),
+  bitfield_(nullptr),
   bitfieldLength_(0)
 {
   setBitfield(bitfield, bitfieldLength);
@@ -78,12 +78,12 @@ void BtBitfieldMessage::setBitfield
   memcpy(bitfield_, bitfield, bitfieldLength_);
 }
 
-BtBitfieldMessage*
+std::unique_ptr<BtBitfieldMessage>
 BtBitfieldMessage::create(const unsigned char* data, size_t dataLength)
 {
   bittorrent::assertPayloadLengthGreater(1,dataLength, NAME);
   bittorrent::assertID(ID, data, NAME);
-  BtBitfieldMessage* message(new BtBitfieldMessage());
+  auto message = make_unique<BtBitfieldMessage>();
   message->setBitfield(data+1, dataLength-1);
   return message;
 }
@@ -108,7 +108,7 @@ unsigned char* BtBitfieldMessage::createMessage() {
    * total: 5+bitfieldLength bytes
    */
   const size_t msgLength = 5+bitfieldLength_;
-  unsigned char* msg = new unsigned char[msgLength];
+  auto msg = new unsigned char[msgLength];
   bittorrent::createPeerMessageString(msg, msgLength, 1+bitfieldLength_, ID);
   memcpy(msg+5, bitfield_, bitfieldLength_);
   return msg;

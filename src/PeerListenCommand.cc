@@ -71,13 +71,13 @@ bool PeerListenCommand::bindPort(uint16_t& port, SegList<int>& sgl)
     ports.push_back(sgl.next());
   }
   std::random_shuffle(ports.begin(), ports.end(),
-                      *SimpleRandomizer::getInstance().get());
+                      *SimpleRandomizer::getInstance());
   const int ipv = (family_ == AF_INET) ? 4 : 6;
   for(std::vector<uint16_t>::const_iterator i = ports.begin(),
         eoi = ports.end(); i != eoi; ++i) {
     port = *i;
     try {
-      socket_->bind(0, port, family_);
+      socket_->bind(nullptr, port, family_);
       socket_->beginListen();
       A2_LOG_NOTICE(fmt(_("IPv%d BitTorrent: listening on TCP port %u"),
                         ipv, port));
@@ -107,17 +107,16 @@ bool PeerListenCommand::execute() {
     return true;
   }
   for(int i = 0; i < 3 && socket_->isReadable(0); ++i) {
-    SharedHandle<SocketCore> peerSocket;
+    std::shared_ptr<SocketCore> peerSocket;
     try {
       peerSocket = socket_->acceptConnection();
       std::pair<std::string, uint16_t> peerInfo;
       peerSocket->getPeerInfo(peerInfo);
 
-      SharedHandle<Peer> peer(new Peer(peerInfo.first, peerInfo.second, true));
+      std::shared_ptr<Peer> peer(new Peer(peerInfo.first, peerInfo.second, true));
       cuid_t cuid = e_->newCUID();
-      Command* command =
-        new ReceiverMSEHandshakeCommand(cuid, peer, e_, peerSocket);
-      e_->addCommand(command);
+      e_->addCommand(make_unique<ReceiverMSEHandshakeCommand>
+                     (cuid, peer, e_, peerSocket));
       A2_LOG_DEBUG(fmt("Accepted the connection from %s:%u.",
                        peer->getIPAddress().c_str(),
                        peer->getPort()));
@@ -129,7 +128,7 @@ bool PeerListenCommand::execute() {
                       ex);
     }
   }
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 

@@ -56,9 +56,9 @@ namespace aria2 {
 PeerInitiateConnectionCommand::PeerInitiateConnectionCommand
 (cuid_t cuid,
  RequestGroup* requestGroup,
- const SharedHandle<Peer>& peer,
+ const std::shared_ptr<Peer>& peer,
  DownloadEngine* e,
- const SharedHandle<BtRuntime>& btRuntime,
+ const std::shared_ptr<BtRuntime>& btRuntime,
  bool mseHandshakeEnabled)
   : PeerAbstractCommand(cuid, peer, e),
     requestGroup_(requestGroup),
@@ -84,20 +84,20 @@ bool PeerInitiateConnectionCommand::executeInternal() {
   getSocket()->establishConnection(getPeer()->getIPAddress(),
                                    getPeer()->getPort(), false);
   if(mseHandshakeEnabled_) {
-    InitiatorMSEHandshakeCommand* c =
-      new InitiatorMSEHandshakeCommand(getCuid(), requestGroup_, getPeer(),
-                                       getDownloadEngine(),
-                                       btRuntime_, getSocket());
+    auto c = make_unique<InitiatorMSEHandshakeCommand>
+      (getCuid(), requestGroup_, getPeer(),
+       getDownloadEngine(), btRuntime_, getSocket());
     c->setPeerStorage(peerStorage_);
     c->setPieceStorage(pieceStorage_);
-    getDownloadEngine()->addCommand(c);
+    getDownloadEngine()->addCommand(std::move(c));
   } else {
-    PeerInteractionCommand* command =
-      new PeerInteractionCommand
-      (getCuid(), requestGroup_, getPeer(), getDownloadEngine(),
-       btRuntime_, pieceStorage_, peerStorage_,
-       getSocket(), PeerInteractionCommand::INITIATOR_SEND_HANDSHAKE);
-    getDownloadEngine()->addCommand(command);
+    getDownloadEngine()->addCommand
+      (make_unique<PeerInteractionCommand>
+       (getCuid(), requestGroup_, getPeer(),
+        getDownloadEngine(),
+        btRuntime_, pieceStorage_, peerStorage_,
+        getSocket(),
+        PeerInteractionCommand::INITIATOR_SEND_HANDSHAKE));
   }
   return true;
 }
@@ -106,16 +106,14 @@ bool PeerInitiateConnectionCommand::executeInternal() {
 bool PeerInitiateConnectionCommand::prepareForNextPeer(time_t wait) {
   if(peerStorage_->isPeerAvailable() && btRuntime_->lessThanEqMinPeers()) {
     cuid_t ncuid = getDownloadEngine()->newCUID();
-    SharedHandle<Peer> peer = peerStorage_->checkoutPeer(ncuid);
+    std::shared_ptr<Peer> peer = peerStorage_->checkoutPeer(ncuid);
     // sanity check
     if(peer) {
-      PeerInitiateConnectionCommand* command;
-      command = new PeerInitiateConnectionCommand(ncuid, requestGroup_, peer,
-                                                  getDownloadEngine(),
-                                                  btRuntime_);
+      auto command = make_unique<PeerInitiateConnectionCommand>
+        (ncuid, requestGroup_, peer, getDownloadEngine(), btRuntime_);
       command->setPeerStorage(peerStorage_);
       command->setPieceStorage(pieceStorage_);
-      getDownloadEngine()->addCommand(command);
+      getDownloadEngine()->addCommand(std::move(command));
     }
   }
   return true;
@@ -131,13 +129,13 @@ bool PeerInitiateConnectionCommand::exitBeforeExecute()
 }
 
 void PeerInitiateConnectionCommand::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+(const std::shared_ptr<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }
 
 void PeerInitiateConnectionCommand::setPieceStorage
-(const SharedHandle<PieceStorage>& pieceStorage)
+(const std::shared_ptr<PieceStorage>& pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }

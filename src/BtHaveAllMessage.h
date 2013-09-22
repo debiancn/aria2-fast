@@ -47,10 +47,10 @@ public:
 
   static const char NAME[];
 
-  static BtHaveAllMessage* create
+  static std::unique_ptr<BtHaveAllMessage> create
   (const unsigned char* data, size_t dataLength);
 
-  virtual void doReceivedAction();
+  virtual void doReceivedAction() CXX11_OVERRIDE;
 };
 
 } // namespace aria2

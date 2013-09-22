@@ -45,8 +45,8 @@
 namespace aria2 {
 
 CheckIntegrityEntry::CheckIntegrityEntry(RequestGroup* requestGroup,
-                                         Command* nextCommand):
-  RequestGroupEntry(requestGroup, nextCommand)
+                                         std::unique_ptr<Command> nextCommand)
+  : RequestGroupEntry{requestGroup, std::move(nextCommand)}
 {}
 
 CheckIntegrityEntry::~CheckIntegrityEntry() {}
@@ -85,21 +85,21 @@ void CheckIntegrityEntry::cutTrailingGarbage()
 }
 
 void CheckIntegrityEntry::proceedFileAllocation
-(std::vector<Command*>& commands,
- const SharedHandle<FileAllocationEntry>& entry,
+(std::vector<std::unique_ptr<Command>>& commands,
+ std::unique_ptr<FileAllocationEntry> entry,
  DownloadEngine* e)
 {
   if(getRequestGroup()->needsFileAllocation()) {
-    e->getFileAllocationMan()->pushEntry(entry);
+    e->getFileAllocationMan()->pushEntry(std::move(entry));
   } else {
     entry->prepareForNextAction(commands, e);
   }
 }
 
 void CheckIntegrityEntry::setValidator
-(const SharedHandle<IteratableValidator>& validator)
+(std::unique_ptr<IteratableValidator> validator)
 {
-  validator_ = validator;
+  validator_ = std::move(validator);
 }
 
 } // namespace aria2

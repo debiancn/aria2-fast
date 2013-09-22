@@ -47,11 +47,11 @@ class FileAllocationDispatcherCommand :
 public:
   FileAllocationDispatcherCommand
   (cuid_t cuid,
-   const SharedHandle<FileAllocationMan>& fileAllocMan,
+   FileAllocationMan* fileAllocMan,
    DownloadEngine* e);
 protected:
-  virtual Command* createCommand
-  (const SharedHandle<FileAllocationEntry>& entry);
+  virtual std::unique_ptr<Command> createCommand(FileAllocationEntry* entry)
+    CXX11_OVERRIDE;
 };
 
 } // namespace aria2

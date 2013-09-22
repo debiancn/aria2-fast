@@ -44,7 +44,8 @@ class DiskWriter;
 class DefaultDiskWriterFactory:public DiskWriterFactory
 {
 public:
-  virtual SharedHandle<DiskWriter> newDiskWriter(const std::string& filename);
+  virtual std::unique_ptr<DiskWriter> newDiskWriter
+  (const std::string& filename) CXX11_OVERRIDE;
 };
 
 } // namespace aria2

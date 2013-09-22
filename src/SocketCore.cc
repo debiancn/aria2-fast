@@ -103,12 +103,12 @@ std::string errorMsg(int errNum)
   if (FormatMessage(
                     FORMAT_MESSAGE_FROM_SYSTEM |
                     FORMAT_MESSAGE_IGNORE_INSERTS,
-                    NULL,
+                    nullptr,
                     errNum,
                     MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
                     (LPTSTR) &buf,
                     sizeof(buf),
-                    NULL
+                    nullptr
                     ) == 0) {
     snprintf(buf, sizeof(buf), EX_SOCKET_UNKNOWN_ERROR, errNum, errNum);
   }
@@ -134,17 +134,17 @@ std::vector<std::pair<sockaddr_union, socklen_t> >
 SocketCore::bindAddrs_;
 
 #ifdef ENABLE_SSL
-SharedHandle<TLSContext> SocketCore::clTlsContext_;
-SharedHandle<TLSContext> SocketCore::svTlsContext_;
+std::shared_ptr<TLSContext> SocketCore::clTlsContext_;
+std::shared_ptr<TLSContext> SocketCore::svTlsContext_;
 
 void SocketCore::setClientTLSContext
-(const SharedHandle<TLSContext>& tlsContext)
+(const std::shared_ptr<TLSContext>& tlsContext)
 {
   clTlsContext_ = tlsContext;
 }
 
 void SocketCore::setServerTLSContext
-(const SharedHandle<TLSContext>& tlsContext)
+(const std::shared_ptr<TLSContext>& tlsContext)
 {
   svTlsContext_ = tlsContext;
 }
@@ -250,7 +250,8 @@ static sock_t bindTo
     error = gai_strerror(s);
     return -1;
   }
-  WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+  std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+    (res, freeaddrinfo);
   struct addrinfo* rp;
   for(rp = res; rp; rp = rp->ai_next) {
     sock_t fd = bindInternal(rp->ai_family, rp->ai_socktype, rp->ai_protocol,
@@ -266,12 +267,11 @@ void SocketCore::bindWithFamily(uint16_t port, int family, int flags)
 {
   closeConnection();
   std::string error;
-  sock_t fd = bindTo(0, port, family, sockType_, flags, error);
+  sock_t fd = bindTo(nullptr, port, family, sockType_, flags, error);
   if(fd == (sock_t) -1) {
     throw DL_ABORT_EX(fmt(EX_SOCKET_BIND, error.c_str()));
-  } else {
-    sockfd_ = fd;
   }
+  sockfd_ = fd;
 }
 
 void SocketCore::bind
@@ -283,34 +283,34 @@ void SocketCore::bind
   if(addr && addr[0]) {
     addrp = addr;
   } else {
-    addrp = 0;
+    addrp = nullptr;
   }
   if(!(flags&AI_PASSIVE) || bindAddrs_.empty()) {
     sock_t fd = bindTo(addrp, port, family, sockType_, flags, error);
-    if(fd != (sock_t) -1) {
-      sockfd_ = fd;
+    if(fd == (sock_t) -1) {
+      throw DL_ABORT_EX(fmt(EX_SOCKET_BIND, error.c_str()));
     }
-  } else {
-    for(std::vector<std::pair<sockaddr_union, socklen_t> >::
-          const_iterator i = bindAddrs_.begin(), eoi = bindAddrs_.end();
-        i != eoi; ++i) {
-      char host[NI_MAXHOST];
-      int s;
-      s = getnameinfo(&(*i).first.sa, (*i).second, host, NI_MAXHOST, 0, 0,
-                      NI_NUMERICHOST);
-      if(s) {
-        error = gai_strerror(s);
-        continue;
-      }
-      if(addrp && strcmp(host, addrp) != 0) {
-        error = "Given address and resolved address do not match.";
-        continue;
-      }
-      sock_t fd = bindTo(host, port, family, sockType_, flags, error);
-      if(fd != (sock_t)-1) {
-        sockfd_ = fd;
-        break;
-      }
+    sockfd_ = fd;
+    return;
+  }
+
+  for (const auto& a : bindAddrs_) {
+    char host[NI_MAXHOST];
+    int s;
+    s = getnameinfo(&a.first.sa, a.second, host, NI_MAXHOST, nullptr, 0,
+                    NI_NUMERICHOST);
+    if(s) {
+      error = gai_strerror(s);
+      continue;
+    }
+    if(addrp && strcmp(host, addrp) != 0) {
+      error = "Given address and resolved address do not match.";
+      continue;
+    }
+    sock_t fd = bindTo(host, port, family, sockType_, flags, error);
+    if(fd != (sock_t)-1) {
+      sockfd_ = fd;
+      break;
     }
   }
   if(sockfd_ == (sock_t) -1) {
@@ -320,7 +320,7 @@ void SocketCore::bind
 
 void SocketCore::bind(uint16_t port, int flags)
 {
-  bind(0, port, protocolFamily_, flags);
+  bind(nullptr, port, protocolFamily_, flags);
 }
 
 void SocketCore::bind(const struct sockaddr* addr, socklen_t addrlen)
@@ -328,11 +328,10 @@ void SocketCore::bind(const struct sockaddr* addr, socklen_t addrlen)
   closeConnection();
   std::string error;
   sock_t fd = bindInternal(addr->sa_family, sockType_, 0, addr, addrlen, error);
-  if(fd != (sock_t)-1) {
-    sockfd_ = fd;
-  } else {
+  if(fd == (sock_t)-1) {
     throw DL_ABORT_EX(fmt(EX_SOCKET_BIND, error.c_str()));
   }
+  sockfd_ = fd;
 }
 
 void SocketCore::beginListen()
@@ -344,7 +343,7 @@ void SocketCore::beginListen()
   setNonBlockingMode();
 }
 
-SharedHandle<SocketCore> SocketCore::acceptConnection() const
+std::shared_ptr<SocketCore> SocketCore::acceptConnection() const
 {
   sockaddr_union sockaddr;
   socklen_t len = sizeof(sockaddr);
@@ -355,7 +354,7 @@ SharedHandle<SocketCore> SocketCore::acceptConnection() const
   if(fd == (sock_t) -1) {
     throw DL_ABORT_EX(fmt(EX_SOCKET_ACCEPT, errorMsg(errNum).c_str()));
   }
-  SharedHandle<SocketCore> sock(new SocketCore(fd, sockType_));
+  std::shared_ptr<SocketCore> sock(new SocketCore(fd, sockType_));
   sock->setNonBlockingMode();
   return sock;
 }
@@ -409,7 +408,8 @@ void SocketCore::establishConnection(const std::string& host, uint16_t port,
   if(s) {
     throw DL_ABORT_EX(fmt(EX_RESOLVE_HOSTNAME, host.c_str(), gai_strerror(s)));
   }
-  WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+  std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+    (res, freeaddrinfo);
   struct addrinfo* rp;
   int errNum;
   for(rp = res; rp; rp = rp->ai_next) {
@@ -484,11 +484,10 @@ void SocketCore::setMulticastInterface(const std::string& localAddr)
   in_addr addr;
   if(localAddr.empty()) {
     addr.s_addr = htonl(INADDR_ANY);
-  } else {
-    if(inetPton(AF_INET, localAddr.c_str(), &addr) != 0) {
-      throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
-                            localAddr.c_str()));
-    }
+  }
+  else if(inetPton(AF_INET, localAddr.c_str(), &addr) != 0) {
+    throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
+                          localAddr.c_str()));
   }
   setSockOpt(IPPROTO_IP, IP_MULTICAST_IF, &addr, sizeof(addr));
 }
@@ -515,11 +514,10 @@ void SocketCore::joinMulticastGroup
   in_addr ifAddr;
   if(localAddr.empty()) {
     ifAddr.s_addr = htonl(INADDR_ANY);
-  } else {
-    if(inetPton(AF_INET, localAddr.c_str(), &ifAddr) != 0) {
-      throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
-                            localAddr.c_str()));
-    }
+  }
+  else if(inetPton(AF_INET, localAddr.c_str(), &ifAddr) != 0) {
+    throw DL_ABORT_EX(fmt("%s is not valid IPv4 numeric address",
+                          localAddr.c_str()));
   }
   struct ip_mreq mreq;
   memset(&mreq, 0, sizeof(mreq));
@@ -603,11 +601,11 @@ bool SocketCore::isWritable(time_t timeout)
   int errNum = SOCKET_ERRNO;
   if(r > 0) {
     return p.revents&(POLLOUT|POLLHUP|POLLERR);
-  } else if(r == 0) {
-    return false;
-  } else {
-    throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_WRITABLE, errorMsg(errNum).c_str()));
   }
+  if(r == 0) {
+    return false;
+  }
+  throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_WRITABLE, errorMsg(errNum).c_str()));
 #else // !HAVE_POLL
 # ifndef __MINGW32__
   CHECK_FD(sockfd_);
@@ -620,21 +618,19 @@ bool SocketCore::isWritable(time_t timeout)
   tv.tv_sec = timeout;
   tv.tv_usec = 0;
 
-  int r = select(sockfd_+1, NULL, &fds, NULL, &tv);
+  int r = select(sockfd_+1, nullptr, &fds, nullptr, &tv);
   int errNum = SOCKET_ERRNO;
   if(r == 1) {
     return true;
-  } else if(r == 0) {
+  }
+  if(r == 0) {
     // time out
     return false;
-  } else {
-    if(errNum == A2_EINPROGRESS || errNum == A2_EINTR) {
-      return false;
-    } else {
-      throw DL_RETRY_EX
-        (fmt(EX_SOCKET_CHECK_WRITABLE, errorMsg(errNum).c_str()));
-    }
   }
+  if(errNum == A2_EINPROGRESS || errNum == A2_EINTR) {
+    return false;
+  }
+  throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_WRITABLE, errorMsg(errNum).c_str()));
 #endif // !HAVE_POLL
 }
 
@@ -649,11 +645,11 @@ bool SocketCore::isReadable(time_t timeout)
   int errNum = SOCKET_ERRNO;
   if(r > 0) {
     return p.revents&(POLLIN|POLLHUP|POLLERR);
-  } else if(r == 0) {
-    return false;
-  } else {
-    throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_READABLE, errorMsg(errNum).c_str()));
   }
+  if(r == 0) {
+    return false;
+  }
+  throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_READABLE, errorMsg(errNum).c_str()));
 #else // !HAVE_POLL
 # ifndef __MINGW32__
   CHECK_FD(sockfd_);
@@ -666,21 +662,19 @@ bool SocketCore::isReadable(time_t timeout)
   tv.tv_sec = timeout;
   tv.tv_usec = 0;
 
-  int r = select(sockfd_+1, &fds, NULL, NULL, &tv);
+  int r = select(sockfd_+1, &fds, nullptr, nullptr, &tv);
   int errNum = SOCKET_ERRNO;
   if(r == 1) {
     return true;
-  } else if(r == 0) {
+  }
+  if(r == 0) {
     // time out
     return false;
-  } else {
-    if(errNum == A2_EINPROGRESS || errNum == A2_EINTR) {
-      return false;
-    } else {
-      throw DL_RETRY_EX
-        (fmt(EX_SOCKET_CHECK_READABLE, errorMsg(errNum).c_str()));
-    }
   }
+  if(errNum == A2_EINPROGRESS || errNum == A2_EINTR) {
+    return false;
+  }
+  throw DL_RETRY_EX(fmt(EX_SOCKET_CHECK_READABLE, errorMsg(errNum).c_str()));
 #endif // !HAVE_POLL
 }
 
@@ -704,12 +698,11 @@ ssize_t SocketCore::writeVector(a2iovec *iov, size_t iovcnt)
 #endif // !__MINGW32__
     int errNum = SOCKET_ERRNO;
     if(ret == -1) {
-      if(A2_WOULDBLOCK(errNum)) {
-        wantWrite_ = true;
-        ret = 0;
-      } else {
+      if(!A2_WOULDBLOCK(errNum)) {
         throw DL_RETRY_EX(fmt(EX_SOCKET_SEND, errorMsg(errNum).c_str()));
       }
+      wantWrite_ = true;
+      ret = 0;
     }
   } else {
     // For SSL/TLS, we could not use writev, so just iterate vector
@@ -737,28 +730,26 @@ ssize_t SocketCore::writeData(const void* data, size_t len)
                       len, 0)) == -1 && SOCKET_ERRNO == A2_EINTR);
     int errNum = SOCKET_ERRNO;
     if(ret == -1) {
-      if(A2_WOULDBLOCK(errNum)) {
-        wantWrite_ = true;
-        ret = 0;
-      } else {
+      if(!A2_WOULDBLOCK(errNum)) {
         throw DL_RETRY_EX(fmt(EX_SOCKET_SEND, errorMsg(errNum).c_str()));
       }
+      wantWrite_ = true;
+      ret = 0;
     }
   } else {
 #ifdef ENABLE_SSL
     ret = tlsSession_->writeData(data, len);
     if(ret < 0) {
-      if(ret == TLS_ERR_WOULDBLOCK) {
-        if(tlsSession_->checkDirection() == TLS_WANT_READ) {
-          wantRead_ = true;
-        } else {
-          wantWrite_ = true;
-        }
-        ret = 0;
-      } else {
+      if(ret != TLS_ERR_WOULDBLOCK) {
         throw DL_RETRY_EX(fmt(EX_SOCKET_SEND,
                               tlsSession_->getLastErrorString().c_str()));
       }
+      if(tlsSession_->checkDirection() == TLS_WANT_READ) {
+        wantRead_ = true;
+      } else {
+        wantWrite_ = true;
+      }
+      ret = 0;
     }
 #endif // ENABLE_SSL
   }
@@ -777,28 +768,26 @@ void SocketCore::readData(void* data, size_t& len)
           SOCKET_ERRNO == A2_EINTR);
     int errNum = SOCKET_ERRNO;
     if(ret == -1) {
-      if(A2_WOULDBLOCK(errNum)) {
-        wantRead_ = true;
-        ret = 0;
-      } else {
+      if(!A2_WOULDBLOCK(errNum)) {
         throw DL_RETRY_EX(fmt(EX_SOCKET_RECV, errorMsg(errNum).c_str()));
       }
+      wantRead_ = true;
+      ret = 0;
     }
   } else {
 #ifdef ENABLE_SSL
     ret = tlsSession_->readData(data, len);
     if(ret < 0) {
-      if(ret == TLS_ERR_WOULDBLOCK) {
-        if(tlsSession_->checkDirection() == TLS_WANT_READ) {
-          wantRead_ = true;
-        } else {
-          wantWrite_ = true;
-        }
-        ret = 0;
-      } else {
+      if(ret != TLS_ERR_WOULDBLOCK) {
         throw DL_RETRY_EX(fmt(EX_SOCKET_SEND,
                               tlsSession_->getLastErrorString().c_str()));
       }
+      if(tlsSession_->checkDirection() == TLS_WANT_READ) {
+        wantRead_ = true;
+      } else {
+        wantWrite_ = true;
+      }
+      ret = 0;
     }
 #endif // ENABLE_SSL
   }
@@ -853,20 +842,20 @@ bool SocketCore::tlsHandshake(TLSContext* tlsctx, const std::string& hostname)
     }
     if(rv == TLS_ERR_OK) {
       secure_ = A2_TLS_CONNECTED;
-    } else if(rv == TLS_ERR_WOULDBLOCK) {
-      if(tlsSession_->checkDirection() == TLS_WANT_READ) {
-        wantRead_ = true;
-      } else {
-        wantWrite_ = true;
-      }
-      return false;
-    } else {
+      break;
+    }
+    if(rv != TLS_ERR_WOULDBLOCK) {
       throw DL_ABORT_EX(fmt("SSL/TLS handshake failure: %s",
                             handshakeError.empty() ?
                             tlsSession_->getLastErrorString().c_str() :
                             handshakeError.c_str()));
     }
-    break;
+    if(tlsSession_->checkDirection() == TLS_WANT_READ) {
+      wantRead_ = true;
+    } else {
+      wantWrite_ = true;
+    }
+    return false;
   default:
     break;
   }
@@ -888,7 +877,8 @@ ssize_t SocketCore::writeData(const void* data, size_t len,
   if(s) {
     throw DL_ABORT_EX(fmt(EX_SOCKET_SEND, gai_strerror(s)));
   }
-  WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+  std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+    (res, freeaddrinfo);
   struct addrinfo* rp;
   ssize_t r = -1;
   int errNum = 0;
@@ -928,12 +918,11 @@ ssize_t SocketCore::readDataFrom(void* data, size_t len,
         && A2_EINTR == SOCKET_ERRNO);
   int errNum = SOCKET_ERRNO;
   if(r == -1) {
-    if(A2_WOULDBLOCK(errNum)) {
-      wantRead_ = true;
-      r = 0;
-    } else {
+    if(!A2_WOULDBLOCK(errNum)) {
       throw DL_RETRY_EX(fmt(EX_SOCKET_RECV, errorMsg(errNum).c_str()));
     }
+    wantRead_ = true;
+    r = 0;
   } else {
     sender = util::getNumericNameInfo(&sockaddr.sa, sockaddrlen);
   }
@@ -954,9 +943,8 @@ std::string SocketCore::getSocketError() const
   }
   if(error != 0) {
     return errorMsg(error);
-  } else {
-    return "";
   }
+  return "";
 }
 
 bool SocketCore::wantRead() const
@@ -974,20 +962,17 @@ void SocketCore::bindAddress(const std::string& iface)
   std::vector<std::pair<sockaddr_union, socklen_t> > bindAddrs;
   getInterfaceAddress(bindAddrs, iface, protocolFamily_);
   if(bindAddrs.empty()) {
-    throw DL_ABORT_EX
-      (fmt(MSG_INTERFACE_NOT_FOUND, iface.c_str(), "not available"));
-  } else {
-    bindAddrs_.swap(bindAddrs);
-    for(std::vector<std::pair<sockaddr_union, socklen_t> >::
-          const_iterator i = bindAddrs_.begin(), eoi = bindAddrs_.end();
-        i != eoi; ++i) {
-      char host[NI_MAXHOST];
-      int s;
-      s = getnameinfo(&(*i).first.sa, (*i).second, host, NI_MAXHOST, 0, 0,
-                      NI_NUMERICHOST);
-      if(s == 0) {
-        A2_LOG_DEBUG(fmt("Sockets will bind to %s", host));
-      }
+    throw DL_ABORT_EX(fmt(MSG_INTERFACE_NOT_FOUND, iface.c_str(),
+                          "not available"));
+  }
+  bindAddrs_.swap(bindAddrs);
+  for (const auto& a: bindAddrs_) {
+    char host[NI_MAXHOST];
+    int s;
+    s = getnameinfo(&a.first.sa, a.second, host, NI_MAXHOST, nullptr, 0,
+                    NI_NUMERICHOST);
+    if(s == 0) {
+      A2_LOG_DEBUG(fmt("Sockets will bind to %s", host));
     }
   }
 }
@@ -999,13 +984,14 @@ void getInterfaceAddress
   A2_LOG_DEBUG(fmt("Finding interface %s", iface.c_str()));
 #ifdef HAVE_GETIFADDRS
   // First find interface in interface addresses
-  struct ifaddrs* ifaddr = 0;
+  struct ifaddrs* ifaddr = nullptr;
   if(getifaddrs(&ifaddr) == -1) {
     int errNum = SOCKET_ERRNO;
     A2_LOG_INFO(fmt(MSG_INTERFACE_NOT_FOUND,
                     iface.c_str(), errorMsg(errNum).c_str()));
   } else {
-    auto_delete<ifaddrs*> ifaddrDeleter(ifaddr, freeifaddrs);
+    std::unique_ptr<ifaddrs, decltype(&freeifaddrs)> ifaddrDeleter
+      (ifaddr, freeifaddrs);
     for(ifaddrs* ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
       if(!ifa->ifa_addr) {
         continue;
@@ -1040,11 +1026,12 @@ void getInterfaceAddress
   if(ifAddrs.empty()) {
     addrinfo* res;
     int s;
-    s = callGetaddrinfo(&res, iface.c_str(), 0, family, SOCK_STREAM, aiFlags,0);
+    s = callGetaddrinfo(&res, iface.c_str(), nullptr, family, SOCK_STREAM, aiFlags,0);
     if(s) {
       A2_LOG_INFO(fmt(MSG_INTERFACE_NOT_FOUND, iface.c_str(), gai_strerror(s)));
     } else {
-      WSAAPI_AUTO_DELETE<addrinfo*> resDeleter(res, freeaddrinfo);
+      std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+        (res, freeaddrinfo);
       addrinfo* rp;
       for(rp = res; rp; rp = rp->ai_next) {
         // Try to bind socket with this address. If it fails, the
@@ -1096,7 +1083,6 @@ int callGetaddrinfo
 
 int inetNtop(int af, const void* src, char* dst, socklen_t size)
 {
-  int s;
   sockaddr_union su;
   memset(&su, 0, sizeof(su));
   if(af == AF_INET) {
@@ -1105,20 +1091,19 @@ int inetNtop(int af, const void* src, char* dst, socklen_t size)
     su.in.sin_len = sizeof(su.in);
 #endif // HAVE_SOCKADDR_IN_SIN_LEN
     memcpy(&su.in.sin_addr, src, sizeof(su.in.sin_addr));
-    s = getnameinfo(&su.sa, sizeof(su.in),
-                    dst, size, 0, 0, NI_NUMERICHOST);
-  } else if(af == AF_INET6) {
+    return getnameinfo(&su.sa, sizeof(su.in), dst, size, nullptr, 0,
+                       NI_NUMERICHOST);
+  }
+  if(af == AF_INET6) {
     su.in6.sin6_family = AF_INET6;
 #ifdef HAVE_SOCKADDR_IN6_SIN6_LEN
     su.in6.sin6_len = sizeof(su.in6);
 #endif // HAVE_SOCKADDR_IN6_SIN6_LEN
     memcpy(&su.in6.sin6_addr, src, sizeof(su.in6.sin6_addr));
-    s = getnameinfo(&su.sa, sizeof(su.in6),
-                    dst, size, 0, 0, NI_NUMERICHOST);
-  } else {
-    s = EAI_FAMILY;
+    return getnameinfo(&su.sa, sizeof(su.in6), dst, size, nullptr, 0,
+                       NI_NUMERICHOST);
   }
-  return s;
+  return EAI_FAMILY;
 }
 
 int inetPton(int af, const char* src, void* dst)
@@ -1134,16 +1119,17 @@ int inetPton(int af, const char* src, void* dst)
     }
     in_addr* addr = reinterpret_cast<in_addr*>(dst);
     addr->s_addr = binaddr.ipv4_addr;
-  } else if(af == AF_INET6) {
+    return 0;
+  }
+  if(af == AF_INET6) {
     if(len != 16) {
       return -1;
     }
     in6_addr* addr = reinterpret_cast<in6_addr*>(dst);
     memcpy(addr->s6_addr, binaddr.ipv6_addr, sizeof(addr->s6_addr));
-  } else {
-    return -1;
+    return 0;
   }
-  return 0;
+  return -1;
 }
 
 namespace net {
@@ -1152,11 +1138,12 @@ size_t getBinAddr(void* dest, const std::string& ip)
 {
   size_t len = 0;
   addrinfo* res;
-  if(callGetaddrinfo(&res, ip.c_str(), 0, AF_UNSPEC,
+  if(callGetaddrinfo(&res, ip.c_str(), nullptr, AF_UNSPEC,
                      0, AI_NUMERICHOST, 0) != 0) {
     return len;
   }
-  WSAAPI_AUTO_DELETE<addrinfo*> resDeleter(res, freeaddrinfo);
+  std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+    (res, freeaddrinfo);
   for(addrinfo* rp = res; rp; rp = rp->ai_next) {
     sockaddr_union su;
     memcpy(&su, rp->ai_addr, rp->ai_addrlen);
@@ -1188,22 +1175,21 @@ bool verifyHostname(const std::string& hostname,
     if(addrLen == 0) {
       return false;
     }
-    for(std::vector<std::string>::const_iterator i = ipAddrs.begin(),
-          eoi = ipAddrs.end(); i != eoi; ++i) {
+    for(auto i = ipAddrs.begin(), eoi = ipAddrs.end(); i != eoi; ++i) {
       if(addrLen == (*i).size() &&
          memcmp(binAddr, (*i).c_str(), addrLen) == 0) {
         return true;
       }
     }
-  } else {
-    if(dnsNames.empty()) {
-      return util::tlsHostnameMatch(commonName, hostname);
-    }
-    for(std::vector<std::string>::const_iterator i = dnsNames.begin(),
-          eoi = dnsNames.end(); i != eoi; ++i) {
-      if(util::tlsHostnameMatch(*i, hostname)) {
-        return true;
-      }
+    return false;
+  }
+
+  if(dnsNames.empty()) {
+    return util::tlsHostnameMatch(commonName, hostname);
+  }
+  for(auto i = dnsNames.begin(), eoi = dnsNames.end(); i != eoi; ++i) {
+    if(util::tlsHostnameMatch(*i, hostname)) {
+      return true;
     }
   }
   return false;
@@ -1233,12 +1219,11 @@ void checkAddrconfig()
   do {
     buf = reinterpret_cast<IP_ADAPTER_ADDRESSES*>(malloc(bufsize));
     retval = GetAdaptersAddresses(AF_UNSPEC, 0, 0, buf, &bufsize);
-    if(retval == ERROR_BUFFER_OVERFLOW) {
-      free(buf);
-      buf = 0;
-    } else {
+    if(retval != ERROR_BUFFER_OVERFLOW) {
       break;
     }
+    free(buf);
+    buf = 0;
   } while(retval == ERROR_BUFFER_OVERFLOW && numTry < MAX_TRY);
   if(retval != NO_ERROR) {
     A2_LOG_INFO("GetAdaptersAddresses failed. Assume both IPv4 and IPv6 "
@@ -1257,51 +1242,53 @@ void checkAddrconfig()
       continue;
     }
     PIP_ADAPTER_UNICAST_ADDRESS ucaddr = p->FirstUnicastAddress;
-    if(ucaddr) {
-      for(PIP_ADAPTER_UNICAST_ADDRESS i = ucaddr; i; i = i->Next) {
-        bool found = false;
-        switch(i->Address.iSockaddrLength) {
-        case sizeof(sockaddr_in): {
-          memcpy(&ad.storage, i->Address.lpSockaddr,
-                 i->Address.iSockaddrLength);
-          uint32_t haddr = ntohl(ad.in.sin_addr.s_addr);
-          if(haddr != INADDR_LOOPBACK &&
-             (haddr < APIPA_IPV4_BEGIN || APIPA_IPV4_END <= haddr)) {
-            ipv4AddrConfigured = true;
-            found = true;
-          }
-          break;
+    if(!ucaddr) {
+      continue;
+    }
+    for(PIP_ADAPTER_UNICAST_ADDRESS i = ucaddr; i; i = i->Next) {
+      bool found = false;
+      switch(i->Address.iSockaddrLength) {
+      case sizeof(sockaddr_in): {
+        memcpy(&ad.storage, i->Address.lpSockaddr,
+                i->Address.iSockaddrLength);
+        uint32_t haddr = ntohl(ad.in.sin_addr.s_addr);
+        if(haddr != INADDR_LOOPBACK &&
+            (haddr < APIPA_IPV4_BEGIN || APIPA_IPV4_END <= haddr)) {
+          ipv4AddrConfigured = true;
+          found = true;
         }
-        case sizeof(sockaddr_in6):
-          memcpy(&ad.storage, i->Address.lpSockaddr,
-                 i->Address.iSockaddrLength);
-          if(!IN6_IS_ADDR_LOOPBACK(&ad.in6.sin6_addr) &&
-             !IN6_IS_ADDR_LINKLOCAL(&ad.in6.sin6_addr)) {
-            ipv6AddrConfigured = true;
-            found = true;
-          }
-          break;
+        break;
+      }
+      case sizeof(sockaddr_in6):
+        memcpy(&ad.storage, i->Address.lpSockaddr,
+                i->Address.iSockaddrLength);
+        if(!IN6_IS_ADDR_LOOPBACK(&ad.in6.sin6_addr) &&
+            !IN6_IS_ADDR_LINKLOCAL(&ad.in6.sin6_addr)) {
+          ipv6AddrConfigured = true;
+          found = true;
         }
-        rv = getnameinfo(i->Address.lpSockaddr, i->Address.iSockaddrLength,
-                         host, NI_MAXHOST, 0, 0, NI_NUMERICHOST);
-        if(rv == 0) {
-          if(found) {
-            A2_LOG_INFO(fmt("Found configured address: %s", host));
-          } else {
-            A2_LOG_INFO(fmt("Not considered: %s", host));
-          }
+        break;
+      }
+      rv = getnameinfo(i->Address.lpSockaddr, i->Address.iSockaddrLength,
+                        host, NI_MAXHOST, 0, 0, NI_NUMERICHOST);
+      if(rv == 0) {
+        if(found) {
+          A2_LOG_INFO(fmt("Found configured address: %s", host));
+        } else {
+          A2_LOG_INFO(fmt("Not considered: %s", host));
         }
       }
     }
   }
   free(buf);
+
   A2_LOG_INFO(fmt("IPv4 configured=%d, IPv6 configured=%d",
                   ipv4AddrConfigured, ipv6AddrConfigured));
 #elif defined(HAVE_GETIFADDRS)
   A2_LOG_INFO("Checking configured addresses");
   ipv4AddrConfigured = false;
   ipv6AddrConfigured = false;
-  ifaddrs* ifaddr = 0;
+  ifaddrs* ifaddr = nullptr;
   int rv;
   rv = getifaddrs(&ifaddr);
   if(rv == -1) {
@@ -1309,7 +1296,8 @@ void checkAddrconfig()
     A2_LOG_INFO(fmt("getifaddrs failed. Cause: %s", errorMsg(errNum).c_str()));
     return;
   }
-  auto_delete<ifaddrs*> ifaddrDeleter(ifaddr, freeifaddrs);
+  std::unique_ptr<ifaddrs, decltype(&freeifaddrs)> ifaddrDeleter
+    (ifaddr, freeifaddrs);
   char host[NI_MAXHOST];
   sockaddr_union ad;
   for(ifaddrs* ifa = ifaddr; ifa; ifa = ifa->ifa_next) {
@@ -1341,7 +1329,7 @@ void checkAddrconfig()
     default:
       continue;
     }
-    rv = getnameinfo(ifa->ifa_addr, addrlen, host, NI_MAXHOST, 0, 0,
+    rv = getnameinfo(ifa->ifa_addr, addrlen, host, NI_MAXHOST, nullptr, 0,
                      NI_NUMERICHOST);
     if(rv == 0) {
       if(found) {

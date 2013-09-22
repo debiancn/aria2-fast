@@ -767,7 +767,8 @@ BitTorrent Specific Options
   file and downloads files mentioned in it.
   If ``mem`` is specified, a torrent file is not written to the disk, but is just
   kept in memory.
-  If ``false`` is specified, the action mentioned above is not taken.
+  If ``false`` is specified, the ``.torrent`` file is downloaded to the disk, but
+  is not parsed as a torrent and its contents are not downloaded.
   Default: ``true``
 
 .. option:: -O, --index-out=<INDEX>=<PATH>
@@ -847,7 +848,9 @@ Metalink Specific Options
   file and downloads files mentioned in it.
   If ``mem`` is specified, a metalink file is not written to the disk, but is just
   kept in memory.
-  If ``false`` is specified, the action mentioned above is not taken.
+  If ``false`` is specified, the ``.metalink`` file is downloaded to
+  the disk, but is not parsed as a metalink file and its contents are not
+  downloaded.
   Default: ``true``
 
 .. option:: --metalink-base-uri=<URI>
@@ -1086,7 +1089,7 @@ Advanced Options
   unit and it is reordered by the offset of the file.  If hash
   checking is involved and the data are cached in memory, we don't
   need to read them from the disk.  SIZE can include ``K`` or ``M``
-  (1K = 1024, 1M = 1024K). Default: ``0``
+  (1K = 1024, 1M = 1024K). Default: ``16M``
 
 .. option:: --download-result=<OPT>
 
@@ -1141,8 +1144,9 @@ Advanced Options
 .. option:: --force-save[=true|false]
 
   Save download with :option:`--save-session <--save-session>` option
-  even if the download is completed or removed. This may be useful to
-  save BitTorrent seeding which is recognized as completed state.
+  even if the download is completed or removed. This option also saves
+  control file in that situations. This may be useful to save
+  BitTorrent seeding which is recognized as completed state.
   Default: ``false``
 
 .. option:: --gid=<GID>
@@ -3643,6 +3647,12 @@ Download only selected files using index(usually called "selectable download")
 .. note::
 
   The index is printed to the console using -S option.
+
+Download .torrent file, but do not download its contents
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code-block:: console
+
+  $ aria2c --follow-torrent=false "http://host/file.torrent"
 
 Specify output filename
 ^^^^^^^^^^^^^^^^^^^^^^^

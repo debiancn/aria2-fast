@@ -41,53 +41,37 @@ namespace aria2 {
 namespace rpc {
 
 namespace {
-InitialXmlRpcRequestParserState*
-initialState = new InitialXmlRpcRequestParserState();
+auto initialState = new InitialXmlRpcRequestParserState();
 
-UnknownElementXmlRpcRequestParserState*
-unknownElementState = new UnknownElementXmlRpcRequestParserState();
+auto unknownElementState = new UnknownElementXmlRpcRequestParserState();
 
-MethodCallXmlRpcRequestParserState*
-methodCallState = new MethodCallXmlRpcRequestParserState();
+auto methodCallState = new MethodCallXmlRpcRequestParserState();
 
-MethodNameXmlRpcRequestParserState*
-methodNameState = new MethodNameXmlRpcRequestParserState();
+auto methodNameState = new MethodNameXmlRpcRequestParserState();
 
-ParamsXmlRpcRequestParserState*
-paramsState = new ParamsXmlRpcRequestParserState();
+auto paramsState = new ParamsXmlRpcRequestParserState();
 
-ParamXmlRpcRequestParserState*
-paramState = new ParamXmlRpcRequestParserState();
+auto paramState = new ParamXmlRpcRequestParserState();
 
-ValueXmlRpcRequestParserState*
-valueState = new ValueXmlRpcRequestParserState();
+auto valueState = new ValueXmlRpcRequestParserState();
 
-IntXmlRpcRequestParserState*
-intState = new IntXmlRpcRequestParserState();
+auto intState = new IntXmlRpcRequestParserState();
 
-StringXmlRpcRequestParserState*
-stringState = new StringXmlRpcRequestParserState();
+auto stringState = new StringXmlRpcRequestParserState();
 
-Base64XmlRpcRequestParserState*
-base64State = new Base64XmlRpcRequestParserState();
+auto base64State = new Base64XmlRpcRequestParserState();
 
-StructXmlRpcRequestParserState*
-structState = new StructXmlRpcRequestParserState();
+auto structState = new StructXmlRpcRequestParserState();
 
-MemberXmlRpcRequestParserState*
-memberState = new MemberXmlRpcRequestParserState();
+auto memberState = new MemberXmlRpcRequestParserState();
 
-NameXmlRpcRequestParserState*
-nameState = new NameXmlRpcRequestParserState();
+auto nameState = new NameXmlRpcRequestParserState();
 
-ArrayXmlRpcRequestParserState*
-arrayState =  new ArrayXmlRpcRequestParserState();
+auto arrayState =  new ArrayXmlRpcRequestParserState();
 
-DataXmlRpcRequestParserState*
-dataState = new DataXmlRpcRequestParserState();
+auto dataState = new DataXmlRpcRequestParserState();
 
-ArrayValueXmlRpcRequestParserState*
-arrayValueState = new ArrayValueXmlRpcRequestParserState();
+auto arrayValueState = new ArrayValueXmlRpcRequestParserState();
 } // namespace
 
 XmlRpcRequestParserStateMachine::XmlRpcRequestParserStateMachine():
@@ -166,15 +150,21 @@ void XmlRpcRequestParserStateMachine::pushFrame()
 }
 
 void XmlRpcRequestParserStateMachine::setCurrentFrameValue
-(const SharedHandle<ValueBase>& value)
+(std::unique_ptr<ValueBase> value)
 {
-  controller_->setCurrentFrameValue(value);
+  controller_->setCurrentFrameValue(std::move(value));
 }
 
-const SharedHandle<ValueBase>&
+const std::unique_ptr<ValueBase>&
 XmlRpcRequestParserStateMachine::getCurrentFrameValue() const
 {
   return controller_->getCurrentFrameValue();
+}
+
+std::unique_ptr<ValueBase>
+XmlRpcRequestParserStateMachine::popCurrentFrameValue()
+{
+  return controller_->popCurrentFrameValue();
 }
 
 void XmlRpcRequestParserStateMachine::setCurrentFrameName

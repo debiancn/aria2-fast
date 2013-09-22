@@ -35,27 +35,29 @@
 #ifndef D_SINGLETON_HOLDER_H
 #define D_SINGLETON_HOLDER_H
 
-#include "SharedHandle.h"
+#include "common.h"
+
+#include <memory>
 
 namespace aria2 {
 
 template<typename T>
 class SingletonHolder {
 private:
-  static SharedHandle<T> instance_;
+  static std::unique_ptr<T> instance_;
 
   SingletonHolder() {}
 public:
   ~SingletonHolder() {}
 
-  static const SharedHandle<T>& instance()
+  static std::unique_ptr<T>& instance()
   {
     return instance_;
   }
 
-  static void instance(const SharedHandle<T>& instance)
+  static void instance(std::unique_ptr<T> ptr)
   {
-    instance_ = instance;
+    instance_ = std::move(ptr);
   }
 
   static void clear()
@@ -65,7 +67,7 @@ public:
 };
 
 template<typename T>
-SharedHandle<T> SingletonHolder<T>::instance_;
+std::unique_ptr<T> SingletonHolder<T>::instance_;
 
 } // namespace aria2
 

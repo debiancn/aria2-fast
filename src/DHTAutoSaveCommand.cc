@@ -58,8 +58,9 @@ namespace aria2 {
 
 DHTAutoSaveCommand::DHTAutoSaveCommand
 (cuid_t cuid, DownloadEngine* e, int family, time_t interval)
- : TimeBasedCommand(cuid, e, interval),
-   family_(family)
+  : TimeBasedCommand{cuid, e, interval},
+    family_{family},
+    routingTable_{nullptr}
 {}
 
 DHTAutoSaveCommand::~DHTAutoSaveCommand() {}
@@ -93,14 +94,12 @@ void DHTAutoSaveCommand::save()
   tempFile.remove();
 
   File(File(dhtFile).getDirname()).mkdirs();
-  std::vector<SharedHandle<DHTNode> > nodes;
-  std::vector<SharedHandle<DHTBucket> > buckets;
+  std::vector<std::shared_ptr<DHTNode> > nodes;
+  std::vector<std::shared_ptr<DHTBucket> > buckets;
   routingTable_->getBuckets(buckets);
-  for(std::vector<SharedHandle<DHTBucket> >::const_iterator i = buckets.begin(),
-        eoi = buckets.end(); i != eoi; ++i) {
-    const SharedHandle<DHTBucket>& bucket = *i;
-    std::vector<SharedHandle<DHTNode> > goodNodes;
-    bucket->getGoodNodes(goodNodes);
+  for (const auto& b : buckets) {
+    std::vector<std::shared_ptr<DHTNode> > goodNodes;
+    b->getGoodNodes(goodNodes);
     nodes.insert(nodes.end(), goodNodes.begin(), goodNodes.end());
   }
 
@@ -117,13 +116,12 @@ void DHTAutoSaveCommand::save()
   }
 }
 
-void DHTAutoSaveCommand::setLocalNode(const SharedHandle<DHTNode>& localNode)
+void DHTAutoSaveCommand::setLocalNode(const std::shared_ptr<DHTNode>& localNode)
 {
   localNode_ = localNode;
 }
 
-void DHTAutoSaveCommand::setRoutingTable
-(const SharedHandle<DHTRoutingTable>& routingTable)
+void DHTAutoSaveCommand::setRoutingTable(DHTRoutingTable* routingTable)
 {
   routingTable_ = routingTable;
 }

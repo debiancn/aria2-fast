@@ -49,7 +49,7 @@ class BtMessageFactory;
 class DefaultBtMessageReceiver : public BtMessageReceiver {
 private:
   bool handshakeSent_;
-  SharedHandle<DownloadContext> downloadContext_;
+  DownloadContext* downloadContext_;
   PeerConnection* peerConnection_;
   BtMessageDispatcher* dispatcher_;
   BtMessageFactory* messageFactory_;
@@ -58,14 +58,15 @@ private:
 public:
   DefaultBtMessageReceiver();
 
-  virtual SharedHandle<BtHandshakeMessage> receiveHandshake
-  (bool quickReply = false);
+  virtual std::unique_ptr<BtHandshakeMessage> receiveHandshake
+  (bool quickReply = false) CXX11_OVERRIDE;
 
-  virtual SharedHandle<BtHandshakeMessage> receiveAndSendHandshake();
+  virtual std::unique_ptr<BtHandshakeMessage> receiveAndSendHandshake()
+    CXX11_OVERRIDE;
 
-  virtual SharedHandle<BtMessage> receiveMessage();
+  virtual std::unique_ptr<BtMessage> receiveMessage() CXX11_OVERRIDE;
 
-  void setDownloadContext(const SharedHandle<DownloadContext>& downloadContext);
+  void setDownloadContext(DownloadContext* downloadContext);
 
   void setPeerConnection(PeerConnection* peerConnection);
 

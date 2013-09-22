@@ -42,9 +42,9 @@ namespace aria2 {
 
 const char BtChokeMessage::NAME[] = "choke";
 
-BtChokeMessage::BtChokeMessage():ZeroBtMessage(ID, NAME) {}
+BtChokeMessage::BtChokeMessage():ZeroBtMessage{ID, NAME} {}
 
-BtChokeMessage* BtChokeMessage::create
+std::unique_ptr<BtChokeMessage> BtChokeMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   return ZeroBtMessage::create<BtChokeMessage>(data, dataLength);
@@ -67,24 +67,24 @@ bool BtChokeMessage::sendPredicate() const
 
 namespace {
 struct ThisProgressUpdate : public ProgressUpdate {
-  ThisProgressUpdate(const SharedHandle<Peer>& peer,
+  ThisProgressUpdate(const std::shared_ptr<Peer>& peer,
                      BtMessageDispatcher* disp)
     : peer(peer), disp(disp) {}
-  virtual void update(size_t length, bool complete)
+  virtual void update(size_t length, bool complete) CXX11_OVERRIDE
   {
     if(complete) {
       peer->amChoking(true);
       disp->doChokingAction();
     }
   }
-  SharedHandle<Peer> peer;
+  std::shared_ptr<Peer> peer;
   BtMessageDispatcher* disp;
 };
 } // namespace
 
-ProgressUpdate* BtChokeMessage::getProgressUpdate()
+std::unique_ptr<ProgressUpdate> BtChokeMessage::getProgressUpdate()
 {
-  return new ThisProgressUpdate(getPeer(), getBtMessageDispatcher());
+  return make_unique<ThisProgressUpdate>(getPeer(), getBtMessageDispatcher());
 }
 
 } // namespace aria2

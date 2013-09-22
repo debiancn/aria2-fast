@@ -55,20 +55,19 @@ const char BtPortMessage::NAME[] = "port";
 BtPortMessage::BtPortMessage(uint16_t port)
   : SimpleBtMessage(ID, NAME),
     port_(port),
-    localNode_(0),
-    routingTable_(0),
-    taskQueue_(0),
-    taskFactory_(0)
+    localNode_(nullptr),
+    routingTable_(nullptr),
+    taskQueue_(nullptr),
+    taskFactory_(nullptr)
 {}
 
-BtPortMessage* BtPortMessage::create
+std::unique_ptr<BtPortMessage> BtPortMessage::create
 (const unsigned char* data, size_t dataLength)
 {
   bittorrent::assertPayloadLengthEqual(3, dataLength, NAME);
   bittorrent::assertID(ID, data, NAME);
   uint16_t port = bittorrent::getShortIntParam(data, 1);
-  BtPortMessage* message(new BtPortMessage(port));
-  return message;
+  return make_unique<BtPortMessage>(port);
 }
 
 void BtPortMessage::doReceivedAction()
@@ -80,11 +79,11 @@ void BtPortMessage::doReceivedAction()
     }
     // node id is random at this point. When ping reply received, new DHTNode
     // instance created with proper node ID and is added to a routing table.
-    SharedHandle<DHTNode> node(new DHTNode());
+    std::shared_ptr<DHTNode> node(new DHTNode());
     node->setIPAddress(getPeer()->getIPAddress());
     node->setPort(port_);
     {
-      SharedHandle<DHTTask> task = taskFactory_->createPingTask(node);
+      std::shared_ptr<DHTTask> task = taskFactory_->createPingTask(node);
       taskQueue_->addImmediateTask(task);
     }
     if(routingTable_->getNumBucket() == 1) {
@@ -107,7 +106,7 @@ unsigned char* BtPortMessage::createMessage()
    * port --- port number, 2bytes
    * total: 7bytes
    */
-  unsigned char* msg = new unsigned char[MESSAGE_LENGTH];
+  auto msg = new unsigned char[MESSAGE_LENGTH];
   bittorrent::createPeerMessageString(msg, MESSAGE_LENGTH, 3, ID);
   bittorrent::setShortIntParam(&msg[5], port_);
   return msg;

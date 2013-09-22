@@ -57,8 +57,11 @@ namespace aria2 {
 // TODO This name of this command is misleading, because now it also
 // handles UDP trackers as well as DHT.
 DHTInteractionCommand::DHTInteractionCommand(cuid_t cuid, DownloadEngine* e)
-  : Command(cuid),
-    e_(e)
+  : Command{cuid},
+    e_{e},
+    dispatcher_{nullptr},
+    receiver_{nullptr},
+    taskQueue_{nullptr}
 {}
 
 DHTInteractionCommand::~DHTInteractionCommand()
@@ -66,7 +69,7 @@ DHTInteractionCommand::~DHTInteractionCommand()
   disableReadCheckSocket(readCheckSocket_);
 }
 
-void DHTInteractionCommand::setReadCheckSocket(const SharedHandle<SocketCore>& socket)
+void DHTInteractionCommand::setReadCheckSocket(const std::shared_ptr<SocketCore>& socket)
 {
   readCheckSocket_ = socket;
   if(socket) {
@@ -74,7 +77,7 @@ void DHTInteractionCommand::setReadCheckSocket(const SharedHandle<SocketCore>& s
   }
 }
 
-void DHTInteractionCommand::disableReadCheckSocket(const SharedHandle<SocketCore>& socket)
+void DHTInteractionCommand::disableReadCheckSocket(const std::shared_ptr<SocketCore>& socket)
 {
   if(socket) {
     e_->deleteSocketForReadCheck(socket, this);
@@ -138,33 +141,34 @@ bool DHTInteractionCommand::execute()
       udpTrackerClient_->requestFail(UDPT_ERR_NETWORK);
     }
   }
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 
-void DHTInteractionCommand::setMessageDispatcher(const SharedHandle<DHTMessageDispatcher>& dispatcher)
+void DHTInteractionCommand::setMessageDispatcher
+(DHTMessageDispatcher* dispatcher)
 {
   dispatcher_ = dispatcher;
 }
 
-void DHTInteractionCommand::setMessageReceiver(const SharedHandle<DHTMessageReceiver>& receiver)
+void DHTInteractionCommand::setMessageReceiver(DHTMessageReceiver* receiver)
 {
   receiver_ = receiver;
 }
 
-void DHTInteractionCommand::setTaskQueue(const SharedHandle<DHTTaskQueue>& taskQueue)
+void DHTInteractionCommand::setTaskQueue(DHTTaskQueue* taskQueue)
 {
   taskQueue_ = taskQueue;
 }
 
 void DHTInteractionCommand::setConnection
-(const SharedHandle<DHTConnection>& connection)
+(std::unique_ptr<DHTConnection> connection)
 {
-  connection_ = connection;
+  connection_ = std::move(connection);
 }
 
 void DHTInteractionCommand::setUDPTrackerClient
-(const SharedHandle<UDPTrackerClient>& udpTrackerClient)
+(const std::shared_ptr<UDPTrackerClient>& udpTrackerClient)
 {
   udpTrackerClient_ = udpTrackerClient;
 }

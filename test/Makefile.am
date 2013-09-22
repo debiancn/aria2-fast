@@ -31,7 +31,6 @@ aria2c_SOURCES = AllTest.cc\
 	SingletonHolderTest.cc\
 	HttpHeaderTest.cc\
 	HttpResponseTest.cc\
-	SharedHandleTest.cc\
 	FileTest.cc\
 	OptionTest.cc\
 	DefaultDiskWriterTest.cc\
@@ -72,7 +71,6 @@ aria2c_SOURCES = AllTest.cc\
 	UriTest.cc\
 	UriSplitTest.cc\
 	MockSegment.h\
-	TripletTest.cc\
 	CookieHelperTest.cc\
 	JsonTest.cc\
 	ValueBaseJsonParserTest.cc\

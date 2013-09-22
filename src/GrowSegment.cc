@@ -38,7 +38,7 @@
 
 namespace aria2 {
 
-GrowSegment::GrowSegment(const SharedHandle<Piece>& piece):
+GrowSegment::GrowSegment(const std::shared_ptr<Piece>& piece):
   piece_(piece), writtenLength_(0) {}
 
 GrowSegment::~GrowSegment() {}
@@ -63,10 +63,10 @@ void GrowSegment::clear(WrDiskCache* diskCache)
 {
   writtenLength_ = 0;
   // cache won't be used in this object.
-  piece_->clearAllBlock(0);
+  piece_->clearAllBlock(nullptr);
 }
 
-SharedHandle<Piece> GrowSegment::getPiece() const
+std::shared_ptr<Piece> GrowSegment::getPiece() const
 {
   return piece_;
 }

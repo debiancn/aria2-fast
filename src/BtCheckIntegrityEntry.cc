@@ -44,32 +44,33 @@
 namespace aria2 {
 
 BtCheckIntegrityEntry::BtCheckIntegrityEntry(RequestGroup* requestGroup):
-  PieceHashCheckIntegrityEntry(requestGroup, 0) {}
+  PieceHashCheckIntegrityEntry(requestGroup, nullptr) {}
 
 BtCheckIntegrityEntry::~BtCheckIntegrityEntry() {}
 
 void BtCheckIntegrityEntry::onDownloadIncomplete
-(std::vector<Command*>& commands, DownloadEngine* e)
+(std::vector<std::unique_ptr<Command>>& commands, DownloadEngine* e)
 {
-  const SharedHandle<PieceStorage>& ps = getRequestGroup()->getPieceStorage();
+  auto& ps = getRequestGroup()->getPieceStorage();
   ps->onDownloadIncomplete();
   if(getRequestGroup()->getOption()->getAsBool(PREF_HASH_CHECK_ONLY)) {
     return;
   }
-  const SharedHandle<DiskAdaptor>& diskAdaptor = ps->getDiskAdaptor();
+  const auto& diskAdaptor = ps->getDiskAdaptor();
   if(diskAdaptor->isReadOnlyEnabled()) {
     // Now reopen DiskAdaptor with read only disabled.
     diskAdaptor->closeFile();
     diskAdaptor->disableReadOnly();
     diskAdaptor->openFile();
   }
-  SharedHandle<BtFileAllocationEntry> entry
-    (new BtFileAllocationEntry(getRequestGroup()));
-  proceedFileAllocation(commands, entry, e);
+  proceedFileAllocation(commands,
+                        make_unique<BtFileAllocationEntry>
+                        (getRequestGroup()),
+                        e);
 }
 
 void BtCheckIntegrityEntry::onDownloadFinished
-(std::vector<Command*>& commands, DownloadEngine* e)
+(std::vector<std::unique_ptr<Command>>& commands, DownloadEngine* e)
 {
   // TODO Currently,when all the checksums
   // are valid, then aira2 goes to seeding mode. Sometimes it is better
@@ -77,9 +78,10 @@ void BtCheckIntegrityEntry::onDownloadFinished
   // behavior.
   if(!getRequestGroup()->getOption()->getAsBool(PREF_HASH_CHECK_ONLY) &&
      getRequestGroup()->getOption()->getAsBool(PREF_BT_HASH_CHECK_SEED)) {
-    SharedHandle<BtFileAllocationEntry> entry
-      (new BtFileAllocationEntry(getRequestGroup()));
-    proceedFileAllocation(commands, entry, e);
+    proceedFileAllocation(commands,
+                          make_unique<BtFileAllocationEntry>
+                          (getRequestGroup()),
+                          e);
   }
 }
 

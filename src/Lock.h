@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2013 Nils Maier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,31 +32,83 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_SLEEP_COMMAND_H
-#define D_SLEEP_COMMAND_H
+#ifndef D_LOCK_H
+#define D_LOCK_H
 
-#include "Command.h"
-#include "TimerA2.h"
+#if defined(_WIN32)
+#include <windows.h>
+#elif defined(ENABLE_PTHREAD)
+#include <pthread.h>
+#endif
+
 
 namespace aria2 {
 
-class DownloadEngine;
-class RequestGroup;
-
-class SleepCommand:public Command {
+class Lock {
 private:
-  DownloadEngine* engine_;
-  RequestGroup* requestGroup_;
-  Command* nextCommand_;
-  time_t wait_;
-  Timer checkPoint_;
+#if defined(_WIN32)
+  ::CRITICAL_SECTION section_;
+#elif defined(ENABLE_PTHREAD)
+  ::pthread_mutex_t mutex_;
+#endif
+
 public:
-  SleepCommand(cuid_t cuid, DownloadEngine* e, RequestGroup* requestGroup,
-               Command* nextCommand, time_t wait);
-  virtual ~SleepCommand();
-  bool execute();
+  Lock() {
+#if defined(_WIN32)
+    ::InitializeCriticalSection(&section_);
+#elif defined(ENABLE_PTHREAD)
+    mutex_ = PTHREAD_RECURSIVE_MUTEX_INITIALIZER;
+#endif
+  }
+
+  ~Lock() {
+#if defined(_WIN32)
+    ::DeleteCriticalSection(&section_);
+#elif defined(ENABLE_PTHREAD)
+    ::pthread_mutex_destroy(&mutex_);
+#endif
+  }
+
+  inline void aquire() {
+#if defined(_WIN32)
+    ::EnterCriticalSection(&section_);
+#elif defined(ENABLE_PTHREAD)
+    ::pthread_mutex_lock(&mutex_);
+#endif
+  }
+
+  inline bool tryAquire() {
+#if defined(_WIN32)
+    return ::TryEnterCriticalSection(&section_) == TRUE;
+#elif defined(ENABLE_PTHREAD)
+    return ::pthread_mutex_trylock(&mutex_) == 0;
+#else
+    return true;
+#endif
+  }
+
+  inline void release() {
+#if defined(_WIN32)
+    ::LeaveCriticalSection(&section_);
+#elif defined(ENABLE_PTHREAD)
+    ::pthread_mutex_unlock(&mutex_);
+#endif
+  }
+
+};
+
+class LockGuard {
+private:
+  Lock& lock_;
+public:
+  inline LockGuard(Lock& lock) : lock_(lock) {
+    lock_.aquire();
+  }
+  inline ~LockGuard() {
+    lock_.release();
+  }
 };
 
 } // namespace aria2
 
-#endif // D_SLEEP_COMMAND_H
+#endif // D_LOCK_H

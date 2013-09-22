@@ -169,21 +169,22 @@ void NumberOptionHandler::parseArg(Option& option, int64_t number) const
 {
   if((min_ == -1 || min_ <= number) && (max_ ==  -1 || number <= max_)) {
     option.put(pref_, util::itos(number));
-  } else {
-    std::string msg = pref_->k;
-    msg += " ";
-    if(min_ == -1 && max_ != -1) {
-      msg += fmt(_("must be smaller than or equal to %" PRId64 "."), max_);
-    } else if(min_ != -1 && max_ != -1) {
-      msg += fmt(_("must be between %" PRId64 " and %" PRId64 "."),
-                 min_, max_);
-    } else if(min_ != -1 && max_ == -1) {
-      msg += fmt(_("must be greater than or equal to %" PRId64 "."), min_);
-    } else {
-      msg += _("must be a number.");
-    }
-    throw DL_ABORT_EX(msg);
+    return;
   }
+
+  std::string msg = pref_->k;
+  msg += " ";
+  if(min_ == -1 && max_ != -1) {
+    msg += fmt(_("must be smaller than or equal to %" PRId64 "."), max_);
+  } else if(min_ != -1 && max_ != -1) {
+    msg += fmt(_("must be between %" PRId64 " and %" PRId64 "."),
+                min_, max_);
+  } else if(min_ != -1 && max_ == -1) {
+    msg += fmt(_("must be greater than or equal to %" PRId64 "."), min_);
+  } else {
+    msg += _("must be a number.");
+  }
+  throw DL_ABORT_EX(msg);
 }
 
 std::string NumberOptionHandler::createPossibleValuesString() const
@@ -241,7 +242,7 @@ FloatNumberOptionHandler::~FloatNumberOptionHandler() {}
 void FloatNumberOptionHandler::parseArg
 (Option& option, const std::string& optarg) const
 {
-  double number = strtod(optarg.c_str(), 0);
+  double number = strtod(optarg.c_str(), nullptr);
   if((min_ < 0 || min_ <= number) && (max_ < 0 || number <= max_)) {
     option.put(pref_, optarg);
   } else {
@@ -372,8 +373,7 @@ ChecksumOptionHandler::~ChecksumOptionHandler() {}
 void ChecksumOptionHandler::parseArg(Option& option, const std::string& optarg)
   const
 {
-  std::pair<Scip, Scip> p;
-  util::divide(p, optarg.begin(), optarg.end(), '=');
+  auto p = util::divide(std::begin(optarg), std::end(optarg), '=');
   std::string hashType(p.first.first, p.first.second);
   std::string hexDigest(p.second.first, p.second.second);
   util::lowercase(hashType);
@@ -394,74 +394,30 @@ ParameterOptionHandler::ParameterOptionHandler
 (const Pref* pref,
  const char* description,
  const std::string& defaultValue,
- const std::vector<std::string>& validParamValues,
+ std::vector<std::string> validParamValues,
  char shortName)
   : AbstractOptionHandler(pref, description, defaultValue,
                           OptionHandler::REQ_ARG, shortName),
-    validParamValues_(validParamValues)
+    validParamValues_(std::move(validParamValues))
 {}
-
-ParameterOptionHandler::ParameterOptionHandler
-(const Pref* pref,
- const char* description,
- const std::string& defaultValue,
- const std::string& validParamValue,
- char shortName)
-  : AbstractOptionHandler(pref, description, defaultValue,
-                          OptionHandler::REQ_ARG, shortName)
-{
-  validParamValues_.push_back(validParamValue);
-}
-
-ParameterOptionHandler::ParameterOptionHandler
-(const Pref* pref,
- const char* description,
- const std::string& defaultValue,
- const std::string& validParamValue1,
- const std::string& validParamValue2,
- char shortName)
-  : AbstractOptionHandler(pref, description, defaultValue,
-                          OptionHandler::REQ_ARG, shortName)
-{
-  validParamValues_.push_back(validParamValue1);
-  validParamValues_.push_back(validParamValue2);
-}
-
-ParameterOptionHandler::ParameterOptionHandler
-(const Pref* pref,
- const char* description,
- const std::string& defaultValue,
- const std::string& validParamValue1,
- const std::string& validParamValue2,
- const std::string& validParamValue3,
- char shortName)
-  : AbstractOptionHandler(pref, description, defaultValue,
-                          OptionHandler::REQ_ARG, shortName)
-{
-  validParamValues_.push_back(validParamValue1);
-  validParamValues_.push_back(validParamValue2);
-  validParamValues_.push_back(validParamValue3);
-}
 
 ParameterOptionHandler::~ParameterOptionHandler() {}
 
 void ParameterOptionHandler::parseArg(Option& option, const std::string& optarg)
   const
 {
-  std::vector<std::string>::const_iterator itr =
-    std::find(validParamValues_.begin(), validParamValues_.end(), optarg);
+  auto itr = std::find(validParamValues_.begin(), validParamValues_.end(), optarg);
   if(itr == validParamValues_.end()) {
     std::string msg = pref_->k;
     msg += " ";
     msg += _("must be one of the following:");
     if(validParamValues_.size() == 0) {
       msg += "''";
-    } else {
-      for(std::vector<std::string>::const_iterator itr =
-            validParamValues_.begin(), eoi = validParamValues_.end();
-          itr != eoi; ++itr) {
+    }
+    else {
+      for (const auto& p: validParamValues_) {
         msg += "'";
-        msg += *itr;
+        msg += p;
         msg += "' ";
       }
     }
@@ -611,7 +567,7 @@ void PrioritizePieceOptionHandler::parseArg
   // error.
   std::vector<size_t> result;
   util::parsePrioritizePieceRange
-    (result, optarg, std::vector<SharedHandle<FileEntry> >(), 1024);
+    (result, optarg, std::vector<std::shared_ptr<FileEntry> >(), 1024);
   option.put(pref_, optarg);
 }
 

@@ -36,7 +36,8 @@
 #define D_DHT_REGISTRY_H
 
 #include "common.h"
-#include "SharedHandle.h"
+
+#include <memory>
 
 namespace aria2 {
 
@@ -55,23 +56,23 @@ private:
   struct Data {
     bool initialized;
 
-    SharedHandle<DHTNode> localNode;
+    std::shared_ptr<DHTNode> localNode;
 
-    SharedHandle<DHTRoutingTable> routingTable;
+    std::unique_ptr<DHTRoutingTable> routingTable;
 
-    SharedHandle<DHTTaskQueue> taskQueue;
+    std::unique_ptr<DHTTaskQueue> taskQueue;
 
-    SharedHandle<DHTTaskFactory> taskFactory;
+    std::unique_ptr<DHTTaskFactory> taskFactory;
 
-    SharedHandle<DHTPeerAnnounceStorage> peerAnnounceStorage;
+    std::unique_ptr<DHTPeerAnnounceStorage> peerAnnounceStorage;
 
-    SharedHandle<DHTTokenTracker> tokenTracker;
+    std::unique_ptr<DHTTokenTracker> tokenTracker;
 
-    SharedHandle<DHTMessageDispatcher> messageDispatcher;
+    std::unique_ptr<DHTMessageDispatcher> messageDispatcher;
 
-    SharedHandle<DHTMessageReceiver> messageReceiver;
+    std::unique_ptr<DHTMessageReceiver> messageReceiver;
 
-    SharedHandle<DHTMessageFactory> messageFactory;
+    std::unique_ptr<DHTMessageFactory> messageFactory;
 
     Data():initialized(false) {}
   };

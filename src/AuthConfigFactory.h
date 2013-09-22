@@ -39,8 +39,8 @@
 
 #include <string>
 #include <set>
+#include <memory>
 
-#include "SharedHandle.h"
 #include "SingletonHolder.h"
 #include "a2functional.h"
 
@@ -52,42 +52,39 @@ class AuthConfig;
 class Request;
 class AuthResolver;
 
-class AuthConfigFactory {
-private:
-  SharedHandle<Netrc> netrc_;
-
-  SharedHandle<AuthConfig> createAuthConfig(const std::string& user,
-                                            const std::string& password) const;
-
-  SharedHandle<AuthResolver> createHttpAuthResolver(const Option* op) const;
-
-  SharedHandle<AuthResolver> createFtpAuthResolver(const Option* op) const;
+class BasicCred {
 public:
-  class BasicCred {
-  public:
-    std::string user_;
-    std::string password_;
-    std::string host_;
-    uint16_t port_;
-    std::string path_;
-    bool activated_;
+  std::string user_;
+  std::string password_;
+  std::string host_;
+  uint16_t port_;
+  std::string path_;
+  bool activated_;
 
-    BasicCred(const std::string& user, const std::string& password,
-              const std::string& host, uint16_t port, const std::string& path,
-              bool activated = false);
+  BasicCred(std::string user, std::string password,
+            std::string host, uint16_t port, std::string path,
+            bool activated = false);
 
-    void activate();
+  void activate();
 
-    bool isActivated() const;
+  bool isActivated() const;
 
-    bool operator==(const BasicCred& cred) const;
+  bool operator==(const BasicCred& cred) const;
 
-    bool operator<(const BasicCred& cred) const;
-  };
+  bool operator<(const BasicCred& cred) const;
+};
 
-  typedef std::set<SharedHandle<BasicCred>,
-                   DerefLess<SharedHandle<BasicCred> > > BasicCredSet;
+class AuthConfigFactory {
+public:
+  typedef std::set<std::unique_ptr<BasicCred>,
+                   DerefLess<std::unique_ptr<BasicCred>>> BasicCredSet;
 private:
+  std::unique_ptr<Netrc> netrc_;
+
+  std::unique_ptr<AuthResolver> createHttpAuthResolver(const Option* op) const;
+
+  std::unique_ptr<AuthResolver> createFtpAuthResolver(const Option* op) const;
+
   BasicCredSet basicCreds_;
 public:
   AuthConfigFactory();
@@ -98,10 +95,10 @@ public:
   // are used in this method: PREF_HTTP_USER, PREF_HTTP_PASSWD,
   // PREF_FTP_USER, PREF_FTP_PASSWD, PREF_NO_NETRC and
   // PREF_HTTP_AUTH_CHALLENGE.
-  SharedHandle<AuthConfig> createAuthConfig
-  (const SharedHandle<Request>& request, const Option* op);
+  std::unique_ptr<AuthConfig> createAuthConfig
+  (const std::shared_ptr<Request>& request, const Option* op);
 
-  void setNetrc(const SharedHandle<Netrc>& netrc);
+  void setNetrc(std::unique_ptr<Netrc> netrc);
 
   // Find a BasicCred using findBasicCred() and activate it then
   // return true.  If matching BasicCred is not found, AuthConfig
@@ -127,7 +124,9 @@ public:
   // If the same BasicCred is already added, then it is replaced with
   // given basicCred. Otherwise, insert given basicCred to
   // basicCreds_.
-  void updateBasicCred(const SharedHandle<BasicCred>& basicCred);
+  //
+  // Made public for unit test.
+  void updateBasicCred(std::unique_ptr<BasicCred> basicCred);
 };
 
 } // namespace aria2

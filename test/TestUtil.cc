@@ -50,7 +50,7 @@ std::string readFile(const std::string& path)
   return ss.str();
 }
 
-Cookie createCookie
+std::unique_ptr<Cookie> createCookie
 (const std::string& name,
  const std::string& value,
  const std::string& domain,
@@ -58,11 +58,11 @@ Cookie createCookie
  const std::string& path,
  bool secure)
 {
-  return Cookie
+  return make_unique<Cookie>
     (name, value, 0, false, domain, hostOnly, path, secure, false, 0);
 }
 
-Cookie createCookie
+std::unique_ptr<Cookie> createCookie
 (const std::string& name,
  const std::string& value,
  time_t expiryTime,
@@ -71,7 +71,7 @@ Cookie createCookie
  const std::string& path,
  bool secure)
 {
-  return Cookie
+  return make_unique<Cookie>
     (name, value, expiryTime, true, domain, hostOnly, path, secure, false, 0);
 }
 
@@ -81,10 +81,9 @@ std::string fromHex(const std::string& s)
 }
 
 #ifdef ENABLE_MESSAGE_DIGEST
-std::string fileHexDigest
-(const SharedHandle<MessageDigest>& ctx, const std::string& filename)
+std::string fileHexDigest(MessageDigest* ctx, const std::string& filename)
 {
-  SharedHandle<DiskWriter> writer(new DefaultDiskWriter(filename));
+  std::shared_ptr<DiskWriter> writer(new DefaultDiskWriter(filename));
   writer->openExistingFile();
   return util::toHex(message_digest::digest(ctx, writer, 0, writer->size()));
 }
@@ -104,10 +103,10 @@ WrDiskCacheEntry::DataCell* createDataCell(int64_t goff,
   return cell;
 }
 
-SharedHandle<RequestGroup> findReservedGroup
-(const SharedHandle<RequestGroupMan>& rgman, a2_gid_t gid)
+std::shared_ptr<RequestGroup> findReservedGroup
+(RequestGroupMan* rgman, a2_gid_t gid)
 {
-  SharedHandle<RequestGroup> rg = rgman->findGroup(gid);
+  auto rg = rgman->findGroup(gid);
   if(rg) {
     if(rg->getState() == RequestGroup::STATE_WAITING) {
       return rg;
@@ -118,47 +117,47 @@ SharedHandle<RequestGroup> findReservedGroup
   return rg;
 }
 
-SharedHandle<RequestGroup> getReservedGroup
-(const SharedHandle<RequestGroupMan>& rgman, size_t index)
+std::shared_ptr<RequestGroup> getReservedGroup
+(RequestGroupMan* rgman, size_t index)
 {
   assert(rgman->getReservedGroups().size() > index);
-  RequestGroupList::const_iterator i = rgman->getReservedGroups().begin();
+  auto i = rgman->getReservedGroups().begin();
   std::advance(i, index);
   return *i;
 }
 
-SharedHandle<RequestGroup> createRequestGroup(int32_t pieceLength,
+std::shared_ptr<RequestGroup> createRequestGroup(int32_t pieceLength,
                                               int64_t totalLength,
                                               const std::string& path,
                                               const std::string& uri,
-                                              const SharedHandle<Option>& opt)
+                                              const std::shared_ptr<Option>& opt)
 {
-  SharedHandle<DownloadContext> dctx(new DownloadContext(pieceLength,
+  std::shared_ptr<DownloadContext> dctx(new DownloadContext(pieceLength,
                                                          totalLength,
                                                          path));
   std::vector<std::string> uris;
   uris.push_back(uri);
   dctx->getFirstFileEntry()->addUris(uris.begin(), uris.end());
-  SharedHandle<RequestGroup> group(new RequestGroup(GroupId::create(), opt));
+  std::shared_ptr<RequestGroup> group(new RequestGroup(GroupId::create(), opt));
   group->setDownloadContext(dctx);
   return group;
 }
 
-SharedHandle<DownloadResult> createDownloadResult
+std::shared_ptr<DownloadResult> createDownloadResult
 (error_code::Value result, const std::string& uri)
 {
   std::vector<std::string> uris;
   uris.push_back(uri);
-  SharedHandle<FileEntry> entry(new FileEntry("/tmp/path", 1, 0, uris));
-  std::vector<SharedHandle<FileEntry> > entries;
+  std::shared_ptr<FileEntry> entry(new FileEntry("/tmp/path", 1, 0, uris));
+  std::vector<std::shared_ptr<FileEntry> > entries;
   entries.push_back(entry);
-  SharedHandle<DownloadResult> dr(new DownloadResult());
+  std::shared_ptr<DownloadResult> dr(new DownloadResult());
   dr->gid = GroupId::create();
   dr->fileEntries = entries;
   dr->result = result;
   dr->belongsTo = 0;
   dr->inMemoryDownload = false;
-  dr->option = SharedHandle<Option>(new Option());
+  dr->option = std::shared_ptr<Option>(new Option());
   return dr;
 }
 

@@ -51,12 +51,12 @@
 namespace aria2 {
 
 BtFileAllocationEntry::BtFileAllocationEntry(RequestGroup* requestGroup):
-  FileAllocationEntry(requestGroup, 0) {}
+  FileAllocationEntry(requestGroup, nullptr) {}
 
 BtFileAllocationEntry::~BtFileAllocationEntry() {}
 
 void BtFileAllocationEntry::prepareForNextAction
-(std::vector<Command*>& commands, DownloadEngine* e)
+(std::vector<std::unique_ptr<Command>>& commands, DownloadEngine* e)
 {
   BtSetup().setup(commands, getRequestGroup(), e,
                   getRequestGroup()->getOption().get());
@@ -67,7 +67,7 @@ void BtFileAllocationEntry::prepareForNextAction
     // For DownloadContext::resetDownloadStartTime(), see also
     // RequestGroup::createInitialCommand()
     getRequestGroup()->getDownloadContext()->resetDownloadStartTime();
-    const std::vector<SharedHandle<FileEntry> >& fileEntries =
+    const std::vector<std::shared_ptr<FileEntry> >& fileEntries =
       getRequestGroup()->getDownloadContext()->getFileEntries();
     if(isUriSuppliedForRequsetFileEntry
        (fileEntries.begin(), fileEntries.end())) {
@@ -75,7 +75,7 @@ void BtFileAllocationEntry::prepareForNextAction
     }
   } else {
 #ifdef __MINGW32__
-    const SharedHandle<DiskAdaptor>& diskAdaptor =
+    const std::shared_ptr<DiskAdaptor>& diskAdaptor =
       getRequestGroup()->getPieceStorage()->getDiskAdaptor();
     if(!diskAdaptor->isReadOnlyEnabled()) {
       // On Windows, if aria2 opens files with GENERIC_WRITE access

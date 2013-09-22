@@ -33,6 +33,9 @@
  */
 /* copyright --> */
 #include "Piece.h"
+
+#include <cassert>
+
 #include "util.h"
 #include "BitfieldMan.h"
 #include "A2STR.h"
@@ -49,8 +52,8 @@
 
 namespace aria2 {
 
-Piece::Piece():index_(0), length_(0), blockLength_(BLOCK_LENGTH), bitfield_(0),
-               usedBySegment_(false), wrCache_(0)
+Piece::Piece():index_(0), length_(0), blockLength_(BLOCK_LENGTH), bitfield_(nullptr),
+               usedBySegment_(false), wrCache_(nullptr)
 #ifdef ENABLE_MESSAGE_DIGEST
               , nextBegin_(0)
 #endif // ENABLE_MESSAGE_DIGEST
@@ -61,7 +64,7 @@ Piece::Piece(size_t index, int32_t length, int32_t blockLength)
    length_(length),
    blockLength_(blockLength),
    bitfield_(new BitfieldMan(blockLength_, length)),
-   usedBySegment_(false), wrCache_(0)
+   usedBySegment_(false), wrCache_(nullptr)
 #ifdef ENABLE_MESSAGE_DIGEST
  ,nextBegin_(0)
 #endif // ENABLE_MESSAGE_DIGEST
@@ -242,8 +245,8 @@ std::string Piece::getDigest()
 }
 
 namespace {
-void updateHashWithRead(const SharedHandle<MessageDigest>& mdctx,
-                        const SharedHandle<DiskAdaptor>& adaptor,
+void updateHashWithRead(MessageDigest* mdctx,
+                        const std::shared_ptr<DiskAdaptor>& adaptor,
                         int64_t offset, size_t len)
 {
   const size_t BUFSIZE = 4096;
@@ -269,9 +272,9 @@ void updateHashWithRead(const SharedHandle<MessageDigest>& mdctx,
 } // namespace
 
 std::string Piece::getDigestWithWrCache
-(size_t pieceLength, const SharedHandle<DiskAdaptor>& adaptor)
+(size_t pieceLength, const std::shared_ptr<DiskAdaptor>& adaptor)
 {
-  SharedHandle<MessageDigest> mdctx(MessageDigest::create(hashType_));
+  auto mdctx = MessageDigest::create(hashType_);
   int64_t start = static_cast<int64_t>(index_)*pieceLength;
   int64_t goff = start;
   if(wrCache_) {
@@ -279,14 +282,14 @@ std::string Piece::getDigestWithWrCache
     for(WrDiskCacheEntry::DataCellSet::iterator i = dataSet.begin(),
           eoi = dataSet.end(); i != eoi; ++i) {
       if(goff < (*i)->goff) {
-        updateHashWithRead(mdctx, adaptor, goff, (*i)->goff - goff);
+        updateHashWithRead(mdctx.get(), adaptor, goff, (*i)->goff - goff);
       }
       mdctx->update((*i)->data+(*i)->offset, (*i)->len);
       goff = (*i)->goff + (*i)->len;
     }
-    updateHashWithRead(mdctx, adaptor, goff, start+length_-goff);
+    updateHashWithRead(mdctx.get(), adaptor, goff, start+length_-goff);
   } else {
-    updateHashWithRead(mdctx, adaptor, goff, length_);
+    updateHashWithRead(mdctx.get(), adaptor, goff, length_);
   }
   return mdctx->digest();
 }
@@ -317,12 +320,12 @@ void Piece::removeUser(cuid_t cuid)
 }
 
 void Piece::initWrCache(WrDiskCache* diskCache,
-                        const SharedHandle<DiskAdaptor>& diskAdaptor)
+                        const std::shared_ptr<DiskAdaptor>& diskAdaptor)
 {
   if(!diskCache) {
     return;
   }
-  assert(wrCache_ == 0);
+  assert(wrCache_ == nullptr);
   wrCache_ = new WrDiskCacheEntry(diskAdaptor);
   bool rv = diskCache->add(wrCache_);
   assert(rv);
@@ -359,7 +362,7 @@ void Piece::updateWrCache(WrDiskCache* diskCache, unsigned char* data,
   }
   assert(wrCache_);
   A2_LOG_DEBUG(fmt("updateWrCache entry=%p", wrCache_));
-  WrDiskCacheEntry::DataCell* cell = new WrDiskCacheEntry::DataCell();
+  auto cell = new WrDiskCacheEntry::DataCell();
   cell->goff = goff;
   cell->data = data;
   cell->offset = offset;
@@ -393,7 +396,7 @@ void Piece::releaseWrCache(WrDiskCache* diskCache)
   if(diskCache && wrCache_) {
     diskCache->remove(wrCache_);
     delete wrCache_;
-    wrCache_ = 0;
+    wrCache_ = nullptr;
   }
 }
 

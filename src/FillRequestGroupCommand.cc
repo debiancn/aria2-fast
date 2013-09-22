@@ -60,7 +60,7 @@ bool FillRequestGroupCommand::execute()
   if(e_->isHaltRequested()) {
     return true;
   }
-  const SharedHandle<RequestGroupMan>& rgman = e_->getRequestGroupMan();
+  auto& rgman = e_->getRequestGroupMan();
   if(rgman->queueCheckRequested()) {
     while(rgman->queueCheckRequested()) {
       try {
@@ -80,7 +80,7 @@ bool FillRequestGroupCommand::execute()
       return true;
     }
   }
-  e_->addRoutineCommand(this);
+  e_->addRoutineCommand(std::unique_ptr<Command>(this));
   return false;
 }
 

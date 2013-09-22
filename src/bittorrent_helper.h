@@ -41,8 +41,8 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <memory>
 
-#include "SharedHandle.h"
 #include "TorrentAttribute.h"
 #include "a2netcompat.h"
 #include "Peer.h"
@@ -65,51 +65,51 @@ extern const std::string SINGLE;
 extern const std::string MULTI;
 
 void load(const std::string& torrentFile,
-          const SharedHandle<DownloadContext>& ctx,
-          const SharedHandle<Option>& option,
+          const std::shared_ptr<DownloadContext>& ctx,
+          const std::shared_ptr<Option>& option,
           const std::string& overrideName = "");
 
 void load(const std::string& torrentFile,
-          const SharedHandle<DownloadContext>& ctx,
-          const SharedHandle<Option>& option,
+          const std::shared_ptr<DownloadContext>& ctx,
+          const std::shared_ptr<Option>& option,
           const std::vector<std::string>& uris,
           const std::string& overrideName = "");
 
 void loadFromMemory(const unsigned char* content, size_t length,
-                    const SharedHandle<DownloadContext>& ctx,
-                    const SharedHandle<Option>& option,
+                    const std::shared_ptr<DownloadContext>& ctx,
+                    const std::shared_ptr<Option>& option,
                     const std::string& defaultName,
                     const std::string& overrideName = "");
 
 void loadFromMemory(const unsigned char* content, size_t length,
-                    const SharedHandle<DownloadContext>& ctx,
-                    const SharedHandle<Option>& option,
+                    const std::shared_ptr<DownloadContext>& ctx,
+                    const std::shared_ptr<Option>& option,
                     const std::vector<std::string>& uris,
                     const std::string& defaultName,
                     const std::string& overrideName = "");
 
 void loadFromMemory(const std::string& context,
-                    const SharedHandle<DownloadContext>& ctx,
-                    const SharedHandle<Option>& option,
+                    const std::shared_ptr<DownloadContext>& ctx,
+                    const std::shared_ptr<Option>& option,
                     const std::string& defaultName,
                     const std::string& overrideName = "");
 
 void loadFromMemory(const std::string& context,
-                    const SharedHandle<DownloadContext>& ctx,
-                    const SharedHandle<Option>& option,
+                    const std::shared_ptr<DownloadContext>& ctx,
+                    const std::shared_ptr<Option>& option,
                     const std::vector<std::string>& uris,
                     const std::string& defaultName,
                     const std::string& overrideName = "");
 
-void loadFromMemory(const SharedHandle<ValueBase>& torrent,
-                    const SharedHandle<DownloadContext>& ctx,
-                    const SharedHandle<Option>& option,
+void loadFromMemory(const ValueBase* torrent,
+                    const std::shared_ptr<DownloadContext>& ctx,
+                    const std::shared_ptr<Option>& option,
                     const std::vector<std::string>& uris,
                     const std::string& defaultName,
                     const std::string& overrideName = "");
 
 // Parses BitTorrent Magnet URI and returns
-// SharedHandle<TorrentAttribute> which includes infoHash, name and
+// std::unique_ptr<TorrentAttribute> which includes infoHash, name and
 // announceList. If parsing operation failed, an RecoverableException
 // will be thrown.  infoHash and name are string and announceList is a
 // list of list of announce URI.
@@ -117,13 +117,13 @@ void loadFromMemory(const SharedHandle<ValueBase>& torrent,
 // magnet:?xt=urn:btih:<info-hash>&dn=<name>&tr=<tracker-url>
 // <info-hash> comes in 2 flavors: 40bytes hexadecimal ascii string,
 // or 32bytes Base32 encoded string.
-SharedHandle<TorrentAttribute> parseMagnet(const std::string& magnet);
+std::unique_ptr<TorrentAttribute> parseMagnet(const std::string& magnet);
 
 // Parses BitTorrent Magnet URI and set them in ctx as a
 // bittorrent::BITTORRENT attibute. If parsing operation failed, an
 // RecoverableException will be thrown.
 void loadMagnet
-(const std::string& magnet, const SharedHandle<DownloadContext>& ctx);
+(const std::string& magnet, const std::shared_ptr<DownloadContext>& ctx);
 
 // Generates Peer ID. BitTorrent specification says Peer ID is 20-byte
 // length.  This function uses peerIdPrefix as a Peer ID and it is
@@ -149,16 +149,20 @@ void computeFastSet
 (std::vector<size_t>& fastSet, const std::string& ipaddr,
  size_t numPieces, const unsigned char* infoHash, size_t fastSetSize);
 
-SharedHandle<TorrentAttribute> getTorrentAttrs
-(const SharedHandle<DownloadContext>& dctx);
+// Make sure that don't recieve return value into std::shared_ptr.
+TorrentAttribute* getTorrentAttrs(DownloadContext* dctx);
+TorrentAttribute* getTorrentAttrs
+(const std::shared_ptr<DownloadContext>& dctx);
 
 // Returns the value associated with INFO_HASH key in BITTORRENT
 // attribute.
-const unsigned char*
-getInfoHash(const SharedHandle<DownloadContext>& downloadContext);
+const unsigned char* getInfoHash(DownloadContext* downloadContext);
+const unsigned char* getInfoHash
+(const std::shared_ptr<DownloadContext>& downloadContext);
 
-std::string
-getInfoHashString(const SharedHandle<DownloadContext>& downloadContext);
+std::string getInfoHashString(DownloadContext* downloadContext);
+std::string getInfoHashString
+(const std::shared_ptr<DownloadContext>& downloadContext);
 
 // Returns 8bytes unsigned integer located at offset pos.  The integer
 // in msg is network byte order. This function converts it into host
@@ -237,22 +241,20 @@ void assertID
 // Converts attrs into torrent data. This function does not guarantee
 // the returned string is valid torrent data.
 std::string metadata2Torrent
-(const std::string& metadata, const SharedHandle<TorrentAttribute>& attrs);
+(const std::string& metadata, const TorrentAttribute* attrs);
 
 // Constructs BitTorrent Magnet URI using attrs.
-std::string torrent2Magnet(const SharedHandle<TorrentAttribute>& attrs);
+std::string torrent2Magnet(const TorrentAttribute* attrs);
 
 // Removes announce URI in uris from attrs.  If uris contains '*', all
 // announce URIs are removed.
 void removeAnnounceUri
-(const SharedHandle<TorrentAttribute>& attrs,
- const std::vector<std::string>& uris);
+(TorrentAttribute* attrs, const std::vector<std::string>& uris);
 
 // Adds announce URI in uris to attrs. Each URI in uris creates its
 // own tier.
 void addAnnounceUri
-(const SharedHandle<TorrentAttribute>& attrs,
- const std::vector<std::string>& uris);
+(TorrentAttribute* attrs, const std::vector<std::string>& uris);
 
 // This helper function uses 2 option values: PREF_BT_TRACKER and
 // PREF_BT_EXCLUDE_TRACKER. First, the value of
@@ -260,8 +262,7 @@ void addAnnounceUri
 // and call removeAnnounceUri(). Then the value of PREF_BT_TRACKER is
 // converted to std::vector<std::string> and call addAnnounceUri().
 void adjustAnnounceUri
-(const SharedHandle<TorrentAttribute>& attrs,
- const SharedHandle<Option>& option);
+(TorrentAttribute* attrs, const std::shared_ptr<Option>& option);
 
 template<typename OutputIterator>
 void extractPeer(const ValueBase* peerData, int family, OutputIterator dest)
@@ -277,7 +278,7 @@ void extractPeer(const ValueBase* peerData, int family, OutputIterator dest)
 
     virtual ~PeerListValueBaseVisitor() {}
 
-    virtual void visit(const String& peerData)
+    virtual void visit(const String& peerData) CXX11_OVERRIDE
     {
       int unit = family_ == AF_INET?6:18;
       size_t length = peerData.s().size();
@@ -290,20 +291,19 @@ void extractPeer(const ValueBase* peerData, int family, OutputIterator dest)
           if(p.first.empty()) {
             continue;
           }
-          *dest_++ = SharedHandle<Peer>(new Peer(p.first, p.second));
+          *dest_++ = std::make_shared<Peer>(p.first, p.second);
         }
       }
     }
 
-    virtual void visit(const Integer& v) {}
-    virtual void visit(const Bool& v) {}
-    virtual void visit(const Null& v) {}
+    virtual void visit(const Integer& v) CXX11_OVERRIDE {}
+    virtual void visit(const Bool& v) CXX11_OVERRIDE {}
+    virtual void visit(const Null& v) CXX11_OVERRIDE {}
 
-    virtual void visit(const List& peerData)
+    virtual void visit(const List& peerData) CXX11_OVERRIDE
     {
-      for(List::ValueType::const_iterator itr = peerData.begin(),
-            eoi = peerData.end(); itr != eoi; ++itr) {
-        const Dict* peerDict = downcast<Dict>(*itr);
+      for(auto & elem : peerData) {
+        const Dict* peerDict = downcast<Dict>(elem);
         if(!peerDict) {
           continue;
         }
@@ -314,24 +314,17 @@ void extractPeer(const ValueBase* peerData, int family, OutputIterator dest)
         if(!ip || !port || !(0 < port->i() && port->i() < 65536)) {
           continue;
         }
-        *dest_ = SharedHandle<Peer>(new Peer(ip->s(), port->i()));
+        *dest_ = std::make_shared<Peer>(ip->s(), port->i());
         ++dest_;
       }
     }
 
-    virtual void visit(const Dict& v) {}
+    virtual void visit(const Dict& v) CXX11_OVERRIDE {}
   };
   if(peerData) {
     PeerListValueBaseVisitor visitor(dest, family);
     peerData->accept(visitor);
   }
-}
-
-template<typename OutputIterator>
-void extractPeer
-(const SharedHandle<ValueBase>& peerData, int family, OutputIterator dest)
-{
-  return extractPeer(peerData.get(), family, dest);
 }
 
 int getCompactLength(int family);
@@ -341,9 +334,9 @@ const char* getModeString(BtFileMode mode);
 
 // Writes the detailed information about torrent loaded in dctx.
 template<typename Output>
-void print(Output& o, const SharedHandle<DownloadContext>& dctx)
+void print(Output& o, const std::shared_ptr<DownloadContext>& dctx)
 {
-  SharedHandle<TorrentAttribute> torrentAttrs = getTorrentAttrs(dctx);
+  TorrentAttribute* torrentAttrs = getTorrentAttrs(dctx);
   o.write("*** BitTorrent File Information ***\n");
   if(!torrentAttrs->comment.empty()) {
     o.printf("Comment: %s\n", torrentAttrs->comment.c_str());
@@ -360,9 +353,8 @@ void print(Output& o, const SharedHandle<DownloadContext>& dctx)
   for(std::vector<std::vector<std::string> >::const_iterator tierIter =
         torrentAttrs->announceList.begin(),
         eoi = torrentAttrs->announceList.end(); tierIter != eoi; ++tierIter) {
-    for(std::vector<std::string>::const_iterator i = (*tierIter).begin(),
-          eoi2 = (*tierIter).end(); i != eoi2; ++i) {
-      o.printf(" %s", (*i).c_str());
+    for(auto & elem : *tierIter) {
+      o.printf(" %s", elem.c_str());
     }
     o.write("\n");
   }

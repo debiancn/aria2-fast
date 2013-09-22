@@ -36,7 +36,8 @@
 #define D_BT_DEPENDENCY_H
 
 #include "Dependency.h"
-#include "SharedHandle.h"
+
+#include <memory>
 
 namespace aria2 {
 
@@ -47,14 +48,14 @@ class BtDependency : public Dependency
 {
 private:
   RequestGroup* dependant_;
-  SharedHandle<RequestGroup> dependee_;
+  std::shared_ptr<RequestGroup> dependee_;
 public:
   BtDependency(RequestGroup* dependant,
-               const SharedHandle<RequestGroup>& dependee);
+               const std::shared_ptr<RequestGroup>& dependee);
 
   virtual ~BtDependency();
 
-  virtual bool resolve();
+  virtual bool resolve() CXX11_OVERRIDE;
 };
 
 } // namespace aria2

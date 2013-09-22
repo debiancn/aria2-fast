@@ -49,14 +49,14 @@ public:
 
   static const char NAME[];
 
-  static BtUnchokeMessage* create
+  static std::unique_ptr<BtUnchokeMessage> create
   (const unsigned char* data, size_t dataLength);
 
-  virtual void doReceivedAction();
+  virtual void doReceivedAction() CXX11_OVERRIDE;
 
-  virtual bool sendPredicate() const;
+  virtual bool sendPredicate() const CXX11_OVERRIDE;
 
-  virtual ProgressUpdate* getProgressUpdate();
+  virtual std::unique_ptr<ProgressUpdate> getProgressUpdate() CXX11_OVERRIDE;
 };
 
 } // namespace aria2

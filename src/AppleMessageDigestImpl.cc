@@ -37,6 +37,7 @@
 #include <CommonCrypto/CommonDigest.h>
 
 #include "array_fun.h"
+#include "a2functional.h"
 #include "HashFuncEntry.h"
 
 namespace aria2 {
@@ -51,20 +52,20 @@ public:
   MessageDigestBase() { reset(); }
   virtual ~MessageDigestBase() {}
 
-  virtual size_t getDigestLength() const {
+  virtual size_t getDigestLength() const CXX11_OVERRIDE {
     return dlen;
   }
-  virtual void reset() {
+  virtual void reset() CXX11_OVERRIDE {
     init_fn(&ctx_);
   }
-  virtual void update(const void* data, size_t length) {
+  virtual void update(const void* data, size_t length) CXX11_OVERRIDE {
     while (length) {
       CC_LONG l = std::min(length, (size_t)std::numeric_limits<uint32_t>::max());
       update_fn(&ctx_, data, l);
       length -= l;
     }
   }
-  virtual void digest(unsigned char* md) {
+  virtual void digest(unsigned char* md) CXX11_OVERRIDE {
     final_fn(md, &ctx_);
   }
 private:
@@ -108,43 +109,45 @@ typedef MessageDigestBase<CC_SHA512_DIGEST_LENGTH,
                           CC_SHA512_Final>
 MessageDigestSHA512;
 
-SharedHandle<MessageDigestImpl> MessageDigestImpl::sha1()
+std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
-  return SharedHandle<MessageDigestImpl>(new MessageDigestSHA1());
+  return std::unique_ptr<MessageDigestImpl>(new MessageDigestSHA1());
 }
 
-SharedHandle<MessageDigestImpl> MessageDigestImpl::create
+std::unique_ptr<MessageDigestImpl> MessageDigestImpl::create
 (const std::string& hashType)
 {
   if (hashType == "sha-1") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestSHA1());
+    return make_unique<MessageDigestSHA1>();
   }
   if (hashType == "sha-224") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestSHA224());
+    return make_unique<MessageDigestSHA224>();
   }
   if (hashType == "sha-256") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestSHA256());
+    return make_unique<MessageDigestSHA256>();
   }
   if (hashType == "sha-384") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestSHA384());
+    return make_unique<MessageDigestSHA384>();
   }
   if (hashType == "sha-512") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestSHA512());
+    return make_unique<MessageDigestSHA512>();
   }
   if (hashType == "md5") {
-    return SharedHandle<MessageDigestImpl>(new MessageDigestMD5());
+    return make_unique<MessageDigestMD5>();
   }
-  return SharedHandle<MessageDigestImpl>();
+  return nullptr;
 }
 
 bool MessageDigestImpl::supports(const std::string& hashType)
 {
-  return hashType == "sha-1" || hashType == "sha-224" || hashType == "sha-256" || hashType == "sha-384" || hashType == "sha-512" || hashType == "md5";
+  return hashType == "sha-1" || hashType == "sha-224" ||
+    hashType == "sha-256" || hashType == "sha-384" ||
+    hashType == "sha-512" || hashType == "md5";
 }
 
 size_t MessageDigestImpl::getDigestLength(const std::string& hashType)
 {
-  SharedHandle<MessageDigestImpl> impl = create(hashType);
+  std::unique_ptr<MessageDigestImpl> impl = create(hashType);
   if (!impl) {
     return 0;
   }

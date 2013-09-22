@@ -76,7 +76,7 @@ std::string DHTTokenTracker::generateToken
   memcpy(src, infoHash, DHT_ID_LENGTH);
   memcpy(src+DHT_ID_LENGTH+COMPACT_LEN_IPV6, secret, SECRET_SIZE);
   unsigned char md[20];
-  message_digest::digest(md, sizeof(md), MessageDigest::sha1(),
+  message_digest::digest(md, sizeof(md), MessageDigest::sha1().get(),
                          src, sizeof(src));
   return std::string(&md[0], &md[sizeof(md)]);
 }
@@ -91,8 +91,8 @@ bool DHTTokenTracker::validateToken(const std::string& token,
                                     const unsigned char* infoHash,
                                     const std::string& ipaddr, uint16_t port) const
 {
-  for(int i = 0; i < 2; ++i) {
-    if(generateToken(infoHash, ipaddr, port, secret_[i]) == token) {
+  for(auto & elem : secret_) {
+    if(generateToken(infoHash, ipaddr, port, elem) == token) {
       return true;
     }
   }

@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.8.1: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.10: http://docutils.sourceforge.net/" />
 <title>aria2 - The ultra fast download utility</title>
 <meta name="author" content="Tatsuhiro Tsujikawa" />
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7056 2011-06-17 10:50:48Z milde $
+:Id: $Id: html4css1.css 7514 2012-09-14 14:27:12Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -78,7 +78,7 @@ div.tip p.admonition-title {
 
 div.attention p.admonition-title, div.caution p.admonition-title,
 div.danger p.admonition-title, div.error p.admonition-title,
-div.warning p.admonition-title {
+div.warning p.admonition-title, .code .error {
   color: red ;
   font-weight: bold ;
   font-family: sans-serif }
@@ -250,9 +250,18 @@ pre.address {
   margin-top: 0 ;
   font: inherit }
 
-pre.literal-block, pre.doctest-block, pre.math {
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
   margin-left: 2em ;
   margin-right: 2em }
+
+pre.code .ln { color: grey; } /* line numbers */
+pre.code, code { background-color: #eeeeee }
+pre.code .comment, code .comment { color: #5C6576 }
+pre.code .keyword, code .keyword { color: #3B0D06; font-weight: bold }
+pre.code .literal.string, code .literal.string { color: #0C5404 }
+pre.code .name.builtin, code .name.builtin { color: #352B84 }
+pre.code .deleted, code .deleted { background-color: #DEB0A1}
+pre.code .inserted, code .inserted { background-color: #A3D289}
 
 span.classifier {
   font-family: sans-serif ;
@@ -344,9 +353,9 @@ chunk checksums, aria2 automatically validates chunks of data while
 downloading a file like BitTorrent.</p>
 <p>The project page is located at <a class="reference external" href="http://aria2.sourceforge.net/">http://aria2.sourceforge.net/</a>.</p>
 <p>See <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">aria2 Online Manual</a> (<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian translation</a>, <a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese
-translation (1.15.2 based)</a>) and <a class="reference external" href="http://sourceforge.net/apps/trac/aria2/wiki/UsageExample">the usage
-examples</a>
-to learn how to use aria2.</p>
+translation</a>) and <a class="reference external" href="http://sourceforge.net/apps/trac/aria2/wiki/UsageExample">the
+usage examples</a> to learn
+how to use aria2.</p>
 </div>
 <div class="section" id="features">
 <h1>Features</h1>
@@ -488,6 +497,11 @@ script respectively.</p>
 </div>
 <div class="section" id="how-to-build">
 <h1>How to build</h1>
+<p>aria2 is primarily written in C++. Initially it was written based on
+C++98/C++03 standard features. We are now migrating aria2 to C++11
+standard. The current source code requires C++11 aware compiler. For
+well-known compilers, such as g++ and clang, flag <tt class="docutils literal"><span class="pre">-std=c++11</span></tt> or
+<tt class="docutils literal"><span class="pre">-std=c++0x</span></tt> must be supported.</p>
 <p>In order to build aria2 from the source package, you need following
 development packages(package name may vary depending on the
 distribution you use):</p>
@@ -516,7 +530,8 @@ libgnutls-dev, nettle-dev, libgmp-dev, libgpg-error-dev and libgcrypt-dev:</p>
 <li>libexpat1-dev    (Required for Metalink support)</li>
 </ul>
 <p>On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
-libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel</p>
+libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel,
+gettext-devel, cppunit</p>
 <p>If you downloaded source code from git repository, you have to run
 following command to generate configure script and other files
 necessary to build the program:</p>
@@ -661,7 +676,7 @@ they are not up-to-date.  You can also build HTML version of aria2 man
 page by <tt class="docutils literal">make html</tt>. The HTML version manual is also available at
 <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">online</a> (<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian
 translation</a>,
-<a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese translation (1.15.2 based)</a>).</p>
+<a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese translation</a>).</p>
 </div>
 <div class="section" id="bittorrrent">
 <h1>BitTorrrent</h1>
@@ -703,7 +718,7 @@ option to change the port number.</p>
 <div class="section" id="other-things-should-be-noted">
 <h2>Other things should be noted</h2>
 <ul class="simple">
-<li>-o option is used to change the filename of .torrent file itself,
+<li><tt class="docutils literal"><span class="pre">-o</span></tt> option is used to change the filename of .torrent file itself,
 not a filename of a file in .torrent file. For this purpose, use
 <tt class="docutils literal"><span class="pre">--index-out</span></tt> option instead.</li>
 <li>The port numbers that aria2 uses by default are 6881-6999 for TCP

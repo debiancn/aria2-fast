@@ -40,13 +40,12 @@
 namespace aria2 {
 
 DHTMessageEntry::DHTMessageEntry
-(const SharedHandle<DHTMessage>& message,
+(std::unique_ptr<DHTMessage> message,
  time_t timeout,
- const SharedHandle<DHTMessageCallback>& callback):
-  message(message),
-  timeout(timeout),
-  callback(callback) {}
-
-DHTMessageEntry::~DHTMessageEntry() {}
+ std::unique_ptr<DHTMessageCallback> callback)
+  : message{std::move(message)},
+    timeout{timeout},
+    callback{std::move(callback)}
+{}
 
 } // namespace aria2

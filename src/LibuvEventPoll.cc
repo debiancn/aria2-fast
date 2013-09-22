@@ -107,15 +107,15 @@ LibuvEventPoll::LibuvEventPoll()
 
 LibuvEventPoll::~LibuvEventPoll()
 {
-  for (KPolls::iterator i = polls_.begin(), e = polls_.end(); i != e; ++i) {
-    i->second->close();
+  for (auto& p: polls_) {
+    p.second->close();
   }
   // Actually kill the polls, and timers, if any.
   uv_run(loop_, (uv_run_mode)(UV_RUN_ONCE | UV_RUN_NOWAIT));
 
   if (loop_) {
     uv_loop_delete(loop_);
-    loop_ = 0;
+    loop_ = nullptr;
   }
 
   // Need this to free only after the loop is gone.
@@ -128,7 +128,7 @@ void LibuvEventPoll::poll(const struct timeval& tv)
 
   // timeout == 0 will tick once
   if (timeout >= 0) {
-    uv_timer_t* timer = new uv_timer_t;
+    auto timer = new uv_timer_t;
     uv_timer_init(loop_, timer);
     uv_timer_start(timer, timer_callback, timeout, timeout);
 
@@ -147,11 +147,10 @@ void LibuvEventPoll::poll(const struct timeval& tv)
   // own timeout and ares may create new sockets or closes socket in
   // their API. So we call ares_process_fd for all ares_channel and
   // re-register their sockets.
-  for(KAsyncNameResolverEntrySet::iterator i = nameResolverEntries_.begin(),
-        eoi = nameResolverEntries_.end(); i != eoi; ++i) {
-    (*i)->processTimeout();
-    (*i)->removeSocketEvents(this);
-    (*i)->addSocketEvents(this);
+  for (auto& r: nameResolverEntries_) {
+    r->processTimeout();
+    r->removeSocketEvents(this);
+    r->addSocketEvents(this);
   }
 #endif // ENABLE_ASYNC_DNS
 
@@ -179,9 +178,14 @@ int LibuvEventPoll::translateEvents(EventPoll::EventType events)
 
 void LibuvEventPoll::pollCallback(KPoll* poll, int status, int events)
 {
+#if HAVE_UV_LAST_ERROR
   if (status == -1) {
     uv_err_t err = uv_last_error(loop_);
     switch (err.code) {
+#else
+  if (status < 0) {
+    switch (status) {
+#endif
       case UV_EAGAIN:
       case UV_EINTR:
         return;
@@ -214,8 +218,8 @@ void LibuvEventPoll::pollCallback(KPoll* poll, int status, int events)
 bool LibuvEventPoll::addEvents(sock_t socket,
                                const LibuvEventPoll::KEvent& event)
 {
-  SharedHandle<KSocketEntry> socketEntry(new KSocketEntry(socket));
-  KSocketEntrySet::iterator i = socketEntries_.lower_bound(socketEntry);
+  auto socketEntry = std::make_shared<KSocketEntry>(socket);
+  auto i = socketEntries_.lower_bound(socketEntry);
 
   if (i != socketEntries_.end() && **i == *socketEntry) {
     event.addSelf(*i);
@@ -229,7 +233,7 @@ bool LibuvEventPoll::addEvents(sock_t socket,
 
   socketEntries_.insert(i, socketEntry);
   event.addSelf(socketEntry);
-  KPoll* poll = new KPoll(this, socketEntry.get(), socket);
+  auto poll = new KPoll(this, socketEntry.get(), socket);
   polls_[socket] = poll;
   poll->start();
   return true;
@@ -243,7 +247,7 @@ bool LibuvEventPoll::addEvents(sock_t socket, Command* command, EventPoll::Event
 
 #ifdef ENABLE_ASYNC_DNS
 bool LibuvEventPoll::addEvents(sock_t socket, Command* command, int events,
-                               const SharedHandle<AsyncNameResolver>& rs)
+                               const std::shared_ptr<AsyncNameResolver>& rs)
 {
   return addEvents(socket, KADNSEvent(rs, command, socket, events));
 }
@@ -252,8 +256,8 @@ bool LibuvEventPoll::addEvents(sock_t socket, Command* command, int events,
 bool LibuvEventPoll::deleteEvents(sock_t socket,
                                   const LibuvEventPoll::KEvent& event)
 {
-  SharedHandle<KSocketEntry> socketEntry(new KSocketEntry(socket));
-  KSocketEntrySet::iterator i = socketEntries_.find(socketEntry);
+  auto socketEntry = std::make_shared<KSocketEntry>(socket);
+  auto i = socketEntries_.find(socketEntry);
 
   if (i == socketEntries_.end()) {
     A2_LOG_DEBUG(fmt("Socket %d is not found in SocketEntries.", socket));
@@ -262,7 +266,7 @@ bool LibuvEventPoll::deleteEvents(sock_t socket,
 
   event.removeSelf(*i);
 
-  KPolls::iterator poll = polls_.find(socket);
+  auto poll = polls_.find(socket);
   if (poll == polls_.end()) {
     return false;
   }
@@ -280,7 +284,7 @@ bool LibuvEventPoll::deleteEvents(sock_t socket,
 
 #ifdef ENABLE_ASYNC_DNS
 bool LibuvEventPoll::deleteEvents(sock_t socket, Command* command,
-                                  const SharedHandle<AsyncNameResolver>& rs)
+                                  const std::shared_ptr<AsyncNameResolver>& rs)
 {
   return deleteEvents(socket, KADNSEvent(rs, command, socket, 0));
 }
@@ -294,13 +298,11 @@ bool LibuvEventPoll::deleteEvents(sock_t socket, Command* command,
 }
 
 #ifdef ENABLE_ASYNC_DNS
-bool LibuvEventPoll::addNameResolver(const SharedHandle<AsyncNameResolver>& resolver,
+bool LibuvEventPoll::addNameResolver(const std::shared_ptr<AsyncNameResolver>& resolver,
                                      Command* command)
 {
-  SharedHandle<KAsyncNameResolverEntry> entry(
-      new KAsyncNameResolverEntry(resolver, command));
-  KAsyncNameResolverEntrySet::iterator itr =
-    nameResolverEntries_.lower_bound(entry);
+  auto entry = std::make_shared<KAsyncNameResolverEntry>(resolver, command);
+  auto itr = nameResolverEntries_.lower_bound(entry);
   if (itr != nameResolverEntries_.end() && *(*itr) == *entry) {
     return false;
   }
@@ -309,12 +311,11 @@ bool LibuvEventPoll::addNameResolver(const SharedHandle<AsyncNameResolver>& reso
   return true;
 }
 
-bool LibuvEventPoll::deleteNameResolver(const SharedHandle<AsyncNameResolver>& resolver,
+bool LibuvEventPoll::deleteNameResolver(const std::shared_ptr<AsyncNameResolver>& resolver,
                                         Command* command)
 {
-  SharedHandle<KAsyncNameResolverEntry> entry(
-      new KAsyncNameResolverEntry(resolver, command));
-  KAsyncNameResolverEntrySet::iterator itr = nameResolverEntries_.find(entry);
+  auto entry = std::make_shared<KAsyncNameResolverEntry>(resolver, command);
+  auto itr = nameResolverEntries_.find(entry);
   if (itr == nameResolverEntries_.end()) {
     return false;
   }

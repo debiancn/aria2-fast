@@ -55,9 +55,9 @@ CreateRequestCommand::CreateRequestCommand(cuid_t cuid,
                                            RequestGroup* requestGroup,
                                            DownloadEngine* e):
   AbstractCommand
-  (cuid, SharedHandle<Request>(), SharedHandle<FileEntry>(), requestGroup, e,
-   SharedHandle<SocketCore>(),
-   SharedHandle<SocketRecvBuffer>(),
+  (cuid, std::shared_ptr<Request>(), std::shared_ptr<FileEntry>(), requestGroup, e,
+   std::shared_ptr<SocketCore>(),
+   std::shared_ptr<SocketRecvBuffer>(),
    false)
 {
   setStatus(Command::STATUS_ONESHOT_REALTIME);
@@ -79,7 +79,7 @@ bool CreateRequestCommand::executeInternal()
     getDownloadEngine()->getRequestGroupMan()->getUsedHosts(usedHosts);
   }
   setRequest
-    (getFileEntry()->getRequest(getRequestGroup()->getURISelector(),
+    (getFileEntry()->getRequest(getRequestGroup()->getURISelector().get(),
                                 getOption()->getAsBool(PREF_REUSE_URI),
                                 usedHosts,
                                 getOption()->get(PREF_REFERER),
@@ -105,16 +105,15 @@ bool CreateRequestCommand::executeInternal()
     // counted (1 for pooled and another one in this command) and
     // AbstractCommand::execute() will behave badly.
     resetRequest();
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     return false;
   }
 
-  Command* command =
-    InitiateConnectionCommandFactory::createInitiateConnectionCommand
-    (getCuid(), getRequest(), getFileEntry(), getRequestGroup(),
-     getDownloadEngine());
   getDownloadEngine()->setNoWait(true);
-  getDownloadEngine()->addCommand(command);
+  getDownloadEngine()->addCommand
+    (InitiateConnectionCommandFactory::createInitiateConnectionCommand
+     (getCuid(), getRequest(), getFileEntry(), getRequestGroup(),
+      getDownloadEngine()));
   return true;
 }
 

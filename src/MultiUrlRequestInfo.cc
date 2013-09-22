@@ -50,7 +50,8 @@
 #include "message.h"
 #include "util.h"
 #include "Option.h"
-#include "StatCalc.h"
+#include "ConsoleStatCalc.h"
+#include "NullStatCalc.h"
 #include "CookieStorage.h"
 #include "File.h"
 #include "Netrc.h"
@@ -59,10 +60,11 @@
 #include "TimeA2.h"
 #include "fmt.h"
 #include "SocketCore.h"
-#include "OutputFile.h"
+#include "NullOutputFile.h"
 #include "UriListParser.h"
 #include "SingletonHolder.h"
 #include "Notifier.h"
+#include "console.h"
 #ifdef ENABLE_WEBSOCKET
 # include "WebSocketSessionMan.h"
 #else // !ENABLE_WEBSOCKET
@@ -84,34 +86,70 @@ extern volatile sig_atomic_t globalHaltRequested;
 } // namespace global
 
 namespace {
-void handler(int signal) {
+
+#ifdef _WIN32
+static const DWORD mainThread = GetCurrentThreadId();
+#endif
+
+static void handler(int signal)
+{
   if(
 #ifdef SIGHUP
      signal == SIGHUP ||
 #endif // SIGHUP
      signal == SIGTERM) {
-    if(global::globalHaltRequested == 0 || global::globalHaltRequested == 2) {
+    if(global::globalHaltRequested <= 2) {
       global::globalHaltRequested = 3;
     }
-  } else {
-    if(global::globalHaltRequested == 0) {
-      global::globalHaltRequested = 1;
-    } else if(global::globalHaltRequested == 2) {
-      global::globalHaltRequested = 3;
+#ifdef _WIN32
+    if (::GetCurrentThreadId() != mainThread) {
+      // SIGTERM may arrive on another thread (via SetConsoleCtrlHandler), and
+      // the process will be forcefully terminated as soon as that thread is
+      // done. So better make sure it isn't done prematurely. ;)
+      while (global::globalHaltRequested != 5) {
+        ::Sleep(100); // Yeah, semi-busy waiting for now.
+      }
     }
+#endif
+    return;
+  }
+
+  // SIGINT
+
+  if (global::globalHaltRequested == 0) {
+    global::globalHaltRequested = 1;
+    return;
+  }
+
+  if (global::globalHaltRequested == 2) {
+    global::globalHaltRequested = 3;
+    return;
   }
 }
 } // namespace
 
+namespace {
+
+std::unique_ptr<StatCalc> getStatCalc(const std::shared_ptr<Option>& op)
+{
+  if(op->getAsBool(PREF_QUIET)) {
+    return make_unique<NullStatCalc>();
+  }
+  auto impl = make_unique<ConsoleStatCalc>(op->getAsInt(PREF_SUMMARY_INTERVAL),
+                                           op->getAsBool(PREF_HUMAN_READABLE));
+  impl->setReadoutVisibility(op->getAsBool(PREF_SHOW_CONSOLE_READOUT));
+  impl->setTruncate(op->getAsBool(PREF_TRUNCATE_CONSOLE_READOUT));
+  return std::move(impl);
+}
+
+} // namespace
+
 MultiUrlRequestInfo::MultiUrlRequestInfo
-(std::vector<SharedHandle<RequestGroup> >& requestGroups,
- const SharedHandle<Option>& op,
- const SharedHandle<StatCalc>& statCalc,
- const SharedHandle<OutputFile>& summaryOut,
- const SharedHandle<UriListParser>& uriListParser)
-  : option_(op),
-    statCalc_(statCalc),
-    summaryOut_(summaryOut),
+(std::vector<std::shared_ptr<RequestGroup> > requestGroups,
+ const std::shared_ptr<Option>& op,
+ const std::shared_ptr<UriListParser>& uriListParser)
+  : requestGroups_(std::move(requestGroups)),
+    option_(op),
     uriListParser_(uriListParser),
     useSignalHandler_(true)
 {
@@ -120,59 +158,55 @@ MultiUrlRequestInfo::MultiUrlRequestInfo
 #else // !HAVE_SIGACTION
   mask_ = 0;
 #endif // !HAVE_SIGACTION
-  requestGroups_.swap(requestGroups);
 }
 
 MultiUrlRequestInfo::~MultiUrlRequestInfo() {}
 
 void MultiUrlRequestInfo::printMessageForContinue()
 {
-  summaryOut_->printf
-    ("\n%s\n%s\n",
-     _("aria2 will resume download if the transfer is restarted."),
-     _("If there are any errors, then see the log file. See '-l' option in help/man page for details."));
+  if(!option_->getAsBool(PREF_QUIET)) {
+    global::cout()->printf
+      ("\n%s\n%s\n",
+       _("aria2 will resume download if the transfer is restarted."),
+       _("If there are any errors, then see the log file. See '-l' option in help/man page for details."));
+  }
 }
 
 int MultiUrlRequestInfo::prepare()
 {
   global::globalHaltRequested = 0;
   try {
-    SharedHandle<Notifier> notifier(new Notifier());
-    SingletonHolder<Notifier>::instance(notifier);
+    SingletonHolder<Notifier>::instance(make_unique<Notifier>());
 
 #ifdef ENABLE_SSL
     if(option_->getAsBool(PREF_ENABLE_RPC) &&
        option_->getAsBool(PREF_RPC_SECURE)) {
-      if(!option_->blank(PREF_RPC_CERTIFICATE)
+      if(option_->blank(PREF_RPC_CERTIFICATE)
 #ifndef HAVE_APPLETLS
-         && !option_->blank(PREF_RPC_PRIVATE_KEY)
+        || option_->blank(PREF_RPC_PRIVATE_KEY)
 #endif // HAVE_APPLETLS
          ) {
-        // We set server TLS context to the SocketCore before creating
-        // DownloadEngine instance.
-        SharedHandle<TLSContext> svTlsContext(TLSContext::make(TLS_SERVER));
-        svTlsContext->addCredentialFile(option_->get(PREF_RPC_CERTIFICATE),
-                                        option_->get(PREF_RPC_PRIVATE_KEY));
-        SocketCore::setServerTLSContext(svTlsContext);
-      } else {
         throw DL_ABORT_EX("Specify --rpc-certificate and --rpc-private-key "
                           "options in order to use secure RPC.");
       }
+      // We set server TLS context to the SocketCore before creating
+      // DownloadEngine instance.
+      std::shared_ptr<TLSContext> svTlsContext(TLSContext::make(TLS_SERVER));
+      svTlsContext->addCredentialFile(option_->get(PREF_RPC_CERTIFICATE),
+                                      option_->get(PREF_RPC_PRIVATE_KEY));
+      SocketCore::setServerTLSContext(svTlsContext);
     }
 #endif // ENABLE_SSL
 
+    // RequestGroups will be transferred to DownloadEngine
     e_ = DownloadEngineFactory().newDownloadEngine(option_.get(),
-                                                   requestGroups_);
-    // Avoid keeping RequestGroups alive longer than necessary
-    requestGroups_.clear();
+                                                   std::move(requestGroups_));
 
 #ifdef ENABLE_WEBSOCKET
     if(option_->getAsBool(PREF_ENABLE_RPC)) {
-      SharedHandle<rpc::WebSocketSessionMan> wsSessionMan
-        (new rpc::WebSocketSessionMan());
-      e_->setWebSocketSessionMan(wsSessionMan);
+      e_->setWebSocketSessionMan(make_unique<rpc::WebSocketSessionMan>());
       SingletonHolder<Notifier>::instance()->addDownloadEventListener
-        (wsSessionMan);
+        (e_->getWebSocketSessionMan().get());
     }
 #endif // ENABLE_WEBSOCKET
 
@@ -189,7 +223,7 @@ int MultiUrlRequestInfo::prepare()
       }
     }
 
-    SharedHandle<AuthConfigFactory> authConfigFactory(new AuthConfigFactory());
+    auto authConfigFactory = make_unique<AuthConfigFactory>();
     File netrccf(option_->get(PREF_NETRC_PATH));
     if(!option_->getAsBool(PREF_NO_NETRC) && netrccf.isFile()) {
 #ifdef __MINGW32__
@@ -202,15 +236,15 @@ int MultiUrlRequestInfo::prepare()
         A2_LOG_NOTICE(fmt(MSG_INCORRECT_NETRC_PERMISSION,
                           option_->get(PREF_NETRC_PATH).c_str()));
       } else {
-        SharedHandle<Netrc> netrc(new Netrc());
+        auto netrc = make_unique<Netrc>();
         netrc->parse(option_->get(PREF_NETRC_PATH));
-        authConfigFactory->setNetrc(netrc);
+        authConfigFactory->setNetrc(std::move(netrc));
       }
     }
-    e_->setAuthConfigFactory(authConfigFactory);
+    e_->setAuthConfigFactory(std::move(authConfigFactory));
 
 #ifdef ENABLE_SSL
-    SharedHandle<TLSContext> clTlsContext(TLSContext::make(TLS_CLIENT));
+    std::shared_ptr<TLSContext> clTlsContext(TLSContext::make(TLS_CLIENT));
     if(!option_->blank(PREF_CERTIFICATE) &&
        !option_->blank(PREF_PRIVATE_KEY)) {
       clTlsContext->addCredentialFile(option_->get(PREF_CERTIFICATE),
@@ -246,7 +280,7 @@ int MultiUrlRequestInfo::prepare()
       e_->getRequestGroupMan()->removeStaleServerStat
         (option_->getAsInt(PREF_SERVER_STAT_TIMEOUT));
     }
-    e_->setStatCalc(statCalc_);
+    e_->setStatCalc(getStatCalc(option_));
     if(uriListParser_) {
       e_->getRequestGroupMan()->setUriListParser(uriListParser_);
     }
@@ -275,9 +309,11 @@ error_code::Value MultiUrlRequestInfo::getResult()
   if(!serverStatOf.empty()) {
     e_->getRequestGroupMan()->saveServerStat(serverStatOf);
   }
-  e_->getRequestGroupMan()->showDownloadResults
-    (*summaryOut_, option_->get(PREF_DOWNLOAD_RESULT) == A2_V_FULL);
-  summaryOut_->flush();
+  if(!option_->getAsBool(PREF_QUIET)) {
+    e_->getRequestGroupMan()->showDownloadResults
+      (*global::cout(), option_->get(PREF_DOWNLOAD_RESULT) == A2_V_FULL);
+    global::cout()->flush();
+  }
 
   RequestGroupMan::DownloadStat s =
     e_->getRequestGroupMan()->getDownloadStat();
@@ -290,7 +326,7 @@ error_code::Value MultiUrlRequestInfo::getResult()
       returnValue = s.getLastErrorResult();
     }
   }
-  SessionSerializer sessionSerializer(e_->getRequestGroupMan());
+  SessionSerializer sessionSerializer{e_->getRequestGroupMan().get()};
   // TODO Add option: --save-session-status=error,inprogress,waiting
   if(!option_->blank(PREF_SAVE_SESSION)) {
     const std::string& filename = option_->get(PREF_SAVE_SESSION);
@@ -375,7 +411,7 @@ void MultiUrlRequestInfo::resetSignalHandlers()
 #endif // SIGPIPE
 }
 
-const SharedHandle<DownloadEngine>&
+const std::unique_ptr<DownloadEngine>&
 MultiUrlRequestInfo::getDownloadEngine() const
 {
   return e_;

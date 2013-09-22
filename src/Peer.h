@@ -42,7 +42,6 @@
 #include <set>
 #include <algorithm>
 
-#include "SharedHandle.h"
 #include "TimerA2.h"
 #include "BtConstants.h"
 #include "PeerStat.h"
@@ -130,7 +129,7 @@ public:
   // Returns true iff res_ != 0.
   bool isActive() const
   {
-    return res_ != 0;
+    return res_ != nullptr;
   }
 
   void setPeerId(const unsigned char* peerId);

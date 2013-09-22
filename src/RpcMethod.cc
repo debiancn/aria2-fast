@@ -59,23 +59,23 @@ RpcMethod::RpcMethod()
 
 RpcMethod::~RpcMethod() {}
 
-SharedHandle<ValueBase> RpcMethod::createErrorResponse
+std::unique_ptr<ValueBase> RpcMethod::createErrorResponse
 (const Exception& e, const RpcRequest& req)
 {
-  SharedHandle<Dict> params = Dict::g();
+  auto params = Dict::g();
   params->put((req.jsonRpc ? "code" : "faultCode"), Integer::g(1));
   params->put((req.jsonRpc ? "message" : "faultString"), std::string(e.what()));
-  return params;
+  return std::move(params);
 }
 
-RpcResponse RpcMethod::execute
-(const RpcRequest& req, DownloadEngine* e)
+RpcResponse RpcMethod::execute(RpcRequest req, DownloadEngine* e)
 {
   try {
-    return RpcResponse(0, process(req, e), req.id);
+    auto r = process(req, e);
+    return RpcResponse(0, std::move(r), std::move(req.id));
   } catch(RecoverableException& ex) {
     A2_LOG_DEBUG_EX(EX_EXCEPTION_CAUGHT, ex);
-    return RpcResponse(1, createErrorResponse(ex, req), req.id);
+    return RpcResponse(1, createErrorResponse(ex, req), std::move(req.id));
   }
 }
 
@@ -85,7 +85,7 @@ void gatherOption
 (InputIterator first, InputIterator last,
  Pred pred,
  Option* option,
- const SharedHandle<OptionParser>& optionParser)
+ const std::shared_ptr<OptionParser>& optionParser)
 {
   for(; first != last; ++first) {
     const std::string& optionName = (*first).first;
@@ -102,9 +102,8 @@ void gatherOption
       // header and index-out option can take array as value
       const List* oplist = downcast<List>((*first).second);
       if(oplist) {
-        for(List::ValueType::const_iterator argiter = oplist->begin(),
-              eoi = oplist->end(); argiter != eoi; ++argiter) {
-          const String* opval = downcast<String>(*argiter);
+        for(auto & elem : *oplist) {
+          const String* opval = downcast<String>(elem);
           if(opval) {
             handler->parse(*option, opval->s());
           }
@@ -119,7 +118,7 @@ void RpcMethod::gatherRequestOption(Option* option, const Dict* optionsDict)
 {
   if(optionsDict) {
     gatherOption(optionsDict->begin(), optionsDict->end(),
-                 std::mem_fun(&OptionHandler::getInitialOption),
+                 std::mem_fn(&OptionHandler::getInitialOption),
                  option, optionParser_);
   }
 }
@@ -128,7 +127,7 @@ void RpcMethod::gatherChangeableOption(Option* option, const Dict* optionsDict)
 {
   if(optionsDict) {
     gatherOption(optionsDict->begin(), optionsDict->end(),
-                 std::mem_fun(&OptionHandler::getChangeOption),
+                 std::mem_fn(&OptionHandler::getChangeOption),
                  option, optionParser_);
   }
 }
@@ -139,7 +138,7 @@ void RpcMethod::gatherChangeableOptionForReserved
 {
   if(optionsDict) {
     gatherOption(optionsDict->begin(), optionsDict->end(),
-                 std::mem_fun(&OptionHandler::getChangeOptionForReserved),
+                 std::mem_fn(&OptionHandler::getChangeOptionForReserved),
                  option, optionParser_);
   }
 }
@@ -149,7 +148,7 @@ void RpcMethod::gatherChangeableGlobalOption
 {
   if(optionsDict) {
     gatherOption(optionsDict->begin(), optionsDict->end(),
-                 std::mem_fun(&OptionHandler::getChangeGlobalOption),
+                 std::mem_fn(&OptionHandler::getChangeGlobalOption),
                  option, optionParser_);
   }
 }

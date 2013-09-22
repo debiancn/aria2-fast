@@ -68,13 +68,13 @@ namespace aria2 {
 extern void showVersion();
 extern void showUsage
 (const std::string& keyword,
- const SharedHandle<OptionParser>& oparser,
+ const std::shared_ptr<OptionParser>& oparser,
  const Console& out);
 
 namespace {
 void overrideWithEnv
 (Option& op,
- const SharedHandle<OptionParser>& optionParser,
+ const std::shared_ptr<OptionParser>& optionParser,
  const Pref* pref,
  const std::string& envName)
 {
@@ -131,7 +131,7 @@ int levenshtein
 namespace {
 
 void showCandidates
-(const std::string& unknownOption, const SharedHandle<OptionParser>& parser)
+(const std::string& unknownOption, const std::shared_ptr<OptionParser>& parser)
 {
   const char* optstr = unknownOption.c_str();
   for(; *optstr == '-'; ++optstr);
@@ -168,8 +168,8 @@ void showCandidates
   global::cerr()->printf("\n");
   global::cerr()->printf(_("Did you mean:"));
   global::cerr()->printf("\n");
-  for(std::vector<std::pair<int, const Pref*> >::iterator i = cands.begin(),
-        eoi = cands.end(); i != eoi && (*i).first <= threshold; ++i) {
+  for(auto i = cands.begin(), eoi = cands.end();
+      i != eoi && (*i).first <= threshold; ++i) {
     global::cerr()->printf("\t--%s\n", (*i).second->k);
   }
 }
@@ -195,7 +195,7 @@ error_code::Value option_processing(Option& op, bool standalone,
                                     int argc, char** argv,
                                     const KeyVals& options)
 {
-  const SharedHandle<OptionParser>& oparser = OptionParser::getInstance();
+  const std::shared_ptr<OptionParser>& oparser = OptionParser::getInstance();
   try {
     bool noConf = false;
     std::string ucfname;
@@ -231,7 +231,7 @@ error_code::Value option_processing(Option& op, bool standalone,
         }
       }
     }
-    SharedHandle<Option> confOption(new Option());
+    std::shared_ptr<Option> confOption(new Option());
     oparser->parseDefaultValues(*confOption);
     if(!noConf) {
       std::string cfname =

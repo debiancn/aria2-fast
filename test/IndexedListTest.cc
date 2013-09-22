@@ -229,7 +229,7 @@ void IndexedListTest::testGet()
   int b = 1;
   list.push_back(123, &a);
   list.push_back(1, &b);
-  CPPUNIT_ASSERT_EQUAL((int*)0, list.get(1000));
+  CPPUNIT_ASSERT_EQUAL((int*)nullptr, list.get(1000));
   CPPUNIT_ASSERT_EQUAL(&a, list.get(123));
 }
 
@@ -237,7 +237,7 @@ namespace {
 struct KeyFunc {
   int n;
   KeyFunc(int n):n(n) {}
-  int operator()(const SharedHandle<std::string>& x)
+  int operator()(const std::shared_ptr<std::string>& x)
   {
     return n++;
   }
@@ -246,25 +246,25 @@ struct KeyFunc {
 
 void IndexedListTest::testInsert_keyFunc()
 {
-  SharedHandle<std::string> s[] = {
-    SharedHandle<std::string>(new std::string("a")),
-    SharedHandle<std::string>(new std::string("b")),
-    SharedHandle<std::string>(new std::string("c")),
-    SharedHandle<std::string>(new std::string("d"))
+  std::shared_ptr<std::string> s[] = {
+    std::shared_ptr<std::string>(new std::string("a")),
+    std::shared_ptr<std::string>(new std::string("b")),
+    std::shared_ptr<std::string>(new std::string("c")),
+    std::shared_ptr<std::string>(new std::string("d"))
   };
   size_t slen = sizeof(s)/sizeof(s[0]);
-  IndexedList<int, SharedHandle<std::string> > list;
-  list.insert(list.begin(), KeyFunc(0), vbegin(s), vend(s));
+  IndexedList<int, std::shared_ptr<std::string> > list;
+  list.insert(list.begin(), KeyFunc(0), std::begin(s), std::end(s));
   CPPUNIT_ASSERT_EQUAL((size_t)slen, list.size());
   for(size_t i = 0; i < slen; ++i) {
     CPPUNIT_ASSERT_EQUAL(*s[i], *list.get(i));
   }
-  list.insert(list.begin()+2, KeyFunc(slen), vbegin(s), vend(s));
+  list.insert(list.begin()+2, KeyFunc(slen), std::begin(s), std::end(s));
   CPPUNIT_ASSERT_EQUAL((size_t)slen*2, list.size());
   for(size_t i = slen; i < slen*2; ++i) {
     CPPUNIT_ASSERT_EQUAL(*s[i - slen], *list.get(i));
   }
-  IndexedList<int, SharedHandle<std::string> >::iterator itr;
+  IndexedList<int, std::shared_ptr<std::string> >::iterator itr;
   itr = list.begin();
   CPPUNIT_ASSERT_EQUAL(std::string("a"), *(*itr++));
   CPPUNIT_ASSERT_EQUAL(std::string("b"), *(*itr++));
@@ -275,7 +275,7 @@ void IndexedListTest::testInsert_keyFunc()
   CPPUNIT_ASSERT_EQUAL(std::string("c"), *(*itr++));
   CPPUNIT_ASSERT_EQUAL(std::string("d"), *(*itr++));
 
-  list.insert(list.begin(), KeyFunc(2*slen-1), vbegin(s), vend(s));
+  list.insert(list.begin(), KeyFunc(2*slen-1), std::begin(s), std::end(s));
   CPPUNIT_ASSERT_EQUAL((size_t)slen*3-1, list.size());
   itr = list.begin();
   CPPUNIT_ASSERT_EQUAL(std::string("b"), *(*itr++));
@@ -319,8 +319,8 @@ void IndexedListTest::testIterator()
   IndexedList<int, int*> list;
   IndexedList<int, int*>::iterator itr;
   IndexedList<int, int*>::const_iterator citr;
-  for(int *i = vbegin(a); i < vend(a); ++i) {
-    CPPUNIT_ASSERT(list.push_back(*i, i));
+  for(auto& i : a) {
+    CPPUNIT_ASSERT(list.push_back(i, &i));
   }
   CPPUNIT_ASSERT(list.begin() == list.begin());
   itr = list.begin();
@@ -417,8 +417,8 @@ void IndexedListTest::testRemoveIf()
 {
   int a[] = {0,1,2,3,4,5,6,7,8,9};
   IndexedList<int, int*> list;
-  for(int *i = vbegin(a); i < vend(a); ++i) {
-    CPPUNIT_ASSERT(list.push_back(*i, i));
+  for(auto& i : a) {
+    CPPUNIT_ASSERT(list.push_back(i, &i));
   }
   list.remove_if(RemoveOdd());
   CPPUNIT_ASSERT_EQUAL((size_t)5, list.size());

@@ -87,9 +87,10 @@ void SocketCoreTest::testInetNtop()
   {
     std::string s = "192.168.0.1";
     addrinfo* res;
-    CPPUNIT_ASSERT_EQUAL(0, callGetaddrinfo(&res, s.c_str(), 0, AF_INET,
+    CPPUNIT_ASSERT_EQUAL(0, callGetaddrinfo(&res, s.c_str(), nullptr, AF_INET,
                                             SOCK_STREAM, 0, 0));
-    WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+    std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+      (res, freeaddrinfo);
     sockaddr_in addr;
     memcpy(&addr, res->ai_addr, sizeof(addr));
     CPPUNIT_ASSERT_EQUAL(0, inetNtop(AF_INET, &addr.sin_addr,
@@ -99,9 +100,10 @@ void SocketCoreTest::testInetNtop()
   {
     std::string s = "2001:db8::2:1";
     addrinfo* res;
-    CPPUNIT_ASSERT_EQUAL(0, callGetaddrinfo(&res, s.c_str(), 0, AF_INET6,
+    CPPUNIT_ASSERT_EQUAL(0, callGetaddrinfo(&res, s.c_str(), nullptr, AF_INET6,
                                             SOCK_STREAM, 0, 0));
-    WSAAPI_AUTO_DELETE<struct addrinfo*> resDeleter(res, freeaddrinfo);
+    std::unique_ptr<addrinfo, decltype(&freeaddrinfo)> resDeleter
+      (res, freeaddrinfo);
     sockaddr_in6 addr;
     memcpy(&addr, res->ai_addr, sizeof(addr));
     CPPUNIT_ASSERT_EQUAL(0, inetNtop(AF_INET6, &addr.sin6_addr,

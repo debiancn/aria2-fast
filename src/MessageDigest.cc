@@ -63,24 +63,21 @@ HashTypeEntry hashTypes[] = {
 };
 } // namespace aria2
 
-MessageDigest::MessageDigest()
+MessageDigest::MessageDigest(std::unique_ptr<MessageDigestImpl> impl)
+  : pImpl_{std::move(impl)}
 {}
 
-MessageDigest::~MessageDigest()
-{}
+MessageDigest::~MessageDigest() {}
 
-SharedHandle<MessageDigest> MessageDigest::sha1()
+std::unique_ptr<MessageDigest> MessageDigest::sha1()
 {
-  SharedHandle<MessageDigest> md(new MessageDigest());
-  md->pImpl_ = MessageDigestImpl::sha1();
-  return md;
+  return make_unique<MessageDigest>(MessageDigestImpl::sha1());
 }
 
-SharedHandle<MessageDigest> MessageDigest::create(const std::string& hashType)
+std::unique_ptr<MessageDigest> MessageDigest::create
+(const std::string& hashType)
 {
-  SharedHandle<MessageDigest> md(new MessageDigest());
-  md->pImpl_ = MessageDigestImpl::create(hashType);
-  return md;
+  return make_unique<MessageDigest>(MessageDigestImpl::create(hashType));
 }
 
 bool MessageDigest::supports(const std::string& hashType)
@@ -91,10 +88,9 @@ bool MessageDigest::supports(const std::string& hashType)
 std::vector<std::string> MessageDigest::getSupportedHashTypes()
 {
   std::vector<std::string> rv;
-  for (HashTypeEntry *i = vbegin(hashTypes), *eoi = vend(hashTypes);
-       i != eoi; ++i) {
-    if (MessageDigestImpl::supports(i->hashType)) {
-      rv.push_back(i->hashType);
+  for (const auto& i : hashTypes) {
+    if (MessageDigestImpl::supports(i.hashType)) {
+      rv.push_back(i.hashType);
     }
   }
   return rv;
@@ -102,10 +98,11 @@ std::vector<std::string> MessageDigest::getSupportedHashTypes()
 
 std::string MessageDigest::getSupportedHashTypeString()
 {
-  std::vector<std::string> ht = getSupportedHashTypes();
+  auto ht = getSupportedHashTypes();
   std::stringstream ss;
-  std::copy(ht.begin(), ht.end(), std::ostream_iterator<std::string>(ss, ", "));
-  std::string res = ss.str();
+  std::copy(std::begin(ht), std::end(ht),
+            std::ostream_iterator<std::string>(ss, ", "));
+  auto res = ss.str();
   if(!res.empty()) {
     res.erase(ss.str().length()-2);
   }
@@ -134,11 +131,11 @@ public:
 
 bool MessageDigest::isStronger(const std::string& lhs, const std::string& rhs)
 {
-  HashTypeEntry* lEntry = std::find_if(vbegin(hashTypes), vend(hashTypes),
-                                       FindHashTypeEntry(lhs));
-  HashTypeEntry* rEntry = std::find_if(vbegin(hashTypes), vend(hashTypes),
-                                       FindHashTypeEntry(rhs));
-  if(lEntry == vend(hashTypes) || rEntry == vend(hashTypes)) {
+  auto lEntry = std::find_if(std::begin(hashTypes), std::end(hashTypes),
+                             FindHashTypeEntry(lhs));
+  auto rEntry = std::find_if(std::begin(hashTypes), std::end(hashTypes),
+                             FindHashTypeEntry(rhs));
+  if(lEntry == std::end(hashTypes) || rEntry == std::end(hashTypes)) {
     return false;
   }
   return lEntry->strength > rEntry->strength;
@@ -189,10 +186,9 @@ void MessageDigest::digest(unsigned char* md)
 std::string MessageDigest::digest()
 {
   size_t length = pImpl_->getDigestLength();
-  array_ptr<unsigned char> buf(new unsigned char[length]);
-  pImpl_->digest(buf);
-  std::string hd(&buf[0], &buf[length]);
-  return hd;
+  auto buf = make_unique<unsigned char[]>(length);
+  pImpl_->digest(buf.get());
+  return std::string(&buf[0], &buf[length]);
 }
 
 } // namespace aria2

@@ -58,15 +58,18 @@ namespace aria2 {
 
 DHTEntryPointNameResolveCommand::DHTEntryPointNameResolveCommand
 (cuid_t cuid, DownloadEngine* e,
- const std::vector<std::pair<std::string, uint16_t> >& entryPoints):
-  Command(cuid),
-  e_(e),
+ const std::vector<std::pair<std::string, uint16_t> >& entryPoints)
+  : Command{cuid},
+    e_{e},
 #ifdef ENABLE_ASYNC_DNS
-  asyncNameResolverMan_(new AsyncNameResolverMan()),
+    asyncNameResolverMan_{make_unique<AsyncNameResolverMan>()},
 #endif // ENABLE_ASYNC_DNS
-  entryPoints_(entryPoints.begin(), entryPoints.end()),
-  numSuccess_(0),
-  bootstrapEnabled_(false)
+    taskQueue_{nullptr},
+    taskFactory_{nullptr},
+    routingTable_{nullptr},
+    entryPoints_(std::begin(entryPoints), std::end(entryPoints)),
+    numSuccess_{0},
+    bootstrapEnabled_{false}
 {
 #ifdef ENABLE_ASYNC_DNS
   configureAsyncNameResolverMan(asyncNameResolverMan_.get(), e_->getOption());
@@ -99,7 +102,7 @@ bool DHTEntryPointNameResolveCommand::execute()
           std::vector<std::string> res;
           int rv = resolveHostname(res, hostname);
           if(rv == 0) {
-            e_->addCommand(this);
+            e_->addCommand(std::unique_ptr<Command>(this));
             return false;
           } else {
             if(rv == 1) {
@@ -148,7 +151,7 @@ bool DHTEntryPointNameResolveCommand::execute()
 void DHTEntryPointNameResolveCommand::addPingTask
 (const std::pair<std::string, uint16_t>& addr)
 {
-  SharedHandle<DHTNode> entryNode(new DHTNode());
+  std::shared_ptr<DHTNode> entryNode(new DHTNode());
   entryNode->setIPAddress(addr.first);
   entryNode->setPort(addr.second);
 
@@ -197,26 +200,25 @@ void DHTEntryPointNameResolveCommand::setBootstrapEnabled(bool f)
   bootstrapEnabled_ = f;
 }
 
-void DHTEntryPointNameResolveCommand::setTaskQueue
-(const SharedHandle<DHTTaskQueue>& taskQueue)
+void DHTEntryPointNameResolveCommand::setTaskQueue(DHTTaskQueue* taskQueue)
 {
   taskQueue_ = taskQueue;
 }
 
 void DHTEntryPointNameResolveCommand::setTaskFactory
-(const SharedHandle<DHTTaskFactory>& taskFactory)
+(DHTTaskFactory* taskFactory)
 {
   taskFactory_ = taskFactory;
 }
 
 void DHTEntryPointNameResolveCommand::setRoutingTable
-(const SharedHandle<DHTRoutingTable>& routingTable)
+(DHTRoutingTable* routingTable)
 {
   routingTable_ = routingTable;
 }
 
 void DHTEntryPointNameResolveCommand::setLocalNode
-(const SharedHandle<DHTNode>& localNode)
+(const std::shared_ptr<DHTNode>& localNode)
 {
   localNode_ = localNode;
 }

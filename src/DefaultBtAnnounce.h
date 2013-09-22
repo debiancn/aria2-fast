@@ -50,7 +50,7 @@ class Randomizer;
 
 class DefaultBtAnnounce : public BtAnnounce {
 private:
-  SharedHandle<DownloadContext> downloadContext_;
+  DownloadContext* downloadContext_;
   int trackers_;
   Timer prevAnnounceTimer_;
   time_t interval_;
@@ -61,36 +61,35 @@ private:
   AnnounceList announceList_;
   std::string trackerId_;
   const Option* option_;
-  SharedHandle<Randomizer> randomizer_;
-  SharedHandle<BtRuntime> btRuntime_;
-  SharedHandle<PieceStorage> pieceStorage_;
-  SharedHandle<PeerStorage> peerStorage_;
+  Randomizer* randomizer_;
+  std::shared_ptr<BtRuntime> btRuntime_;
+  std::shared_ptr<PieceStorage> pieceStorage_;
+  std::shared_ptr<PeerStorage> peerStorage_;
   uint16_t tcpPort_;
 
   bool adjustAnnounceList();
 public:
-  DefaultBtAnnounce(const SharedHandle<DownloadContext>& downloadContext,
-                    const Option* option);
+  DefaultBtAnnounce(DownloadContext* downloadContext, const Option* option);
 
   virtual ~DefaultBtAnnounce();
 
-  void setBtRuntime(const SharedHandle<BtRuntime>& btRuntime);
+  void setBtRuntime(const std::shared_ptr<BtRuntime>& btRuntime);
 
-  const SharedHandle<BtRuntime>& getBtRuntime() const
+  const std::shared_ptr<BtRuntime>& getBtRuntime() const
   {
     return btRuntime_;
   }
 
-  void setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage);
+  void setPieceStorage(const std::shared_ptr<PieceStorage>& pieceStorage);
 
-  const SharedHandle<PieceStorage>& getPieceStorage() const
+  const std::shared_ptr<PieceStorage>& getPieceStorage() const
   {
     return pieceStorage_;
   }
 
-  void setPeerStorage(const SharedHandle<PeerStorage>& peerStorage);
+  void setPeerStorage(const std::shared_ptr<PeerStorage>& peerStorage);
 
-  const SharedHandle<PeerStorage>& getPeerStorage() const
+  const std::shared_ptr<PeerStorage>& getPeerStorage() const
   {
     return peerStorage_;
   }
@@ -101,42 +100,43 @@ public:
 
   bool isCompletedAnnounceReady();
 
-  virtual bool isAnnounceReady();
+  virtual bool isAnnounceReady() CXX11_OVERRIDE;
 
-  virtual std::string getAnnounceUrl();
+  virtual std::string getAnnounceUrl() CXX11_OVERRIDE;
 
-  virtual SharedHandle<UDPTrackerRequest>
+  virtual std::shared_ptr<UDPTrackerRequest>
   createUDPTrackerRequest(const std::string& remoteAddr, uint16_t remotePort,
-                          uint16_t localPort);
+                          uint16_t localPort) CXX11_OVERRIDE;
 
-  virtual void announceStart();
+  virtual void announceStart() CXX11_OVERRIDE;
 
-  virtual void announceSuccess();
+  virtual void announceSuccess() CXX11_OVERRIDE;
 
-  virtual void announceFailure();
+  virtual void announceFailure() CXX11_OVERRIDE;
 
-  virtual bool isAllAnnounceFailed();
+  virtual bool isAllAnnounceFailed() CXX11_OVERRIDE;
 
-  virtual void resetAnnounce();
+  virtual void resetAnnounce() CXX11_OVERRIDE;
 
   virtual void processAnnounceResponse(const unsigned char* trackerResponse,
-                                       size_t trackerResponseLength);
+                                       size_t trackerResponseLength)
+    CXX11_OVERRIDE;
 
   virtual void processUDPTrackerResponse
-  (const SharedHandle<UDPTrackerRequest>& req);
+  (const std::shared_ptr<UDPTrackerRequest>& req) CXX11_OVERRIDE;
 
-  virtual bool noMoreAnnounce();
+  virtual bool noMoreAnnounce() CXX11_OVERRIDE;
 
-  virtual void shuffleAnnounce();
+  virtual void shuffleAnnounce() CXX11_OVERRIDE;
 
-  virtual void overrideMinInterval(time_t interval);
+  virtual void overrideMinInterval(time_t interval) CXX11_OVERRIDE;
 
-  virtual void setTcpPort(uint16_t port)
+  virtual void setTcpPort(uint16_t port) CXX11_OVERRIDE
   {
     tcpPort_ = port;
   }
 
-  void setRandomizer(const SharedHandle<Randomizer>& randomizer);
+  void setRandomizer(Randomizer* randomizer);
 
   time_t getInterval() const
   {

@@ -68,10 +68,8 @@
 namespace aria2 {
 
 HttpResponse::HttpResponse()
-  : cuid_(0)
+  : cuid_{0}
 {}
-
-HttpResponse::~HttpResponse() {}
 
 void HttpResponse::validateResponse() const
 {
@@ -126,15 +124,13 @@ std::string HttpResponse::determinFilename() const
                           httpRequest_->getFile().end());
     if(file.empty()) {
       return "index.html";
-    } else {
-      return file;
     }
-  } else {
-    A2_LOG_INFO(fmt(MSG_CONTENT_DISPOSITION_DETECTED,
-                    cuid_,
-                    contentDisposition.c_str()));
-    return contentDisposition;
+    return file;
   }
+  A2_LOG_INFO(fmt(MSG_CONTENT_DISPOSITION_DETECTED,
+                  cuid_,
+                  contentDisposition.c_str()));
+  return contentDisposition;
 }
 
 void HttpResponse::retrieveCookie()
@@ -191,17 +187,17 @@ const std::string& HttpResponse::getTransferEncoding() const
   return httpHeader_->find(HttpHeader::TRANSFER_ENCODING);
 }
 
-SharedHandle<StreamFilter> HttpResponse::getTransferEncodingStreamFilter() const
+std::unique_ptr<StreamFilter>
+HttpResponse::getTransferEncodingStreamFilter() const
 {
-  SharedHandle<StreamFilter> filter;
   // TODO Transfer-Encoding header field can contains multiple tokens. We should
   // parse the field and retrieve each token.
   if(isTransferEncodingSpecified()) {
     if(util::strieq(getTransferEncoding(), "chunked")) {
-      filter.reset(new ChunkedDecodingStreamFilter());
+      return make_unique<ChunkedDecodingStreamFilter>();
     }
   }
-  return filter;
+  return nullptr;
 }
 
 bool HttpResponse::isContentEncodingSpecified() const
@@ -214,16 +210,16 @@ const std::string& HttpResponse::getContentEncoding() const
   return httpHeader_->find(HttpHeader::CONTENT_ENCODING);
 }
 
-SharedHandle<StreamFilter> HttpResponse::getContentEncodingStreamFilter() const
+std::unique_ptr<StreamFilter>
+HttpResponse::getContentEncodingStreamFilter() const
 {
-  SharedHandle<StreamFilter> filter;
 #ifdef HAVE_ZLIB
   if(util::strieq(getContentEncoding(), "gzip") ||
      util::strieq(getContentEncoding(), "deflate")) {
-    filter.reset(new GZipDecodingStreamFilter());
+    return make_unique<GZipDecodingStreamFilter>();
   }
 #endif // HAVE_ZLIB
-  return filter;
+  return nullptr;
 }
 
 int64_t HttpResponse::getContentLength() const
@@ -256,14 +252,19 @@ std::string HttpResponse::getContentType() const
   }
 }
 
-void HttpResponse::setHttpHeader(const SharedHandle<HttpHeader>& httpHeader)
+void HttpResponse::setHttpHeader(std::unique_ptr<HttpHeader> httpHeader)
 {
-  httpHeader_ = httpHeader;
+  httpHeader_ = std::move(httpHeader);
 }
 
-void HttpResponse::setHttpRequest(const SharedHandle<HttpRequest>& httpRequest)
+const std::unique_ptr<HttpHeader>& HttpResponse::getHttpHeader() const
 {
-  httpRequest_ = httpRequest;
+  return httpHeader_;
+}
+
+void HttpResponse::setHttpRequest(std::unique_ptr<HttpRequest> httpRequest)
+{
+  httpRequest_ = std::move(httpRequest);
 }
 
 int HttpResponse::getStatusCode() const
@@ -296,9 +297,8 @@ bool parseMetalinkHttpLink(MetalinkHttpEntry& result, const std::string& s)
             std::string::const_iterator> p = util::stripIter(first+1, last);
   if(p.first == p.second) {
     return false;
-  } else {
-    result.uri.assign(p.first, p.second);
   }
+  result.uri.assign(p.first, p.second);
   last = std::find(last, s.end(), ';');
   if(last != s.end()) {
     ++last;
@@ -344,7 +344,7 @@ bool parseMetalinkHttpLink(MetalinkHttpEntry& result, const std::string& s)
 // Link header field is defined by http://tools.ietf.org/html/rfc5988.
 void HttpResponse::getMetalinKHttpEntries
 (std::vector<MetalinkHttpEntry>& result,
- const SharedHandle<Option>& option) const
+ const std::shared_ptr<Option>& option) const
 {
   std::pair<std::multimap<int, std::string>::const_iterator,
             std::multimap<int, std::string>::const_iterator> p =
@@ -360,15 +360,13 @@ void HttpResponse::getMetalinKHttpEntries
     if(option->defined(PREF_METALINK_LOCATION)) {
       const std::string& loc = option->get(PREF_METALINK_LOCATION);
       util::split(loc.begin(), loc.end(), std::back_inserter(locs), ',', true);
-      for(std::vector<std::string>::iterator i = locs.begin(), eoi = locs.end();
-          i != eoi; ++i) {
-        util::lowercase(*i);
+      for (auto& l: locs) {
+        util::lowercase(l);
       }
     }
-    for(std::vector<MetalinkHttpEntry>::iterator i = result.begin(),
-          eoi = result.end(); i != eoi; ++i) {
-      if(std::find(locs.begin(), locs.end(), (*i).geo) != locs.end()) {
-        (*i).pri -= 999999;
+    for (auto& r: result) {
+      if(std::find(locs.begin(), locs.end(), r.geo) != locs.end()) {
+        r.pri -= 999999;
       }
     }
   }
@@ -406,10 +404,9 @@ void HttpResponse::getDigest(std::vector<Checksum>& result) const
   }
   std::sort(result.begin(), result.end(), HashTypeStronger());
   std::vector<Checksum> temp;
-  for(std::vector<Checksum>::iterator i = result.begin(),
-        eoi = result.end(); i != eoi;) {
+  for(auto i = result.begin(), eoi = result.end(); i != eoi;) {
     bool ok = true;
-    std::vector<Checksum>::iterator j = i+1;
+    auto j = i+1;
     for(; j != eoi; ++j) {
       if((*i).getHashType() != (*j).getHashType()) {
         break;

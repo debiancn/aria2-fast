@@ -84,62 +84,55 @@
 namespace aria2 {
 
 namespace {
-SharedHandle<StreamFilter> getTransferEncodingStreamFilter
-(const SharedHandle<HttpResponse>& httpResponse,
- const SharedHandle<StreamFilter>& delegate = SharedHandle<StreamFilter>())
+std::unique_ptr<StreamFilter> getTransferEncodingStreamFilter
+(HttpResponse* httpResponse,
+ std::unique_ptr<StreamFilter> delegate = nullptr)
 {
-  SharedHandle<StreamFilter> filter;
   if(httpResponse->isTransferEncodingSpecified()) {
-    filter = httpResponse->getTransferEncodingStreamFilter();
+    auto filter = httpResponse->getTransferEncodingStreamFilter();
     if(!filter) {
       throw DL_ABORT_EX
         (fmt(EX_TRANSFER_ENCODING_NOT_SUPPORTED,
              httpResponse->getTransferEncoding().c_str()));
     }
     filter->init();
-    filter->installDelegate(delegate);
+    filter->installDelegate(std::move(delegate));
+    return filter;
   }
-  if(!filter) {
-    filter = delegate;
-  }
-  return filter;
+  return delegate;
 }
 } // namespace
 
 namespace {
-SharedHandle<StreamFilter> getContentEncodingStreamFilter
-(const SharedHandle<HttpResponse>& httpResponse,
- const SharedHandle<StreamFilter>& delegate = SharedHandle<StreamFilter>())
+std::unique_ptr<StreamFilter> getContentEncodingStreamFilter
+(HttpResponse* httpResponse,
+ std::unique_ptr<StreamFilter> delegate = nullptr)
 {
-  SharedHandle<StreamFilter> filter;
   if(httpResponse->isContentEncodingSpecified()) {
-    filter = httpResponse->getContentEncodingStreamFilter();
+    auto filter = httpResponse->getContentEncodingStreamFilter();
     if(!filter) {
       A2_LOG_INFO
         (fmt("Content-Encoding %s is specified, but the current implementation"
              "doesn't support it. The decoding process is skipped and the"
              "downloaded content will be still encoded.",
              httpResponse->getContentEncoding().c_str()));
-    } else {
-      filter->init();
-      filter->installDelegate(delegate);
     }
+    filter->init();
+    filter->installDelegate(std::move(delegate));
+    return filter;
   }
-  if(!filter) {
-    filter = delegate;
-  }
-  return filter;
+  return delegate;
 }
 } // namespace
 
 HttpResponseCommand::HttpResponseCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const SharedHandle<HttpConnection>& httpConnection,
+ const std::shared_ptr<HttpConnection>& httpConnection,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& s)
+ const std::shared_ptr<SocketCore>& s)
   : AbstractCommand(cuid, req, fileEntry, requestGroup, e, s,
                     httpConnection->getSocketRecvBuffer()),
     httpConnection_(httpConnection)
@@ -151,21 +144,20 @@ HttpResponseCommand::~HttpResponseCommand() {}
 
 bool HttpResponseCommand::executeInternal()
 {
-  SharedHandle<HttpRequest> httpRequest =httpConnection_->getFirstHttpRequest();
-  SharedHandle<HttpResponse> httpResponse = httpConnection_->receiveResponse();
+  auto httpResponse = httpConnection_->receiveResponse();
   if(!httpResponse) {
     // The server has not responded to our request yet.
     // For socket->wantRead() == true, setReadCheckSocket(socket) is already
     // done in the constructor.
     setWriteCheckSocketIf(getSocket(), getSocket()->wantWrite());
-    getDownloadEngine()->addCommand(this);
+    addCommandSelf();
     return false;
   }
   // check HTTP status number
   httpResponse->validateResponse();
   httpResponse->retrieveCookie();
 
-  SharedHandle<HttpHeader> httpHeader = httpResponse->getHttpHeader();
+  const auto& httpHeader = httpResponse->getHttpHeader();
   // Disable persistent connection if:
   //   Connection: close is received or the remote server is not HTTP/1.1.
   // We don't care whether non-HTTP/1.1 server returns Connection: keep-alive.
@@ -202,10 +194,9 @@ bool HttpResponseCommand::executeInternal()
         getDownloadContext()->setAcceptMetalink(false);
         std::vector<MetalinkHttpEntry> entries;
         httpResponse->getMetalinKHttpEntries(entries, getOption());
-        for(std::vector<MetalinkHttpEntry>::iterator i = entries.begin(),
-              eoi = entries.end(); i != eoi; ++i) {
-          getFileEntry()->addUri((*i).uri);
-          A2_LOG_DEBUG(fmt("Adding URI=%s", (*i).uri.c_str()));
+        for(const auto& e : entries) {
+          getFileEntry()->addUri(e.uri);
+          A2_LOG_DEBUG(fmt("Adding URI=%s", e.uri.c_str()));
         }
       }
     }
@@ -213,16 +204,16 @@ bool HttpResponseCommand::executeInternal()
     if(httpHeader->defined(HttpHeader::DIGEST)) {
       std::vector<Checksum> checksums;
       httpResponse->getDigest(checksums);
-      for(std::vector<Checksum>::iterator i = checksums.begin(),
-            eoi = checksums.end(); i != eoi; ++i) {
+      for(const auto &checksum : checksums) {
         if(getDownloadContext()->getHashType().empty()) {
           A2_LOG_DEBUG(fmt("Setting digest: type=%s, digest=%s",
-                           (*i).getHashType().c_str(),
-                           (*i).getDigest().c_str()));
-          getDownloadContext()->setDigest((*i).getHashType(), (*i).getDigest());
+                           checksum.getHashType().c_str(),
+                           checksum.getDigest().c_str()));
+          getDownloadContext()->setDigest(checksum.getHashType(),
+                                          checksum.getDigest());
           break;
         } else {
-          if(checkChecksum(getDownloadContext(), *i)) {
+          if(checkChecksum(getDownloadContext(), checksum)) {
             break;
           }
         }
@@ -234,7 +225,7 @@ bool HttpResponseCommand::executeInternal()
     if(statusCode == 404) {
       getRequestGroup()->increaseAndValidateFileNotFoundCount();
     }
-    return skipResponseBody(httpResponse);
+    return skipResponseBody(std::move(httpResponse));
   }
   if(getFileEntry()->isUniqueProtocol()) {
     // Redirection should be considered here. We need to parse
@@ -269,7 +260,7 @@ bool HttpResponseCommand::executeInternal()
 
     // If both transfer-encoding and total length is specified, we
     // assume we can do segmented downloading
-    if(totalLength == 0 || shouldInflateContentEncoding(httpResponse)) {
+    if(totalLength == 0 || shouldInflateContentEncoding(httpResponse.get())) {
       // we ignore content-length when inflate is required
       getFileEntry()->setLength(0);
       if(getRequest()->getMethod() == Request::METHOD_GET &&
@@ -279,9 +270,9 @@ bool HttpResponseCommand::executeInternal()
         // server says the size of file is 0 explicitly.
         getDownloadContext()->markTotalLengthIsUnknown();
       }
-      return handleOtherEncoding(httpResponse);
+      return handleOtherEncoding(std::move(httpResponse));
     } else {
-      return handleDefaultEncoding(httpResponse);
+      return handleDefaultEncoding(std::move(httpResponse));
     }
   } else {
 #ifdef ENABLE_MESSAGE_DIGEST
@@ -289,9 +280,8 @@ bool HttpResponseCommand::executeInternal()
        httpHeader->defined(HttpHeader::DIGEST)) {
       std::vector<Checksum> checksums;
       httpResponse->getDigest(checksums);
-      for(std::vector<Checksum>::iterator i = checksums.begin(),
-            eoi = checksums.end(); i != eoi; ++i) {
-        if(checkChecksum(getDownloadContext(), *i)) {
+      for(const auto &checksum : checksums) {
+        if(checkChecksum(getDownloadContext(), checksum)) {
           break;
         }
       }
@@ -308,17 +298,17 @@ bool HttpResponseCommand::executeInternal()
       // Also we can't resume in this case too.  So truncate the file
       // anyway.
       getPieceStorage()->getDiskAdaptor()->truncate(0);
+      auto teFilter = getTransferEncodingStreamFilter
+        (httpResponse.get(),
+         getContentEncodingStreamFilter(httpResponse.get()));
       getDownloadEngine()->addCommand
-        (createHttpDownloadCommand
-         (httpResponse,
-          getTransferEncodingStreamFilter
-          (httpResponse,
-           getContentEncodingStreamFilter(httpResponse))));
+        (createHttpDownloadCommand(std::move(httpResponse),
+                                   std::move(teFilter)));
     } else {
+      auto teFilter = getTransferEncodingStreamFilter(httpResponse.get());
       getDownloadEngine()->addCommand
-        (createHttpDownloadCommand
-         (httpResponse,
-          getTransferEncodingStreamFilter(httpResponse)));
+        (createHttpDownloadCommand(std::move(httpResponse),
+                                   std::move(teFilter)));
     }
     return true;
   }
@@ -332,7 +322,7 @@ void HttpResponseCommand::updateLastModifiedTime(const Time& lastModified)
 }
 
 bool HttpResponseCommand::shouldInflateContentEncoding
-(const SharedHandle<HttpResponse>& httpResponse)
+(HttpResponse* httpResponse)
 {
   // Basically, on the fly inflation cannot be made with segment
   // download, because in each segment we don't know where the date
@@ -347,12 +337,10 @@ bool HttpResponseCommand::shouldInflateContentEncoding
 }
 
 bool HttpResponseCommand::handleDefaultEncoding
-(const SharedHandle<HttpResponse>& httpResponse)
+(std::unique_ptr<HttpResponse> httpResponse)
 {
-  SharedHandle<HttpRequest> httpRequest = httpResponse->getHttpRequest();
-  SharedHandle<BtProgressInfoFile> progressInfoFile
-    (new DefaultBtProgressInfoFile
-     (getDownloadContext(), SharedHandle<PieceStorage>(), getOption().get()));
+  auto progressInfoFile = std::make_shared<DefaultBtProgressInfoFile>
+    (getDownloadContext(), std::shared_ptr<PieceStorage>{}, getOption().get());
   getRequestGroup()->adjustFilename(progressInfoFile);
   getRequestGroup()->initPieceStorage();
 
@@ -361,8 +349,7 @@ bool HttpResponseCommand::handleDefaultEncoding
     return true;
   }
 
-  SharedHandle<CheckIntegrityEntry> checkEntry =
-    getRequestGroup()->createCheckIntegrityEntry();
+  auto checkEntry = getRequestGroup()->createCheckIntegrityEntry();
   if(!checkEntry) {
     return true;
   }
@@ -370,30 +357,25 @@ bool HttpResponseCommand::handleDefaultEncoding
   // We have to make sure that command that has Request object must
   // have segment after PieceStorage is initialized. See
   // AbstractCommand::execute()
-  SharedHandle<Segment> segment =
-    getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
+  auto segment = getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
   // pipelining requires implicit range specified. But the request for
   // this response most likely dones't contains range header. This means
   // we can't continue to use this socket because server sends all entity
   // body instead of a segment.
   // Therefore, we shutdown the socket here if pipelining is enabled.
-  DownloadCommand* command = 0;
   if(getRequest()->getMethod() == Request::METHOD_GET &&
      segment && segment->getPositionToWrite() == 0 &&
      !getRequest()->isPipeliningEnabled()) {
-    command = createHttpDownloadCommand
-      (httpResponse,
-       getTransferEncodingStreamFilter(httpResponse));
+    auto teFilter = getTransferEncodingStreamFilter(httpResponse.get());
+    checkEntry->pushNextCommand
+      (createHttpDownloadCommand(std::move(httpResponse),
+                                 std::move(teFilter)));
   } else {
     getSegmentMan()->cancelSegment(getCuid());
     getFileEntry()->poolRequest(getRequest());
   }
-  // After command is passed to prepareForNextAction(), it is managed
-  // by CheckIntegrityEntry.
-  checkEntry->pushNextCommand(command);
-  command = 0;
 
-  prepareForNextAction(checkEntry);
+  prepareForNextAction(std::move(checkEntry));
 
   if(getRequest()->getMethod() == Request::METHOD_HEAD) {
     poolConnection();
@@ -403,10 +385,8 @@ bool HttpResponseCommand::handleDefaultEncoding
 }
 
 bool HttpResponseCommand::handleOtherEncoding
-(const SharedHandle<HttpResponse>& httpResponse) {
+(std::unique_ptr<HttpResponse> httpResponse) {
   // We assume that RequestGroup::getTotalLength() == 0 here
-  SharedHandle<HttpRequest> httpRequest = httpResponse->getHttpRequest();
-
   if(getOption()->getAsBool(PREF_DRY_RUN)) {
     getRequestGroup()->initPieceStorage();
     onDryRunFileFound();
@@ -422,10 +402,8 @@ bool HttpResponseCommand::handleOtherEncoding
   // In this context, knowsTotalLength() is true only when the file is
   // really zero-length.
 
-  SharedHandle<StreamFilter> streamFilter =
-    getTransferEncodingStreamFilter
-    (httpResponse,
-     getContentEncodingStreamFilter(httpResponse));
+  auto streamFilter = getTransferEncodingStreamFilter
+    (httpResponse.get(), getContentEncodingStreamFilter(httpResponse.get()));
   // If chunked transfer-encoding is specified, we have to read end of
   // chunk markers(0\r\n\r\n, for example).
   bool chunkedUsed = streamFilter &&
@@ -441,11 +419,11 @@ bool HttpResponseCommand::handleOtherEncoding
     // See also FtpNegotiationCommand::onFileSizeDetermined()
     if(getDownloadContext()->isChecksumVerificationNeeded()) {
       A2_LOG_DEBUG("Zero length file exists. Verify checksum.");
-      SharedHandle<ChecksumCheckIntegrityEntry> entry
-        (new ChecksumCheckIntegrityEntry(getRequestGroup()));
+      auto  entry = make_unique<ChecksumCheckIntegrityEntry>
+        (getRequestGroup());
       entry->initValidator();
       getPieceStorage()->getDiskAdaptor()->openExistingFile();
-      getDownloadEngine()->getCheckIntegrityMan()->pushEntry(entry);
+      getDownloadEngine()->getCheckIntegrityMan()->pushEntry(std::move(entry));
     } else
 #endif // ENABLE_MESSAGE_DIGEST
       {
@@ -475,10 +453,10 @@ bool HttpResponseCommand::handleOtherEncoding
 #ifdef ENABLE_MESSAGE_DIGEST
     if(getDownloadContext()->isChecksumVerificationNeeded()) {
       A2_LOG_DEBUG("Verify checksum for zero-length file");
-      SharedHandle<ChecksumCheckIntegrityEntry> entry
-        (new ChecksumCheckIntegrityEntry(getRequestGroup()));
+      auto entry = make_unique<ChecksumCheckIntegrityEntry>
+        (getRequestGroup());
       entry->initValidator();
-      getDownloadEngine()->getCheckIntegrityMan()->pushEntry(entry);
+      getDownloadEngine()->getCheckIntegrityMan()->pushEntry(std::move(entry));
     } else
 #endif // ENABLE_MESSAGE_DIGEST
       {
@@ -493,45 +471,44 @@ bool HttpResponseCommand::handleOtherEncoding
   getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
 
   getDownloadEngine()->addCommand
-    (createHttpDownloadCommand(httpResponse, streamFilter));
+    (createHttpDownloadCommand(std::move(httpResponse),
+                               std::move(streamFilter)));
   return true;
 }
 
 bool HttpResponseCommand::skipResponseBody
-(const SharedHandle<HttpResponse>& httpResponse)
+(std::unique_ptr<HttpResponse> httpResponse)
 {
-  SharedHandle<StreamFilter> filter =
-    getTransferEncodingStreamFilter(httpResponse);
+  auto filter = getTransferEncodingStreamFilter(httpResponse.get());
   // We don't use Content-Encoding here because this response body is just
   // thrown away.
-
-  HttpSkipResponseCommand* command = new HttpSkipResponseCommand
+  auto httpResponsePtr = httpResponse.get();
+  auto command = make_unique<HttpSkipResponseCommand>
     (getCuid(), getRequest(), getFileEntry(), getRequestGroup(),
-     httpConnection_, httpResponse,
+     httpConnection_, std::move(httpResponse),
      getDownloadEngine(), getSocket());
-  command->installStreamFilter(filter);
+  command->installStreamFilter(std::move(filter));
 
   // If request method is HEAD or the response body is zero-length,
   // set command's status to real time so that avoid read check blocking
   if(getRequest()->getMethod() == Request::METHOD_HEAD ||
-     (httpResponse->getEntityLength() == 0 &&
-      !httpResponse->isTransferEncodingSpecified())) {
+     (httpResponsePtr->getEntityLength() == 0 &&
+      !httpResponsePtr->isTransferEncodingSpecified())) {
     command->setStatusRealtime();
     // If entity length == 0, then socket read/write check must be disabled.
     command->disableSocketCheck();
     getDownloadEngine()->setNoWait(true);
   }
 
-  getDownloadEngine()->addCommand(command);
+  getDownloadEngine()->addCommand(std::move(command));
   return true;
 }
 
 namespace {
-bool decideFileAllocation
-(const SharedHandle<StreamFilter>& filter)
+bool decideFileAllocation(StreamFilter* filter)
 {
 #ifdef HAVE_ZLIB
-  for(SharedHandle<StreamFilter> f = filter; f; f = f->getDelegate()){
+  for(StreamFilter* f = filter; f; f = f->getDelegate().get()){
     // Since the compressed file's length are returned in the response header
     // and the decompressed file size is unknown at this point, disable file
     // allocation here.
@@ -544,28 +521,29 @@ bool decideFileAllocation
 }
 } // namespace
 
-HttpDownloadCommand* HttpResponseCommand::createHttpDownloadCommand
-(const SharedHandle<HttpResponse>& httpResponse,
- const SharedHandle<StreamFilter>& filter)
+std::unique_ptr<HttpDownloadCommand>
+HttpResponseCommand::createHttpDownloadCommand
+(std::unique_ptr<HttpResponse> httpResponse,
+ std::unique_ptr<StreamFilter> filter)
 {
 
-  HttpDownloadCommand* command =
-    new HttpDownloadCommand(getCuid(), getRequest(), getFileEntry(),
-                            getRequestGroup(),
-                            httpResponse, httpConnection_,
-                            getDownloadEngine(), getSocket());
+  auto command = make_unique<HttpDownloadCommand>
+    (getCuid(), getRequest(), getFileEntry(),
+     getRequestGroup(),
+     std::move(httpResponse), httpConnection_,
+     getDownloadEngine(), getSocket());
   command->setStartupIdleTime(getOption()->getAsInt(PREF_STARTUP_IDLE_TIME));
   command->setLowestDownloadSpeedLimit
     (getOption()->getAsInt(PREF_LOWEST_SPEED_LIMIT));
-  command->installStreamFilter(filter);
   if(getRequestGroup()->isFileAllocationEnabled() &&
-     !decideFileAllocation(filter)) {
+     !decideFileAllocation(filter.get())) {
     getRequestGroup()->setFileAllocationEnabled(false);
   }
+  command->installStreamFilter(std::move(filter));
   getRequestGroup()->getURISelector()->tuneDownloadCommand
-    (getFileEntry()->getRemainingUris(), command);
+    (getFileEntry()->getRemainingUris(), command.get());
 
-  return command;
+  return std::move(command);
 }
 
 void HttpResponseCommand::poolConnection()
@@ -585,7 +563,7 @@ void HttpResponseCommand::onDryRunFileFound()
 
 #ifdef ENABLE_MESSAGE_DIGEST
 bool HttpResponseCommand::checkChecksum
-(const SharedHandle<DownloadContext>& dctx,
+(const std::shared_ptr<DownloadContext>& dctx,
  const Checksum& checksum)
 {
   if(dctx->getHashType() == checksum.getHashType()) {

@@ -78,7 +78,7 @@ std::string SizeFormatter::operator()(int64_t size) const
 namespace {
 class AbbrevSizeFormatter:public SizeFormatter {
 protected:
-  virtual std::string format(int64_t size) const
+  virtual std::string format(int64_t size) const CXX11_OVERRIDE
   {
     return util::abbrevSize(size);
   }
@@ -88,7 +88,7 @@ protected:
 namespace {
 class PlainSizeFormatter:public SizeFormatter {
 protected:
-  virtual std::string format(int64_t size) const
+  virtual std::string format(int64_t size) const CXX11_OVERRIDE
   {
     return util::itos(size);
   }
@@ -96,7 +96,7 @@ protected:
 } // namespace
 
 namespace {
-void printSizeProgress(std::ostream& o, const SharedHandle<RequestGroup>& rg,
+void printSizeProgress(std::ostream& o, const std::shared_ptr<RequestGroup>& rg,
                        const TransferStat& stat,
                        const SizeFormatter& sizeFormatter)
 {
@@ -142,9 +142,9 @@ void printProgressCompact(std::ostream& o, const DownloadEngine* e,
     e->getRequestGroupMan()->getRequestGroups();
   size_t cnt = 0;
   const size_t MAX_ITEM = 5;
-  for(RequestGroupList::const_iterator i = groups.begin(),
+  for(auto i = groups.begin(),
         eoi = groups.end(); i != eoi && cnt < MAX_ITEM; ++i, ++cnt) {
-    const SharedHandle<RequestGroup>& rg = *i;
+    const std::shared_ptr<RequestGroup>& rg = *i;
     TransferStat stat = rg->calculateStat();
     o << "[#" << GroupId::toAbbrevHex(rg->getGID()) << " ";
     printSizeProgress(o, rg, stat, sizeFormatter);
@@ -158,7 +158,7 @@ void printProgressCompact(std::ostream& o, const DownloadEngine* e,
 
 namespace {
 void printProgress
-(std::ostream& o, const SharedHandle<RequestGroup>& rg, const DownloadEngine* e,
+(std::ostream& o, const std::shared_ptr<RequestGroup>& rg, const DownloadEngine* e,
  const SizeFormatter& sizeFormatter)
 {
   TransferStat stat = rg->calculateStat();
@@ -171,7 +171,7 @@ void printProgress
   o << " CN:"
     << rg->getNumConnection();
 #ifdef ENABLE_BITTORRENT
-  const SharedHandle<BtObject>& btObj = e->getBtRegistry()->get(rg->getGID());
+  auto btObj = e->getBtRegistry()->get(rg->getGID());
   if(btObj) {
     const PeerSet& peers = btObj->peerStorage->getUsedPeers();
     o << " SD:"
@@ -214,7 +214,7 @@ public:
     const char SEP_CHAR = '-';
     std::stringstream o;
     printProgress(o, rg, e_, sizeFormatter_);
-    const std::vector<SharedHandle<FileEntry> >& fileEntries =
+    const std::vector<std::shared_ptr<FileEntry> >& fileEntries =
       rg->getDownloadContext()->getFileEntries();
     o << "\nFILE: ";
     writeFilePath(fileEntries.begin(), fileEntries.end(),
@@ -240,8 +240,8 @@ void printProgressSummary
     time_t now;
     struct tm* staticNowtmPtr;
     char buf[26];
-    if(time(&now) != (time_t)-1 && (staticNowtmPtr = localtime(&now)) != 0 &&
-       asctime_r(staticNowtmPtr, buf) != 0) {
+    if(time(&now) != (time_t)-1 && (staticNowtmPtr = localtime(&now)) != nullptr &&
+       asctime_r(staticNowtmPtr, buf) != nullptr) {
       char* lfptr = strchr(buf, '\n');
       if(lfptr) {
         *lfptr = '\0';
@@ -321,7 +321,7 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
   }
   size_t numGroup = e->getRequestGroupMan()->countRequestGroup();
   if(numGroup == 1) {
-    const SharedHandle<RequestGroup>& rg =
+    const std::shared_ptr<RequestGroup>& rg =
       *e->getRequestGroupMan()->getRequestGroups().begin();
     printProgress(o, rg, e, sizeFormatter);
   } else if(numGroup > 1) {
@@ -330,8 +330,7 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
   }
 
   {
-    const SharedHandle<FileAllocationEntry>& entry =
-      e->getFileAllocationMan()->getPickedEntry();
+    auto& entry = e->getFileAllocationMan()->getPickedEntry();
     if(entry) {
       o << " [FileAlloc:#"
         << GroupId::toAbbrevHex(entry->getRequestGroup()->getGID()) << " "
@@ -350,8 +349,7 @@ ConsoleStatCalc::calculateStat(const DownloadEngine* e)
   }
 #ifdef ENABLE_MESSAGE_DIGEST
   {
-    const SharedHandle<CheckIntegrityEntry>& entry =
-      e->getCheckIntegrityMan()->getPickedEntry();
+    auto& entry = e->getCheckIntegrityMan()->getPickedEntry();
     if(entry) {
       o << " [Checksum:#"
         << GroupId::toAbbrevHex(entry->getRequestGroup()->getGID()) << " "

@@ -71,11 +71,13 @@ DHTGetPeersCommand::DHTGetPeersCommand
 (cuid_t cuid,
  RequestGroup* requestGroup,
  DownloadEngine* e)
-  : Command(cuid),
-    requestGroup_(requestGroup),
-    e_(e),
-    numRetry_(0),
-    lastGetPeerTime_(0)
+  : Command{cuid},
+    requestGroup_{requestGroup},
+    e_{e},
+    taskQueue_{nullptr},
+    taskFactory_{nullptr},
+    numRetry_{0},
+    lastGetPeerTime_{0}
 {
   requestGroup_->increaseNumCommand();
 }
@@ -126,26 +128,26 @@ bool DHTGetPeersCommand::execute()
     task_.reset();
   }
 
-  e_->addCommand(this);
+  e_->addCommand(std::unique_ptr<Command>(this));
   return false;
 }
 
-void DHTGetPeersCommand::setTaskQueue(const SharedHandle<DHTTaskQueue>& taskQueue)
+void DHTGetPeersCommand::setTaskQueue(DHTTaskQueue* taskQueue)
 {
   taskQueue_ = taskQueue;
 }
 
-void DHTGetPeersCommand::setTaskFactory(const SharedHandle<DHTTaskFactory>& taskFactory)
+void DHTGetPeersCommand::setTaskFactory(DHTTaskFactory* taskFactory)
 {
   taskFactory_ = taskFactory;
 }
 
-void DHTGetPeersCommand::setBtRuntime(const SharedHandle<BtRuntime>& btRuntime)
+void DHTGetPeersCommand::setBtRuntime(const std::shared_ptr<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }
 
-void DHTGetPeersCommand::setPeerStorage(const SharedHandle<PeerStorage>& ps)
+void DHTGetPeersCommand::setPeerStorage(const std::shared_ptr<PeerStorage>& ps)
 {
   peerStorage_ = ps;
 }

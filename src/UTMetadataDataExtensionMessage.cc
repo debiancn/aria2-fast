@@ -54,12 +54,12 @@ namespace aria2 {
 
 UTMetadataDataExtensionMessage::UTMetadataDataExtensionMessage
 (uint8_t extensionMessageID)
-  : UTMetadataExtensionMessage(extensionMessageID),
-    totalSize_(0),
-    tracker_(0)
+  : UTMetadataExtensionMessage{extensionMessageID},
+    totalSize_{0},
+    dctx_{nullptr},
+    pieceStorage_{nullptr},
+    tracker_{nullptr}
 {}
-
-UTMetadataDataExtensionMessage::~UTMetadataDataExtensionMessage() {}
 
 std::string UTMetadataDataExtensionMessage::getPayload()
 {
@@ -90,7 +90,7 @@ void UTMetadataDataExtensionMessage::doReceivedAction()
       std::string metadata = util::toString(pieceStorage_->getDiskAdaptor());
       unsigned char infoHash[INFO_HASH_LENGTH];
       message_digest::digest(infoHash, INFO_HASH_LENGTH,
-                             MessageDigest::sha1(),
+                             MessageDigest::sha1().get(),
                              metadata.data(), metadata.size());
       if(memcmp(infoHash, bittorrent::getInfoHash(dctx_),
                 INFO_HASH_LENGTH) == 0) {
@@ -109,19 +109,39 @@ void UTMetadataDataExtensionMessage::doReceivedAction()
   }
 }
 
+void UTMetadataDataExtensionMessage::setTotalSize(size_t totalSize)
+{
+  totalSize_ = totalSize;
+}
+
+size_t UTMetadataDataExtensionMessage::getTotalSize() const
+{
+  return totalSize_;
+}
+
 void UTMetadataDataExtensionMessage::setData(const std::string& data)
 {
   data_ = data;
 }
 
+const std::string& UTMetadataDataExtensionMessage::getData() const
+{
+  return data_;
+}
+
 void UTMetadataDataExtensionMessage::setPieceStorage
-(const SharedHandle<PieceStorage>& pieceStorage)
+(PieceStorage* pieceStorage)
 {
   pieceStorage_ = pieceStorage;
 }
 
-void UTMetadataDataExtensionMessage::setDownloadContext
-(const SharedHandle<DownloadContext>& dctx)
+void UTMetadataDataExtensionMessage::setUTMetadataRequestTracker
+(UTMetadataRequestTracker* tracker)
+{
+  tracker_ = tracker;
+}
+
+void UTMetadataDataExtensionMessage::setDownloadContext(DownloadContext* dctx)
 {
   dctx_ = dctx;
 }

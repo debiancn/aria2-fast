@@ -41,8 +41,7 @@
 #include <vector>
 #include <deque>
 #include <string>
-
-#include "SharedHandle.h"
+#include <memory>
 
 namespace aria2 {
 
@@ -60,18 +59,18 @@ private:
   DownloadEngine* e_;
 
 #ifdef ENABLE_ASYNC_DNS
-  SharedHandle<AsyncNameResolverMan> asyncNameResolverMan_;
+  std::unique_ptr<AsyncNameResolverMan> asyncNameResolverMan_;
 #endif // ENABLE_ASYNC_DNS
 
-  SharedHandle<DHTTaskQueue> taskQueue_;
+  DHTTaskQueue* taskQueue_;
 
-  SharedHandle<DHTTaskFactory> taskFactory_;
+  DHTTaskFactory* taskFactory_;
 
-  SharedHandle<DHTRoutingTable> routingTable_;
+  DHTRoutingTable* routingTable_;
 
-  SharedHandle<DHTNode> localNode_;
+  std::shared_ptr<DHTNode> localNode_;
 
-  std::deque<std::pair<std::string, uint16_t> > entryPoints_;
+  std::deque<std::pair<std::string, uint16_t>> entryPoints_;
 
   int numSuccess_;
 
@@ -91,17 +90,17 @@ public:
 
   virtual ~DHTEntryPointNameResolveCommand();
 
-  virtual bool execute();
+  virtual bool execute() CXX11_OVERRIDE;
 
   void setBootstrapEnabled(bool f);
 
-  void setTaskQueue(const SharedHandle<DHTTaskQueue>& taskQueue);
+  void setTaskQueue(DHTTaskQueue* taskQueue);
 
-  void setTaskFactory(const SharedHandle<DHTTaskFactory>& taskFactory);
+  void setTaskFactory(DHTTaskFactory* taskFactory);
 
-  void setRoutingTable(const SharedHandle<DHTRoutingTable>& routingTable);
+  void setRoutingTable(DHTRoutingTable* routingTable);
 
-  void setLocalNode(const SharedHandle<DHTNode>& localNode);
+  void setLocalNode(const std::shared_ptr<DHTNode>& localNode);
 };
 
 } // namespace aria2

@@ -61,16 +61,16 @@ class Checksum;
 // HttpSkipResponseCommand.
 class HttpResponseCommand : public AbstractCommand {
 private:
-  SharedHandle<HttpConnection> httpConnection_;
+  std::shared_ptr<HttpConnection> httpConnection_;
 
-  bool handleDefaultEncoding(const SharedHandle<HttpResponse>& httpResponse);
-  bool handleOtherEncoding(const SharedHandle<HttpResponse>& httpResponse);
-  bool skipResponseBody(const SharedHandle<HttpResponse>& httpResponse);
+  bool handleDefaultEncoding(std::unique_ptr<HttpResponse> httpResponse);
+  bool handleOtherEncoding(std::unique_ptr<HttpResponse> httpResponse);
+  bool skipResponseBody(std::unique_ptr<HttpResponse> httpResponse);
 
-  HttpDownloadCommand*
+  std::unique_ptr<HttpDownloadCommand>
   createHttpDownloadCommand
-  (const SharedHandle<HttpResponse>& httpResponse,
-   const SharedHandle<StreamFilter>& streamFilter);
+  (std::unique_ptr<HttpResponse> httpResponse,
+   std::unique_ptr<StreamFilter> streamFilter);
 
   void updateLastModifiedTime(const Time& lastModified);
 
@@ -82,23 +82,22 @@ private:
   // value.  If they have same hash type but different hash value,
   // throws exception.  Otherwise returns false.
   bool checkChecksum
-  (const SharedHandle<DownloadContext>& dctx,
+  (const std::shared_ptr<DownloadContext>& dctx,
    const Checksum& checksum);
 #endif // ENABLE_MESSAGE_DIGEST
 protected:
   bool executeInternal();
 
-  bool shouldInflateContentEncoding
-  (const SharedHandle<HttpResponse>& httpResponse);
+  bool shouldInflateContentEncoding(HttpResponse* httpResponse);
 
 public:
   HttpResponseCommand(cuid_t cuid,
-                      const SharedHandle<Request>& req,
-                      const SharedHandle<FileEntry>& fileEntry,
+                      const std::shared_ptr<Request>& req,
+                      const std::shared_ptr<FileEntry>& fileEntry,
                       RequestGroup* requestGroup,
-                      const SharedHandle<HttpConnection>& httpConnection,
+                      const std::shared_ptr<HttpConnection>& httpConnection,
                       DownloadEngine* e,
-                      const SharedHandle<SocketCore>& s);
+                      const std::shared_ptr<SocketCore>& s);
   ~HttpResponseCommand();
 };
 

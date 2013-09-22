@@ -51,7 +51,7 @@ AnnounceList::AnnounceList
 }
 
 AnnounceList::AnnounceList
-(const std::deque<SharedHandle<AnnounceTier> >& announceTiers):
+(const std::deque<std::shared_ptr<AnnounceTier> >& announceTiers):
   tiers_(announceTiers), currentTrackerInitialized_(false)  {
   resetIterator();
 }
@@ -61,13 +61,12 @@ AnnounceList::~AnnounceList() {}
 void AnnounceList::reconfigure
 (const std::vector<std::vector<std::string> >& announceList)
 {
-  for(std::vector<std::vector<std::string> >::const_iterator itr =
-        announceList.begin(), eoi = announceList.end(); itr != eoi; ++itr) {
-    if((*itr).empty()) {
+  for (const auto& vec: announceList) {
+    if(vec.empty()) {
       continue;
     }
-    std::deque<std::string> urls((*itr).begin(), (*itr).end());
-    SharedHandle<AnnounceTier> tier(new AnnounceTier(urls));
+    std::deque<std::string> urls(vec.begin(), vec.end());
+    std::shared_ptr<AnnounceTier> tier(new AnnounceTier(urls));
     tiers_.push_back(tier);
   }
   resetIterator();
@@ -76,7 +75,7 @@ void AnnounceList::reconfigure
 void AnnounceList::reconfigure(const std::string& url) {
   std::deque<std::string> urls;
   urls.push_back(url);
-  SharedHandle<AnnounceTier> tier(new AnnounceTier(urls));
+  std::shared_ptr<AnnounceTier> tier(new AnnounceTier(urls));
   tiers_.push_back(tier);
   resetIterator();
 }
@@ -161,7 +160,7 @@ const char* AnnounceList::getEventString() const {
 namespace {
 class FindStoppedAllowedTier {
 public:
-  bool operator()(const SharedHandle<AnnounceTier>& tier) const {
+  bool operator()(const std::shared_ptr<AnnounceTier>& tier) const {
     switch(tier->event) {
     case AnnounceTier::DOWNLOADING:
     case AnnounceTier::STOPPED:
@@ -178,7 +177,7 @@ public:
 namespace {
 class FindCompletedAllowedTier {
 public:
-  bool operator()(const SharedHandle<AnnounceTier>& tier) const {
+  bool operator()(const std::shared_ptr<AnnounceTier>& tier) const {
     switch(tier->event) {
     case AnnounceTier::DOWNLOADING:
     case AnnounceTier::COMPLETED:
@@ -199,7 +198,7 @@ size_t AnnounceList::countCompletedAllowedTier() const {
 }
 
 void AnnounceList::setCurrentTier
-(const std::deque<SharedHandle<AnnounceTier> >::iterator& itr) {
+(const std::deque<std::shared_ptr<AnnounceTier> >::iterator& itr) {
   if(itr != tiers_.end()) {
     currentTier_ = itr;
     currentTracker_ = (*currentTier_)->urls.begin();
@@ -207,15 +206,13 @@ void AnnounceList::setCurrentTier
 }
 
 void AnnounceList::moveToStoppedAllowedTier() {
-  std::deque<SharedHandle<AnnounceTier> >::iterator itr =
-    find_wrap_if(tiers_.begin(), tiers_.end(),
-                 currentTier_,
-                 FindStoppedAllowedTier());
+  auto itr = find_wrap_if(tiers_.begin(), tiers_.end(), currentTier_,
+                          FindStoppedAllowedTier());
   setCurrentTier(itr);
 }
 
 void AnnounceList::moveToCompletedAllowedTier() {
-  std::deque<SharedHandle<AnnounceTier> >::iterator itr =
+  auto itr =
     find_wrap_if(tiers_.begin(), tiers_.end(),
                  currentTier_,
                  FindCompletedAllowedTier());
@@ -223,11 +220,10 @@ void AnnounceList::moveToCompletedAllowedTier() {
 }
 
 void AnnounceList::shuffle() {
-  for(std::deque<SharedHandle<AnnounceTier> >::const_iterator itr =
-        tiers_.begin(), eoi = tiers_.end(); itr != eoi; ++itr) {
-    std::deque<std::string>& urls = (*itr)->urls;
+  for (const auto& tier: tiers_) {
+    auto& urls = tier->urls;
     std::random_shuffle(urls.begin(), urls.end(),
-                        *(SimpleRandomizer::getInstance().get()));
+                        *SimpleRandomizer::getInstance());
   }
 }
 

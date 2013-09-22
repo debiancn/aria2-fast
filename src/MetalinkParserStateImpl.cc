@@ -35,6 +35,7 @@
 #include "MetalinkParserStateImpl.h"
 
 #include <cstring>
+#include <algorithm>
 
 #include "MetalinkParserStateV3Impl.h"
 #include "MetalinkParserStateV4Impl.h"
@@ -57,7 +58,7 @@ public:
   bool operator()(const XmlAttr& attr) const
   {
     return strcmp(attr.localname, localname_) == 0 &&
-      (attr.nsUri == 0 || strcmp(attr.nsUri, nsUri_) == 0);
+      (attr.nsUri == nullptr || strcmp(attr.nsUri, nsUri_) == 0);
   }
 };
 } // namespace

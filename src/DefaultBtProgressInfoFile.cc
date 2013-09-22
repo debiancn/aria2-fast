@@ -65,7 +65,7 @@ namespace aria2 {
 
 namespace {
 std::string createFilename
-(const SharedHandle<DownloadContext>& dctx, const std::string& suffix)
+(const std::shared_ptr<DownloadContext>& dctx, const std::string& suffix)
 {
   std::string t = dctx->getBasePath();
   t += suffix;
@@ -74,8 +74,8 @@ std::string createFilename
 } // namespace
 
 DefaultBtProgressInfoFile::DefaultBtProgressInfoFile
-(const SharedHandle<DownloadContext>& dctx,
- const SharedHandle<PieceStorage>& pieceStorage,
+(const std::shared_ptr<DownloadContext>& dctx,
+ const std::shared_ptr<PieceStorage>& pieceStorage,
  const Option* option)
   : dctx_(dctx),
     pieceStorage_(pieceStorage),
@@ -93,7 +93,7 @@ void DefaultBtProgressInfoFile::updateFilename()
 bool DefaultBtProgressInfoFile::isTorrentDownload()
 {
 #ifdef ENABLE_BITTORRENT
-  return btRuntime_;
+  return btRuntime_.get();
 #else // !ENABLE_BITTORRENT
   return false;
 #endif // !ENABLE_BITTORRENT
@@ -174,10 +174,10 @@ void DefaultBtProgressInfoFile::save()
     // TODO implement this
     uint32_t numInFlightPieceNL = htonl(pieceStorage_->countInFlightPiece());
     WRITE_CHECK(fp, &numInFlightPieceNL, sizeof(numInFlightPieceNL));
-    std::vector<SharedHandle<Piece> > inFlightPieces;
+    std::vector<std::shared_ptr<Piece> > inFlightPieces;
     inFlightPieces.reserve(pieceStorage_->countInFlightPiece());
     pieceStorage_->getInFlightPieces(inFlightPieces);
-    for(std::vector<SharedHandle<Piece> >::const_iterator itr =
+    for(std::vector<std::shared_ptr<Piece> >::const_iterator itr =
           inFlightPieces.begin(), eoi = inFlightPieces.end();
         itr != eoi; ++itr) {
       uint32_t indexNL = htonl((*itr)->getIndex());
@@ -242,18 +242,17 @@ void DefaultBtProgressInfoFile::load()
     throw DL_ABORT_EX(fmt("Invalid info hash length: %d", infoHashLength));
   }
   if(infoHashLength > 0) {
-    array_ptr<unsigned char> savedInfoHash(new unsigned char[infoHashLength]);
-    READ_CHECK(fp, static_cast<unsigned char*>(savedInfoHash),
-               infoHashLength);
+    auto savedInfoHash = make_unique<unsigned char[]>((size_t)infoHashLength);
+    READ_CHECK(fp, savedInfoHash.get(), infoHashLength);
 #ifdef ENABLE_BITTORRENT
     if(infoHashCheckEnabled) {
       const unsigned char* infoHash = bittorrent::getInfoHash(dctx_);
       if(infoHashLength != INFO_HASH_LENGTH ||
-         memcmp(savedInfoHash, infoHash, INFO_HASH_LENGTH) != 0) {
+         memcmp(savedInfoHash.get(), infoHash, INFO_HASH_LENGTH) != 0) {
         throw DL_ABORT_EX
           (fmt("info hash mismatch. expected: %s, actual: %s",
                util::toHex(infoHash, INFO_HASH_LENGTH).c_str(),
-               util::toHex(savedInfoHash, infoHashLength).c_str()
+               util::toHex(savedInfoHash.get(), infoHashLength).c_str()
                ));
       }
     }
@@ -302,18 +301,17 @@ void DefaultBtProgressInfoFile::load()
            bitfieldLength));
   }
 
-  array_ptr<unsigned char> savedBitfield(new unsigned char[bitfieldLength]);
-  READ_CHECK(fp, static_cast<unsigned char*>(savedBitfield),
-             bitfieldLength);
+  auto savedBitfield = make_unique<unsigned char[]>((size_t)bitfieldLength);
+  READ_CHECK(fp, savedBitfield.get(), bitfieldLength);
   if(pieceLength == static_cast<uint32_t>(dctx_->getPieceLength())) {
-    pieceStorage_->setBitfield(savedBitfield, bitfieldLength);
+    pieceStorage_->setBitfield(savedBitfield.get(), bitfieldLength);
 
     uint32_t numInFlightPiece;
     READ_CHECK(fp, &numInFlightPiece, sizeof(numInFlightPiece));
     if(version >= 1) {
       numInFlightPiece = ntohl(numInFlightPiece);
     }
-    std::vector<SharedHandle<Piece> > inFlightPieces;
+    std::vector<std::shared_ptr<Piece> > inFlightPieces;
     inFlightPieces.reserve(numInFlightPiece);
     while(numInFlightPiece--) {
       uint32_t index;
@@ -332,7 +330,7 @@ void DefaultBtProgressInfoFile::load()
       if(!(length <= static_cast<uint32_t>(dctx_->getPieceLength()))) {
         throw DL_ABORT_EX(fmt("piece length out of range: %u", length));
       }
-      SharedHandle<Piece> piece(new Piece(index, length));
+      std::shared_ptr<Piece> piece(new Piece(index, length));
       uint32_t bitfieldLength;
       READ_CHECK(fp, &bitfieldLength, sizeof(bitfieldLength));
       if(version >= 1) {
@@ -345,11 +343,10 @@ void DefaultBtProgressInfoFile::load()
                static_cast<unsigned long>(piece->getBitfieldLength()),
                bitfieldLength));
       }
-      array_ptr<unsigned char> pieceBitfield
-        (new unsigned char[bitfieldLength]);
-      READ_CHECK(fp, static_cast<unsigned char*>(pieceBitfield),
-                 bitfieldLength);
-      piece->setBitfield(pieceBitfield, bitfieldLength);
+      auto pieceBitfield = make_unique<unsigned char[]>
+        ((size_t)bitfieldLength);
+      READ_CHECK(fp, pieceBitfield.get(), bitfieldLength);
+      piece->setBitfield(pieceBitfield.get(), bitfieldLength);
 
 #ifdef ENABLE_MESSAGE_DIGEST
 
@@ -367,7 +364,7 @@ void DefaultBtProgressInfoFile::load()
       numInFlightPiece = ntohl(numInFlightPiece);
     }
     BitfieldMan src(pieceLength, totalLength);
-    src.setBitfield(savedBitfield, bitfieldLength);
+    src.setBitfield(savedBitfield.get(), bitfieldLength);
     if((src.getCompletedLength() || numInFlightPiece) &&
        !option_->getAsBool(PREF_ALLOW_PIECE_LENGTH_CHANGE)) {
       throw DOWNLOAD_FAILURE_EXCEPTION2
@@ -405,13 +402,13 @@ bool DefaultBtProgressInfoFile::exists()
 
 #ifdef ENABLE_BITTORRENT
 void DefaultBtProgressInfoFile::setPeerStorage
-(const SharedHandle<PeerStorage>& peerStorage)
+(const std::shared_ptr<PeerStorage>& peerStorage)
 {
   peerStorage_ = peerStorage;
 }
 
 void DefaultBtProgressInfoFile::setBtRuntime
-(const SharedHandle<BtRuntime>& btRuntime)
+(const std::shared_ptr<BtRuntime>& btRuntime)
 {
   btRuntime_ = btRuntime;
 }

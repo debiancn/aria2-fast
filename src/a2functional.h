@@ -40,167 +40,17 @@
 #include <functional>
 #include <string>
 #include <algorithm>
+#include <memory>
 
-#include "SharedHandle.h"
 #include "A2STR.h"
 
 namespace aria2 {
-
-// mem_fun_t for SharedHandle
-template <class ReturnType, typename ClassType>
-class mem_fun_sh_t:public std::unary_function< SharedHandle<ClassType>, ReturnType>
-{
-private:
-  ReturnType (ClassType::*f)();
-
-public:
-  mem_fun_sh_t(ReturnType (ClassType::*f)()):f(f) {}
-
-  ReturnType operator()(const SharedHandle<ClassType>& x) const
-  {
-    return (x.get()->*f)();
-  }
-};
-
-// const_mem_fun_t for SharedHandle
-template <class ReturnType, typename ClassType>
-class const_mem_fun_sh_t:public std::unary_function< SharedHandle<ClassType>, ReturnType>
-{
-private:
-  ReturnType (ClassType::*f)() const;
-
-public:
-  const_mem_fun_sh_t(ReturnType (ClassType::*f)() const):f(f) {}
-
-  ReturnType operator()(const SharedHandle<ClassType>& x) const
-  {
-    return (x.get()->*f)();
-  }
-};
-
-template <class ReturnType, typename ClassType>
-mem_fun_sh_t<ReturnType, ClassType>
-mem_fun_sh(ReturnType (ClassType::*f)())
-{
-  return mem_fun_sh_t<ReturnType, ClassType>(f);
-};
-
-template <class ReturnType, typename ClassType>
-const_mem_fun_sh_t<ReturnType, ClassType>
-mem_fun_sh(ReturnType (ClassType::*f)() const)
-{
-  return const_mem_fun_sh_t<ReturnType, ClassType>(f);
-};
-
-// mem_fun1_t for SharedHandle
-template<typename ReturnType, typename ClassType, typename ArgType>
-class mem_fun1_sh_t:public std::binary_function<SharedHandle<ClassType>,
-                                                ArgType,
-                                                ReturnType>
-{
-private:
-  ReturnType (ClassType::*f)(ArgType);
-
-public:
-  mem_fun1_sh_t(ReturnType (ClassType::*f)(ArgType)):f(f) {}
-
-  ReturnType operator()(const SharedHandle<ClassType>& x, ArgType a) const
-  {
-    return (x.get()->*f)(a);
-  }
-};
-
-template<typename ReturnType, typename ClassType, typename ArgType>
-mem_fun1_sh_t<ReturnType, ClassType, ArgType>
-mem_fun_sh(ReturnType (ClassType::*f)(ArgType))
-{
-  return mem_fun1_sh_t<ReturnType, ClassType, ArgType>(f);
-};
-
-template<class BinaryOp, class UnaryOp>
-class adopt2nd_t:public std::binary_function<typename BinaryOp::first_argument_type,
-                                             typename UnaryOp::argument_type,
-                                             typename BinaryOp::result_type> {
-private:
-  BinaryOp binaryOp_;
-  UnaryOp unaryOp_;
-public:
-  adopt2nd_t(const BinaryOp& b, const UnaryOp& u):
-    binaryOp_(b), unaryOp_(u) {}
-
-  typename BinaryOp::result_type
-  operator()(const typename BinaryOp::first_argument_type& x,
-             const typename UnaryOp::argument_type& y)
-  {
-    return binaryOp_(x, unaryOp_(y));
-  }
-
-};
-
-template <class BinaryOp, class UnaryOp>
-inline adopt2nd_t<BinaryOp, UnaryOp>
-adopt2nd(const BinaryOp& binaryOp, const UnaryOp& unaryOp)
-{
-  return adopt2nd_t<BinaryOp, UnaryOp>(binaryOp, unaryOp);
-};
-
-template<typename Pair>
-class Ascend1st:public std::binary_function<Pair, Pair, bool>
-{
-public:
-  bool operator()(const Pair& p1, const Pair& p2) const
-  {
-    return p1.first < p2.first;
-  }
-};
-
-template<typename Pair>
-class select2nd
-{
-public:
-  typename Pair::second_type operator()(const Pair& p) const
-  {
-    return p.second;
-  }
-
-  typename Pair::second_type operator()(Pair& p) const
-  {
-    return p.second;
-  }
-};
 
 class Deleter {
 public:
   template<class T>
   void operator()(T* ptr) {
     delete ptr;
-  }
-};
-
-template<typename T>
-class auto_delete {
-private:
-  T obj_;
-  void (*deleter_)(T);
-public:
-  auto_delete(T obj, void (*deleter)(T)):obj_(obj), deleter_(deleter) {}
-
-  ~auto_delete()
-  {
-    deleter_(obj_);
-  }
-};
-
-template<typename T>
-class auto_delete_d {
-private:
-  T obj_;
-public:
-  auto_delete_d(T obj):obj_(obj) {}
-
-  ~auto_delete_d()
-  {
-    delete obj_;
   }
 };
 
@@ -271,8 +121,8 @@ std::string strjoin(InputIterator first, InputIterator last,
 template<typename T>
 class LeastRecentAccess:public std::binary_function<T, T, bool> {
 public:
-  bool operator()(const SharedHandle<T>& lhs,
-                  const SharedHandle<T>& rhs) const
+  bool operator()(const std::shared_ptr<T>& lhs,
+                  const std::shared_ptr<T>& rhs) const
   {
     return lhs->getLastAccessTime() < rhs->getLastAccessTime();
   }
@@ -324,11 +174,25 @@ struct DerefEqual<T> derefEqual(const T& t)
 
 template<typename T>
 struct RefLess {
-  bool operator()(const SharedHandle<T>& lhs, const SharedHandle<T>& rhs) const
+  bool operator()(const std::shared_ptr<T>& lhs, const std::shared_ptr<T>& rhs) const
   {
     return lhs.get() < rhs.get();
   }
 };
+
+template<typename T, typename... U>
+typename std::enable_if<!std::is_array<T>::value, std::unique_ptr<T>>::type
+make_unique(U&&... u)
+{
+  return std::unique_ptr<T>(new T(std::forward<U>(u)...));
+}
+
+template<typename T>
+typename std::enable_if<std::is_array<T>::value, std::unique_ptr<T>>::type
+make_unique(size_t size)
+{
+  return std::unique_ptr<T>(new typename std::remove_extent<T>::type[size]());
+}
 
 } // namespace aria2
 

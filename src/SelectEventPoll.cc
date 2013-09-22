@@ -79,9 +79,7 @@ void SelectEventPoll::SocketEntry::addCommandEvent
 (Command* command, int events)
 {
   CommandEvent cev(command, events);
-  std::deque<CommandEvent>::iterator i = std::find(commandEvents_.begin(),
-                                                   commandEvents_.end(),
-                                                   cev);
+  auto i = std::find(commandEvents_.begin(), commandEvents_.end(), cev);
   if(i == commandEvents_.end()) {
     commandEvents_.push_back(cev);
   } else {
@@ -92,9 +90,7 @@ void SelectEventPoll::SocketEntry::removeCommandEvent
 (Command* command, int events)
 {
   CommandEvent cev(command, events);
-  std::deque<CommandEvent>::iterator i = std::find(commandEvents_.begin(),
-                                                   commandEvents_.end(),
-                                                   cev);
+  auto i = std::find(commandEvents_.begin(), commandEvents_.end(), cev);
   if(i == commandEvents_.end()) {
     // not found
   } else {
@@ -106,9 +102,9 @@ void SelectEventPoll::SocketEntry::removeCommandEvent
 }
 void SelectEventPoll::SocketEntry::processEvents(int events)
 {
+  using namespace std::placeholders;
   std::for_each(commandEvents_.begin(), commandEvents_.end(),
-                std::bind2nd(std::mem_fun_ref(&CommandEvent::processEvents),
-                             events));
+                std::bind(&CommandEvent::processEvents, _1, events));
 }
 
 int accumulateEvent(int events, const SelectEventPoll::CommandEvent& event)
@@ -126,7 +122,7 @@ int SelectEventPoll::SocketEntry::getEvents()
 #ifdef ENABLE_ASYNC_DNS
 
 SelectEventPoll::AsyncNameResolverEntry::AsyncNameResolverEntry
-(const SharedHandle<AsyncNameResolver>& nameResolver, Command* command):
+(const std::shared_ptr<AsyncNameResolver>& nameResolver, Command* command):
   nameResolver_(nameResolver), command_(command) {}
 
 int SelectEventPoll::AsyncNameResolverEntry::getFds
@@ -183,7 +179,7 @@ void SelectEventPoll::poll(const struct timeval& tv)
 
   for(AsyncNameResolverEntrySet::iterator itr = nameResolverEntries_.begin(),
         eoi = nameResolverEntries_.end(); itr != eoi; ++itr) {
-    const SharedHandle<AsyncNameResolverEntry>& entry = *itr;
+    const std::shared_ptr<AsyncNameResolverEntry>& entry = *itr;
     int fd = entry->getFds(&rfds, &wfds);
     // TODO force error if fd == 0
     if(fdmax_ < fd) {
@@ -198,7 +194,7 @@ void SelectEventPoll::poll(const struct timeval& tv)
 #ifdef __MINGW32__
     retval = select(fdmax_+1, &rfds, &wfds, &efds, &ttv);
 #else // !__MINGW32__
-    retval = select(fdmax_+1, &rfds, &wfds, NULL, &ttv);
+    retval = select(fdmax_+1, &rfds, &wfds, nullptr, &ttv);
 #endif // !__MINGW32__
   } while(retval == -1 && errno == EINTR);
   if(retval > 0) {
@@ -280,7 +276,7 @@ void SelectEventPoll::updateFdSet()
 bool SelectEventPoll::addEvents(sock_t socket, Command* command,
                                 EventPoll::EventType events)
 {
-  SharedHandle<SocketEntry> socketEntry(new SocketEntry(socket));
+  std::shared_ptr<SocketEntry> socketEntry(new SocketEntry(socket));
   SocketEntrySet::iterator i = socketEntries_.lower_bound(socketEntry);
   if(i != socketEntries_.end() && *(*i) == *socketEntry) {
     (*i)->addCommandEvent(command, events);
@@ -295,7 +291,7 @@ bool SelectEventPoll::addEvents(sock_t socket, Command* command,
 bool SelectEventPoll::deleteEvents(sock_t socket, Command* command,
                                    EventPoll::EventType events)
 {
-  SharedHandle<SocketEntry> socketEntry(new SocketEntry(socket));
+  std::shared_ptr<SocketEntry> socketEntry(new SocketEntry(socket));
   SocketEntrySet::iterator i = socketEntries_.find(socketEntry);
   if(i == socketEntries_.end()) {
     A2_LOG_DEBUG(fmt("Socket %d is not found in SocketEntries.", socket));
@@ -312,9 +308,9 @@ bool SelectEventPoll::deleteEvents(sock_t socket, Command* command,
 
 #ifdef ENABLE_ASYNC_DNS
 bool SelectEventPoll::addNameResolver
-(const SharedHandle<AsyncNameResolver>& resolver, Command* command)
+(const std::shared_ptr<AsyncNameResolver>& resolver, Command* command)
 {
-  SharedHandle<AsyncNameResolverEntry> entry
+  std::shared_ptr<AsyncNameResolverEntry> entry
     (new AsyncNameResolverEntry(resolver, command));
   AsyncNameResolverEntrySet::iterator itr =
     nameResolverEntries_.lower_bound(entry);
@@ -327,9 +323,9 @@ bool SelectEventPoll::addNameResolver
 }
 
 bool SelectEventPoll::deleteNameResolver
-(const SharedHandle<AsyncNameResolver>& resolver, Command* command)
+(const std::shared_ptr<AsyncNameResolver>& resolver, Command* command)
 {
-  SharedHandle<AsyncNameResolverEntry> entry
+  std::shared_ptr<AsyncNameResolverEntry> entry
     (new AsyncNameResolverEntry(resolver, command));
   return nameResolverEntries_.erase(entry) == 1;
 }

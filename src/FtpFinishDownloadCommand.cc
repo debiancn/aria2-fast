@@ -56,12 +56,12 @@ namespace aria2 {
 
 FtpFinishDownloadCommand::FtpFinishDownloadCommand
 (cuid_t cuid,
- const SharedHandle<Request>& req,
- const SharedHandle<FileEntry>& fileEntry,
+ const std::shared_ptr<Request>& req,
+ const std::shared_ptr<FileEntry>& fileEntry,
  RequestGroup* requestGroup,
- const SharedHandle<FtpConnection>& ftpConnection,
+ const std::shared_ptr<FtpConnection>& ftpConnection,
  DownloadEngine* e,
- const SharedHandle<SocketCore>& socket)
+ const std::shared_ptr<SocketCore>& socket)
   :AbstractCommand(cuid, req, fileEntry, requestGroup, e, socket),
    ftpConnection_(ftpConnection)
 {}
@@ -80,7 +80,7 @@ bool FtpFinishDownloadCommand::execute()
       getCheckPoint() = global::wallclock();
       int status = ftpConnection_->receiveResponse();
       if(status == 0) {
-        getDownloadEngine()->addCommand(this);
+        addCommandSelf();
         return false;
       }
       if(status == 226) {
@@ -97,7 +97,7 @@ bool FtpFinishDownloadCommand::execute()
       A2_LOG_INFO(fmt("CUID#%" PRId64 " - Timeout before receiving transfer complete.",
                       getCuid()));
     } else {
-      getDownloadEngine()->addCommand(this);
+      addCommandSelf();
       return false;
     }
   } catch(RecoverableException& e) {

@@ -53,7 +53,7 @@ DHTTaskExecutor::~DHTTaskExecutor() {}
 void DHTTaskExecutor::update()
 {
   execTasks_.erase(std::remove_if(execTasks_.begin(), execTasks_.end(),
-                                  mem_fun_sh(&DHTTask::finished)),
+                                  std::mem_fn(&DHTTask::finished)),
                    execTasks_.end());
   int r;
   if(static_cast<size_t>(numConcurrent_) > execTasks_.size()) {
@@ -62,7 +62,7 @@ void DHTTaskExecutor::update()
     r = 0;
   }
   while(r && !queue_.empty()) {
-    SharedHandle<DHTTask> task = queue_.front();
+    std::shared_ptr<DHTTask> task = queue_.front();
     queue_.pop_front();
     task->startup();
     if(!task->finished()) {

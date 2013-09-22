@@ -45,8 +45,6 @@
 namespace aria2 {
 
 class DownloadContext;
-class PeerStorage;
-class PieceStorage;
 class BtMessage;
 class BtMessageFactory;
 class Peer;
@@ -57,14 +55,12 @@ class PeerConnection;
 class DefaultBtMessageDispatcher : public BtMessageDispatcher {
 private:
   cuid_t cuid_;
-  std::deque<SharedHandle<BtMessage> > messageQueue_;
-  std::deque<RequestSlot> requestSlots_;
-  SharedHandle<DownloadContext> downloadContext_;
-  SharedHandle<PeerStorage> peerStorage_;
-  SharedHandle<PieceStorage> pieceStorage_;
-  SharedHandle<PeerConnection> peerConnection_;
+  std::deque<std::unique_ptr<BtMessage> > messageQueue_;
+  std::deque<std::unique_ptr<RequestSlot>> requestSlots_;
+  DownloadContext* downloadContext_;
+  PeerConnection* peerConnection_;
   BtMessageFactory* messageFactory_;
-  SharedHandle<Peer> peer_;
+  std::shared_ptr<Peer> peer_;
   RequestGroupMan* requestGroupMan_;
   time_t requestTimeout_;
 public:
@@ -72,68 +68,68 @@ public:
 
   virtual ~DefaultBtMessageDispatcher();
 
-  virtual void addMessageToQueue(const SharedHandle<BtMessage>& btMessage);
+  virtual void addMessageToQueue(std::unique_ptr<BtMessage> btMessage)
+    CXX11_OVERRIDE;
 
-  virtual void addMessageToQueue
-  (const std::vector<SharedHandle<BtMessage> >& btMessages);
-
-  virtual void sendMessages();
+  virtual void sendMessages() CXX11_OVERRIDE;
 
   // For unit tests without PeerConnection
   void sendMessagesInternal();
 
   virtual void doCancelSendingPieceAction
-  (size_t index, int32_t begin, int32_t length);
+  (size_t index, int32_t begin, int32_t length) CXX11_OVERRIDE;
 
-  virtual void doCancelSendingPieceAction(const SharedHandle<Piece>& piece);
+  virtual void doCancelSendingPieceAction(const std::shared_ptr<Piece>& piece)
+    CXX11_OVERRIDE;
 
-  virtual void doAbortOutstandingRequestAction(const SharedHandle<Piece>& piece);
+  virtual void doAbortOutstandingRequestAction
+  (const std::shared_ptr<Piece>& piece) CXX11_OVERRIDE;
 
-  virtual void doChokedAction();
+  virtual void doChokedAction() CXX11_OVERRIDE;
 
-  virtual void doChokingAction();
+  virtual void doChokingAction() CXX11_OVERRIDE;
 
-  virtual void checkRequestSlotAndDoNecessaryThing();
+  virtual void checkRequestSlotAndDoNecessaryThing() CXX11_OVERRIDE;
 
-  virtual bool isSendingInProgress();
+  virtual bool isSendingInProgress() CXX11_OVERRIDE;
 
-  virtual size_t countMessageInQueue() {
+  virtual size_t countMessageInQueue() CXX11_OVERRIDE
+  {
     return messageQueue_.size();
   }
 
-  virtual size_t countOutstandingRequest()
+  virtual size_t countOutstandingRequest() CXX11_OVERRIDE
   {
     return requestSlots_.size();
   }
 
-  virtual bool isOutstandingRequest(size_t index, size_t blockIndex);
+  virtual bool isOutstandingRequest(size_t index, size_t blockIndex)
+    CXX11_OVERRIDE;
 
-  virtual RequestSlot getOutstandingRequest
-  (size_t index, int32_t begin, int32_t length);
+  virtual const RequestSlot* getOutstandingRequest
+  (size_t index, int32_t begin, int32_t length) CXX11_OVERRIDE;
 
-  virtual void removeOutstandingRequest(const RequestSlot& slot);
+  virtual void removeOutstandingRequest(const RequestSlot* slot)
+    CXX11_OVERRIDE;
 
-  virtual void addOutstandingRequest(const RequestSlot& requestSlot);
+  virtual void addOutstandingRequest(std::unique_ptr<RequestSlot> requestSlot)
+    CXX11_OVERRIDE;
 
-  virtual size_t countOutstandingUpload();
+  virtual size_t countOutstandingUpload() CXX11_OVERRIDE;
 
-  const std::deque<SharedHandle<BtMessage> >& getMessageQueue() const
+  const std::deque<std::unique_ptr<BtMessage>>& getMessageQueue() const
   {
     return messageQueue_;
   }
 
-  const std::deque<RequestSlot>& getRequestSlots() const
+  const std::deque<std::unique_ptr<RequestSlot>>& getRequestSlots() const
   {
     return requestSlots_;
   }
 
-  void setPeer(const SharedHandle<Peer>& peer);
+  void setPeer(const std::shared_ptr<Peer>& peer);
 
-  void setDownloadContext(const SharedHandle<DownloadContext>& downloadContext);
-
-  void setPieceStorage(const SharedHandle<PieceStorage>& pieceStorage);
-
-  void setPeerStorage(const SharedHandle<PeerStorage>& peerStorage);
+  void setDownloadContext(DownloadContext* downloadContext);
 
   void setBtMessageFactory(BtMessageFactory* factory);
 
@@ -149,7 +145,7 @@ public:
     requestTimeout_ = requestTimeout;
   }
 
-  void setPeerConnection(const SharedHandle<PeerConnection>& peerConnection)
+  void setPeerConnection(PeerConnection* peerConnection)
   {
     peerConnection_ = peerConnection;
   }
