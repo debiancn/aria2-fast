@@ -1,1 +1,16 @@
-aria2c -d /tmp http://www.debian.org
+#!/bin/sh
+set -e
+
+PORT=43248
+
+# start local http server
+python3 -m http.server $PORT &
+HTTP_PID=$!
+trap "kill $HTTP_PID" EXIT TERM INT
+# let the http server settle down
+sleep 2
+
+aria2c -d $ADTTMP http://localhost:$PORT/debian/control
+
+# verify that files are identical
+cmp debian/control $ADTTMP/control

@@ -1,3 +1,10 @@
+aria2 (1.18.0-2) UNRELEASED; urgency=low
+
+  * debian/tests/httpfile
+    + Do not depend on internet being available, thanks to Martin Pitt (Closes: #727537) 
+
+ -- Patrick Ruckstuhl <patrick@ch.tario.org>  Thu, 24 Oct 2013 18:23:59 +0200
+
 aria2 (1.18.0-1) unstable; urgency=low
 
   [ Kartik Mistry ]
