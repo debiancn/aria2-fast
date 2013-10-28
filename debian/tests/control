@@ -1,1 +1,2 @@
 Tests: httpfile
+Depends: @, python3
