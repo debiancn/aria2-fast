@@ -32,15 +32,13 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#include "AppleMessageDigestImpl.h"
+
+#include "MessageDigestImpl.h"
 
 #include <CommonCrypto/CommonDigest.h>
 
-#include "array_fun.h"
-#include "a2functional.h"
-#include "HashFuncEntry.h"
-
 namespace aria2 {
+namespace {
 
 template<size_t dlen,
          typename ctx_t,
@@ -52,6 +50,9 @@ public:
   MessageDigestBase() { reset(); }
   virtual ~MessageDigestBase() {}
 
+  static  size_t length() {
+    return dlen;
+  }
   virtual size_t getDigestLength() const CXX11_OVERRIDE {
     return dlen;
   }
@@ -59,10 +60,12 @@ public:
     init_fn(&ctx_);
   }
   virtual void update(const void* data, size_t length) CXX11_OVERRIDE {
+    auto bytes = reinterpret_cast<const char*>(data);
     while (length) {
       CC_LONG l = std::min(length, (size_t)std::numeric_limits<uint32_t>::max());
-      update_fn(&ctx_, data, l);
+      update_fn(&ctx_, bytes, l);
       length -= l;
+      bytes += l;
     }
   }
   virtual void digest(unsigned char* md) CXX11_OVERRIDE {
@@ -109,49 +112,20 @@ typedef MessageDigestBase<CC_SHA512_DIGEST_LENGTH,
                           CC_SHA512_Final>
 MessageDigestSHA512;
 
+} // namespace
+
 std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
   return std::unique_ptr<MessageDigestImpl>(new MessageDigestSHA1());
 }
 
-std::unique_ptr<MessageDigestImpl> MessageDigestImpl::create
-(const std::string& hashType)
-{
-  if (hashType == "sha-1") {
-    return make_unique<MessageDigestSHA1>();
-  }
-  if (hashType == "sha-224") {
-    return make_unique<MessageDigestSHA224>();
-  }
-  if (hashType == "sha-256") {
-    return make_unique<MessageDigestSHA256>();
-  }
-  if (hashType == "sha-384") {
-    return make_unique<MessageDigestSHA384>();
-  }
-  if (hashType == "sha-512") {
-    return make_unique<MessageDigestSHA512>();
-  }
-  if (hashType == "md5") {
-    return make_unique<MessageDigestMD5>();
-  }
-  return nullptr;
-}
-
-bool MessageDigestImpl::supports(const std::string& hashType)
-{
-  return hashType == "sha-1" || hashType == "sha-224" ||
-    hashType == "sha-256" || hashType == "sha-384" ||
-    hashType == "sha-512" || hashType == "md5";
-}
-
-size_t MessageDigestImpl::getDigestLength(const std::string& hashType)
-{
-  std::unique_ptr<MessageDigestImpl> impl = create(hashType);
-  if (!impl) {
-    return 0;
-  }
-  return impl->getDigestLength();
-}
+MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
+  { "sha-1", make_hi<MessageDigestSHA1>() },
+  { "sha-224", make_hi<MessageDigestSHA224>() },
+  { "sha-256", make_hi<MessageDigestSHA256>() },
+  { "sha-384", make_hi<MessageDigestSHA384>() },
+  { "sha-512", make_hi<MessageDigestSHA512>() },
+  { "md5", make_hi<MessageDigestMD5>() },
+};
 
 } // namespace aria2

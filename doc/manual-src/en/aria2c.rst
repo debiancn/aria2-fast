@@ -347,11 +347,33 @@ HTTP Specific Options
     certificates store, aria2 will automatically load those
     certificates at the startup.
 
+  .. note::
+
+    *WinTLS* and *AppleTLS* do not support this option. Instead you will
+    have to import the certificate into the OS trust store.
+
 .. option:: --certificate=<FILE>
 
-  Use the client certificate in FILE.
-  The certificate must be in PEM format.
-  You may use :option:`--private-key` option to specify the private key.
+  Use the client certificate in FILE. The certificate must be
+  either in PKCS12 (.p12, .pfx) or in PEM format.
+
+  PKCS12 files must contain the certificate, a key and optionally a chain
+  of additional certificates. Only PKCS12 files with a blank import password
+  can be opened!
+
+  When using PEM, you have to specify the private key via :option:`--private-key`
+  as well.
+
+  .. note::
+    *WinTLS* does not support PEM files at the moment. Users have to use PKCS12
+    files.
+
+  .. note::
+    *AppleTLS* users should use the Keychain Access utility to import the client
+    certificate and get the SHA-1 fingerprint from the Information dialog
+    corresponding to that certificate.
+    To start aria2c use `--certificate=<SHA-1>` and just omit the
+    :option:`--private-key` option.
 
 .. option:: --check-certificate[=true|false]
 
@@ -922,16 +944,27 @@ RPC Options
 .. option:: --rpc-certificate=<FILE>
 
   Use the certificate in FILE for RPC server. The certificate must be
-  in PEM format. Use :option:`--rpc-private-key` option to specify the
-  private key. Use :option:`--rpc-secure` option to enable encryption.
+  either in PKCS12 (.p12, .pfx) or in PEM format.
 
-  *AppleTLS* users should use the Keychain Access utility to first generate a
-  self-signed SSL-Server certificate, e.g. using the wizard, and get the
-  SHA-1 fingerprint from the Information dialog corresponding to that new
-  certificate.
-  To start aria2c with :option:`--rpc-secure` use
-  `--rpc-certificate=<SHA-1>` and just omit the :option:`--rpc-private-key`
-  option.
+  PKCS12 files must contain the certificate, a key and optionally a chain
+  of additional certificates. Only PKCS12 files with a blank import password
+  can be opened!
+
+  When using PEM, you have to specify the private key via :option:`--rpc-private-key`
+  as well. Use :option:`--rpc-secure` option to enable encryption.
+
+  .. note::
+    *WinTLS* does not support PEM files at the moment. Users have to use PKCS12
+    files.
+
+  .. note::
+    *AppleTLS* users should use the Keychain Access utility to first generate a
+    self-signed SSL-Server certificate, e.g. using the wizard, and get the
+    SHA-1 fingerprint from the Information dialog corresponding to that new
+    certificate.
+    To start aria2c with :option:`--rpc-secure` use
+    `--rpc-certificate=<SHA-1>` and just omit the :option:`--rpc-private-key`
+    option.
 
 .. option:: --rpc-listen-all[=true|false]
 

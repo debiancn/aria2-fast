@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.18.0],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.18.1],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -40,6 +40,7 @@ AC_DEFINE_UNQUOTED([TARGET], ["$target"], [Define target-type])
 # Checks for arguments.
 ARIA2_ARG_WITHOUT([libuv])
 ARIA2_ARG_WITHOUT([appletls])
+ARIA2_ARG_WITH([wintls])
 ARIA2_ARG_WITHOUT([gnutls])
 ARIA2_ARG_WITHOUT([libnettle])
 ARIA2_ARG_WITHOUT([libgmp])
@@ -53,6 +54,7 @@ ARIA2_ARG_WITHOUT([libz])
 ARIA2_ARG_WITH([tcmalloc])
 ARIA2_ARG_WITH([jemalloc])
 
+ARIA2_ARG_DISABLE([ssl])
 ARIA2_ARG_DISABLE([bittorrent])
 ARIA2_ARG_DISABLE([metalink])
 ARIA2_ARG_DISABLE([epoll])
@@ -286,7 +288,38 @@ case "$host" in
   *darwin*)
     have_osx="yes"
   ;;
+  *mingw*)
+    AC_CHECK_HEADERS([windows.h \
+                      winsock2.h \
+                      ws2tcpip.h \
+                      mmsystem.h \
+                      io.h \
+                      iphlpapi.h\
+                      winioctl.h \
+                      share.h], [], [],
+                      [[
+#ifdef HAVE_WS2TCPIP_H
+# include <ws2tcpip.h>
+#endif
+#ifdef HAVE_WINSOCK2_H
+# include <winsock2.h>
+#endif
+#ifdef HAVE_WINDOWS_H
+# include <windows.h>
+#endif
+                      ]])
+  ;;
 esac
+
+
+if test "x$enable_ssl" != "xyes"; then
+  with_appletls=no
+  with_wintls=no
+  with_libnettle=no
+  with_libgcrypt=no
+  with_gnutls=no
+  with_openssl=no
+fi
 
 if test "x$with_appletls" = "xyes"; then
   AC_MSG_CHECKING([whether to enable Mac OS X native SSL/TLS])
@@ -303,7 +336,40 @@ if test "x$with_appletls" = "xyes"; then
   fi
 fi
 
-if test "x$with_gnutls" = "xyes" && test "x$have_appletls" != "xyes"; then
+if test "x$with_wintls" = "xyes"; then
+  AC_HAVE_LIBRARY([crypt32],[have_wintls_libs=yes],[have_wintls_libs=no])
+  AC_HAVE_LIBRARY([secur32],[have_wintls_libs=$have_wintls_libs],[have_wintls_libs=no])
+  AC_HAVE_LIBRARY([advapi32],[have_wintls_libs=$have_wintls_libs],[have_wintls_libs=no])
+  AC_CHECK_HEADER([wincrypt.h], [have_wintls_headers=yes], [have_wintls_headers=no], [[
+#ifdef HAVE_WINDOWS_H
+# include <windows.h>
+#endif
+  ]])
+  AC_CHECK_HEADER([security.h], [have_wintls_headers=$have_wintls_headers], [have_wintls_headers=no], [[
+#ifdef HAVE_WINDOWS_H
+# include <windows.h>
+#endif
+#ifndef SECURITY_WIN32
+#define SECURITY_WIN32 1
+#endif
+  ]])
+
+  if test "x$have_wintls_libs" = "xyes" &&
+     test "x$have_wintls_headers" = "xyes"; then
+    AC_DEFINE([SECURITY_WIN32], [1], [Use security.h in WIN32 mode])
+    LIBS="$LIBS -lcrypt32 -lsecur32 -ladvapi32"
+    have_wintls=yes
+  else
+    have_wintls=no
+  fi
+  if test "x$have_wintls" != "xyes"; then
+    if test "x$with_wintls_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([wintls])
+    fi
+  fi
+fi
+
+if test "x$with_gnutls" = "xyes" && test "x$have_appletls" != "xyes" && test "x$have_wintls" != "xyes"; then
   # gnutls >= 2.8 doesn't have libgnutls-config anymore. We require
   # 2.2.0 because we use gnutls_priority_set_direct()
   PKG_CHECK_MODULES([LIBGNUTLS], [gnutls >= 2.2.0],
@@ -321,7 +387,7 @@ if test "x$with_gnutls" = "xyes" && test "x$have_appletls" != "xyes"; then
   fi
 fi
 
-if test "x$with_openssl" = "xyes" && test "x$have_appletls" != "xyes" && test "x$have_libgnutls" != "xyes"; then
+if test "x$with_openssl" = "xyes" && test "x$have_appletls" != "xyes" && test "x$have_wintls" != "xyes" && test "x$have_libgnutls" != "xyes"; then
   PKG_CHECK_MODULES([OPENSSL], [openssl >= 0.9.8],
                     [have_openssl=yes], [have_openssl=no])
   if test "x$have_openssl" = "xyes"; then
@@ -394,39 +460,50 @@ if test "x$with_libcares" = "xyes"; then
 fi
 
 use_md=""
-if test "x$have_osx" == "xyes"; then
+if test "x$have_appletls" == "xyes"; then
   use_md="apple"
   AC_DEFINE([USE_APPLE_MD], [1], [What message digest implementation to use])
 else
-  if test "x$have_libnettle" = "xyes"; then
-    AC_DEFINE([USE_LIBNETTLE_MD], [1], [What message digest implementation to use])
-    use_md="libnettle"
+  if test "x$have_wintls" == "xyes"; then
+    use_md="windows"
+    AC_DEFINE([USE_WINDOWS_MD], [1], [What message digest implementation to use])
   else
-    if test "x$have_libgcrypt" = "xyes"; then
-      AC_DEFINE([USE_LIBGCRYPT_MD], [1], [What message digest implementation to use])
-      use_md="libgcrypt"
+    if test "x$have_libnettle" = "xyes"; then
+      AC_DEFINE([USE_LIBNETTLE_MD], [1], [What message digest implementation to use])
+      use_md="libnettle"
     else
-      if test "x$have_openssl" = "xyes"; then
-        AC_DEFINE([USE_OPENSSL_MD], [1], [What message digest implementation to use])
-        use_md="openssl"
+      if test "x$have_libgcrypt" = "xyes"; then
+        AC_DEFINE([USE_LIBGCRYPT_MD], [1], [What message digest implementation to use])
+        use_md="libgcrypt"
+      else
+        if test "x$have_openssl" = "xyes"; then
+          AC_DEFINE([USE_OPENSSL_MD], [1], [What message digest implementation to use])
+          use_md="openssl"
+        else
+          AC_DEFINE([USE_INTERNAL_MD], [1], [What message digest implementation to use])
+          use_md="internal"
+        fi
       fi
     fi
   fi
 fi
 
 # Define variables based on the result of the checks for libraries.
-if test "x$have_appletls" = "xyes" || test "x$have_libgnutls" = "xyes" || test "x$have_openssl" = "xyes"; then
+if test "x$have_appletls" = "xyes" || test "x$have_wintls" == "xyes" || test "x$have_libgnutls" = "xyes" || test "x$have_openssl" = "xyes"; then
   have_ssl="yes"
   AC_DEFINE([ENABLE_SSL], [1], [Define to 1 if ssl support is enabled.])
   AM_CONDITIONAL([ENABLE_SSL], true)
 else
+  have_ssl="no"
   AM_CONDITIONAL([ENABLE_SSL], false)
 fi
 
 
 AM_CONDITIONAL([HAVE_OSX], [ test "x$have_osx" = "xyes" ])
 AM_CONDITIONAL([HAVE_APPLETLS], [ test "x$have_appletls" = "xyes" ])
+AM_CONDITIONAL([HAVE_WINTLS], [ test "x$have_wintls" = "xyes" ])
 AM_CONDITIONAL([USE_APPLE_MD], [ test "x$use_md" = "xapple" ])
+AM_CONDITIONAL([USE_WINDOWS_MD], [ test "x$use_md" = "xwindows" ])
 AM_CONDITIONAL([HAVE_LIBGNUTLS], [ test "x$have_libgnutls" = "xyes" ])
 AM_CONDITIONAL([HAVE_LIBNETTLE], [ test "x$have_libnettle" = "xyes" ])
 AM_CONDITIONAL([USE_LIBNETTLE_MD], [ test "x$use_md" = "xlibnettle"])
@@ -435,6 +512,7 @@ AM_CONDITIONAL([HAVE_LIBGCRYPT], [ test "x$have_libgcrypt" = "xyes" ])
 AM_CONDITIONAL([USE_LIBGCRYPT_MD], [ test "x$use_md" = "xlibgcrypt"])
 AM_CONDITIONAL([HAVE_OPENSSL], [ test "x$have_openssl" = "xyes" ])
 AM_CONDITIONAL([USE_OPENSSL_MD], [ test "x$use_md" = "xopenssl"])
+AM_CONDITIONAL([USE_INTERNAL_MD], [ test "x$use_md" = "xinternal"])
 
 if test "x$use_md" != "x"; then
   AC_DEFINE([ENABLE_MESSAGE_DIGEST], [1],
@@ -445,14 +523,26 @@ else
   AM_CONDITIONAL([ENABLE_MESSAGE_DIGEST], false)
 fi
 
-if test "x$have_libnettle" = "xyes" && test "x$have_libgmp" = "xyes" ||
-   test "x$have_libgcrypt" = "xyes" || test "x$have_openssl" = "xyes"; then
-  enable_bignum=yes
+if test "x$have_libgmp" = "xyes" ||
+   test "x$have_libgcrypt" = "xyes" ||
+   test "x$have_openssl" = "xyes"; then
+  AM_CONDITIONAL([USE_INTERNAL_BIGNUM], false)
+else
+  AC_DEFINE([USE_INTERNAL_BIGNUM], [1], [Define to 1 if internal BIGNUM support is enabled.])
+  AM_CONDITIONAL([USE_INTERNAL_BIGNUM], true)
+fi
+
+if test "x$have_libnettle" = "xyes" ||
+   test "x$have_libgcrypt" = "xyes" ||
+   test "x$have_openssl" = "xyes"; then
+  AM_CONDITIONAL([USE_INTERNAL_ARC4], false)
+else
+  AC_DEFINE([USE_INTERNAL_ARC4], [1], [Define to 1 if internal ARC4 support is enabled.])
+  AM_CONDITIONAL([USE_INTERNAL_ARC4], true)
 fi
 
 if test "x$enable_bittorrent" = "xyes" &&
-   test "x$enable_message_digest" = "xyes" &&
-   test "x$enable_bignum" = "xyes"; then
+   test "x$enable_message_digest" = "xyes"; then
   AC_DEFINE([ENABLE_BITTORRENT], [1],
             [Define to 1 if BitTorrent support is enabled.])
   AM_CONDITIONAL([ENABLE_BITTORRENT], true)
@@ -518,30 +608,6 @@ esac
 # Checks for header files.
 AC_FUNC_ALLOCA
 AC_HEADER_STDC
-
-case "$host" in
-	*mingw*)
-    AC_CHECK_HEADERS([windows.h \
-                      winsock2.h \
-                      ws2tcpip.h \
-                      mmsystem.h \
-                      io.h \
-                      iphlpapi.h\
-                      winioctl.h \
-                      share.h], [], [],
-                      [[
-#ifdef HAVE_WS2TCPIP_H
-# include <ws2tcpip.h>
-#endif
-#ifdef HAVE_WINSOCK2_H
-# include <winsock2.h>
-#endif
-#ifdef HAVE_WINDOWS_H
-# include <windows.h>
-#endif
-                      ]])
-		;;
-esac
 
 AC_CHECK_HEADERS([argz.h \
                   arpa/inet.h \
@@ -869,6 +935,7 @@ AC_SUBST([bashcompletiondir])
 
 case "$host" in
   *android*)
+    android=yes
     LIBS="$LIBS -lstdc++ -lsupc++"
     case "$host" in
       arm-*)
@@ -886,6 +953,7 @@ case "$host" in
     ;;
 esac
 
+AM_CONDITIONAL([ANDROID], [test "x$android" = "xyes"])
 AM_CONDITIONAL([ANDROID_ARM], [test "x$android_arm" = "xyes"])
 AM_CONDITIONAL([ANDROID_MIPS], [test "x$android_mips" = "xyes"])
 AM_CONDITIONAL([ANDROID_X86], [test "x$android_x86" = "xyes"])
@@ -934,6 +1002,7 @@ echo "LibUV:          $have_libuv"
 echo "SQLite3:        $have_sqlite3"
 echo "SSL Support:    $have_ssl"
 echo "AppleTLS:       $have_appletls"
+echo "WinTLS:         $have_wintls"
 echo "GnuTLS:         $have_libgnutls"
 echo "OpenSSL:        $have_openssl"
 echo "CA Bundle:      $ca_bundle"
@@ -945,7 +1014,7 @@ echo "Epoll:          $have_epoll"
 echo "Bittorrent:     $enable_bittorrent"
 echo "Metalink:       $enable_metalink"
 echo "XML-RPC:        $enable_xml_rpc"
-echo "Message Digest: $enable_message_digest"
+echo "Message Digest: $use_md"
 echo "WebSocket:      $enable_websocket"
 echo "Libaria2:       $enable_libaria2"
 if test "x$enable_libaria2" = "xyes"; then

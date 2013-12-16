@@ -99,10 +99,11 @@ Dependency
 ======================== ========================================
 features                  dependency
 ======================== ========================================
-HTTPS                    GnuTLS or OpenSSL
+HTTPS                    OSX or GnuTLS or OpenSSL
 BitTorrent               libnettle+libgmp or libgcrypt or OpenSSL
 Metalink                 libxml2 or Expat.
-Checksum                 libnettle or libgcrypt or OpenSSL
+Checksum                 None. Optional: OSX or libnettle or libgcrypt
+                         or OpenSSL (see note)
 gzip, deflate in HTTP    zlib
 Async DNS                C-Ares
 Firefox3/Chromium cookie libsqlite3
@@ -118,16 +119,26 @@ JSON-RPC over WebSocket  libnettle or libgcrypt or OpenSSL
 
 .. note::
 
+  On Apple OSX the OS-level SSL/TLS support will be preferred. Hence
+  neither GnuTLS nor OpenSSL are required on that platform. If you'd like
+  to disable this behavior, run configure with ``--without-appletls``.
+
   GnuTLS has precedence over OpenSSL if both libraries are installed.
   If you prefer OpenSSL, run configure with ``--without-gnutls``
   ``--with-openssl``.
 
 .. note::
 
+  On Apple OSX the OS-level checksumming support will be preferred,
+  unless aria2 is configured with ``--without-appletls``.
+
   libnettle has precedence over libgcrypt if both libraries are
   installed.  If you prefer libgcrypt, run configure with
   ``--without-libnettle --with-libgcrypt``. If OpenSSL is selected over
   GnuTLS, neither libnettle nor libgcrypt will be used.
+  
+  If none of the optional dependencies are installed, an internal
+  implementation that only supports md5 and sha1 will be used.
 
 A user can have one of the following configurations for SSL and crypto
 libraries:
@@ -183,8 +194,7 @@ You can use libexpat1-dev instead of libxml2-dev:
 * libexpat1-dev    (Required for Metalink support)
 
 On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
-libgcrypt-devel, libgcrypt-devel, libxml2-devel, openssl-devel,
-gettext-devel, cppunit
+libgcrypt-devel, libxml2-devel, openssl-devel, gettext-devel, cppunit
 
 If you downloaded source code from git repository, you have to run
 following command to generate configure script and other files
@@ -296,6 +306,9 @@ Cross-compiling Android binary
 In this section, we describe how to build Android binary using Android
 NDK cross-compiler on Debian Linux.
 
+At the time of this writing, android-ndk-r9 should compile aria2
+without errors.
+
 ``android-config`` script is a configure script wrapper for Android
 build.  We use it to create official Android build.  This script
 assumes the following libraries have been built for cross-compile:
@@ -315,14 +328,14 @@ by ourselves.
 environment variable which must fulfill the following conditions:
 
 * Android NDK toolchain is installed under
-  ``$ANDROID_HOME/toolchain``.  Refer to "3/ Invoking the compiler
+  ``$ANDROID_HOME/toolchain``.  Refer to "4/ Invoking the compiler
   (the easy way):" section in Android NDK
   ``docs/STANDALONE-TOOLCHAIN.html`` to install custom toolchain.
 
   For example, to install toolchain under ``$ANDROID_HOME/toolchain``,
   do this::
 
-      $NDK/build/tools/make-standalone-toolchain.sh --platform=android-9 --install-dir=$ANDROID_HOME/toolchain
+      $NDK/build/tools/make-standalone-toolchain.sh --platform=android-18 --toolchain=arm-linux-androideabi-4.8 --install-dir=$ANDROID_HOME/toolchain
 
   You may need to add ``--system=linux-x86_64`` to the above
   command-line for x86_64 Linux host.

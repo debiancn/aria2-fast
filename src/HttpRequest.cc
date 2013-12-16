@@ -224,8 +224,8 @@ std::string HttpRequest::createRequest()
     val += base64::encode(authText.begin(), authText.end());
     builtinHds.push_back(std::make_pair("Authorization:", val));
   }
-  if(!getPreviousURI().empty()) {
-    builtinHds.push_back(std::make_pair("Referer:", getPreviousURI()));
+  if(!request_->getReferer().empty()) {
+    builtinHds.push_back(std::make_pair("Referer:", request_->getReferer()));
   }
   if(cookieStorage_) {
     std::string cookiesValue;
@@ -411,11 +411,6 @@ const std::string& HttpRequest::getQuery() const
   return request_->getQuery();
 }
 
-const std::string& HttpRequest::getPreviousURI() const
-{
-  return request_->getPreviousUri();
-}
-
 std::string HttpRequest::getURIHost() const
 {
   return request_->getURIHost();
@@ -441,10 +436,9 @@ bool HttpRequest::conditionalRequest() const
   if(!ifModSinceHeader_.empty()) {
     return true;
   }
-  for(auto i = headers_.begin(),
-        eoi = headers_.end(); i != eoi; ++i) {
-    if(util::istartsWith(*i, "if-modified-since") ||
-       util::istartsWith(*i, "if-none-match")) {
+  for(auto& h : headers_) {
+    if(util::istartsWith(h, "if-modified-since") ||
+       util::istartsWith(h, "if-none-match")) {
       return true;
     }
   }

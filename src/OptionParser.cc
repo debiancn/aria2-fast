@@ -51,7 +51,6 @@
 #include "OptionHandlerFactory.h"
 #include "DlAbortEx.h"
 #include "error_code.h"
-#include "prefs.h"
 #include "UnknownOptionException.h"
 #include "LogFactory.h"
 #include "fmt.h"
@@ -186,7 +185,7 @@ void OptionParser::parseArg
       // option is ambiguous.
       int ambiguous = 0;
       for(int i = 1, len = option::countOption(); i < len; ++i) {
-        const Pref* pref = option::i2p(i);
+        PrefPtr pref = option::i2p(i);
         const OptionHandler* h = find(pref);
         if(h && !h->isHidden()) {
           if(strcmp(pref->k, optstr) == 0) {
@@ -234,7 +233,7 @@ void OptionParser::parse(Option& option, std::istream& is) const
     if(nv.first.first == nv.first.second) {
       continue;
     }
-    const Pref* pref =
+    PrefPtr pref =
       option::k2p(std::string(nv.first.first, nv.first.second));
     const OptionHandler* handler = find(pref);
     if(handler) {
@@ -247,14 +246,13 @@ void OptionParser::parse(Option& option, std::istream& is) const
 
 void OptionParser::parse(Option& option, const KeyVals& options) const
 {
-  for(KeyVals::const_iterator i = options.begin(), eoi = options.end();
-      i != eoi; ++i) {
-    const Pref* pref = option::k2p((*i).first);
+  for(const auto& o : options) {
+    auto pref = option::k2p(o.first);
     const OptionHandler* handler = find(pref);
     if(handler) {
-      handler->parse(option, (*i).second);
+      handler->parse(option, o.second);
     } else {
-      A2_LOG_WARN(fmt("Unknown option: %s", (*i).first.c_str()));
+      A2_LOG_WARN(fmt("Unknown option: %s", o.first.c_str()));
     }
   }
 }
@@ -325,7 +323,7 @@ std::vector<const OptionHandler*> OptionParser::findAll() const
   return result;
 }
 
-const OptionHandler* OptionParser::find(const Pref* pref) const
+const OptionHandler* OptionParser::find(PrefPtr pref) const
 {
   return findById(pref->i);
 }

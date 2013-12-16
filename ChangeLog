@@ -1,1452 +1,643 @@
-commit 7ca627bfe954105ebf95b65f4047ef31464f8111
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-09-09
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-09-09
-
-    Fix out-of-tree builds of libaria2api
-    
-    Also it's not just the `html` target that needs libaria2api generated.
-    
-    The fix is mighty ackward, as it is not really out-of-tree: libaria2api
-    still will be but into the srcdir. I settled for this because trying to
-    do a real include from the build dir is really a mess, either requireing
-    heavy pre-processing or a custom sphinx Include directive :p
-
-commit 4bd4aa2dc3c0e68eb222d34a80a2b690b71fcee0
+commit 1cf03bdada27191691b2e4ce074a9b7e06577225
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-09-10
+AuthorDate: 2013-10-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-09-10
-
-    mingw: Deactivate __USE_MINGW_ANSI_STDIO
-    
-    Deactivate __USE_MINGW_ANSI_STDIO because it causes lots of errors for
-    PRId64.
-
-commit 51bbdbb085cdbb7ada9989f2994bcc73ca6403b8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-09-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-09-08
+CommitDate: 2013-10-20
 
     Update NEWS
 
-commit 9a164bb4b198c8371bdd097773991c5965cf2db0
+commit 95843a5fe653f90f87c6604b809329735423ad64
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-09-08
+AuthorDate: 2013-10-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-09-08
+CommitDate: 2013-10-20
 
-    Bump up version number to 1.18.0
+    TimeTest: Fix testElapsed() fail occasionally
 
-commit d668a8a604bdd8b76c42dcb6edb0e91bc1db7839
-Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2013-09-03
-Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2013-09-03
-
-    Update aria2c.rst
-
-commit acd2af82d07e346ba782f4ec7bb8711c49056c3f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-29
-
-    util::htmlEscape: Optimize a bit
-    
-    The cause of slowness of the first implementation is the memory
-    allocation overhead and appending character by character.  In this
-    implementation, the output buffer is reserved the same size of input.
-    This is reasonable because most likely no replacement happens in
-    practice. And the unmodified region is copied using iterator range to
-    speed up a bit.
-
-commit 3b0ad59ee59f01a19026c832abce60ecf1d181a1
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-25
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-25
-
-    Use AM subdir-objects
-    
-    Doing so in AM_INIT_AUTOMAKE seems to be the most compatible way of
-    doing so.
-    
-    Closes GH-120
-
-commit 75e61ee3d01ab74cc6929aca12197a369320cbc0
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Fast-path for percentEncodeMini(string&)
-
-commit b2da75ca3304e377c7da3c3ee287f393ad90dc07
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Optimize htmlEscape implementation a bit
-
-commit 1b8de6bb18ca00264cbcadfbcd5781ce16231166
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Add fast-path to percentEncode(string&)
-
-commit 72c5aaa31a9e82172bb2a467f819d3d1c8ca35fe
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Give hint on how to install sphinx-build
-    
-    ... and remove trailing parenthesis from warning messages
-
-commit 4418ebdedc0fab2adb2d58977507064224aa8564
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    AppleTLSSession: Remove unused private member
-
-commit 522ae80fd463bfe1be239397984ed71e9cff94bd
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Fix no-return warning in FtpInitiateConnectionCommand
-    
-    ... and untangle code a bit while at it.
-
-commit c3b42da8d9415d20fa18fa37aa75a965935e3038
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    AM_SILENT_RULES([yes]) with backwards-compatiblity
-    
-    Supported since automake-1.11. There is no point in having the very
-    verbose compile stuff running about, which cannot even silenced properly
-    with `make -s` by default. Otherwise, `make V=1` or
-    `--disable-silent-rules` are your friends
-
-commit a3f86f313e7fbae3cb909f8a477b524b5972f852
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Fix automake-1.14 am_aux_dir
-    
-    AC_USE_SYSTEM_EXTENSIONS will cause AC_PROG_CC, which is overridden by
-    automake-1.14, which will then init (part) of automake, in particular
-    am_aux_dir expansion, which in turn relies on ac_aux-dir, which is not
-    initialized at this point, and thus: certain doom (or fun, depending on
-    your POV and mood :p)
-    
-    Hence call AC_USE_SYSTEM_EXTENSIONS only after AM_INIT_AUTOMAKE. This,
-    of course, caused a lot of related macro shuffling.
-    
-    Tested against automake-1.10 (OSX Lion/XCode version) and automake-1.14
-    (homebrew version)
-
-commit 0f86713b24f43b80fcc5f1dc3072456a05f0969f
-Merge: 22e414d 2dd1423
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-24
-
-    Merge pull request #119 from tatsuhiro-t/kill-intl
-    
-    Figure out the internal ./intl
-
-commit 2dd14236a3a97cafb4a32e3dff3821f093c9d9f7
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-24
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-24
-
-    Require external gettext for --enable-nls
-    
-    And stop using the internal flavor with ./intl
-
-commit 22e414dbb0263a87029d14b0bd3da4a83f743567
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-21
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-21
-
-    Make AX_CXX_COMPILE_STDCXX_11 test for -stdlib=libc++ via std::shared_ptr
-    
-    The clang shipped with OSX XCode and clangs not build enabling libcpp,
-    will default to the libstdc++ headers and lib installed on the system.
-    In the OSX case, that libstdc++ is the one bundles with gcc-4.2, which
-    is far too old to provide all required C++11 types, such as
-    std::shared_ptr.
-    Hence, the C++11 check should try to compile a program with a C++11 type
-    and try -stdlib=libc++ if the default lib fails to compile said program.
-
-commit b888088dc3de4828897b6c9062cb75e1cd665d19
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-21
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-21
-
-    Make the configure check for C++11 compiler mandatory
-    
-    Remove stray "dnl", so that mandatory actually works with (my)
-    autoreconf.
-
-commit ee2e21150b276663ed88bc7e5089109f6da60996
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-21
-
-    Use std::unordered_map in IndexedList for faster speed
-    
-    Because mingw cross compiler g++-4.6.3 does not support
-    std::unordered_map::emplace and std::deque::emplace, traditional
-    insert member function is used instead.
-
-commit 252e91e0ac21e507baab110afbda12c8227cf948
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-21
-
-    Add gettext-devel and cppunit to fedora package list
-
-commit cf6f58ceece4c85760c82b78c4872dba331ddfc6
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-21
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-21
-
-    More code cleanups
-
-commit 8526ceeb452d23d7aa73d01c6cb0fc8ae5e0377b
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-21
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-21
-
-    Convert to autos and ranged loops
-
-commit d8f44ef4f6c5ad86b08658ecba41a84b775b6e69
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-20
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-20
-
-    Convert most 0/NULL pointers to nullptr
-    
-    Courtesy of llvm cpp11-migrate 3.3
-
-commit 9da17424c62ebabf7c407695e6990cdd9820ebc9
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-20
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-20
-
-    Fix json::decodeGetParams when compiled with recent Apple clang
-
-commit 270f4298383f747821e72141f3185a8d7c8d39c4
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-20
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-20
-
-    Fix util::nextParam when compiled with recent Apple clang
-
-commit d87365efc6f88baf18d907e55ec8b9c87b2c1775
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-21
-
-    Use @echo instead of $(warning ...) to suppress warning on autoreconf
-
-commit c26c1e234ab3e7839b21e095b8cee1bdc4de7ad5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Move GHR outside of function and provide ctor to suppress compiler warning
-    
-    Without ctor, compiler emits warning "unused variable ghr".
-
-commit b6d84c0160d2db509a2b7fe1644f693ade14122b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Use nullptr for std::shared_ptr and unique_ptr default parameter
-
-commit 5ba71503332c0013b94b52afc522f6e098a2f845
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Code cleanup
-
-commit 7b04c841d693400c76fc711291ff006fabc43089
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Code cleanup
-
-commit 7f049dc2a480f55131c96def2226084e48f49d60
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Fix bad use of std::move
-    
-    In the original code, std::move(cookieDomain) may be performed before
-    util::isNumericHost(cookieDomain), which is unintentional.
-
-commit 7e01328daf2872a2921936dbeec39eb66c65e376
-Merge: bf5a940 02c65e0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-19
-
-    Merge branch 'master' into win-ctrl-c
-
-commit 02c65e0eca82bd46721d568906cb5fc05ead9beb
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-19
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-19
-
-    Always build doc/manual-src
-    
-    Should sphinx-build be not available AND the man file not be prsent,
-    then just "touch" it into existence (and warn about that)
-
-commit bf5a940ed48e2baaca8cd8305d0b631fb81ca118
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-18
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-18
-
-    Define a type for signal handlers
-
-commit 79fcafc31f593b4217657d4cd10effc832d7b7c3
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-17
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-18
-
-    Win: Use SetConsoleCtrlHandler for SIGINT/SIGTERM
-
-commit 9e25335850c859ff54677807c7b8613414622917
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-17
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-18
-
-    Implement a simple resource lock (threading)
-    
-    In this initial implementation Locks are no-ops on platforms other than
-    Windows.
-
-commit 322bd45cfb7c0a493175827899e57f6ef5bab22b
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-18
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-18
-
-    Check for sphinx-build during configure
-
-commit 2216d8cd34275bca70735c331a3379060e4ee65b
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-18
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-18
-
-    Fix out-of-tree README.html build
-
-commit a982dee961671a36b71884bde21658831830088d
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-16
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-16
-
-    Switch CA_BUNDLE to AC_DEFINE
-
-commit 303f987ee90dc56edf75df7e1e5d6002bdc514aa
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-16
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-16
-
-    Add --with-disk-cache configure option
-    
-    Enables packagers more fine grained control over the default value
-    without having to mess with config files.
-    
-    See GH-115
-
-commit 90c39522a2217a7bbd480f759ffc1456a29474ef
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-11
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-16
-
-    Libuv: Compatiblity fix with master
-
-commit 4be7ec380f82dba11d6c8f9173a9ad4f7ca6e6e5
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-08-12
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-08-12
-
-    Change defaults: Enable 16M disk cache by default.
-
-commit 732ed1fb8b779530fac545dd382169e584384f0e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-12
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-12
-
-    Fix broken XMLRPC method call
-
-commit 8d626822020a76558ef0b7400b6870e89ecd12b0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-08-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-08-04
-
-    Fix segmentation fault if RpcMethod::process throws exception
-
-commit de55569de527a5172f14a5ee9f6ecbcf41382e25
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-28
-
-    Always save control file if --force-save is given
-
-commit 41121e09f7cf6ed4a95797a80da63bca1d4884cd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-12
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-12
-
-    Use std::unique_ptr for Metalink objects
-
-commit 59e63d956ee63d99202b67a32e8a277f3b04650d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-11
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-11
-
-    Rewrite RPC method factory function
-
-commit 7c06b903f3493db95fcf4bd42cccc59e3b4d0692
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-11
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-11
-
-    Use std::unique_ptr for ValueBase object hierarchy
-
-commit 7a57ecc5f814dc305e5e4b9bd960d69b43870c0e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-07
-
-    DefaultBtMessageDispatcher: Remove unused members peerStorage_, pieceStorage_
-
-commit cf8cfeefbcfff1eebc2b5fde9f14ff3efff8d6e3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-07
-
-    DHTInteractionCommand: Use std::unique_ptr for DHTConnection
-    
-    Remove DHTConnection from DHTMessageReceiver because it is not used.
-
-commit fc6318d23f58827427be8ccbdab1a82da2a1c9bf
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-07-07
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-07-07
-
-    Fix a bad std::move in HttpConnection
-    
-    C++ Standard says that the order of evaluation of arguments is
-    unspecified. Even if it wasn't, std::move would run first, invalidating
-    the httpRequest smartptr, so that httpRequest->createRequest() would be
-    executed on the invalid ptr.
-    Some compilers might be smart enough to correct this error, clang XCode
-    Edition surely is not (not should it).
-
-commit 3f5f1e26d9932a00caffb4866e8a277b7477fa47
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Refactor PeerInterationCommand ctor
-
-commit 3c66c18489bb7e4f828fc5107299174cbc4ee4e5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    TrackerWatcherCommand: Use std::unique_ptr for trackerRequest_
-
-commit 5378ed8c431045a211af4c0b078ca9de6369f2d2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    MultiUrlRequestFactory: Use std::unique_ptr for DownloadEngine
-
-commit 00e27e4fa47477109fc467d96241a0fabd3c4ad2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine: Use std::unique_ptr for eventPoll_
-
-commit f83b0fcfa38cf80b15b275d48c131fa691d3006b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Refactor MultiUrlRequestInfo ctor
-    
-    StatCalc creation is moved to MultiUrlRequestInfo.  The summary output
-    is done only when PREF_QUIET is false and it is always to
-    global::cout(), so remove summaryOut_ and just use global::cout() in
-    that case. Also use std::unique_ptr for statCalc_ in DownloadEngine.
-
-commit 162c138362955eede9ca8ec2e4b5e804688eda32
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    BtRegistry: Use std::unique_ptr for BtObject
-
-commit cc3cd8a58b11d639c327ca6debb041747c3828d6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine: Use std::unique_ptr for btRegistry_
-
-commit 3a3ac4ef9b687274fc123dd1adf5b5f5e02d013d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine: Use std::unique_ptr for dnsCache_
-
-commit 9130dc6776d1706478b11f1c19b5160b24c887da
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine:: Use std::unique_ptr for webSocketSessionMan_
-    
-    Notifier::addDownloadEventListener now takes pointer to
-    DownloadEventListener. Session holds unique_ptr to
-    ApiCallbackDownloadEventListener object.
-
-commit 81f46fbf924722e22e141119b4a0bfb3ed136fd0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Use CXX11_OVERRIDE
-
-commit 5c4f97b8a95ac73e498054ba6caeb8042ad0306b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    MultiUrlRequestInfo: Remove virtual from dtor
-
-commit 68f2a333553dff378483cd628ba52aa6c5de63b8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine: Use std::unique_ptr for RequestGroupMan
-
-commit 697c1008f715669cdd6c8e5b7610a20182375253
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DownloadEngine: Use std::unique_ptr for checkIntegrityMan_, fileAllocationMan_
-
-commit 6b397c812520016f7b2b22544f51bfddbcca8dfe
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Use std::unique_ptr for CheckIntegrityEntry and FileAllocationEntry
-
-commit c9e58779e1a30b32ea2f86e686211d901aca19f0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Use std::unique_ptr for IteratableValidator
-
-commit d3a04d10a72b00487eb3c994bd3d0405e11c4789
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    DefaultPieceStorage::initStorage: Clean up
-
-commit ae84ff26e2ded61e19d38ddbd23bcbdb0279cc8a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    AbstractSingleDiskAdaptor: Use std::unique_ptr for diskWriter_
-
-commit f8d305fe639a2a458106f3f233f696157c6ab06d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Use std::unique_ptr for FileAllocationIterator
-
-commit 345ba415a50fbf99b1f0049f29be62d0bd11c608
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    MultiDiskWriter: Rewrite resetDiskWriterEntries() using simpler algorithm
-
-commit f000fd0cab7860920b5269c018ea3eaae9f35e2e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    MultiDiskAdaptor: Use std::unique_ptr for DiskWriterEntry and DiskWriter
-    
-    MultiFileAllocationIterator is also rewritten so that it does not
-    requre copying DiskWriterEntry objects.
-
-commit e823fe8bb5efb018648934ed6e047a515b4018bb
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Set log level DEBUG for unittests
-
-commit 28d5c7408f82d051019ca8f29dc309c73e539bbe
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Check that C++ compiler supports override keyword
-    
-    If the compiler supports override, define CXX11_OVERRIDE as override,
-    otherwise define it as empty. Use CXX11_OVERRIDE instead of override.
-
-commit cce5b3206ae4fa44365a5ac84dfaac69a3b4035c
-Merge: d404430 093ea1d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-06
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-06
-
-    Merge branch 'fix-streamfilters' of https://github.com/nmaier/aria2 into nmaier-fix-streamfilters
-
-commit 093ea1de4462a7d7659d73bad961f1a605704e3b
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-07-05
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-07-05
-
-    Fix bogus virtual override in StreamFilters
-
-commit d4044306f3d534c31f58b7a2f1dd91929ab5e092
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-07-05
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-07-05
-
-    AppleTLS: Fix MessageDigestImpl
-
-commit 59ba3c99f6445730be04750237c108bd85a05a8f
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-07-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-07-05
-
-    AppleTLS: Fix session CFRelease stuff
-
-commit c6a733378ff38e0a4f846250cee82f555bff151a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr to receive BtMessage
-
-commit 0cdeaa817783bfd74fddbc84079812b0ce77dfe1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Return nullptr directly where std::shared_ptr is expected
-    
-    The constructor of std::shared_ptr which takes nullptr is not explicit
-    so we can return nullptr directly.
-
-commit 107de5899779d4c2eecc86aaf74dc4cec8286293
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Return nullptr directly where std::unique_ptr is expected
-    
-    The constructor of std::unique_ptr which takes nullptr is not explicit
-    so we can return nullptr directly.
-
-commit 6ba1725e0f731860f75e67d15e305f35dd0c3d67
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for ARC4Encryptor in PeerConnection and MSEHandshake
-
-commit b4ae03970266351f3b024a30df88205aacf7d225
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    BinExpr, UnExpr: Make copies of args so that we can use them with rvalues
-
-commit 05d75ed21826ec699083836bc32bd6e14ae1ac87
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Fix array version make_unique is invoked for 1 size_t arg accidentally
-
-commit bc6aa3073b3584c63dff4f08cdbb7656ce23eff9
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for StreamPieceSelector instead of std::shared_ptr
-
-commit 128783cf8636bb713f29e472b11444c2b9287d8d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for PieceSelector instead of std::shared_ptr
-
-commit a479473949a8b82b1943c7d57966acfbb58f6c81
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for URISelector instead of std::shared_ptr
-
-commit c36370ef60ae4f8c1ed251a404ccddff671194a1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for LpdMessage instead of std::shared_ptr
-
-commit 57f1902ee1fd24e2fa94a5e5c0ee357335366d7d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for StreamFilter instead of std::shared_ptr
-
-commit cb205a207ce6c2f4e01247e2270e2fe687062a23
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-04
-
-    Use std::unique_ptr for HttpRequest instead of std::shared_ptr
-
-commit 9a38c102dc4ff4a0a7cc96ccef7cd1400f37eea5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Use std::unique_ptr for HttpResponse instead of std::shared_ptr
-
-commit 7e6db8d801973bfc62b80f411f14d1d332a1f7aa
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Use std::unique_ptr instead of array_ptr
-
-commit df0034f1cd5a3c642fba65f228da7ca0674161b8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Add countSetBitSlow tests
-
-commit c2e62cdb81d2c0e36f3165229d9d86b0ff38c3b4
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Fix compile error with i686-w64-mingw32-g++ 4.6
-    
-    Which does not support constructor delegate
-
-commit 211f685add3851f6f421e7203455307e50baacc3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    BitfieldMan: Rewrite getCompletedLength and countMissingBlockNow
-    
-    Rewritten so that no memory allocation is required for these
-    functions.
-
-commit 0d85fb0df319b2ede3fde4a7a66634c1208ffad3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Use std::unique_ptr for AsyncResolverMan
-
-commit 74d6d6427119591a9a81f64777d90691a221f690
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Use std::unique_ptr for MessageDigest
-
-commit f2d85c38cc6e7c514510e117a6711913f08bf64d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-03
-
-    Fix segmentaion fault
-
-commit f022402dc91e7796032dfbeacd730bb8bf201920
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-02
-
-    Use std::unique_ptr in DHTRegistry
-
-commit 1a5d75e819604a46b72d1f07401ac5017c96ad15
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-02
-
-    Use std::unique_ptr to store DHTMessages instead of std::shared_ptr
-
-commit 4f7d1c395bf7fd8826c235c69edf8328e71917a5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-01
-
-    Use std::unique_ptr for ProgressUpdate instead of raw pointer
-
-commit 529b9fdceb7b5a277a983badd29dca3cc69259c5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-07-01
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-07-01
-
-    Use std::unique_ptr for ExtensionMessage
-
-commit 9e35750bb8db4376052898e3ed0e1bfa0bd0bfaf
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-30
-
-    Code cleanup
-
-commit 098f1571be6f9d30d394eb83d35cc67f8e9ebcb0
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-30
-
-    Wrap BtMessage objects by std::unique_ptr instead of std::shared_ptr
-
-commit abcb0745ed3c60f17942ce65fb63159a157854ea
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-30
-
-    Fix unitest compile error
-
-commit 03ae308faaa9188db0c246f859fba291f9b108e7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-30
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-30
-
-    Use RequestSlot as pointer to avoid copying
-
-commit d128a39fb6d9ecf4f26af9858852bcd2ab8935dd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-29
-
-    HttpServer: Return bool for receiveHeader, use std::unique_ptr for headers
-
-commit 6a3e26a34d4e1c878e2d7d4ba2f72c362c5f8a3a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-29
-
-    Remove accidentally added const
-
-commit 5a223115e09cd568169fe2efd71d09689a980335
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-28
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-29
-
-    Rewrite CookieStorage
-
-commit 0b1e05b13bfd7cfbf75b299c1f32cdd6e6aed953
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-27
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-27
-
-    Fix compile error
-
-commit da7400ef5c62ee144fc14ba7ca4745349f0b0c72
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-26
-
-    Return std::unique_ptr member as const ref
-    
-    Returning raw pointer has a risk that it may be stolen by
-    std::shared_ptr in accident.
-
-commit 47402c5f29cb806f73aae2ed18aa2dde21956700
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-26
-
-    Refactor HttpConnection and its neighbor objects
-
-commit d485c8e76758c68ce55e9554d339eaf715ae7bca
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-26
-
-    Rewrite AuthConfig objects using std::unique_ptr
-
-commit a4cf50914dc5c5ca1a363b9f63a34eeb3c17cee4
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-25
-
-    HttpRequest: Use raw non-owning pointer for cookieStorage_
-
-commit 4803482a51bbb0de968fe301bcea42bc41b8cf46
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-25
-
-    HttpRequest: Store non-owning raw pointer for authConfigFactory_
-
-commit 6bcf33a69e1bfa9f7679b78f9f287d84798015aa
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-25
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-25
-
-    Fix compile error with clang
-
-commit 2761301dfb6e12fd229f65b49eb28391e49ca671
+commit 0d0a8a1c3511762fa5d12dda50c4660f0dd9465b
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-25
+AuthorDate: 2013-10-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-25
+CommitDate: 2013-10-20
 
-    Rewrite util::divide
+    Bump up version number to 1.18.1
 
-commit 2f6eff3821d11608215292792d0879efeeabe2e3
+commit 2548cd4d6e7e74d7fd8d0df86315037bea28180f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-24
+AuthorDate: 2013-10-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-24
+CommitDate: 2013-10-20
 
-    download_helper: Cleanup
+    Fix missing sha1.h and md5.h in Makefile.am
 
-commit b364c2436b49907aa957bd32616266bbbff7c1ca
+commit 218dc89be9b9e2d2baf9bbf46afe90d2cefe8e2b
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-24
+AuthorDate: 2013-10-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-24
+CommitDate: 2013-10-20
 
-    toUpper, toLower: Let compiler copy src
+    Update doc
 
-commit a159cc96fb8a0d8c2755758bb771a5ba25325656
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-24
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-24
+commit a0b669a15a947563c10457db6eb730d6b5504e09
+Author:     mozillazg <opensource.mozillazg@gmail.com>
+AuthorDate: 2013-10-17
+Commit:     mozillazg <opensource.mozillazg@gmail.com>
+CommitDate: 2013-10-17
 
     Update README.rst
 
-commit 10cdc59297f4e1327217008f2ae073c400959df2
+commit 065979cda4eab93436809d3d1a5c392be26c82c0
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-24
+AuthorDate: 2013-10-08
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-24
+CommitDate: 2013-10-08
 
-    Remove vbegin and vend in favor of std::begin and std::end
+    Remove log message "TLS else" as this function called repeatedly
 
-commit d2ec57057e591810ebbb5febb34ae0cadf5068c5
+commit 33293bcd5af9b643b9486990033664da6f628eb7
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
+AuthorDate: 2013-10-08
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
+CommitDate: 2013-10-08
 
-    HttpServer: Use std::unique_ptr for lastBody_ and headerProcessor_
+    LibsslTLSContext: Remove weak cipher suite
 
-commit fba7e7ee8b8339c9709c1fe9d07279df07781af3
+commit 98d88ec6d55ce9e510b98ac1bf32bbeda00f25d5
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
+AuthorDate: 2013-10-07
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
+CommitDate: 2013-10-07
 
-    Use move to send string data into SocketBuffer::pushStr
+    Don't log "TLS Handshaking" twice or more
 
-commit 508109edbb2ad74321ebdcf96989f18bc16271ba
+commit c2ae77dff472a06d95c39e69a9d72d95eaaf0ef7
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
+AuthorDate: 2013-10-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
+CommitDate: 2013-10-06
 
-    SocketBuffer: Use std::unique_ptr to store BufEntry
+    test: Fix stack overflow
 
-commit c0b60eb087ea47c0c9bd995b5398ed9f8edc907a
+commit 3080af7370f97b088663ce3dfdcb2a3dfbdf9498
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
+AuthorDate: 2013-10-01
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
+CommitDate: 2013-10-01
 
-    Use std::unique_ptr for UnionSeedCriteria
-
-commit fa9f3fb5a3c8912a0a6880ffba9c72f4424ea044
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    Wrap Command object in std::unique_ptr
-
-commit bb5b7eeedb3ce7396007818cbab4f5f5660997a5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    Move RequestGroup vector from Context to RequestGroupMan
-
-commit 28c84148e437dc073937629ac9c9905e1445f16c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    Pass std::unique_ptr by value
-
-commit 23086b6e21ee846f56d1cdd3711ff1a38b44c627
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    AbstractBtMessage: Use std::unique_ptr for validator
-
-commit a18bba7c66bd8b5539963227ba43f5b9d296e196
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    DefaultBtMessageReceiver: Use raw pointer for non-owning object
-
-commit 85f5134626b6301b0f865e28ce8f4d40f62c3fa1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    DefaultBtMessageDispatcher: Use raw pointers for non-owning objects
-
-commit 9db01bed71e79416c2928a509ebe1373c3c2ba07
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    DefaultBtAnnounce: Use non-owning raw pointer for downloadContext_
-
-commit bfb732c5d47678f155bbec319bac94068b679b69
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    DefaultBtRequestFactory: Use raw pointer for pieceStorage_
-
-commit bef6236da80cb18a3212bde7c33c556883cbd536
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
-
-    DownloadContext::attrs_ now holds std::unique_ptr
+    Request: Remove previousUri_
     
-    DownloadContext::getAttribute() returns a raw pointer.
+    Historically, the previousUri_ has different meaning from referer_,
+    but in the course of development, they have the same value.  This
+    change remove previousUri_ in favor of referer_.
 
-commit 1a299c4d7cf5ab8d130e678d152c4c47ae3430ea
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-23
+commit 667a4725e8554eb5f1f917b5012e3b0dc6c7b039
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-10-01
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2013-10-01
 
-    Use raw pointers to PieceStorage, PeerStorage and DownloadContxt for BtMessages
+    Update aria2c.rst
 
-commit 09c597fbb83fcd4fd958dae38ab0f2c7718da570
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    ParameterOptionHandler: Use initializer lists for params
-
-commit d1a17e5ef3408a53627dfc3007c8ffde1540d418
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Use AX_CXX_COMPILE_STDCXX_11 macro to detect C++0x/C++11 support in compiler
-
-commit 286bb2840e09dac16341b733f9fd39c779bef389
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Remove Triplet, use std::tuple instead
-
-commit 5cb7ae0b86608db86c3866f5371b844d726becd1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Use std::unique_ptr in SingletonHolder
-
-commit ca329a7ccb627091c3de7015900c2826fc4df5c1
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Use std::mem_fn instead of std::mem_fun
-
-commit 38d457435534fd06d6278feaf3d9efd471a19746
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Remove forEachMemFunSH in favor of for loop with auto
-
-commit 05d85e296563842ab57eb201fb6d11a68cf8fa41
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Remove auto_delete in favor of std::unique_ptr
-
-commit e791eb9ca334e7746bc0735cebcda09e30fa65df
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Cleanup a2functional.h
-    
-    Remove mem_fun_sh in favor of std::mem_fun. Remove unused functions.
-    
-    Use std::mem_fn instead of mem_fun_sh
-
-commit 50dcd6394c645fdd9e7fbe879f511888bfa88423
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Use std::unique_ptr instead of std::shared_ptr
-
-commit c330ac901d653b17f28baf41b6991c3f362fd8ed
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Fix mingw32 compile error
-
-commit 07d270c87e6f9184aea4ca17eb26e466712e8db2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-22
-
-    Require -std=c++11 and use std::shared_ptr instead of SharedHandle
-
-commit 126a4bde612eb0e6c48cf2f13ebe3eac45cc71a8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-18
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-19
-
-    Rewrite URI path component normalization
-
-commit f022444d812f32ffd47f135cb9f4eb833a9e5fb7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-18
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-18
-
-    Join URI on redirect
-
-commit 4a106e7fcf9dbc04525dcc0ac245d9afd42cc23e
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-13
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-13
-
-    Send HAVE message to the peer which the piece is downloaded from
-    
-    Historically, aria2 did not send HAVE message to the peer which the
-    piece is coming from, thinking it is obvious that the peer knows we
-    have the piece. But it is not obvious if one piece is download from
-    more than 1 peers (e.g., end game mode). So it is better to send HAVE
-    to all peers connected.
-
-commit e3506b04fb22c2770487793a2bcf79d0dfbd5ca5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-13
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-13
-
-    Revert 9eea959 only the parts which affect src/BtPieceMessage.cc
-    
-    This is because we are not sure that peer has a piece just sending off
-    its block. It should be notified by the peer.
-
-commit 9eea95945568ecc01221fb827ff211d98207bf79
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-12
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-12
-
-    Improve peer bitfield and piece stat update
-    
-    On HAVE message reception and PIECE message transmission, update peer
-    bitfield and piece stat only if current peer bitfield indicates it
-    does not have the piece.
-
-commit 4ff6a9f1d46c0d1a60c2540bcaf97246bd8205b7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-12
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-12
-
-    Do the same doc improvements to --follow-metalink
-
-commit 75d3e6f4dd38ede699fd3cca51bf51418edbaa41
-Author:     gt <static.vortex@gmx.com>
-AuthorDate: 2013-06-11
-Commit:     gt <static.vortex@gmx.com>
-CommitDate: 2013-06-11
-
-    Improvements to --follow-torrent=false documentation.
-
-commit 81e6b6844371f2976f69235764296c83a0bc290c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-12
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-12
-
-    Pass A2Gid by value, since it is uint64_t
-
-commit f4085b310f14eeee63dc21cac18851cfbae4f838
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-10
-
-    Update doc
-
-commit 3b32dcb9f1dc9706b6a74b46e8ebc147e5844616
+commit 1065f9d9646398a3a479437bb1037570e7c21498
 Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-04-28
+AuthorDate: 2013-09-30
 Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2013-06-10
+CommitDate: 2013-09-30
 
-    SessionSerializer: Truly unique URIs
+    Document that AppleTLS, WinTLS does not support --ca-certitifcate
+
+commit 41bee457925e8b48f199d87c6548a89d0aa0e5f0
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    Document WinTLS, AppleTLS, PKCS12 for --certificate
+
+commit 3b35887827e089b78c90ebbe571d964867c59888
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    WinTLS: Enable --certifcate support
+
+commit 3b9a3853058daf871a312081658e572ff135dcc2
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    AppleTLS: Enable --certificate
     
-    Before, only spent uris where sanitized not to be contained within
-    remaining uris. Change this so that each uri in the
-    union(remaining,spent) get saved once at most.
-    The order of the uris will won't be changed, with remaining uris going
-    first followed by spent uris.
+    Tested against self-signed CA with nginx
+
+commit 4c84af31be3ef0c23f896e3fc88a7ec5ef2778df
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    WinTLS: Fix PKCS12 loading
     
-    Also avoid copying the uri std::strings around during dupe checking,
-    usually resulting in better performance regarding CPU and space.
+    It appears that, contrary to most documentation, CERT_CONTEXT* is eaten
+    alive by AcquireCredentialsHandle(). Hence you cannot really reuse that.
 
-commit ca7c63aa7ed91d32cc912dfcfbd8a3f5fcf22163
+commit 50ac6afe365ad04962354780e7973122d0f48133
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-06-09
+AuthorDate: 2013-09-30
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-06-09
+CommitDate: 2013-09-30
 
-    Update doc
+    util.cc: Remove uselss inline static
 
-commit e8b27b7017355759a6801fc66773e3475d4694eb
+commit b772aa6a5e5ad80c1fa52b5fb881acaef571e847
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-28
+AuthorDate: 2013-09-30
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-28
+CommitDate: 2013-09-30
 
-    libaria2.rst: Fix typo
+    util::percentEncodeMini: Fix regression bug removed unsignedness
+    
+    srange-based for around std::string is convenient but several
+    functions depend unsigned char for correctness and readability.
 
-commit 232d31afaf15d3d7dc517e7d2d69b5aecb367f45
+commit 9768aa9fad671c74a382083a9e8516315de3737c
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    WinTLS: Document PKCS12-only support.
+
+commit 00dd83b461d03fabdc83a5c9fc4a6009acc8da4a
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-30
+
+    Implement WinTLS
+
+commit 3f1d293ed1634a6bf97262d9f1c30b47461b725b
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-29
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-29
+
+    WinMessgeDigestImpl: gcc-4.6 does not support .emplace() yet
+
+commit 40e53de90867936faaa9f21409c6d62aded7cac2
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-28
+AuthorDate: 2013-09-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-28
+CommitDate: 2013-09-28
 
-    Add test for recent changes in SessionSerializer
+    MessageDigestImpl.h: Simplify hash_info_t access
 
-commit d444a6cc9e3c12db3a3dc52cdee6e62652772d53
+commit 6f6a17bff75c7a189091bd12265d001450cde704
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-28
+AuthorDate: 2013-09-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-28
+CommitDate: 2013-09-28
 
-    Make getOption RPC method return option for stopped downloads
+    Randomizer: Remove unused interfaces
 
-commit fde376efbc745908f4cf090c8aef5079ad1ff393
+commit 986f69e5bf3caad104bcb20a07ceaaee79182e49
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-28
+AuthorDate: 2013-09-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-28
+CommitDate: 2013-09-28
 
-    SessionSerializer: Save spent URIs as well as remaining ones
+    SimpleRandomizer: Use std::random
 
-commit 7669c72d0313fb85472805cacd32b2c80dfb8e1a
+commit 44479c910ecc89304fccea98b0ce0bed5d3e3801
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-27
+AuthorDate: 2013-09-26
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-27
+CommitDate: 2013-09-26
 
-    Add unittest for DownloadResultDH
+    Log exception; throw error if loading private key and/or certificate failed
 
-commit e4bf9b9cc584d5e0da573a142d00ce63f8d3eff9
+commit 7f18494a8c1b714368e64e7abd7abb30c123a862
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-05-27
+AuthorDate: 2013-09-26
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-05-27
+CommitDate: 2013-09-26
 
-    Implement DownloadResultDH::getOption()/getOptions()
+    SimpleRandmizer: Fix certain bits generated by getRandomBytes are always 0
+    
+    This is because in Linux RAND_MAX is 2**31-1 and we used int32_t to
+    hold random number from random() and got each bytes. This means that
+    highest bit is always unset. In little endian system, every 4n-th (n
+    >=0) byte has highest bit is unset. To fix this, we just use lower 2
+    bytes of random().
+
+commit ac996737e567c1ff29afbfb00acf22a2b4d57b7b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    Move OpenSSL_add_all_algorithms() to Platform::setUp()
+
+commit d7d5e8570b12871fa1c57d61ede8eb072346e95a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    Include prefs.h instead of typedef PrefPtr everywhere
+
+commit 8536f13cff3175c0ca3bf21b4314c1ed508dd7d9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    uri.cc: Use auto instead of adhoc typedef
+
+commit d2af91ed082db767f7b1d726e587847c28b6a16b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    InternalDHKeyExchange: Remove unused dtor
+
+commit da278225c1758562cabd802453bcbd6735772f8f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    InternalARC4Encryptor: Fix compiler warning and remove no use ctor/dtor
+
+commit f2a1d241c246312036cc37b49aff5f3468e63d13
+Merge: ca8ac6e c81fd8e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-26
+
+    Merge branch 'master' into bignum-arc4
+
+commit c81fd8e194ff6dd5633071046d445e27558745bc
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    InternalMessageDigestImpl: Fix memory leak
+
+commit 7dc5567cada8fb497af92d673fca78bd57b83b9b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    InternalMessageDigestImpl: Code cleanup
+
+commit 77b7747ca8b6fdb44a5c5143ac3110164b65afc9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    Ensure that Commands are cleaned up before RequestGroupMan is deleted
+
+commit ca8ac6e7d378814b376e2f6c57691d4ec41d5de8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    bignum.h: Fix compile error
+
+commit 6198b607e954cbcfca61fa89fc547d473ccf4c09
+Merge: 99f170b e3e4ff7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    Merge branch 'master' into bignum-arc4
+
+commit e3e4ff700a4ebf629f546c2379859b4181aed864
+Merge: 86c61fc cf5b049
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    Merge branch 'master' into random
+
+commit cf5b049999f19f62d50e426516f8249388e4200b
+Merge: 450677f 5787b1e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-25
+
+    Merge branch 'patch-2' of https://github.com/ITriskTI/aria2 into ITriskTI-patch-2
+
+commit 450677f2bbf1bd6ce2672930143d013b8c32e2cb
+Author:     Nils Maier <testnutzer123@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Nils Maier <testnutzer123@gmail.com>
+CommitDate: 2013-09-25
+
+    Mention --without-appletls for checksumming
+
+commit ede8ee7fe8b22973ce6c0f8a24107c847c92ff28
+Author:     Nils Maier <testnutzer123@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Nils Maier <testnutzer123@gmail.com>
+CommitDate: 2013-09-25
+
+    Add notes about AppleTLS and -MD
+
+commit f2137eb784b9e8161b769327102848dce016dd27
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-09-25
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-25
+
+    Fixed a typo in the English manual
+    
+    Closes #133
+
+commit 5787b1e1615e91814fd762d78de527f018c18482
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2013-09-24
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2013-09-24
+
+    Update aria2c.rst
+
+commit 99f170b8888d806204c17a211c189db406147d6b
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-24
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Provide internal ARC4 implementation
+    
+    Now you can build bittorrent support without without external
+    libraries, meaning you can skip libnettle, libgmp, libgcrypt, GnuTLS and
+    OpenSSL on OSX (for now).
+
+commit e854463b2d78fe9ce107e024e5e07623ff93d838
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-24
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Internal implementation of DHKeyExchange
+    
+    Reusing a bignum (well, unsigned very-long) implementation I had lying
+    around for years and just cleaned up a bit and brought to C++11 land.
+    
+    It might not be the most performant implementation, but it shoud be fast
+    enough for our purposes and will go a long way of removing gcrypt,
+    nettle, gmp, openssl dependencies when using AppleTLS and WinTLS
+    (upcoming).
+
+commit 86c61fcf5b56ede1f30d38ae856634b7913b80e7
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-23
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Make generateRandomBytes less biased.
+
+commit 213de910fdcdec08c96670bfaa617aef7ca4c28d
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Add myself to AUTHORS
+
+commit e5644a718802c9efc0670e3f72c7c8b92098e760
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-24
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Revert OptionHandlerFactory changes
+
+commit d1ae9f87fd97247c6ee46622a3a78836a359381b
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-24
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    using to typedef to make gcc-4.6 happy
+
+commit 4a1d1869626c63bc1b999a0d755b140f3ce21803
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-24
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-24
+
+    Better error messages when PKCS12 import fails
+
+commit 063451f0c950dade26e9eacc19f83458692d48d1
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-23
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-23
+
+    TLS: Minor code cleanups
+
+commit d560bf0e6fb12e4908140a577d5d8b574baa9dc4
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-23
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-23
+
+    TLS: Fix dangling str() pointers
+
+commit 2f1f45bcc58c6b3a4dc050f3e3d9676c82b80e47
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-22
+
+    Document PKCS12 availability
+
+commit 37f9c668ff67a417ac5e90966d73d170c651d3fe
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-22
+
+    Teach GnuTLS backend to load .p12 files
+
+commit f7b0fbbf532bdce896b1f2a1bdf3bdd0acdb88e6
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-22
+
+    Teach Libssl backend to load .p12 files
+
+commit 08e2e412dc562513d48900c071707a3cccb9c22f
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Add some md5 tests
+
+commit 7cb69c4d9e0a02fa07735004563612566edb8d14
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Add --disable-ssl configure option
+
+commit 38bdea4e069574c26751627039b67fc53d7b240c
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Add internal md5 and sha1 message digests
+
+commit a1deb0e9f1910aaed8f0194ebd1173cd9574231a
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Only use AppleMessageDigest when using AppleTLS
+
+commit fa30fe4b15dc10d5ac278534da54e63951a099e7
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    One MessageDigestImpl.h to rule them all.
+
+commit a4e29303efe846bb891e8b146bcf5e12c8c338ce
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    WinTLS: Implement messsage digest using the Cryptography Provider
+
+commit b678bc5e10462177777a34ba41ee226838decd1c
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Fix AppleMessageDigestImpl use with large data
+
+commit 7738063100e4e404791e150f35ba43ab133cbb55
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-20
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    AppleTLS: Remove unused variables
+
+commit 3b9988251f88eabb426aeadb79b7c2bfda27e9a9
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-19
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    clang-modernize -add-override on headers
+
+commit e2700f50a5d8da1596cefccc01d70aa4696e3f4a
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-09-15
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Code cleanup in Http*
+
+commit 29d569eef98cdcabe52c365e75ca4da2174d8bf0
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-08-25
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    Cleanup RequestGroup code a bit
+
+commit 3590077d5c43d492b3e357d1a50afca4a7d1cfcf
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-08-25
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-20
+
+    More auto-converts by cpp11-migrate
+
+commit a76eeb2b8106dd725097750c3ee4958e505e3c85
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-08-25
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-19
+
+    Introduce PrefPtr typedef
+
+commit 8e6e46dfcfdd269538e6c3070e6eea4b624d74fe
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2013-08-25
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2013-09-19
+
+    More code cleanups
+
+commit 9e7579b475e322ec86ff986e3371fea3fd5c857e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-20
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-20
+
+    Set old cookie's creation-time to new cookie on replacement
+    
+    As described in http://tools.ietf.org/html/rfc6265#section-5.3
+
+commit c6eb9701731c8edf5b8b1525cef12014e7cd8ad6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-18
+
+    Update README.rst
+
+commit e3a41a51dab04d346db6d64bd202aa72cdff80c5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-18
+
+    Fix link error with Android NDK r9
+    
+    Since Android ndk r9, __set_errno is deprecated. It is now defined as
+    inline function in errno.h. The syscall assembly calls __set_errno,
+    but since libc.so does not export it, the link fails. To workaround
+    this, replace all occurrences of __set_errno with a2_set_errno and
+    define it as normal C function.
+
+commit fa09dc9115c4d34da6c5797287ee2ba61d6f162e
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-17
+
+    Clean up if defined style
+
+commit 58f35a07a521e51e8fb09013af17b4689b09fd34
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2013-09-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2013-09-14
+
+    Update .gitignore

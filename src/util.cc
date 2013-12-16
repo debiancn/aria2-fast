@@ -83,7 +83,6 @@
 #include "DownloadContext.h"
 #include "BufferedFile.h"
 #include "SocketCore.h"
-#include "prefs.h"
 #include "Lock.h"
 
 #ifdef ENABLE_MESSAGE_DIGEST
@@ -279,8 +278,8 @@ bool isHexDigit(const char c)
 
 bool isHexDigit(const std::string& s)
 {
-  for(std::string::const_iterator i = s.begin(), eoi = s.end(); i != eoi; ++i) {
-    if(!isHexDigit(*i)) {
+  for (const auto& c : s) {
+    if(!isHexDigit(c)) {
       return false;
     }
   }
@@ -348,13 +347,11 @@ bool isCRLF(const char c)
 
 namespace {
 
-inline static
 bool isUtf8Tail(unsigned char ch)
 {
   return in(ch, 0x80u, 0xbfu);
 }
 
-inline static
 bool inPercentEncodeMini(const unsigned char c)
 {
   return c > 0x20 && c < 0x7fu &&
@@ -459,9 +456,9 @@ std::string percentEncodeMini(const std::string& src)
     return src;
   }
   std::string result;
-  for (const auto& c: src) {
+  for (auto c: src) {
     if(!inPercentEncodeMini(c)) {
-      result += fmt("%%%02X", c);
+      result += fmt("%%%02X", static_cast<unsigned char>(c));
     } else {
       result += c;
     }
@@ -676,15 +673,15 @@ void computeHeadPieces
   if(head == 0) {
     return;
   }
-  for(auto fi = fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
-    if((*fi)->getLength() == 0) {
+  for (const auto& fi: fileEntries) {
+    if(fi->getLength() == 0) {
       continue;
     }
-    size_t lastIndex =
-      ((*fi)->getOffset()+std::min(head, (*fi)->getLength())-1)/pieceLength;
-    for(size_t index = (*fi)->getOffset()/pieceLength;
-        index <= lastIndex; ++index) {
-      indexes.push_back(index);
+    const size_t lastIndex = (fi->getOffset() +
+        std::min(head, fi->getLength()) - 1
+        ) / pieceLength;
+    for(size_t idx = fi->getOffset() / pieceLength; idx <= lastIndex; ++idx) {
+      indexes.push_back(idx);
     }
   }
 }
@@ -700,16 +697,16 @@ void computeTailPieces
   if(tail == 0) {
     return;
   }
-  for(auto fi = fileEntries.begin(), eoi = fileEntries.end(); fi != eoi; ++fi) {
-    if((*fi)->getLength() == 0) {
+  for (const auto& fi: fileEntries) {
+    if(fi->getLength() == 0) {
       continue;
     }
-    int64_t endOffset = (*fi)->getLastOffset();
-    size_t fromIndex =
-      (endOffset-1-(std::min(tail, (*fi)->getLength())-1))/pieceLength;
-    for(size_t index = fromIndex; index <= (endOffset-1)/pieceLength;
-        ++index) {
-      indexes.push_back(index);
+    int64_t endOffset = fi->getLastOffset();
+    size_t fromIndex = (endOffset - 1 - (std::min(tail, fi->getLength()) - 1)) /
+      pieceLength;
+    const size_t toIndex = (endOffset - 1) / pieceLength;
+    while (fromIndex <= toIndex) {
+      indexes.push_back(fromIndex++);
     }
   }
 }
@@ -724,23 +721,26 @@ void parsePrioritizePieceRange
   std::vector<size_t> indexes;
   std::vector<Scip> parts;
   splitIter(src.begin(), src.end(), std::back_inserter(parts), ',', true);
-  for(std::vector<Scip>::const_iterator i = parts.begin(),
-        eoi = parts.end(); i != eoi; ++i) {
-    if(util::streq((*i).first, (*i).second, "head")) {
+  for (const auto& i: parts) {
+    if(util::streq(i.first, i.second, "head")) {
       computeHeadPieces(indexes, fileEntries, pieceLength, defaultSize);
-    } else if(util::startsWith((*i).first, (*i).second, "head=")) {
-      std::string sizestr((*i).first+5, (*i).second);
+    }
+    else if(util::startsWith(i.first, i.second, "head=")) {
+      std::string sizestr(i.first + 5, i.second);
       computeHeadPieces(indexes, fileEntries, pieceLength,
                         std::max((int64_t)0, getRealSize(sizestr)));
-    } else if(util::streq((*i).first, (*i).second, "tail")) {
+    }
+    else if(util::streq(i.first, i.second, "tail")) {
       computeTailPieces(indexes, fileEntries, pieceLength, defaultSize);
-    } else if(util::startsWith((*i).first, (*i).second, "tail=")) {
-      std::string sizestr((*i).first+5, (*i).second);
+    }
+    else if(util::startsWith(i.first, i.second, "tail=")) {
+      std::string sizestr(i.first + 5, i.second);
       computeTailPieces(indexes, fileEntries, pieceLength,
                         std::max((int64_t)0, getRealSize(sizestr)));
-    } else {
+    }
+    else {
       throw DL_ABORT_EX(fmt("Unrecognized token %s",
-                            std::string((*i).first, (*i).second).c_str()));
+                            std::string(i.first, i.second).c_str()));
     }
   }
   std::sort(indexes.begin(), indexes.end());
@@ -1177,20 +1177,19 @@ std::string getContentDispositionFilename(const std::string& header)
                                          header.c_str(), header.size());
   if(rv == -1) {
     return "";
-  } else {
-    std::string res;
-    if(!charset || strieq(charset, charset+charsetlen, "iso-8859-1")) {
-      res = iso8859p1ToUtf8(cdval, rv);
-    } else {
-      res.assign(cdval, rv);
-    }
-    if(!detectDirTraversal(res) &&
-       res.find_first_of("/\\") == std::string::npos) {
-      return res;
-    } else {
-      return "";
-    }
   }
+
+  std::string res;
+  if(!charset || strieq(charset, charset+charsetlen, "iso-8859-1")) {
+    res = iso8859p1ToUtf8(cdval, rv);
+  } else {
+    res.assign(cdval, rv);
+  }
+  if(!detectDirTraversal(res) &&
+      res.find_first_of("/\\") == std::string::npos) {
+    return res;
+  }
+  return "";
 }
 
 std::string toUpper(std::string src)
@@ -1335,32 +1334,30 @@ void setGlobalSignalHandler(int sig, sigset_t* mask, signal_handler_t handler,
 std::string getHomeDir()
 {
   const char* p = getenv("HOME");
-  if(p) {
+  if (p) {
     return p;
-  } else {
-#ifdef __MINGW32__
-    p = getenv("USERPROFILE");
-    if(p) {
-      return p;
-    } else {
-      p = getenv("HOMEDRIVE");
-      if(p) {
-        std::string homeDir = p;
-        p = getenv("HOMEPATH");
-        if(p) {
-          homeDir += p;
-          return homeDir;
-        }
-      }
-    }
-#elif HAVE_PWD_H
-    passwd* pw = getpwuid(geteuid());
-    if(pw && pw->pw_dir) {
-      return pw->pw_dir;
-    }
-#endif // HAVE_PWD_H
-    return A2STR::NIL;
   }
+#ifdef __MINGW32__
+  p = getenv("USERPROFILE");
+  if (p) {
+    return p;
+  }
+  p = getenv("HOMEDRIVE");
+  if (p) {
+    std::string homeDir = p;
+    p = getenv("HOMEPATH");
+    if (p) {
+      homeDir += p;
+      return homeDir;
+    }
+  }
+#elif HAVE_PWD_H
+  passwd* pw = getpwuid(geteuid());
+  if(pw && pw->pw_dir) {
+    return pw->pw_dir;
+  }
+#endif // HAVE_PWD_H
+  return A2STR::NIL;
 }
 
 int64_t getRealSize(const std::string& sizeWithUnit)
@@ -1387,7 +1384,8 @@ int64_t getRealSize(const std::string& sizeWithUnit)
   if(!parseLLIntNoThrow(v, size) || v < 0) {
     throw DL_ABORT_EX(fmt("Bad or negative value detected: %s",
                           sizeWithUnit.c_str()));
-  } else if(INT64_MAX/mult < v) {
+  }
+  if(INT64_MAX/mult < v) {
     throw DL_ABORT_EX(fmt(MSG_STRING_INTEGER_CONVERSION_FAILURE,
                           "overflow/underflow"));
   }
@@ -1474,11 +1472,9 @@ void mkdirs(const std::string& dirpath)
   if(!dir.mkdirs()) {
     int errNum = errno;
     if(!dir.isDir()) {
-      throw DL_ABORT_EX3
-        (errNum,
-         fmt(EX_MAKE_DIR, dir.getPath().c_str(),
-             safeStrerror(errNum).c_str()),
-         error_code::DIR_CREATE_ERROR);
+      throw DL_ABORT_EX3(errNum, fmt(EX_MAKE_DIR, dir.getPath().c_str(),
+                                     safeStrerror(errNum).c_str()),
+                         error_code::DIR_CREATE_ERROR);
     }
   }
 }
@@ -1518,9 +1514,8 @@ void* allocateAlignedMemory(size_t alignment, size_t size)
   void* buffer;
   int res;
   if((res = posix_memalign(&buffer, alignment, size)) != 0) {
-    throw FATAL_EXCEPTION
-      (fmt("Error in posix_memalign: %s",
-           util::safeStrerror(res).c_str()));
+    throw FATAL_EXCEPTION(fmt("Error in posix_memalign: %s",
+                              util::safeStrerror(res).c_str()));
   }
   return buffer;
 }
@@ -1597,9 +1592,7 @@ namespace {
 void generateRandomDataRandom(unsigned char* data, size_t length)
 {
   const auto& rd = SimpleRandomizer::getInstance();
-  for(size_t i = 0; i < length; ++i) {
-    data[i] = static_cast<unsigned long>(rd->getRandomNumber(256));
-  }
+  rd->getRandomBytes(data, length);
 }
 } // namespace
 
@@ -1663,11 +1656,13 @@ std::string applyDir(const std::string& dir, const std::string& relPath)
   if(dir.empty()) {
     s = "./";
     s += relPath;
-  } else {
+  }
+  else {
     s = dir;
     if(dir == "/") {
       s += relPath;
-    } else {
+    }
+    else {
       s += "/";
       s += relPath;
     }
@@ -1728,18 +1723,20 @@ bool detectDirTraversal(const std::string& s)
   if(s.empty()) {
     return false;
   }
-  for(std::string::const_iterator i = s.begin(), eoi = s.end(); i != eoi; ++i) {
-    unsigned char c = *i;
-    if(in(c, 0x00u, 0x1fu) || c == 0x7fu) {
+  for (auto c : s) {
+    unsigned char ch = c;
+    if (in(ch, 0x00u, 0x1fu) || ch == 0x7fu) {
       return true;
     }
   }
   return s == "." || s == ".." || s[0] == '/' ||
-    util::startsWith(s, "./") || util::startsWith(s, "../") ||
+    util::startsWith(s, "./") ||
+    util::startsWith(s, "../") ||
     s.find("/../") != std::string::npos ||
     s.find("/./") != std::string::npos ||
     s[s.size()-1] == '/' ||
-    util::endsWith(s, "/.") || util::endsWith(s, "/..");
+    util::endsWith(s, "/.") ||
+    util::endsWith(s, "/..");
 }
 
 std::string escapePath(const std::string& s)
@@ -1750,8 +1747,8 @@ std::string escapePath(const std::string& s)
     { '"', '*', ':', '<', '>', '?', '\\', '|' };
 #endif // __MINGW32__
   std::string d;
-  for(std::string::const_iterator i = s.begin(), eoi = s.end(); i != eoi; ++i) {
-    unsigned char c = *i;
+  for(auto cc: s) {
+    unsigned char c = cc;
     if(in(c, 0x00u, 0x1fu) || c == 0x7fu
 #ifdef __MINGW32__
        || std::find(std::begin(WIN_INVALID_PATH_CHARS),
@@ -1761,7 +1758,7 @@ std::string escapePath(const std::string& s)
        ){
       d += fmt("%%%02X", c);
     } else {
-      d += *i;
+      d += c;
     }
   }
   return d;
@@ -1810,9 +1807,8 @@ void executeHook
                   numFilesStr.c_str(),
                   firstFilename.c_str()));
   pid_t cpid = fork();
-  if(cpid == -1) {
-    A2_LOG_ERROR("fork() failed. Cannot execute user command.");
-  } else if(cpid == 0) {
+  if (cpid > 0) {
+    // child!
     execlp(command.c_str(),
            command.c_str(),
            gidStr.c_str(),
@@ -1821,8 +1817,15 @@ void executeHook
            reinterpret_cast<char*>(0));
     perror(("Could not execute user command: "+command).c_str());
     _exit(EXIT_FAILURE);
+    return;
   }
-#else
+
+  if(cpid == -1) {
+    A2_LOG_ERROR("fork() failed. Cannot execute user command.");
+  }
+  return;
+
+#else // __MINGW32__
   PROCESS_INFORMATION pi;
   STARTUPINFOW si;
 
@@ -1832,6 +1835,8 @@ void executeHook
   bool batch = util::iendsWith(command, ".bat");
   std::string cmdline;
   std::string cmdexe;
+
+  // XXX batch handling, in particular quoting, correct?
   if(batch) {
     const char* p = getenv("windir");
     if(p) {
@@ -1878,6 +1883,8 @@ void executeHook
   if(!rc) {
     A2_LOG_ERROR("CreateProcess() failed. Cannot execute user command.");
   }
+  return;
+
 #endif
 }
 
@@ -1885,13 +1892,13 @@ void executeHook
 
 void executeHookByOptName
 (const std::shared_ptr<RequestGroup>& group, const Option* option,
- const Pref* pref)
+ PrefPtr pref)
 {
   executeHookByOptName(group.get(), option, pref);
 }
 
 void executeHookByOptName
-(const RequestGroup* group, const Option* option, const Pref* pref)
+(const RequestGroup* group, const Option* option, PrefPtr pref)
 {
   const std::string& cmd = option->get(pref);
   if(!cmd.empty()) {
@@ -1912,11 +1919,10 @@ void executeHookByOptName
 std::string createSafePath
 (const std::string& dir, const std::string& filename)
 {
-  return util::applyDir
-    (dir,
-     util::isUtf8(filename)?
-     util::fixTaintedBasename(filename):
-     util::escapePath(util::percentEncode(filename)));
+  return util::applyDir(dir, util::isUtf8(filename) ?
+                             util::fixTaintedBasename(filename) :
+                             util::escapePath(util::percentEncode(filename))
+                        );
 }
 
 std::string encodeNonUtf8(const std::string& s)
@@ -1926,11 +1932,10 @@ std::string encodeNonUtf8(const std::string& s)
 
 std::string makeString(const char* str)
 {
-  if(str) {
-    return str;
-  } else {
+  if(!str) {
     return A2STR::NIL;
   }
+  return str;
 }
 
 std::string safeStrerror(int errNum)
@@ -1944,9 +1949,8 @@ bool noProxyDomainMatch
 {
   if(!domain.empty() && domain[0] == '.' && !util::isNumericHost(hostname)) {
     return util::endsWith(hostname, domain);
-  } else {
-    return hostname == domain;
   }
+  return hostname == domain;
 }
 
 bool tlsHostnameMatch(const std::string& pattern, const std::string& hostname)
@@ -1987,11 +1991,10 @@ bool tlsHostnameMatch(const std::string& pattern, const std::string& hostname)
   if(hnLeftLabelEnd - hostname.begin() < ptLeftLabelEnd - pattern.begin()) {
     return false;
   }
-  return
-    istartsWith(hostname.begin(), hnLeftLabelEnd,
-                pattern.begin(), ptWildcard) &&
-    iendsWith(hostname.begin(), hnLeftLabelEnd,
-              ptWildcard+1, ptLeftLabelEnd);
+  return istartsWith(hostname.begin(), hnLeftLabelEnd, pattern.begin(),
+                     ptWildcard) &&
+         iendsWith(hostname.begin(), hnLeftLabelEnd, ptWildcard + 1,
+                   ptLeftLabelEnd);
 }
 
 bool strieq(const std::string& a, const char* b)

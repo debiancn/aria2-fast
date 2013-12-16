@@ -32,40 +32,26 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_APPLE_MESSAGE_DIGEST_IMPL_H
-#define D_APPLE_MESSAGE_DIGEST_IMPL_H
+#ifndef D_INTERNAL_ARC4_ENCRYPTOR_H
+#define D_INTERNAL_ARC4_ENCRYPTOR_H
 
 #include "common.h"
 
-#include <string>
-#include <memory>
-
 namespace aria2 {
 
-class MessageDigestImpl {
-public:
-  virtual ~MessageDigestImpl() {}
-  static std::unique_ptr<MessageDigestImpl> sha1();
-  static std::unique_ptr<MessageDigestImpl> create(const std::string& hashType);
-
-  static bool supports(const std::string& hashType);
-  static size_t getDigestLength(const std::string& hashType);
-
-public:
-  virtual size_t getDigestLength() const = 0;
-  virtual void reset() = 0;
-  virtual void update(const void* data, size_t length) = 0;
-  virtual void digest(unsigned char* md) = 0;
-
-protected:
-  MessageDigestImpl() {}
-
+class ARC4Encryptor {
 private:
-  MessageDigestImpl(const MessageDigestImpl&);
-  MessageDigestImpl& operator=(const MessageDigestImpl&);
+  unsigned char state_[256];
+  unsigned i, j;
 
+public:
+  void init(const unsigned char* key, size_t keyLength);
+
+  // Encrypts data in in buffer to out buffer. in and out can be the
+  // same buffer.
+  void encrypt(size_t len, unsigned char* out, const unsigned char* in);
 };
 
 } // namespace aria2
 
-#endif // D_APPLE_MESSAGE_DIGEST_IMPL_H
+#endif // D_INTERNAL_ARC4_ENCRYPTOR_H

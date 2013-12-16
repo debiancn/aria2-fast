@@ -7,16 +7,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2013-09-10 21:23+0900\n"
-"PO-Revision-Date: 2013-03-08 15:11+0000\n"
+"POT-Creation-Date: 2013-10-20 23:17+0900\n"
+"PO-Revision-Date: 2013-09-20 05:17+0000\n"
 "Last-Translator: gsavix <gsavix@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2013-09-09 13:05+0000\n"
-"X-Generator: Launchpad (build 16761)\n"
+"X-Launchpad-Export-Date: 2013-10-20 13:04+0000\n"
+"X-Generator: Launchpad (build 16807)\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: src/DownloadEngine.cc:241
@@ -797,6 +797,22 @@ msgid ""
 "a\n"
 "                              torrent and its contents are not downloaded."
 msgstr ""
+" --follow-torrent=true|false|mem Se verdadeiro ou mem for especificado, "
+"quando um arquivo\n"
+"                              com sufixo  .torrent ou cujo conteúdo for\n"
+"                              application/x-bittorrent estiver sendo "
+"baixado, aria2\n"
+"                              irá tratar como um arquivo torrent e irá "
+"baixar\n"
+"                              o especificado.\n"
+"                              Se for especificado mem, um arquivo torrent "
+"não\n"
+"                              será gravado em disco, mas mantido em "
+"memória.\n"
+"                              Se for especificado false, o arquivo .torrent "
+"é gravado\n"
+"                              em disco, mas seu conteúdo não será baixado "
+"para disco."
 
 #: src/usage_text.h:275
 msgid ""
@@ -1146,6 +1162,21 @@ msgid ""
 "                              metalink file and its contents are not\n"
 "                              downloaded."
 msgstr ""
+" --follow-metalink=true|false|mem Se verdadeiro ou mem for especificado, "
+"quando o arquivo\n"
+"                              cujo sufixo for .meta4 ou .metalink, ou o tipo "
+"de conteúdo\n"
+"                              for application/metalink4+xml ou application/"
+"metalink+xml\n"
+"                              o aria2 fará o download do arquivo metalink e "
+"de seu respectivo conteúdo.\n"
+"                              Se mem for especificado, o arquivo metalink "
+"não será gravado para disco,\n"
+"                              mas mantido em memória.\n"
+"                              Se false for especificado, o arquivo .metalink "
+"será gravado em disco, mas\n"
+"                              o aria2 não fará o download do conteúdo do "
+"arquivo especificado no .metalink."
 
 #: src/usage_text.h:396
 msgid ""
@@ -2804,6 +2835,14 @@ msgid ""
 "                              BitTorrent seeding which is recognized as\n"
 "                              completed state."
 msgstr ""
+" --force-save[=true|false] Salva download com opção --save-session mesmo "
+"quando\n"
+"                              o download é completado ou removido. \n"
+"                              Essa  opção também salva o arquivo de controle "
+"nessas situações.\n"
+"                              Isso pode ser útil para salvar BitTorrent que "
+"tenha sido reconhecido\n"
+"                              como tendo situação completada ou finalizada."
 
 #: src/usage_text.h:929
 msgid ""
@@ -2943,7 +2982,7 @@ msgstr "Algoritmos Hash"
 
 #: src/version_usage.cc:77
 msgid "Libraries"
-msgstr ""
+msgstr "Bibliotecas"
 
 #: src/version_usage.cc:80
 #, c-format
@@ -3104,7 +3143,7 @@ msgstr "Utilização:"
 msgid "Configuration file %s is not found."
 msgstr "Arquivo de configuração %s não encontrado."
 
-#: src/OptionHandlerException.cc:43
+#: src/OptionHandlerException.cc:42
 #, c-format
 msgid "We encountered a problem while processing the option '--%s'."
 msgstr "Encontrado problema enquanto processava a opção '--%s'."
@@ -3162,7 +3201,7 @@ msgstr "IPv%d RPC: ouvindo na porta TCP %u"
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr "IPv%d BitTorrent: ouvindo na porta TCP %u"
 
-#: src/RequestGroup.cc:373
+#: src/RequestGroup.cc:372
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
@@ -3170,7 +3209,7 @@ msgstr ""
 "Para Bittorrent Magnet URI, habilitar DHT é altamente recomendado.Ver opção "
 "--enable-dht."
 
-#: src/RequestGroup.cc:670
+#: src/RequestGroup.cc:659
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""

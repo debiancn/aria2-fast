@@ -779,7 +779,7 @@ void SocketCore::readData(void* data, size_t& len)
     ret = tlsSession_->readData(data, len);
     if(ret < 0) {
       if(ret != TLS_ERR_WOULDBLOCK) {
-        throw DL_RETRY_EX(fmt(EX_SOCKET_SEND,
+        throw DL_RETRY_EX(fmt(EX_SOCKET_RECV,
                               tlsSession_->getLastErrorString().c_str()));
       }
       if(tlsSession_->checkDirection() == TLS_WANT_READ) {
@@ -814,6 +814,7 @@ bool SocketCore::tlsHandshake(TLSContext* tlsctx, const std::string& hostname)
   wantWrite_ = false;
   switch(secure_) {
   case A2_TLS_NONE:
+    A2_LOG_DEBUG("Creating TLS session");
     tlsSession_.reset(TLSSession::make(tlsctx));
     rv = tlsSession_->init(sockfd_);
     if(rv != TLS_ERR_OK) {
@@ -833,6 +834,7 @@ bool SocketCore::tlsHandshake(TLSContext* tlsctx, const std::string& hostname)
       }
     }
     secure_ = A2_TLS_HANDSHAKING;
+    A2_LOG_DEBUG("TLS Handshaking");
     // Fall through
   case A2_TLS_HANDSHAKING:
     if(tlsctx->getSide() == TLS_CLIENT) {
@@ -1175,9 +1177,9 @@ bool verifyHostname(const std::string& hostname,
     if(addrLen == 0) {
       return false;
     }
-    for(auto i = ipAddrs.begin(), eoi = ipAddrs.end(); i != eoi; ++i) {
-      if(addrLen == (*i).size() &&
-         memcmp(binAddr, (*i).c_str(), addrLen) == 0) {
+    for(auto& ipAddr : ipAddrs) {
+      if(addrLen == ipAddr.size() &&
+         memcmp(binAddr, ipAddr.c_str(), addrLen) == 0) {
         return true;
       }
     }
@@ -1187,8 +1189,8 @@ bool verifyHostname(const std::string& hostname,
   if(dnsNames.empty()) {
     return util::tlsHostnameMatch(commonName, hostname);
   }
-  for(auto i = dnsNames.begin(), eoi = dnsNames.end(); i != eoi; ++i) {
-    if(util::tlsHostnameMatch(*i, hostname)) {
+  for(auto& dnsName : dnsNames) {
+    if(util::tlsHostnameMatch(dnsName, hostname)) {
       return true;
     }
   }

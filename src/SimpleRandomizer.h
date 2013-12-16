@@ -38,6 +38,7 @@
 #include "Randomizer.h"
 
 #include <memory>
+#include <random>
 
 #ifdef __MINGW32__
 # include <wincrypt.h>
@@ -51,25 +52,25 @@ private:
 
 #ifdef __MINGW32__
   HCRYPTPROV cryProvider_;
-#endif //__MINGW32__
+#else // !__MINGW32__
+  std::minstd_rand eng_;
+#endif //!__MINGW32__
 
   SimpleRandomizer();
 public:
 
   static const std::unique_ptr<SimpleRandomizer>& getInstance();
 
-  static void init();
-
   virtual ~SimpleRandomizer();
 
-  virtual long int getRandomNumber() CXX11_OVERRIDE;
-
-  virtual long int getMaxRandomNumber() CXX11_OVERRIDE;
+  void init();
 
   /**
    * Returns random number in [0, to).
    */
   virtual long int getRandomNumber(long int to) CXX11_OVERRIDE;
+
+  void getRandomBytes(unsigned char *buf, size_t len);
 
   long int operator()(long int to);
 };
