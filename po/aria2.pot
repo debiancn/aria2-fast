@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: aria2 1.18.0\n"
+"Project-Id-Version: aria2 1.18.1\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2013-09-10 21:23+0900\n"
+"POT-Creation-Date: 2013-10-20 23:17+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1950,7 +1950,7 @@ msgstr ""
 msgid "Configuration file %s is not found."
 msgstr ""
 
-#: src/OptionHandlerException.cc:43
+#: src/OptionHandlerException.cc:42
 #, c-format
 msgid "We encountered a problem while processing the option '--%s'."
 msgstr ""
@@ -2003,13 +2003,13 @@ msgstr ""
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:373
+#: src/RequestGroup.cc:372
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:670
+#: src/RequestGroup.cc:659
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""

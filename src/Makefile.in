@@ -82,67 +82,75 @@ build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
 bin_PROGRAMS = aria2c$(EXEEXT)
+@ANDROID_TRUE@am__append_1 = android/android.c
 
 # Android NDK R8e does not provide ftruncate64. Use assembly code from
 # android source code and link it.
-@ANDROID_ARM_TRUE@am__append_1 = android/arm-ftruncate64.S
-@ANDROID_MIPS_TRUE@am__append_2 = android/mips-ftruncate64.S
-@ANDROID_X86_TRUE@am__append_3 = android/x86-ftruncate64.S android/x86-asm.h
-@MINGW_BUILD_TRUE@am__append_4 = WinConsoleFile.cc WinConsoleFile.h
-@ENABLE_WEBSOCKET_TRUE@am__append_5 = WebSocketSession.cc WebSocketSession.h\
+@ANDROID_ARM_TRUE@am__append_2 = android/arm-ftruncate64.S
+@ANDROID_MIPS_TRUE@am__append_3 = android/mips-ftruncate64.S
+@ANDROID_X86_TRUE@am__append_4 = android/x86-ftruncate64.S android/x86-asm.h
+@MINGW_BUILD_TRUE@am__append_5 = WinConsoleFile.cc WinConsoleFile.h
+@ENABLE_WEBSOCKET_TRUE@am__append_6 = WebSocketSession.cc WebSocketSession.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.cc WebSocketSessionMan.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.cc WebSocketResponseCommand.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h
 
-@ENABLE_WEBSOCKET_FALSE@am__append_6 = NullWebSocketSessionMan.h
-@HAVE_SOME_XMLLIB_TRUE@am__append_7 = XmlAttr.cc XmlAttr.h\
+@ENABLE_WEBSOCKET_FALSE@am__append_7 = NullWebSocketSessionMan.h
+@HAVE_SOME_XMLLIB_TRUE@am__append_8 = XmlAttr.cc XmlAttr.h\
 @HAVE_SOME_XMLLIB_TRUE@	XmlParser.cc XmlParser.h\
 @HAVE_SOME_XMLLIB_TRUE@	ParserStateMachine.h
 
-@HAVE_LIBXML2_TRUE@am__append_8 = Xml2XmlParser.cc Xml2XmlParser.h
-@HAVE_LIBEXPAT_TRUE@am__append_9 = ExpatXmlParser.cc ExpatXmlParser.h
-@ENABLE_XML_RPC_TRUE@am__append_10 = XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
+@HAVE_LIBXML2_TRUE@am__append_9 = Xml2XmlParser.cc Xml2XmlParser.h
+@HAVE_LIBEXPAT_TRUE@am__append_10 = ExpatXmlParser.cc ExpatXmlParser.h
+@ENABLE_XML_RPC_TRUE@am__append_11 = XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserState.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h
 
-@HAVE_SOME_FALLOCATE_TRUE@am__append_11 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
-@HAVE_EPOLL_TRUE@am__append_12 = EpollEventPoll.cc EpollEventPoll.h
-@ENABLE_SSL_TRUE@am__append_13 = TLSContext.h TLSSession.h
-@USE_APPLE_MD_TRUE@am__append_14 = AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
-@HAVE_APPLETLS_TRUE@am__append_15 = AppleTLSContext.cc AppleTLSContext.h \
+@HAVE_SOME_FALLOCATE_TRUE@am__append_12 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
+@HAVE_EPOLL_TRUE@am__append_13 = EpollEventPoll.cc EpollEventPoll.h
+@ENABLE_SSL_TRUE@am__append_14 = TLSContext.h TLSSession.h
+@USE_APPLE_MD_TRUE@am__append_15 = AppleMessageDigestImpl.cc
+@HAVE_APPLETLS_TRUE@am__append_16 = AppleTLSContext.cc AppleTLSContext.h \
 @HAVE_APPLETLS_TRUE@        AppleTLSSession.cc AppleTLSSession.h
 
-@HAVE_LIBGNUTLS_TRUE@am__append_16 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+@USE_WINDOWS_MD_TRUE@am__append_17 = WinMessageDigestImpl.cc
+@HAVE_WINTLS_TRUE@am__append_18 = WinTLSContext.cc WinTLSContext.h \
+@HAVE_WINTLS_TRUE@	WinTLSSession.cc WinTLSSession.h
+
+@USE_INTERNAL_BIGNUM_TRUE@am__append_19 = InternalDHKeyExchange.cc InternalDHKeyExchange.h bignum.h
+@USE_INTERNAL_ARC4_TRUE@am__append_20 = InternalARC4Encryptor.cc InternalARC4Encryptor.h
+@USE_INTERNAL_MD_TRUE@am__append_21 = InternalMessageDigestImpl.cc sha1.c sha1.h md5.c md5.h
+@HAVE_LIBGNUTLS_TRUE@am__append_22 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
 @HAVE_LIBGNUTLS_TRUE@        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 
-@HAVE_LIBGCRYPT_TRUE@am__append_17 = LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+@HAVE_LIBGCRYPT_TRUE@am__append_23 = LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
 @HAVE_LIBGCRYPT_TRUE@        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
 
-@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_18 = LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
-@HAVE_LIBNETTLE_TRUE@am__append_19 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
-@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_20 = LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
-@HAVE_LIBGMP_TRUE@am__append_21 = a2gmp.cc a2gmp.h \
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_24 = LibgcryptMessageDigestImpl.cc
+@HAVE_LIBNETTLE_TRUE@am__append_25 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_26 = LibnettleMessageDigestImpl.cc
+@HAVE_LIBGMP_TRUE@am__append_27 = a2gmp.cc a2gmp.h \
 @HAVE_LIBGMP_TRUE@        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 
-@HAVE_OPENSSL_TRUE@am__append_22 = LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+@HAVE_OPENSSL_TRUE@am__append_28 = LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
 @HAVE_OPENSSL_TRUE@        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
 
-@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_23 = LibsslTLSContext.cc LibsslTLSContext.h \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_29 = LibsslTLSContext.cc LibsslTLSContext.h \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@        LibsslTLSSession.cc LibsslTLSSession.h
 
-@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_24 = LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
-@HAVE_ZLIB_TRUE@am__append_25 = GZipEncoder.cc GZipEncoder.h\
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_30 = LibsslMessageDigestImpl.cc
+@HAVE_ZLIB_TRUE@am__append_31 = GZipEncoder.cc GZipEncoder.h\
 @HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
 @HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h
 
-@HAVE_SQLITE3_TRUE@am__append_26 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
+@HAVE_SQLITE3_TRUE@am__append_32 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_27 = AsyncNameResolver.cc AsyncNameResolver.h\
+@ENABLE_ASYNC_DNS_TRUE@am__append_33 = AsyncNameResolver.cc AsyncNameResolver.h\
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.cc AsyncNameResolverMan.h
 
-@ENABLE_MESSAGE_DIGEST_TRUE@am__append_28 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
+@ENABLE_MESSAGE_DIGEST_TRUE@am__append_34 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.cc IteratableChecksumValidator.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.cc CheckIntegrityDispatcherCommand.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.cc CheckIntegrityCommand.h\
@@ -154,7 +162,7 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestImpl.h\
 @ENABLE_MESSAGE_DIGEST_TRUE@	HashFuncEntry.h
 
-@ENABLE_BITTORRENT_TRUE@am__append_29 = PeerAbstractCommand.cc PeerAbstractCommand.h\
+@ENABLE_BITTORRENT_TRUE@am__append_35 = PeerAbstractCommand.cc PeerAbstractCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.cc PeerInteractionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	Peer.cc Peer.h\
@@ -331,7 +339,7 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.cc UDPTrackerRequest.h\
 @ENABLE_BITTORRENT_TRUE@	NameResolveCommand.cc NameResolveCommand.h
 
-@ENABLE_METALINK_TRUE@am__append_30 = Metalinker.cc Metalinker.h\
+@ENABLE_METALINK_TRUE@am__append_36 = Metalinker.cc Metalinker.h\
 @ENABLE_METALINK_TRUE@	MetalinkEntry.cc MetalinkEntry.h\
 @ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.cc MetalinkMetaurl.h\
@@ -345,21 +353,21 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.cc MetalinkPostDownloadHandler.h\
 @ENABLE_METALINK_TRUE@	metalink_helper.cc metalink_helper.h
 
-@HAVE_ASCTIME_R_FALSE@am__append_31 = asctime_r.c asctime_r.h
-@HAVE_BASENAME_FALSE@am__append_32 = libgen.c libgen.h
-@HAVE_GETADDRINFO_FALSE@am__append_33 = getaddrinfo.c getaddrinfo.h
-@HAVE_GAI_STRERROR_FALSE@am__append_34 = gai_strerror.c gai_strerror.h
-@HAVE_GETTIMEOFDAY_FALSE@am__append_35 = gettimeofday.c gettimeofday.h
-@HAVE_LOCALTIME_R_FALSE@am__append_36 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_37 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_38 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_39 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_40 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_41 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_42 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_43 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_44 = KqueueEventPoll.cc KqueueEventPoll.h
-@HAVE_LIBUV_TRUE@am__append_45 = LibuvEventPoll.cc LibuvEventPoll.h
+@HAVE_ASCTIME_R_FALSE@am__append_37 = asctime_r.c asctime_r.h
+@HAVE_BASENAME_FALSE@am__append_38 = libgen.c libgen.h
+@HAVE_GETADDRINFO_FALSE@am__append_39 = getaddrinfo.c getaddrinfo.h
+@HAVE_GAI_STRERROR_FALSE@am__append_40 = gai_strerror.c gai_strerror.h
+@HAVE_GETTIMEOFDAY_FALSE@am__append_41 = gettimeofday.c gettimeofday.h
+@HAVE_LOCALTIME_R_FALSE@am__append_42 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_43 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_44 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_45 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_46 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_47 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_48 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_49 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_50 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_LIBUV_TRUE@am__append_51 = LibuvEventPoll.cc LibuvEventPoll.h
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/libaria2.pc.in alloca.c $(top_srcdir)/depcomp
@@ -571,42 +579,47 @@ am__libaria2_la_SOURCES_DIST = option_processing.cc version_usage.cc \
 	ConnectCommand.cc ConnectCommand.h ControlChain.h \
 	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
 	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
-	Lock.h android/arm-ftruncate64.S android/mips-ftruncate64.S \
-	android/x86-ftruncate64.S android/x86-asm.h WinConsoleFile.cc \
-	WinConsoleFile.h WebSocketSession.cc WebSocketSession.h \
-	WebSocketSessionMan.cc WebSocketSessionMan.h \
-	WebSocketResponseCommand.cc WebSocketResponseCommand.h \
-	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h \
-	NullWebSocketSessionMan.h XmlAttr.cc XmlAttr.h XmlParser.cc \
-	XmlParser.h ParserStateMachine.h Xml2XmlParser.cc \
-	Xml2XmlParser.h ExpatXmlParser.cc ExpatXmlParser.h \
+	Lock.h android/android.c android/arm-ftruncate64.S \
+	android/mips-ftruncate64.S android/x86-ftruncate64.S \
+	android/x86-asm.h WinConsoleFile.cc WinConsoleFile.h \
+	WebSocketSession.cc WebSocketSession.h WebSocketSessionMan.cc \
+	WebSocketSessionMan.h WebSocketResponseCommand.cc \
+	WebSocketResponseCommand.h WebSocketInteractionCommand.cc \
+	WebSocketInteractionCommand.h NullWebSocketSessionMan.h \
+	XmlAttr.cc XmlAttr.h XmlParser.cc XmlParser.h \
+	ParserStateMachine.h Xml2XmlParser.cc Xml2XmlParser.h \
+	ExpatXmlParser.cc ExpatXmlParser.h \
 	XmlRpcRequestParserStateMachine.cc \
 	XmlRpcRequestParserStateMachine.h XmlRpcRequestParserState.h \
 	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h \
 	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h \
 	FallocFileAllocationIterator.cc FallocFileAllocationIterator.h \
 	EpollEventPoll.cc EpollEventPoll.h TLSContext.h TLSSession.h \
-	AppleMessageDigestImpl.cc AppleMessageDigestImpl.h \
-	AppleTLSContext.cc AppleTLSContext.h AppleTLSSession.cc \
-	AppleTLSSession.h LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
-	LibgnutlsTLSSession.cc LibgnutlsTLSSession.h \
-	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
-	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h \
-	LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h \
+	AppleMessageDigestImpl.cc AppleTLSContext.cc AppleTLSContext.h \
+	AppleTLSSession.cc AppleTLSSession.h WinMessageDigestImpl.cc \
+	WinTLSContext.cc WinTLSContext.h WinTLSSession.cc \
+	WinTLSSession.h InternalDHKeyExchange.cc \
+	InternalDHKeyExchange.h bignum.h InternalARC4Encryptor.cc \
+	InternalARC4Encryptor.h InternalMessageDigestImpl.cc sha1.c \
+	sha1.h md5.c md5.h LibgnutlsTLSContext.cc \
+	LibgnutlsTLSContext.h LibgnutlsTLSSession.cc \
+	LibgnutlsTLSSession.h LibgcryptARC4Encryptor.cc \
+	LibgcryptARC4Encryptor.h LibgcryptDHKeyExchange.cc \
+	LibgcryptDHKeyExchange.h LibgcryptMessageDigestImpl.cc \
 	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h \
-	LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h \
-	a2gmp.cc a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
+	LibnettleMessageDigestImpl.cc a2gmp.cc a2gmp.h \
+	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
 	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
 	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h \
 	LibsslTLSContext.cc LibsslTLSContext.h LibsslTLSSession.cc \
-	LibsslTLSSession.h LibsslMessageDigestImpl.cc \
-	LibsslMessageDigestImpl.h GZipEncoder.cc GZipEncoder.h \
-	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h \
-	GZipFile.cc GZipFile.h Sqlite3CookieParser.cc \
-	Sqlite3CookieParser.h Sqlite3CookieParserImpl.cc \
-	Sqlite3CookieParserImpl.h AsyncNameResolver.cc \
-	AsyncNameResolver.h AsyncNameResolverMan.cc \
-	AsyncNameResolverMan.h IteratableChunkChecksumValidator.cc \
+	LibsslTLSSession.h LibsslMessageDigestImpl.cc GZipEncoder.cc \
+	GZipEncoder.h GZipDecodingStreamFilter.cc \
+	GZipDecodingStreamFilter.h GZipFile.cc GZipFile.h \
+	Sqlite3CookieParser.cc Sqlite3CookieParser.h \
+	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h \
+	AsyncNameResolver.cc AsyncNameResolver.h \
+	AsyncNameResolverMan.cc AsyncNameResolverMan.h \
+	IteratableChunkChecksumValidator.cc \
 	IteratableChunkChecksumValidator.h \
 	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
 	CheckIntegrityDispatcherCommand.cc \
@@ -772,49 +785,56 @@ am__libaria2_la_SOURCES_DIST = option_processing.cc version_usage.cc \
 	KeepRunningCommand.h ApiCallbackDownloadEventListener.cc \
 	ApiCallbackDownloadEventListener.h
 am__dirstamp = $(am__leading_dot)dirstamp
-@ANDROID_ARM_TRUE@am__objects_1 = android/arm-ftruncate64.lo
-@ANDROID_MIPS_TRUE@am__objects_2 = android/mips-ftruncate64.lo
-@ANDROID_X86_TRUE@am__objects_3 = android/x86-ftruncate64.lo
-@MINGW_BUILD_TRUE@am__objects_4 = WinConsoleFile.lo
-@ENABLE_WEBSOCKET_TRUE@am__objects_5 = WebSocketSession.lo \
+@ANDROID_TRUE@am__objects_1 = android/android.lo
+@ANDROID_ARM_TRUE@am__objects_2 = android/arm-ftruncate64.lo
+@ANDROID_MIPS_TRUE@am__objects_3 = android/mips-ftruncate64.lo
+@ANDROID_X86_TRUE@am__objects_4 = android/x86-ftruncate64.lo
+@MINGW_BUILD_TRUE@am__objects_5 = WinConsoleFile.lo
+@ENABLE_WEBSOCKET_TRUE@am__objects_6 = WebSocketSession.lo \
 @ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.lo \
 @ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.lo \
 @ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.lo
-am__objects_6 =
-@HAVE_SOME_XMLLIB_TRUE@am__objects_7 = XmlAttr.lo XmlParser.lo
-@HAVE_LIBXML2_TRUE@am__objects_8 = Xml2XmlParser.lo
-@HAVE_LIBEXPAT_TRUE@am__objects_9 = ExpatXmlParser.lo
-@ENABLE_XML_RPC_TRUE@am__objects_10 =  \
+am__objects_7 =
+@HAVE_SOME_XMLLIB_TRUE@am__objects_8 = XmlAttr.lo XmlParser.lo
+@HAVE_LIBXML2_TRUE@am__objects_9 = Xml2XmlParser.lo
+@HAVE_LIBEXPAT_TRUE@am__objects_10 = ExpatXmlParser.lo
+@ENABLE_XML_RPC_TRUE@am__objects_11 =  \
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateMachine.lo \
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.lo \
 @ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.lo
-@HAVE_SOME_FALLOCATE_TRUE@am__objects_11 =  \
+@HAVE_SOME_FALLOCATE_TRUE@am__objects_12 =  \
 @HAVE_SOME_FALLOCATE_TRUE@	FallocFileAllocationIterator.lo
-@HAVE_EPOLL_TRUE@am__objects_12 = EpollEventPoll.lo
-@USE_APPLE_MD_TRUE@am__objects_13 = AppleMessageDigestImpl.lo
-@HAVE_APPLETLS_TRUE@am__objects_14 = AppleTLSContext.lo \
+@HAVE_EPOLL_TRUE@am__objects_13 = EpollEventPoll.lo
+@USE_APPLE_MD_TRUE@am__objects_14 = AppleMessageDigestImpl.lo
+@HAVE_APPLETLS_TRUE@am__objects_15 = AppleTLSContext.lo \
 @HAVE_APPLETLS_TRUE@	AppleTLSSession.lo
-@HAVE_LIBGNUTLS_TRUE@am__objects_15 = LibgnutlsTLSContext.lo \
+@USE_WINDOWS_MD_TRUE@am__objects_16 = WinMessageDigestImpl.lo
+@HAVE_WINTLS_TRUE@am__objects_17 = WinTLSContext.lo WinTLSSession.lo
+@USE_INTERNAL_BIGNUM_TRUE@am__objects_18 = InternalDHKeyExchange.lo
+@USE_INTERNAL_ARC4_TRUE@am__objects_19 = InternalARC4Encryptor.lo
+@USE_INTERNAL_MD_TRUE@am__objects_20 = InternalMessageDigestImpl.lo \
+@USE_INTERNAL_MD_TRUE@	sha1.lo md5.lo
+@HAVE_LIBGNUTLS_TRUE@am__objects_21 = LibgnutlsTLSContext.lo \
 @HAVE_LIBGNUTLS_TRUE@	LibgnutlsTLSSession.lo
-@HAVE_LIBGCRYPT_TRUE@am__objects_16 = LibgcryptARC4Encryptor.lo \
+@HAVE_LIBGCRYPT_TRUE@am__objects_22 = LibgcryptARC4Encryptor.lo \
 @HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.lo
-@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_17 = LibgcryptMessageDigestImpl.lo
-@HAVE_LIBNETTLE_TRUE@am__objects_18 = LibnettleARC4Encryptor.lo
-@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_19 = LibnettleMessageDigestImpl.lo
-@HAVE_LIBGMP_TRUE@am__objects_20 = a2gmp.lo LibgmpDHKeyExchange.lo
-@HAVE_OPENSSL_TRUE@am__objects_21 = LibsslARC4Encryptor.lo \
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_23 = LibgcryptMessageDigestImpl.lo
+@HAVE_LIBNETTLE_TRUE@am__objects_24 = LibnettleARC4Encryptor.lo
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_25 = LibnettleMessageDigestImpl.lo
+@HAVE_LIBGMP_TRUE@am__objects_26 = a2gmp.lo LibgmpDHKeyExchange.lo
+@HAVE_OPENSSL_TRUE@am__objects_27 = LibsslARC4Encryptor.lo \
 @HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.lo
-@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_22 =  \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_28 =  \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSContext.lo \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSSession.lo
-@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_23 = LibsslMessageDigestImpl.lo
-@HAVE_ZLIB_TRUE@am__objects_24 = GZipEncoder.lo \
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_29 = LibsslMessageDigestImpl.lo
+@HAVE_ZLIB_TRUE@am__objects_30 = GZipEncoder.lo \
 @HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.lo GZipFile.lo
-@HAVE_SQLITE3_TRUE@am__objects_25 = Sqlite3CookieParser.lo \
+@HAVE_SQLITE3_TRUE@am__objects_31 = Sqlite3CookieParser.lo \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.lo
-@ENABLE_ASYNC_DNS_TRUE@am__objects_26 = AsyncNameResolver.lo \
+@ENABLE_ASYNC_DNS_TRUE@am__objects_32 = AsyncNameResolver.lo \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.lo
-@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_27 = IteratableChunkChecksumValidator.lo \
+@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_33 = IteratableChunkChecksumValidator.lo \
 @ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.lo \
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.lo \
 @ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.lo \
@@ -822,7 +842,7 @@ am__objects_6 =
 @ENABLE_MESSAGE_DIGEST_TRUE@	message_digest_helper.lo \
 @ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.lo ChunkChecksum.lo \
 @ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.lo
-@ENABLE_BITTORRENT_TRUE@am__objects_28 = PeerAbstractCommand.lo \
+@ENABLE_BITTORRENT_TRUE@am__objects_34 = PeerAbstractCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.lo Peer.lo \
 @ENABLE_BITTORRENT_TRUE@	PeerSessionResource.lo \
@@ -940,7 +960,7 @@ am__objects_6 =
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.lo \
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.lo \
 @ENABLE_BITTORRENT_TRUE@	NameResolveCommand.lo
-@ENABLE_METALINK_TRUE@am__objects_29 = Metalinker.lo MetalinkEntry.lo \
+@ENABLE_METALINK_TRUE@am__objects_35 = Metalinker.lo MetalinkEntry.lo \
 @ENABLE_METALINK_TRUE@	MetalinkResource.lo MetalinkMetaurl.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserController.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.lo \
@@ -951,22 +971,22 @@ am__objects_6 =
 @ENABLE_METALINK_TRUE@	Metalink2RequestGroup.lo \
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.lo \
 @ENABLE_METALINK_TRUE@	metalink_helper.lo
-@HAVE_ASCTIME_R_FALSE@am__objects_30 = asctime_r.lo
-@HAVE_BASENAME_FALSE@am__objects_31 = libgen.lo
-@HAVE_GETADDRINFO_FALSE@am__objects_32 = getaddrinfo.lo
-@HAVE_GAI_STRERROR_FALSE@am__objects_33 = gai_strerror.lo
-@HAVE_GETTIMEOFDAY_FALSE@am__objects_34 = gettimeofday.lo
-@HAVE_LOCALTIME_R_FALSE@am__objects_35 = localtime_r.lo
-@HAVE_STRPTIME_FALSE@am__objects_36 = strptime.lo
-@HAVE_TIMEGM_FALSE@am__objects_37 = timegm.lo
-@HAVE_DAEMON_FALSE@am__objects_38 = daemon.lo
-@HAVE_TIMEGETTIME_TRUE@am__objects_39 = clock_gettime_mingw.lo
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_40 = clock_gettime_osx.lo
-@HAVE_POLL_TRUE@am__objects_41 = PollEventPoll.lo
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_42 = PortEventPoll.lo
-@HAVE_KQUEUE_TRUE@am__objects_43 = KqueueEventPoll.lo
-@HAVE_LIBUV_TRUE@am__objects_44 = LibuvEventPoll.lo
-am__objects_45 = option_processing.lo version_usage.lo Context.lo \
+@HAVE_ASCTIME_R_FALSE@am__objects_36 = asctime_r.lo
+@HAVE_BASENAME_FALSE@am__objects_37 = libgen.lo
+@HAVE_GETADDRINFO_FALSE@am__objects_38 = getaddrinfo.lo
+@HAVE_GAI_STRERROR_FALSE@am__objects_39 = gai_strerror.lo
+@HAVE_GETTIMEOFDAY_FALSE@am__objects_40 = gettimeofday.lo
+@HAVE_LOCALTIME_R_FALSE@am__objects_41 = localtime_r.lo
+@HAVE_STRPTIME_FALSE@am__objects_42 = strptime.lo
+@HAVE_TIMEGM_FALSE@am__objects_43 = timegm.lo
+@HAVE_DAEMON_FALSE@am__objects_44 = daemon.lo
+@HAVE_TIMEGETTIME_TRUE@am__objects_45 = clock_gettime_mingw.lo
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_46 = clock_gettime_osx.lo
+@HAVE_POLL_TRUE@am__objects_47 = PollEventPoll.lo
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_48 = PortEventPoll.lo
+@HAVE_KQUEUE_TRUE@am__objects_49 = KqueueEventPoll.lo
+@HAVE_LIBUV_TRUE@am__objects_50 = LibuvEventPoll.lo
+am__objects_51 = option_processing.lo version_usage.lo Context.lo \
 	SocketCore.lo Command.lo AbstractCommand.lo \
 	InitiateConnectionCommandFactory.lo DownloadCommand.lo \
 	HttpInitiateConnectionCommand.lo HttpRequestCommand.lo \
@@ -1040,8 +1060,8 @@ am__objects_45 = option_processing.lo version_usage.lo Context.lo \
 	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
 	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
 	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_6) \
-	$(am__objects_13) $(am__objects_14) $(am__objects_15) \
+	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_7) $(am__objects_14) $(am__objects_15) \
 	$(am__objects_16) $(am__objects_17) $(am__objects_18) \
 	$(am__objects_19) $(am__objects_20) $(am__objects_21) \
 	$(am__objects_22) $(am__objects_23) $(am__objects_24) \
@@ -1051,9 +1071,11 @@ am__objects_45 = option_processing.lo version_usage.lo Context.lo \
 	$(am__objects_34) $(am__objects_35) $(am__objects_36) \
 	$(am__objects_37) $(am__objects_38) $(am__objects_39) \
 	$(am__objects_40) $(am__objects_41) $(am__objects_42) \
-	$(am__objects_43) $(am__objects_44)
-@ENABLE_LIBARIA2_FALSE@am_libaria2_la_OBJECTS = $(am__objects_45)
-@ENABLE_LIBARIA2_TRUE@am_libaria2_la_OBJECTS = $(am__objects_45) \
+	$(am__objects_43) $(am__objects_44) $(am__objects_45) \
+	$(am__objects_46) $(am__objects_47) $(am__objects_48) \
+	$(am__objects_49) $(am__objects_50)
+@ENABLE_LIBARIA2_FALSE@am_libaria2_la_OBJECTS = $(am__objects_51)
+@ENABLE_LIBARIA2_TRUE@am_libaria2_la_OBJECTS = $(am__objects_51) \
 @ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo \
 @ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo
 libaria2_la_OBJECTS = $(am_libaria2_la_OBJECTS)
@@ -1558,7 +1580,9 @@ SRCS = option_processing.cc version_usage.cc Context.cc Context.h \
 	$(am__append_34) $(am__append_35) $(am__append_36) \
 	$(am__append_37) $(am__append_38) $(am__append_39) \
 	$(am__append_40) $(am__append_41) $(am__append_42) \
-	$(am__append_43) $(am__append_44) $(am__append_45)
+	$(am__append_43) $(am__append_44) $(am__append_45) \
+	$(am__append_46) $(am__append_47) $(am__append_48) \
+	$(am__append_49) $(am__append_50) $(am__append_51)
 @ENABLE_LIBARIA2_TRUE@pkgconfigdir = $(libdir)/pkgconfig
 @ENABLE_LIBARIA2_TRUE@pkgconfig_DATA = libaria2.pc
 @ENABLE_LIBARIA2_TRUE@DISTCLEANFILES = $(pkgconfig_DATA)
@@ -1666,6 +1690,8 @@ android/$(am__dirstamp):
 android/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) android/$(DEPDIR)
 	@: > android/$(DEPDIR)/$(am__dirstamp)
+android/android.lo: android/$(am__dirstamp) \
+	android/$(DEPDIR)/$(am__dirstamp)
 android/arm-ftruncate64.lo: android/$(am__dirstamp) \
 	android/$(DEPDIR)/$(am__dirstamp)
 android/mips-ftruncate64.lo: android/$(am__dirstamp) \
@@ -1949,6 +1975,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InitiatorMSEHandshakeCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderStreamPieceSelector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderURISelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InternalARC4Encryptor.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InternalDHKeyExchange.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InternalMessageDigestImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChecksumValidator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChunkChecksumValidator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/JsonParser.Plo@am__quote@
@@ -2101,6 +2130,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSession.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSessionMan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinConsoleFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinMessageDigestImpl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinTLSContext.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinTLSSession.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCache.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCacheEntry.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Xml2XmlParser.Plo@am__quote@
@@ -2134,12 +2166,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localtime_r.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_digest_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metalink_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option_processing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paramed_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prefs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpc_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sha1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strptime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timegm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri.Plo@am__quote@
@@ -2147,6 +2181,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_usage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallclock.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/android.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/arm-ftruncate64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/mips-ftruncate64.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/x86-ftruncate64.Plo@am__quote@

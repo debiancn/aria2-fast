@@ -225,14 +225,13 @@ namespace {
 
     SUITE(SSL_NO_SUCH_CIPHERSUITE)
   };
-  static const size_t nSuites = sizeof(kSuites) / sizeof(*kSuites);
 #undef SUITE
 
   static inline const char* suiteToString(const SSLCipherSuite suite)
   {
-    for (size_t i = 0; i < nSuites; ++i) {
-      if (kSuites[i].suite == suite) {
-        return kSuites[i].name;
+    for (auto & s : kSuites) {
+      if (s.suite == suite) {
+        return s.name;
       }
     }
     return "Unknown suite";
@@ -241,13 +240,12 @@ namespace {
   static const char* kBlocked[] = {
     "NULL", "anon", "MD5", "EXPORT", "DES", "IDEA", "NO_SUCH", "EMPTY"
   };
-  static const size_t nBlocked = sizeof(kBlocked) / sizeof(*kBlocked);
 
   static inline bool isBlockedSuite(SSLCipherSuite suite)
   {
     const char* name = suiteToString(suite);
-    for (size_t i = 0; i < nBlocked; ++i) {
-      if (strstr(name, kBlocked[i])) {
+    for (auto& blocked : kBlocked) {
+      if (strstr(name, blocked)) {
         return true;
       }
     }
@@ -335,13 +333,13 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
   }
 #endif
 
-  if (ctx->getSide() != TLS_SERVER) {
-    // Done with client-only initialization
-    return;
-  }
-
   SecIdentityRef creds = ctx->getCredentials();
   if (!creds) {
+    if (ctx->getSide() != TLS_SERVER) {
+      // Done with client-only initialization
+      return;
+    }
+
     A2_LOG_ERROR("AppleTLS: No credentials");
     state_ = st_error;
     return;

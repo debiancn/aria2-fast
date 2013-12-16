@@ -107,7 +107,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
-#if defined HAVE_ARES_SET_SERVERS && HAVE_ARES_ADDR_NODE
+#if defined(HAVE_ARES_SET_SERVERS) && defined(HAVE_ARES_ADDR_NODE)
   {
     OptionHandler* op(new DefaultOptionHandler
                       (PREF_ASYNC_DNS_SERVER,
@@ -305,7 +305,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
 #endif // ENABLE_ASYNC_DNS
-#if defined HAVE_MMAP || defined __MINGW32__
+#if defined(HAVE_MMAP) || defined(__MINGW32__)
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_ENABLE_MMAP,
@@ -804,7 +804,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
                        TEXT_RPC_CERTIFICATE,
                        NO_DEFAULT_VALUE,
                        false)
-#endif
+#endif // HAVE_APPLETLS
         );
     op->addTag(TAG_RPC);
     handlers.push_back(op);
@@ -1155,11 +1155,20 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new DefaultOptionHandler
+    OptionHandler* op(
+#ifdef HAVE_APPLETLS
+                      new DefaultOptionHandler
+                      (PREF_CERTIFICATE,
+                       TEXT_CERTIFICATE,
+                       NO_DEFAULT_VALUE)
+#else // HAVE_APPLETLS
+                      new LocalFilePathOptionHandler
                       (PREF_CERTIFICATE,
                        TEXT_CERTIFICATE,
                        NO_DEFAULT_VALUE,
-                       PATH_TO_FILE));
+                       false)
+#endif // HAVE_APPLETLS
+        );
     op->addTag(TAG_HTTP);
     op->addTag(TAG_HTTPS);
     handlers.push_back(op);
@@ -1607,7 +1616,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   // BitTorrent/Metalink Options
-#if defined ENABLE_BITTORRENT || defined ENABLE_METALINK
+#if defined(ENABLE_BITTORRENT) || defined(ENABLE_METALINK)
   {
     OptionHandler* op(new IntegerRangeOptionHandler
                       (PREF_SELECT_FILE,

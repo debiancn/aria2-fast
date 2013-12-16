@@ -1,4 +1,4 @@
-.TH "ARIA2C" "1" "September 10, 2013" "1.18.0" "aria2"
+.TH "ARIA2C" "1" "October 20, 2013" "1.18.1" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -424,13 +424,46 @@ certificates store, aria2 will automatically load those
 certificates at the startup.
 .UNINDENT
 .UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIWinTLS\fP and \fIAppleTLS\fP do not support this option. Instead you will
+have to import the certificate into the OS trust store.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-certificate=<FILE>
-Use the client certificate in FILE.
-The certificate must be in PEM format.
-You may use \fI\%--private-key\fP option to specify the private key.
+Use the client certificate in FILE. The certificate must be
+either in PKCS12 (.p12, .pfx) or in PEM format.
+.sp
+PKCS12 files must contain the certificate, a key and optionally a chain
+of additional certificates. Only PKCS12 files with a blank import password
+can be opened!
+.sp
+When using PEM, you have to specify the private key via \fI\%--private-key\fP
+as well.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIWinTLS\fP does not support PEM files at the moment. Users have to use PKCS12
+files.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIAppleTLS\fP users should use the Keychain Access utility to import the client
+certificate and get the SHA\-1 fingerprint from the Information dialog
+corresponding to that certificate.
+To start aria2c use \fI\-\-certificate=<SHA\-1>\fP and just omit the
+\fI\%--private-key\fP option.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1102,9 +1135,26 @@ Default: \fBfalse\fP
 .TP
 .B \-\-rpc\-certificate=<FILE>
 Use the certificate in FILE for RPC server. The certificate must be
-in PEM format. Use \fI\%--rpc-private-key\fP option to specify the
-private key. Use \fI\%--rpc-secure\fP option to enable encryption.
+either in PKCS12 (.p12, .pfx) or in PEM format.
 .sp
+PKCS12 files must contain the certificate, a key and optionally a chain
+of additional certificates. Only PKCS12 files with a blank import password
+can be opened!
+.sp
+When using PEM, you have to specify the private key via \fI\%--rpc-private-key\fP
+as well. Use \fI\%--rpc-secure\fP option to enable encryption.
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fIWinTLS\fP does not support PEM files at the moment. Users have to use PKCS12
+files.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
 \fIAppleTLS\fP users should use the Keychain Access utility to first generate a
 self\-signed SSL\-Server certificate, e.g. using the wizard, and get the
 SHA\-1 fingerprint from the Information dialog corresponding to that new
@@ -1112,6 +1162,8 @@ certificate.
 To start aria2c with \fI\%--rpc-secure\fP use
 \fI\-\-rpc\-certificate=<SHA\-1>\fP and just omit the \fI\%--rpc-private-key\fP
 option.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP

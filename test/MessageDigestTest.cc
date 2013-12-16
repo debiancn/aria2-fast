@@ -18,9 +18,11 @@ class MessageDigestTest:public CppUnit::TestFixture {
   CPPUNIT_TEST_SUITE_END();
 
   std::unique_ptr<MessageDigest> sha1_;
+  std::unique_ptr<MessageDigest> md5_;
 public:
   void setUp()
   {
+    md5_ = MessageDigest::create("md5");
     sha1_ = MessageDigest::sha1();
   }
 
@@ -37,13 +39,26 @@ CPPUNIT_TEST_SUITE_REGISTRATION( MessageDigestTest );
 
 void MessageDigestTest::testDigest()
 {
+  md5_->update("aria2", 5);
+  CPPUNIT_ASSERT_EQUAL(std::string("2c90cadbef42945f0dcff2b959977ff8"),
+                       util::toHex(md5_->digest()));
+  md5_->reset();
+  md5_->update("abc", 3);
+  CPPUNIT_ASSERT_EQUAL(std::string("900150983cd24fb0d6963f7d28e17f72"),
+                       util::toHex(md5_->digest()));
+
   sha1_->update("aria2", 5);
   CPPUNIT_ASSERT_EQUAL(std::string("f36003f22b462ffa184390533c500d8989e9f681"),
+                       util::toHex(sha1_->digest()));
+  sha1_->reset();
+  sha1_->update("abc", 3);
+  CPPUNIT_ASSERT_EQUAL(std::string("a9993e364706816aba3e25717850c26c9cd0d89d"),
                        util::toHex(sha1_->digest()));
 }
 
 void MessageDigestTest::testSupports()
 {
+  CPPUNIT_ASSERT(MessageDigest::supports("md5"));
   CPPUNIT_ASSERT(MessageDigest::supports("sha-1"));
   // Fails because sha1 is not valid name.
   CPPUNIT_ASSERT(!MessageDigest::supports("sha1"));
@@ -51,6 +66,7 @@ void MessageDigestTest::testSupports()
 
 void MessageDigestTest::testGetDigestLength()
 {
+  CPPUNIT_ASSERT_EQUAL((size_t)16, MessageDigest::getDigestLength("md5"));
   CPPUNIT_ASSERT_EQUAL((size_t)20, MessageDigest::getDigestLength("sha-1"));
   CPPUNIT_ASSERT_EQUAL((size_t)20, sha1_->getDigestLength());
 }

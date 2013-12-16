@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2011 Tatsuhiro Tsujikawa
+ * Copyright (C) 2013 Nils Maier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,44 +32,37 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_LIBNETTLE_MESSAGE_DIGEST_IMPL_H
-#define D_LIBNETTLE_MESSAGE_DIGEST_IMPL_H
 
-#include "common.h"
-
-#include <string>
-#include <memory>
-
-#include <nettle/nettle-meta.h>
+#include "InternalARC4Encryptor.h"
 
 namespace aria2 {
 
-class MessageDigestImpl {
-public:
-  MessageDigestImpl(const nettle_hash* hashInfo);
-  // We don't implement copy ctor.
-  MessageDigestImpl(const MessageDigestImpl&) = delete;
-  // We don't implement assignment operator.
-  MessageDigestImpl& operator==(const MessageDigestImpl&) = delete;
+void ARC4Encryptor::init(const unsigned char* key, size_t keyLength)
+{
+  j = 0;
+  for (auto& c : state_) c = j++;
 
-  ~MessageDigestImpl();
+  j = 0;
+  for (i = 0; i < sizeof(state_); ++i) {
+    j = (j + state_[i] + key[i % keyLength]) & 0xff;
+    auto tmp = state_[i];
+    state_[i] = state_[j];
+    state_[j] = tmp;
+  }
+  i = j = 0;
+}
 
-  static std::unique_ptr<MessageDigestImpl> sha1();
-  static std::unique_ptr<MessageDigestImpl> create
-  (const std::string& hashType);
-
-  static bool supports(const std::string& hashType);
-  static size_t getDigestLength(const std::string& hashType);
-
-  size_t getDigestLength() const;
-  void reset();
-  void update(const void* data, size_t length);
-  void digest(unsigned char* md);
-private:
-  const nettle_hash* hashInfo_;
-  char* ctx_;
-};
+void ARC4Encryptor::encrypt(size_t len, unsigned char* out,
+                            const unsigned char* in)
+{
+  for (auto c = 0u; c < len; ++c) {
+    i = (i + 1) & 0xff;
+    j = (j + state_[i]) & 0xff;
+    auto sj = state_[i];
+    auto si = state_[i] = state_[j];
+    state_[j] = sj;
+    out[c] = in[c] ^ state_[(si + sj) & 0xff];
+  }
+}
 
 } // namespace aria2
-
-#endif // D_LIBNETTLE_MESSAGE_DIGEST_IMPL_H

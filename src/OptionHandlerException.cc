@@ -34,7 +34,6 @@
 /* copyright --> */
 #include "OptionHandlerException.h"
 #include "fmt.h"
-#include "prefs.h"
 
 namespace aria2 {
 
@@ -45,7 +44,7 @@ const char* MESSAGE =
 
 OptionHandlerException::OptionHandlerException
 (const char* file, int line,
- const Pref* pref)
+ PrefPtr pref)
   : RecoverableException
     (file, line, fmt(MESSAGE, pref->k), error_code::OPTION_ERROR),
     pref_(pref)
@@ -53,7 +52,7 @@ OptionHandlerException::OptionHandlerException
 
 OptionHandlerException::OptionHandlerException
 (const char* file, int line,
- const Pref* pref,
+ PrefPtr pref,
  const Exception& cause)
   : RecoverableException
     (file, line, fmt(MESSAGE, pref->k), error_code::OPTION_ERROR,

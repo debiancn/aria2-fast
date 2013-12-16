@@ -253,6 +253,10 @@ SRCS =  option_processing.cc\
 	FtpTunnelRequestConnectChain.h\
 	Lock.h
 
+if ANDROID
+SRCS += android/android.c
+endif # ANDROID
+
 # Android NDK R8e does not provide ftruncate64. Use assembly code from
 # android source code and link it.
 if ANDROID_ARM
@@ -317,13 +321,34 @@ SRCS += TLSContext.h TLSSession.h
 endif # ENABLE_SSL
 
 if USE_APPLE_MD
-SRCS += AppleMessageDigestImpl.cc AppleMessageDigestImpl.h
+SRCS += AppleMessageDigestImpl.cc
 endif # USE_APPLE_MD
 
 if HAVE_APPLETLS
 SRCS += AppleTLSContext.cc AppleTLSContext.h \
         AppleTLSSession.cc AppleTLSSession.h
 endif # HAVE_APPLETLS
+
+if USE_WINDOWS_MD
+SRCS += WinMessageDigestImpl.cc
+endif # USE_WINDOWS_MD
+
+if HAVE_WINTLS
+SRCS += WinTLSContext.cc WinTLSContext.h \
+	WinTLSSession.cc WinTLSSession.h
+endif # HAVE_WINTLS
+
+if USE_INTERNAL_BIGNUM
+SRCS += InternalDHKeyExchange.cc InternalDHKeyExchange.h bignum.h
+endif
+
+if USE_INTERNAL_ARC4
+SRCS += InternalARC4Encryptor.cc InternalARC4Encryptor.h
+endif
+
+if USE_INTERNAL_MD
+SRCS += InternalMessageDigestImpl.cc sha1.c sha1.h md5.c md5.h
+endif # USE_WINDOWS_MD
 
 if HAVE_LIBGNUTLS
 SRCS += LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
@@ -334,14 +359,14 @@ if HAVE_LIBGCRYPT
 SRCS += LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
         LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
 if USE_LIBGCRYPT_MD
-SRCS += LibgcryptMessageDigestImpl.cc LibgcryptMessageDigestImpl.h
+SRCS += LibgcryptMessageDigestImpl.cc
 endif # USE_LIBGCRYPT_MD
 endif # HAVE_LIBGCRYPT
 
 if HAVE_LIBNETTLE
 SRCS += LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
 if USE_LIBNETTLE_MD
-SRCS += LibnettleMessageDigestImpl.cc LibnettleMessageDigestImpl.h
+SRCS += LibnettleMessageDigestImpl.cc
 endif # USE_LIBNETTLE_MD
 endif # HAVE_LIBNETTLE
 
@@ -358,7 +383,7 @@ SRCS += LibsslTLSContext.cc LibsslTLSContext.h \
         LibsslTLSSession.cc LibsslTLSSession.h
 endif # !HAVE_APPLETLS
 if USE_OPENSSL_MD
-SRCS += LibsslMessageDigestImpl.cc LibsslMessageDigestImpl.h
+SRCS += LibsslMessageDigestImpl.cc
 endif
 endif # HAVE_OPENSSL
 

@@ -43,6 +43,7 @@
 #include <functional>
 
 #include "console.h"
+#include "prefs.h"
 
 namespace aria2 {
 
@@ -56,7 +57,6 @@ extern const std::string PATH_TO_DIR;
 extern const std::string PATH_TO_COMMAND;
 
 class Option;
-struct Pref;
 
 class OptionHandler {
 public:
@@ -82,7 +82,7 @@ public:
 
   virtual void hide() = 0;
 
-  virtual const Pref* getPref() const = 0;
+  virtual PrefPtr getPref() const = 0;
 
   enum ARG_TYPE {
     REQ_ARG,

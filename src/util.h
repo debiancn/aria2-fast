@@ -62,6 +62,7 @@
 #include "message.h"
 #include "DlAbortEx.h"
 #include "fmt.h"
+#include "prefs.h"
 
 #ifndef HAVE_SIGACTION
 #  define sigset_t int
@@ -75,7 +76,6 @@ class BinaryStream;
 class FileEntry;
 class RequestGroup;
 class Option;
-struct Pref;
 
 #define STRTOLL(X) strtoll(X, reinterpret_cast<char**>(0), 10)
 #define STRTOULL(X) strtoull(X, reinterpret_cast<char**>(0), 10)
@@ -781,11 +781,11 @@ bool inSameCidrBlock
 // No throw
 void executeHookByOptName
 (const std::shared_ptr<RequestGroup>& group, const Option* option,
- const Pref* pref);
+ PrefPtr pref);
 
 // No throw
 void executeHookByOptName
-(const RequestGroup* group, const Option* option, const Pref* pref);
+(const RequestGroup* group, const Option* option, PrefPtr pref);
 
 std::string createSafePath(const std::string& dir, const std::string& filename);
 

@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2010 Tatsuhiro Tsujikawa
+ * Copyright (C) 2013 Nils Maier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,44 +32,41 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_LIBSSL_MESSAGE_DIGEST_IMPL_H
-#define D_LIBSSL_MESSAGE_DIGEST_IMPL_H
+
+#ifndef D_INTERNAL_DH_KEY_EXCHANGE_H
+#define D_INTERNAL_DH_KEY_EXCHANGE_H
 
 #include "common.h"
-
-#include <string>
-#include <memory>
-
-#include <openssl/evp.h>
+#include "bignum.h"
 
 namespace aria2 {
 
-class MessageDigestImpl {
-public:
-  MessageDigestImpl(const EVP_MD* hashFunc);
-  // We don't implement copy ctor.
-  MessageDigestImpl(const MessageDigestImpl&) = delete;
-  // We don't implement assignment operator.
-  MessageDigestImpl& operator==(const MessageDigestImpl&) = delete;
-
-  ~MessageDigestImpl();
-
-  static std::unique_ptr<MessageDigestImpl> sha1();
-  static std::unique_ptr<MessageDigestImpl> create
-  (const std::string& hashType);
-
-  static bool supports(const std::string& hashType);
-  static size_t getDigestLength(const std::string& hashType);
-
-  size_t getDigestLength() const;
-  void reset();
-  void update(const void* data, size_t length);
-  void digest(unsigned char* md);
+class DHKeyExchange {
 private:
-  const EVP_MD* hashFunc_;
-  EVP_MD_CTX ctx_;
+  typedef bignum::ulong<1024> n; // aka max. 8096 bits
+  size_t keyLength_;
+  n prime_;
+  n generator_;
+  n privateKey_;
+  n publicKey_;
+
+public:
+  DHKeyExchange() : keyLength_(0) {}
+
+  void init(const unsigned char* prime, size_t primeBits,
+            const unsigned char* generator, size_t privateKeyBits);
+
+  void generatePublicKey();
+
+  size_t getPublicKey(unsigned char* out, size_t outLength) const;
+
+  void generateNonce(unsigned char* out, size_t outLength) const;
+
+  size_t computeSecret(unsigned char* out, size_t outLength,
+                       const unsigned char* peerPublicKeyData,
+                       size_t peerPublicKeyLength) const;
 };
 
 } // namespace aria2
 
-#endif // D_LIBSSL_MESSAGE_DIGEST_IMPL_H
+#endif // D_INTERNAL_DH_KEY_EXCHANGE_H
