@@ -1,8 +1,8 @@
-aria2 (1.18.1-1) UNRELEASED; urgency=medium
+aria2 (1.18.1-1) unstable; urgency=medium
 
   * New upstream release.
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 16 Dec 2013 17:40:52 +0530
+ -- Kartik Mistry <kartik@debian.org>  Mon, 16 Dec 2013 18:41:03 +0530
 
 aria2 (1.18.0-2) unstable; urgency=low
 
