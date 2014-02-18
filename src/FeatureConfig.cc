@@ -186,8 +186,11 @@ std::string usedLibs()
   res += "sqlite3/" SQLITE_VERSION " ";
 #endif // HAVE_SQLITE3
 #ifdef HAVE_APPLETLS
-  res += "appleTLS ";
+  res += "AppleTLS ";
 #endif // HAVE_APPLETLS
+#ifdef HAVE_WINTLS
+  res += "WinTLS ";
+#endif // HAVE_WINTLS
 #ifdef HAVE_LIBGNUTLS
   res += "GnuTLS/" GNUTLS_VERSION " ";
 #endif // HAVE_LIBGNUTLS

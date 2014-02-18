@@ -32,26 +32,39 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_TRUE_REQUEST_GROUP_CRITERIA_H
-#define D_TRUE_REQUEST_GROUP_CRITERIA_H
+#ifndef D_DOWNLOAD_HANDLER_FACTORY_H
+#define D_DOWNLOAD_HANDLER_FACTORY_H
 
-#include "RequestGroupCriteria.h"
+#include "common.h"
+
+#include <memory>
 
 namespace aria2 {
 
-class TrueRequestGroupCriteria:public RequestGroupCriteria
-{
-public:
-  TrueRequestGroupCriteria() {}
+class PreDownloadHandler;
+class PostDownloadHandler;
 
-  virtual ~TrueRequestGroupCriteria() {}
+namespace download_handlers {
 
-  virtual bool match(const RequestGroup* requestGroup) const CXX11_OVERRIDE
-  {
-    return true;
-  }
-};
+const PreDownloadHandler* getMemoryPreDownloadHandler();
+
+#ifdef ENABLE_METALINK
+
+const PreDownloadHandler* getMetalinkPreDownloadHandler();
+const PostDownloadHandler* getMetalinkPostDownloadHandler();
+
+#endif // ENABLE_METALINK
+
+#ifdef ENABLE_BITTORRENT
+
+const PreDownloadHandler* getBtPreDownloadHandler();
+const PostDownloadHandler* getBtPostDownloadHandler();
+const PostDownloadHandler* getUTMetadataPostDownloadHandler();
+
+#endif // ENABLE_BITTORRENT
+
+} // namespace download_handlers
 
 } // namespace aria2
 
-#endif // D_TRUE_REQUEST_GROUP_CRITERIA_H
+#endif // D_DOWNLOAD_HANDLER_FACTORY_H

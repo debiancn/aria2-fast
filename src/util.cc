@@ -106,29 +106,16 @@ int utf8ToWChar(wchar_t* out, size_t outLength, const char* src)
 } // namespace
 
 namespace {
-int ansiToWChar(wchar_t* out, size_t outLength, const char* src)
-{
-  return MultiByteToWideChar(CP_ACP, 0, src, -1, out, outLength);
-}
-} // namespace
-
-namespace {
 int wCharToUtf8(char* out, size_t outLength, const wchar_t* src)
 {
-  return WideCharToMultiByte(CP_UTF8, 0, src, -1, out, outLength, 0, 0);
-}
-} // namespace
-
-namespace {
-int wCharToAnsi(char* out, size_t outLength, const wchar_t* src)
-{
-  return WideCharToMultiByte(CP_ACP, 0, src, -1, out, outLength, 0, 0);
+  return WideCharToMultiByte(CP_UTF8, 0, src, -1, out, outLength,
+                             nullptr, nullptr);
 }
 } // namespace
 
 std::wstring utf8ToWChar(const char* src)
 {
-  int len = utf8ToWChar(0, 0, src);
+  int len = utf8ToWChar(nullptr, 0, src);
   if(len <= 0) {
     abort();
   }
@@ -146,25 +133,9 @@ std::wstring utf8ToWChar(const std::string& src)
   return utf8ToWChar(src.c_str());
 }
 
-std::string utf8ToNative(const std::string& src)
-{
-  std::wstring wsrc = utf8ToWChar(src);
-  int len = wCharToAnsi(0, 0, wsrc.c_str());
-  if(len <= 0) {
-    abort();
-  }
-  auto buf = make_unique<char[]>((size_t)len);
-  len = wCharToAnsi(buf.get(), len, wsrc.c_str());
-  if(len <= 0) {
-    abort();
-  } else {
-    return buf.get();
-  }
-}
-
 std::string wCharToUtf8(const std::wstring& wsrc)
 {
-  int len = wCharToUtf8(0, 0, wsrc.c_str());
+  int len = wCharToUtf8(nullptr, 0, wsrc.c_str());
   if(len <= 0) {
     abort();
   }
@@ -177,20 +148,6 @@ std::string wCharToUtf8(const std::wstring& wsrc)
   }
 }
 
-std::string nativeToUtf8(const std::string& src)
-{
-  int len = ansiToWChar(0, 0, src.c_str());
-  if(len <= 0) {
-    abort();
-  }
-  auto buf = make_unique<wchar_t[]>((size_t)len);
-  len = ansiToWChar(buf.get(), len, src.c_str());
-  if(len <= 0) {
-    abort();
-  } else {
-    return wCharToUtf8(std::wstring(buf.get()));
-  }
-}
 #endif // __MINGW32__
 
 namespace util {
@@ -1807,7 +1764,7 @@ void executeHook
                   numFilesStr.c_str(),
                   firstFilename.c_str()));
   pid_t cpid = fork();
-  if (cpid > 0) {
+  if (cpid == 0) {
     // child!
     execlp(command.c_str(),
            command.c_str(),
@@ -1863,9 +1820,9 @@ void executeHook
   if(batch) {
     cmdline += "\"";
   }
-  int cmdlineLen = utf8ToWChar(0, 0, cmdline.c_str());
+  int cmdlineLen = utf8ToWChar(nullptr, 0, cmdline.c_str());
   assert(cmdlineLen > 0);
-  auto wcharCmdline = std::unique_ptr<wchar_t[]>(new wchar_t[cmdlineLen]);
+  auto wcharCmdline = make_unique<wchar_t[]>(cmdlineLen);
   cmdlineLen = utf8ToWChar(wcharCmdline.get(), cmdlineLen, cmdline.c_str());
   assert(cmdlineLen > 0);
   A2_LOG_INFO(fmt("Executing user command: %s", cmdline.c_str()));

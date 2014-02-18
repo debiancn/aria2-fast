@@ -372,8 +372,9 @@ HTTP Specific Options
     *AppleTLS* users should use the Keychain Access utility to import the client
     certificate and get the SHA-1 fingerprint from the Information dialog
     corresponding to that certificate.
-    To start aria2c use `--certificate=<SHA-1>` and just omit the
-    :option:`--private-key` option.
+    To start aria2c use `--certificate=<SHA-1>`.
+    Alternatively PKCS12 files are also supported. PEM files, however, are not
+    supported.
 
 .. option:: --check-certificate[=true|false]
 
@@ -620,7 +621,8 @@ BitTorrent Specific Options
 
 .. option:: --bt-max-open-files=<NUM>
 
-  Specify maximum number of files to open in each BitTorrent download.
+  Specify maximum number of files to open in multi-file
+  BitTorrent/Metalink download globally.
   Default: ``100``
 
 .. option:: --bt-max-peers=<NUM>
@@ -963,8 +965,9 @@ RPC Options
     SHA-1 fingerprint from the Information dialog corresponding to that new
     certificate.
     To start aria2c with :option:`--rpc-secure` use
-    `--rpc-certificate=<SHA-1>` and just omit the :option:`--rpc-private-key`
-    option.
+    `--rpc-certificate=<SHA-1>`.
+    Alternatively PKCS12 files are also supported. PEM files, however, are not
+    supported.
 
 .. option:: --rpc-listen-all[=true|false]
 
@@ -1560,11 +1563,11 @@ based on the last error encountered.
 
 4
   If aria2 saw the specfied number of "resource not found" error.
-  See :option:`--max-file-not-found` option).
+  See :option:`--max-file-not-found` option.
 
 5
   If a download aborted because download speed was too slow.
-  See :option:`--lowest-speed-limit` option)
+  See :option:`--lowest-speed-limit` option.
 
 6
   If network problem occurred.
@@ -1629,7 +1632,7 @@ based on the last error encountered.
   If HTTP authorization failed.
 
 25
-  If aria2 could not parse bencoded file(usually ".torrent" file).
+  If aria2 could not parse bencoded file (usually ".torrent" file).
 
 26
   If ".torrent" file was corrupted or missing information that aria2 needed.
@@ -1806,7 +1809,6 @@ of URIs. These optional lines must start with white space(s).
   * :option:`bt-exclude-tracker <--bt-exclude-tracker>`
   * :option:`bt-external-ip <--bt-external-ip>`
   * :option:`bt-hash-check-seed <--bt-hash-check-seed>`
-  * :option:`bt-max-open-files <--bt-max-open-files>`
   * :option:`bt-max-peers <--bt-max-peers>`
   * :option:`bt-metadata-only <--bt-metadata-only>`
   * :option:`bt-min-crypto-level <--bt-min-crypto-level>`
@@ -2942,6 +2944,7 @@ All code examples come from Python2.7 interpreter.
   struct.
   The following options are available:
 
+  * :option:`bt-max-open-files <--bt-max-open-files>`
   * :option:`download-result <--download-result>`
   * :option:`log <-l>`
   * :option:`log-level <--log-level>`
@@ -3795,6 +3798,20 @@ Resume download started by web browsers or another programs
 
 Client certificate authorization for SSL/TLS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Specify a PKCS12 file as follows:
+
+.. code-block:: console
+
+  $ aria2c --certificate=/path/to/mycert.p12
+
+.. note::
+
+  The file specified in :option:`--certificate` must be contain one PKCS12 encoded
+  certificate and key. The password must be blank.
+
+Alternatively, if PEM files are supported, use a command like the following:
+
 .. code-block:: console
 
   $ aria2c --certificate=/path/to/mycert.pem --private-key=/path/to/mykey.pem https://host/file
@@ -3816,7 +3833,18 @@ RPC
 Encrypt RPC transport by SSL/TLS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Specify server certificate file and private key file as follows:
+Specify server PKC12 file:
+
+.. code-block:: console
+
+  $ aria2c --enable-rpc --rpc-certificate=/path/to/server.p12 --rpc-secure
+
+.. note::
+
+  The file specified in :option:`--rpc-certificate` must be contain one PKCS12 encoded
+  certificate and key. The password must be blank.
+
+Alternatively when PEM files are supported, specify the server certificate file and private key file as follows:
 
 .. code-block:: console
 
@@ -3911,7 +3939,7 @@ The Metalink Download Description Format: :rfc:`5854`
 
 COPYRIGHT
 ---------
-Copyright (C) 2006, 2013 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2014 Tatsuhiro Tsujikawa
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
