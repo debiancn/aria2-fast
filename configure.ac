@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.18.1],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.18.3],[t-tujikawa@users.sourceforge.net],[aria2],[http://aria2.sourceforge.net/])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -420,7 +420,9 @@ if test "x$have_openssl" != "xyes"; then
     fi
   fi
   if test "x$with_libgmp" = "xyes" &&
-     test "x$have_libnettle" = "xyes" &&
+     (test "x$have_libnettle" = "xyes" ||
+      test "x$have_appletls" = "xyes" ||
+      test "x$have_wintls" = "xyes") &&
      test "x$enable_bittorrent" = "xyes"; then
     AC_SEARCH_LIBS([__gmpz_init], [gmp], [have_libgmp=yes], [have_libgmp=no])
     if test "x$have_libgmp" = "xyes"; then
@@ -959,11 +961,23 @@ AM_CONDITIONAL([ANDROID_MIPS], [test "x$android_mips" = "xyes"])
 AM_CONDITIONAL([ANDROID_X86], [test "x$android_x86" = "xyes"])
 
 if test "x$ARIA2_STATIC" = "xyes"; then
-  LDFLAGS="$LDFLAGS -all-static -static-libgcc -static-libstdc++"
+  # -static-libgcc and -static-libstdc++ are linker flags and not for
+  # libtool.
+  LDFLAGS="$LDFLAGS -all-static"
   dnl For non-MinGW build, we need additional libs for static build.
-  if test "x$win_build" != "xyes"; then
-    LIBS="$LIBS -lpthread -ldl -lrt"
-  fi
+  case "$host" in
+    *mingw*|*msvc*|*darwin*)
+    ;;
+
+    *)
+      LIBS="$LIBS -lpthread -ldl -lrt"
+    ;;
+  esac
+fi
+
+if test "x$win_build" = "xyes" && test "x$enable_libaria2" = "xyes"; then
+  # Creating dll needs this
+  LDFLAGS="$LDFLAGS -no-undefined"
 fi
 
 AC_CONFIG_FILES([Makefile

@@ -115,7 +115,7 @@ SRCS =  option_processing.cc\
 	ContentTypeRequestGroupCriteria.cc ContentTypeRequestGroupCriteria.h\
 	DownloadHandler.cc DownloadHandler.h\
 	DownloadHandlerConstants.cc DownloadHandlerConstants.h\
-	DownloadHandlerFactory.cc DownloadHandlerFactory.h\
+	download_handlers.cc download_handlers.h\
 	MemoryPreDownloadHandler.h\
 	MemoryBufferPreDownloadHandler.h\
 	HaveEraseCommand.cc HaveEraseCommand.h\
@@ -140,7 +140,6 @@ SRCS =  option_processing.cc\
 	PostDownloadHandler.h\
 	PreDownloadHandler.h\
 	SingletonHolder.h\
-	TrueRequestGroupCriteria.h\
 	a2algo.h\
 	a2functional.h\
 	a2io.h\
@@ -226,6 +225,7 @@ SRCS =  option_processing.cc\
 	OutputFile.h\
 	NullOutputFile.h\
 	console.cc console.h\
+	ColorizedStream.cc ColorizedStream.h\
 	IOFile.cc IOFile.h\
 	BufferedFile.cc BufferedFile.h\
 	SegList.h\

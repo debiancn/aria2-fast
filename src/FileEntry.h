@@ -62,31 +62,35 @@ class FileEntry {
 public:
   typedef std::set<std::shared_ptr<Request>, RefLess<Request> >
   InFlightRequestSet;
-private:
-  std::string path_;
-  std::deque<std::string> uris_;
-  std::deque<std::string> spentUris_;
-  int64_t length_;
-  int64_t offset_;
-  bool requested_;
 
+private:
   class RequestFaster {
   public:
     bool operator()(const std::shared_ptr<Request>& lhs,
                     const std::shared_ptr<Request>& rhs) const;
   };
-
   typedef std::set<std::shared_ptr<Request>, RequestFaster> RequestPool;
-  RequestPool requestPool_;
-  InFlightRequestSet inFlightRequests_;
-  std::string contentType_;
+
+  int64_t length_;
+  int64_t offset_;
+
+  std::deque<std::string> uris_;
+  std::deque<std::string> spentUris_;
   // URIResult is stored in the ascending order of the time when its result is
   // available.
   std::deque<URIResult> uriResults_;
-  bool uniqueProtocol_;
-  int maxConnectionPerServer_;
+  RequestPool requestPool_;
+  InFlightRequestSet inFlightRequests_;
+
+  std::string path_;
+  std::string contentType_;
   std::string originalName_;
+
   Timer lastFasterReplace_;
+  int maxConnectionPerServer_;
+
+  bool requested_;
+  bool uniqueProtocol_;
 
   void storePool(const std::shared_ptr<Request>& request);
 public:
@@ -105,7 +109,7 @@ public:
 
   const std::string& getPath() const { return path_; }
 
-  void setPath(const std::string& path);
+  void setPath(std::string path);
 
   int64_t getLength() const { return length_; }
 
@@ -163,7 +167,7 @@ public:
   // Inserts uris_ and spentUris_ into uris.
   void getUris(std::vector<std::string>& uris) const;
 
-  void setContentType(const std::string& contentType);
+  void setContentType(std::string contentType);
 
   const std::string& getContentType() const { return contentType_; }
 
@@ -253,7 +257,7 @@ public:
   // Push URIs in pooled or in-flight requests to the front of uris_.
   void putBackRequest();
 
-  void setOriginalName(const std::string& originalName);
+  void setOriginalName(std::string originalName);
 
   const std::string& getOriginalName() const
   {

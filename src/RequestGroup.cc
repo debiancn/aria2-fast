@@ -61,7 +61,7 @@
 #include "RequestGroupMan.h"
 #include "DefaultBtProgressInfoFile.h"
 #include "DefaultPieceStorage.h"
-#include "DownloadHandlerFactory.h"
+#include "download_handlers.h"
 #include "MemoryBufferPreDownloadHandler.h"
 #include "DownloadHandlerConstants.h"
 #include "Option.h"
@@ -78,6 +78,7 @@
 #include "SimpleRandomizer.h"
 #include "Segment.h"
 #include "SocketRecvBuffer.h"
+#include "RequestGroupCriteria.h"
 #ifdef ENABLE_MESSAGE_DIGEST
 # include "CheckIntegrityCommand.h"
 # include "ChecksumCheckIntegrityEntry.h"
@@ -122,35 +123,35 @@ namespace aria2 {
 
 RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
                            const std::shared_ptr<Option>& option)
-  : gid_(gid),
-    state_(STATE_WAITING),
+  : belongsToGID_(0),
+    gid_(gid),
     option_(option),
-    numConcurrentCommand_(option->getAsInt(PREF_SPLIT)),
-    numStreamConnection_(0),
-    numStreamCommand_(0),
-    numCommand_(0),
-    saveControlFile_(true),
     progressInfoFile_(new NullProgressInfoFile()),
-    preLocalFileCheckEnabled_(true),
-    haltRequested_(false),
-    forceHaltRequested_(false),
-    haltReason_(RequestGroup::NONE),
-    pauseRequested_(false),
     uriSelector_(make_unique<InorderURISelector>()),
-    lastModifiedTime_(Time::null()),
-    fileNotFoundCount_(0),
-    timeout_(option->getAsInt(PREF_TIMEOUT)),
+    requestGroupMan_(nullptr),
 #ifdef ENABLE_BITTORRENT
     btRuntime_(nullptr),
     peerStorage_(nullptr),
 #endif // ENABLE_BITTORRENT
-    inMemoryDownload_(false),
+    lastModifiedTime_(Time::null()),
+    timeout_(option->getAsInt(PREF_TIMEOUT)),
+    state_(STATE_WAITING),
+    numConcurrentCommand_(option->getAsInt(PREF_SPLIT)),
+    numStreamConnection_(0),
+    numStreamCommand_(0),
+    numCommand_(0),
+    fileNotFoundCount_(0),
     maxDownloadSpeedLimit_(option->getAsInt(PREF_MAX_DOWNLOAD_LIMIT)),
     maxUploadSpeedLimit_(option->getAsInt(PREF_MAX_UPLOAD_LIMIT)),
+    resumeFailureCount_(0),
+    haltReason_(RequestGroup::NONE),
     lastErrorCode_(error_code::UNDEFINED),
-    belongsToGID_(0),
-    requestGroupMan_(nullptr),
-    resumeFailureCount_(0)
+    saveControlFile_(true),
+    preLocalFileCheckEnabled_(true),
+    haltRequested_(false),
+    forceHaltRequested_(false),
+    pauseRequested_(false),
+    inMemoryDownload_(false)
 {
   fileAllocationEnabled_ = option_->get(PREF_FILE_ALLOCATION) != V_NONE;
   if(!option_->getAsBool(PREF_DRY_RUN)) {
@@ -354,24 +355,36 @@ void RequestGroup::createInitialCommand(
                       (progressInfoFile ?
                       progressInfoFile : progressInfoFile_)));
 
+    if (option_->getAsBool(PREF_ENABLE_DHT) ||
+        (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
+         option_->getAsBool(PREF_ENABLE_DHT6))) {
+
+      if (option_->getAsBool(PREF_ENABLE_DHT)) {
+        e->addCommand(DHTSetup().setup(e, AF_INET));
+      }
+
+      if (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
+          option_->getAsBool(PREF_ENABLE_DHT6)) {
+        e->addCommand(DHTSetup().setup(e, AF_INET6));
+      }
+      const auto& nodes = torrentAttrs->nodes;
+      // TODO Are nodes in torrent IPv4 only?
+      if(!torrentAttrs->privateTorrent &&
+         !nodes.empty() && DHTRegistry::isInitialized()) {
+        auto command = make_unique<DHTEntryPointNameResolveCommand>(
+            e->newCUID(), e, nodes);
+        command->setTaskQueue(DHTRegistry::getData().taskQueue.get());
+        command->setTaskFactory(DHTRegistry::getData().taskFactory.get());
+        command->setRoutingTable(DHTRegistry::getData().routingTable.get());
+        command->setLocalNode(DHTRegistry::getData().localNode);
+        e->addCommand(std::move(command));
+      }
+    } else if(metadataGetMode) {
+      A2_LOG_NOTICE(_("For BitTorrent Magnet URI, enabling DHT is strongly"
+                      " recommended. See --enable-dht option."));
+    }
+
     if (metadataGetMode) {
-      if (option_->getAsBool(PREF_ENABLE_DHT) ||
-          (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
-          option_->getAsBool(PREF_ENABLE_DHT6))) {
-
-        if (option_->getAsBool(PREF_ENABLE_DHT)) {
-          e->addCommand(DHTSetup().setup(e, AF_INET));
-        }
-
-        if (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
-            option_->getAsBool(PREF_ENABLE_DHT6)) {
-          e->addCommand(DHTSetup().setup(e, AF_INET6));
-        }
-      }
-      else {
-        A2_LOG_NOTICE(_("For BitTorrent Magnet URI, enabling DHT is strongly"
-                        " recommended. See --enable-dht option."));
-      }
       BtCheckIntegrityEntry{this}.onDownloadIncomplete(commands, e);
       return;
     }
@@ -418,31 +431,6 @@ void RequestGroup::createInitialCommand(
     }
     progressInfoFile_ = progressInfoFile;
 
-    if (!torrentAttrs->privateTorrent &&
-        (option_->getAsBool(PREF_ENABLE_DHT) ||
-        (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
-          option_->getAsBool(PREF_ENABLE_DHT6)))) {
-
-      if (option_->getAsBool(PREF_ENABLE_DHT)) {
-        e->addCommand(DHTSetup().setup(e, AF_INET));
-      }
-
-      if (!e->getOption()->getAsBool(PREF_DISABLE_IPV6) &&
-          option_->getAsBool(PREF_ENABLE_DHT6)) {
-        e->addCommand(DHTSetup().setup(e, AF_INET6));
-      }
-      const auto& nodes = torrentAttrs->nodes;
-      // TODO Are nodes in torrent IPv4 only?
-      if(!nodes.empty() && DHTRegistry::isInitialized()) {
-        auto command = make_unique<DHTEntryPointNameResolveCommand>(
-            e->newCUID(), e, nodes);
-        command->setTaskQueue(DHTRegistry::getData().taskQueue.get());
-        command->setTaskFactory(DHTRegistry::getData().taskFactory.get());
-        command->setRoutingTable(DHTRegistry::getData().routingTable.get());
-        command->setLocalNode(DHTRegistry::getData().localNode);
-        e->addCommand(std::move(command));
-      }
-    }
     auto entry = make_unique<BtCheckIntegrityEntry>(this);
     // --bt-seed-unverified=true is given and download has completed, skip
     // validation for piece hashes.
@@ -464,11 +452,6 @@ void RequestGroup::createInitialCommand(
        downloadContext_->getTotalLength() == 0) {
       createNextCommand(commands, e, 1);
       return;
-    }
-    if (e->getRequestGroupMan()->isSameFileBeingDownloaded(this)) {
-      throw DOWNLOAD_FAILURE_EXCEPTION2(fmt(EX_DUPLICATE_FILE_DOWNLOAD,
-                                            downloadContext_->getBasePath().c_str()),
-                                        error_code::DUPLICATE_DOWNLOAD);
     }
     auto progressInfoFile = std::make_shared<DefaultBtProgressInfoFile>(
         downloadContext_,
@@ -618,6 +601,7 @@ void RequestGroup::initPieceStorage()
     tempPieceStorage = ps;
   }
   tempPieceStorage->initStorage();
+  tempPieceStorage->getDiskAdaptor()->setRequestGroupMan(requestGroupMan_);
   segmentMan_ = std::make_shared<SegmentMan>(downloadContext_, tempPieceStorage);
   pieceStorage_ = tempPieceStorage;
 }
@@ -651,6 +635,15 @@ void RequestGroup::adjustFilename(
   if(!isPreLocalFileCheckEnabled()) {
     // OK, no need to care about filename.
     return;
+  }
+  // TODO need this?
+  if(requestGroupMan_) {
+    if(requestGroupMan_->isSameFileBeingDownloaded(this)) {
+      // The file name must be renamed
+      tryAutoFileRenaming();
+      A2_LOG_NOTICE(fmt(MSG_FILE_RENAMED, getFirstFilePath().c_str()));
+      return;
+    }
   }
   if (!option_->getAsBool(PREF_DRY_RUN) &&
       option_->getAsBool(PREF_REMOVE_CONTROL_FILE) &&
@@ -743,26 +736,23 @@ void RequestGroup::shouldCancelDownloadForSafety()
     return;
   }
 
+  tryAutoFileRenaming();
+  A2_LOG_NOTICE(fmt(MSG_FILE_RENAMED, getFirstFilePath().c_str()));
+}
+
+void RequestGroup::tryAutoFileRenaming()
+{
   if (!option_->getAsBool(PREF_AUTO_FILE_RENAMING)) {
     throw DOWNLOAD_FAILURE_EXCEPTION2(fmt(MSG_FILE_ALREADY_EXISTS,
                                           getFirstFilePath().c_str()),
                                       error_code::FILE_ALREADY_EXISTS);
   }
 
-  if (!tryAutoFileRenaming()) {
+  std::string filepath = getFirstFilePath();
+  if(filepath.empty()) {
     throw DOWNLOAD_FAILURE_EXCEPTION2(fmt("File renaming failed: %s",
                                           getFirstFilePath().c_str()),
                                       error_code::FILE_RENAMING_FAILED);
-  }
-
-  A2_LOG_NOTICE(fmt(MSG_FILE_RENAMED, getFirstFilePath().c_str()));
-}
-
-bool RequestGroup::tryAutoFileRenaming()
-{
-  std::string filepath = getFirstFilePath();
-  if(filepath.empty()) {
-    return false;
   }
   for (int i = 1; i < 10000; ++i) {
     auto newfilename = fmt("%s.%d", filepath.c_str(), i);
@@ -770,10 +760,12 @@ bool RequestGroup::tryAutoFileRenaming()
     File ctrlfile(newfile.getPath() + DefaultBtProgressInfoFile::getSuffix());
     if (!newfile.exists() || (newfile.exists() && ctrlfile.exists())) {
       downloadContext_->getFirstFileEntry()->setPath(newfile.getPath());
-      return true;
+      return;
     }
   }
-  return false;
+  throw DOWNLOAD_FAILURE_EXCEPTION2(fmt("File renaming failed: %s",
+                                        getFirstFilePath().c_str()),
+                                    error_code::FILE_RENAMING_FAILED);
 }
 
 void RequestGroup::createNextCommandWithAdj(
@@ -1000,7 +992,7 @@ void RequestGroup::releaseRuntimeResource(DownloadEngine* e)
   }
   // Don't reset segmentMan_ and pieceStorage_ here to provide
   // progress information via RPC
-  progressInfoFile_.reset();
+  progressInfoFile_ = std::make_shared<NullProgressInfoFile>();
   downloadContext_->releaseRuntimeResource();
 }
 
@@ -1049,12 +1041,14 @@ void RequestGroup::initializePreDownloadHandler()
 {
 #ifdef ENABLE_BITTORRENT
   if(option_->get(PREF_FOLLOW_TORRENT) == V_MEM) {
-    preDownloadHandlers_.push_back(DownloadHandlerFactory::getBtPreDownloadHandler());
+    preDownloadHandlers_.push_back
+      (download_handlers::getBtPreDownloadHandler());
   }
 #endif // ENABLE_BITTORRENT
 #ifdef ENABLE_METALINK
   if(option_->get(PREF_FOLLOW_METALINK) == V_MEM) {
-    preDownloadHandlers_.push_back(DownloadHandlerFactory::getMetalinkPreDownloadHandler());
+    preDownloadHandlers_.push_back
+      (download_handlers::getMetalinkPreDownloadHandler());
   }
 #endif // ENABLE_METALINK
 }
@@ -1064,13 +1058,15 @@ void RequestGroup::initializePostDownloadHandler()
 #ifdef ENABLE_BITTORRENT
   if(option_->getAsBool(PREF_FOLLOW_TORRENT) ||
      option_->get(PREF_FOLLOW_TORRENT) == V_MEM) {
-    postDownloadHandlers_.push_back(DownloadHandlerFactory::getBtPostDownloadHandler());
+    postDownloadHandlers_.push_back
+      (download_handlers::getBtPostDownloadHandler());
   }
 #endif // ENABLE_BITTORRENT
 #ifdef ENABLE_METALINK
   if(option_->getAsBool(PREF_FOLLOW_METALINK) ||
      option_->get(PREF_FOLLOW_METALINK) == V_MEM) {
-    postDownloadHandlers_.push_back(DownloadHandlerFactory::getMetalinkPostDownloadHandler());
+    postDownloadHandlers_.push_back
+      (download_handlers::getMetalinkPostDownloadHandler());
   }
 #endif // ENABLE_METALINK
 }
@@ -1094,14 +1090,12 @@ void RequestGroup::setDiskWriterFactory(
   diskWriterFactory_ = diskWriterFactory;
 }
 
-void RequestGroup::addPostDownloadHandler
-(const std::shared_ptr<PostDownloadHandler>& handler)
+void RequestGroup::addPostDownloadHandler(const PostDownloadHandler* handler)
 {
   postDownloadHandlers_.push_back(handler);
 }
 
-void RequestGroup::addPreDownloadHandler(
-    const std::shared_ptr<PreDownloadHandler>& handler)
+void RequestGroup::addPreDownloadHandler(const PreDownloadHandler* handler)
 {
   preDownloadHandlers_.push_back(handler);
 }

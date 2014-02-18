@@ -3,14 +3,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.10: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
 <title>aria2 - The ultra fast download utility</title>
 <meta name="author" content="Tatsuhiro Tsujikawa" />
 <style type="text/css">
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: html4css1.css 7514 2012-09-14 14:27:12Z milde $
+:Id: $Id: html4css1.css 7614 2013-02-21 15:55:51Z milde $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -314,6 +314,21 @@ table.docutils th.field-name, table.docinfo th.docinfo-name {
   white-space: nowrap ;
   padding-left: 0 }
 
+/* "booktabs" style (no vertical lines) */
+table.docutils.booktabs {
+  border: 0px;
+  border-top: 2px solid;
+  border-bottom: 2px solid;
+  border-collapse: collapse;
+}
+table.docutils.booktabs * {
+  border: 0px;
+}
+table.docutils.booktabs th {
+  border-bottom: thin solid;
+  text-align: left;
+}
+
 h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
 h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
   font-size: 100% }
@@ -371,8 +386,8 @@ how to use aria2.</p>
 <li>HTTP Proxy support</li>
 <li>HTTP BASIC authentication support</li>
 <li>HTTP Proxy authentication support</li>
-<li>Well-known environment variables for proxy: <tt class="docutils literal">http_proxy</tt>, <tt class="docutils literal">https_proxy</tt>,
-<tt class="docutils literal">ftp_proxy</tt>, <tt class="docutils literal">all_proxy</tt> and <tt class="docutils literal">no_proxy</tt></li>
+<li>Well-known environment variables for proxy: <tt class="docutils literal">http_proxy</tt>,
+<tt class="docutils literal">https_proxy</tt>, <tt class="docutils literal">ftp_proxy</tt>, <tt class="docutils literal">all_proxy</tt> and <tt class="docutils literal">no_proxy</tt></li>
 <li>HTTP gzip, deflate content encoding support</li>
 <li>Verify peer using given trusted CA certificate in HTTPS</li>
 <li>Client certificate authentication in HTTPS</li>
@@ -387,8 +402,8 @@ and the Mozilla/Firefox
 <li>Download/Upload speed throttling</li>
 <li>BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE,
 Multi-Tracker, UDP tracker</li>
-<li>BitTorrent <a class="reference external" href="http://getright.com/seedtorrent.html">WEB-Seeding</a>. aria2
-requests chunks more than piece size to reduce the request
+<li>BitTorrent <a class="reference external" href="http://getright.com/seedtorrent.html">WEB-Seeding</a>.
+aria2 requests chunks more than piece size to reduce the request
 overhead. It also supports pipelined requests with piece size.</li>
 <li>BitTorrent Local Peer Discovery</li>
 <li>Rename/change the directory structure of BitTorrent downloads
@@ -400,8 +415,8 @@ completely</li>
 <li>Can disable segmented downloading in Metalink</li>
 <li>Netrc support</li>
 <li>Configuration file support</li>
-<li>Download URIs found in a text file or stdin and the destination directory and
-output filename can be specified optionally</li>
+<li>Download URIs found in a text file or stdin and the destination
+directory and output filename can be specified optionally</li>
 <li>Parameterized URI support</li>
 <li>IPv6 support with Happy Eyeballs</li>
 <li>Disk cache to reduce disk activity</li>
@@ -432,17 +447,18 @@ files are stored there.</p>
 </thead>
 <tbody valign="top">
 <tr><td>HTTPS</td>
-<td>OSX or GnuTLS or OpenSSL</td>
+<td>OSX or GnuTLS or OpenSSL or Windows</td>
 </tr>
 <tr><td>BitTorrent</td>
-<td>libnettle+libgmp or libgcrypt or OpenSSL</td>
+<td>None. Optional: libnettle+libgmp or libgcrypt
+or OpenSSL (see note)</td>
 </tr>
 <tr><td>Metalink</td>
 <td>libxml2 or Expat.</td>
 </tr>
 <tr><td>Checksum</td>
 <td>None. Optional: OSX or libnettle or libgcrypt
-or OpenSSL (see note)</td>
+or OpenSSL or Windows (see note)</td>
 </tr>
 <tr><td>gzip, deflate in HTTP</td>
 <td>zlib</td>
@@ -469,11 +485,15 @@ If you prefer Expat, run configure with <tt class="docutils literal"><span class
 <div class="note">
 <p class="first admonition-title">Note</p>
 <p>On Apple OSX the OS-level SSL/TLS support will be preferred. Hence
-neither GnuTLS nor OpenSSL are required on that platform. If you'd like
-to disable this behavior, run configure with <tt class="docutils literal"><span class="pre">--without-appletls</span></tt>.</p>
-<p class="last">GnuTLS has precedence over OpenSSL if both libraries are installed.
+neither GnuTLS nor OpenSSL are required on that platform. If you'd
+like to disable this behavior, run configure with
+<tt class="docutils literal"><span class="pre">--without-appletls</span></tt>.</p>
+<p>GnuTLS has precedence over OpenSSL if both libraries are installed.
 If you prefer OpenSSL, run configure with <tt class="docutils literal"><span class="pre">--without-gnutls</span></tt>
 <tt class="docutils literal"><span class="pre">--with-openssl</span></tt>.</p>
+<p class="last">On Windows there is an experimental SSL implementation available that
+is based on the native Windows SSL capabilities (Schannel). Run
+configure with <tt class="docutils literal"><span class="pre">--with-wintls</span></tt> to use.</p>
 </div>
 <div class="note">
 <p class="first admonition-title">Note</p>
@@ -483,8 +503,11 @@ unless aria2 is configured with <tt class="docutils literal"><span class="pre">-
 installed.  If you prefer libgcrypt, run configure with
 <tt class="docutils literal"><span class="pre">--without-libnettle</span> <span class="pre">--with-libgcrypt</span></tt>. If OpenSSL is selected over
 GnuTLS, neither libnettle nor libgcrypt will be used.</p>
-<p class="last">If none of the optional dependencies are installed, an internal
+<p>If none of the optional dependencies are installed, an internal
 implementation that only supports md5 and sha1 will be used.</p>
+<p class="last">On Windows there is an experimental implementation available that is
+based on the native Windows capabilities. Run configure with
+<tt class="docutils literal"><span class="pre">--with-wintls</span></tt> to use.</p>
 </div>
 <p>A user can have one of the following configurations for SSL and crypto
 libraries:</p>
@@ -508,8 +531,8 @@ script respectively.</p>
 <p>aria2 is primarily written in C++. Initially it was written based on
 C++98/C++03 standard features. We are now migrating aria2 to C++11
 standard. The current source code requires C++11 aware compiler. For
-well-known compilers, such as g++ and clang, flag <tt class="docutils literal"><span class="pre">-std=c++11</span></tt> or
-<tt class="docutils literal"><span class="pre">-std=c++0x</span></tt> must be supported.</p>
+well-known compilers, such as g++ and clang, the <tt class="docutils literal"><span class="pre">-std=c++11</span></tt> or
+<tt class="docutils literal"><span class="pre">-std=c++0x</span></tt> flag must be supported.</p>
 <p>In order to build aria2 from the source package, you need following
 development packages(package name may vary depending on the
 distribution you use):</p>
@@ -547,7 +570,7 @@ $ autoreconf -i
 </pre>
 <p>Also you need <a class="reference external" href="http://sphinx.pocoo.org/">Sphinx</a> to build man page.</p>
 <p>If you are building aria2 for Mac OS X, take a look at
-build_osx_release.sh, which builds OSX universal binary DMG.</p>
+the make-release-os.mk GNU Make makefile.</p>
 <p>The quickest way to build aria2 is first run configure script:</p>
 <pre class="literal-block">
 $ ./configure
@@ -561,10 +584,11 @@ $ ./configure ARIA2_STATIC=yes
 <pre class="literal-block">
 $ make
 </pre>
-<p>See <a class="reference internal" href="#cross-compiling-windows-binary">Cross-compiling Windows binary</a> to create Windows binary.  See
-<a class="reference internal" href="#cross-compiling-android-binary">Cross-compiling Android binary</a> to create Android binary.</p>
-<p>The configure script checks available libraries and enables the features
-as much as possible because all the features are enabled by default.</p>
+<p>See <a class="reference internal" href="#cross-compiling-windows-binary">Cross-compiling Windows binary</a> to create a Windows binary.
+See <a class="reference internal" href="#cross-compiling-android-binary">Cross-compiling Android binary</a> to create an Android binary.</p>
+<p>The configure script checks available libraries and enables as many
+features as possible execept for experimental features not enabled by
+default.</p>
 <p>Since 1.1.0, aria2 checks the certificate of HTTPS servers by default.
 If you build with OpenSSL or the recent version of GnuTLS which has
 <tt class="docutils literal">gnutls_certificate_set_x509_system_trust()</tt> function and the
@@ -585,11 +609,15 @@ without CA bundle. In such case, you can specify the CA bundle file
 using aria2's <tt class="docutils literal"><span class="pre">--ca-certificate</span></tt> option.  If you don't have CA bundle
 file installed, then the last resort is disable the certificate
 validation using <tt class="docutils literal"><span class="pre">--check-certificate=false</span></tt>.</p>
-<p>By default, bash_completion file named <tt class="docutils literal">aria2c</tt> is installed to the
-directory <tt class="docutils literal">$prefix/share/doc/aria2/bash_completion</tt>.  To change the
-install directory of the file, use <tt class="docutils literal"><span class="pre">--with-bashcompletiondir</span></tt>
+<p>Using the native OSX (AppleTLS) and/or Windows (WinTLS) implementation
+will automatically use the system certificate store, so
+<tt class="docutils literal"><span class="pre">--with-ca-bundle</span></tt> is not necessary and will be ignored when using
+these implementations.</p>
+<p>By default, the bash_completion file named <tt class="docutils literal">aria2c</tt> is installed to
+the directory <tt class="docutils literal">$prefix/share/doc/aria2/bash_completion</tt>.  To change
+the install directory of the file, use <tt class="docutils literal"><span class="pre">--with-bashcompletiondir</span></tt>
 option.</p>
-<p>The executable is 'aria2c' in src directory.</p>
+<p>After a <tt class="docutils literal">make</tt> the executable is located at <tt class="docutils literal">src/aria2c</tt>.</p>
 <p>aria2 uses CppUnit for automated unit testing. To run the unit test:</p>
 <pre class="literal-block">
 $ make check
@@ -597,8 +625,8 @@ $ make check
 </div>
 <div class="section" id="cross-compiling-windows-binary">
 <h1>Cross-compiling Windows binary</h1>
-<p>In this section, we describe how to build Windows binary using
-mingw-w64 cross-compiler on Debian Linux.</p>
+<p>In this section, we describe how to build a Windows binary using
+a mingw-w64 cross-compiler on Debian Linux.</p>
 <p>Basically, after compiling and installing depended libraries, you can
 do cross-compile just passing appropriate <tt class="docutils literal"><span class="pre">--host</span></tt> option and
 specifying <tt class="docutils literal">CPPFLAGS</tt>, <tt class="docutils literal">LDFLAGS</tt> and <tt class="docutils literal">PKG_CONFIG_LIBDIR</tt>
@@ -633,6 +661,9 @@ added to <tt class="docutils literal">CPPFLAGS</tt>. <tt class="docutils literal
 <pre class="literal-block">
 $ HOST=x86_64-w64-mingw32 ./mingw-config
 </pre>
+<p>If you want libaria2 dll with <tt class="docutils literal"><span class="pre">--enable-libaria2</span></tt>, then don't use
+<tt class="docutils literal">ARIA2_STATIC=yes</tt> and prepare the DLL version of external
+libraries.</p>
 </div>
 <div class="section" id="cross-compiling-android-binary">
 <h1>Cross-compiling Android binary</h1>
@@ -689,8 +720,8 @@ translation</a>,
 </div>
 <div class="section" id="bittorrrent">
 <h1>BitTorrrent</h1>
-<div class="section" id="about-filename">
-<h2>About filename</h2>
+<div class="section" id="about-filenames">
+<h2>About filenames</h2>
 <p>The filename of the downloaded file is determined as follows:</p>
 <dl class="docutils">
 <dt>single-file mode</dt>
@@ -745,8 +776,8 @@ selective download completes.</li>
 <div class="section" id="metalink">
 <h1>Metalink</h1>
 <p>The current implementation supports HTTP(S)/FTP/BitTorrent.  The other
-P2P protocols are ignored. Both Metalink4 and Metalink version 3.0
-documents are supported.</p>
+P2P protocols are ignored. Both Metalink4 (RFC 5854) and Metalink
+version 3.0 documents are supported.</p>
 <p>For checksum verification, md5, sha-1, sha-224, sha-256, sha-384 and
 sha-512 are supported. If multiple hash algorithms are provided, aria2
 uses stronger one. If whole file checksum verification fails, aria2

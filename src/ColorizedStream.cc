@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2013 Nils Maier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,70 +32,73 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_DOWNLOAD_HANDLER_FACTORY_H
-#define D_DOWNLOAD_HANDLER_FACTORY_H
 
-#include "common.h"
+#include "ColorizedStream.h"
 
-#include <memory>
-
-#include "MemoryBufferPreDownloadHandler.h"
-#ifdef ENABLE_BITTORRENT
-#  include "MemoryBencodePreDownloadHandler.h"
-#endif // ENABLE_BITTORRENT
 
 namespace aria2 {
+namespace colors {
 
-#ifdef ENABLE_METALINK
-class MetalinkPostDownloadHandler;
-#endif // ENABLE_METALINK
-#ifdef ENABLE_BITTORRENT
-class BtPostDownloadHandler;
-class UTMetadataPostDownloadHandler;
-#endif // ENABLE_BITTORRENT
+const Color black("30");
+const Color red("31");
+const Color green("32");
+const Color yellow("33");
+const Color blue("34");
+const Color magenta("35");
+const Color cyan("36");
+const Color white("37");
 
-class DownloadHandlerFactory
+const Color lightred("1;31");
+const Color lightgreen("1;32");
+const Color lightyellow("1;33");
+const Color lightblue("1;34");
+const Color lightmagenta("1;35");
+const Color lightcyan("1;36");
+const Color lightwhite("1;37");
+
+const Color clear("0");
+
+} // namespace colors
+
+std::string ColorizedStreamBuf::str(bool color) const
 {
-private:
-#ifdef ENABLE_METALINK
-  static std::shared_ptr<PreDownloadHandler>
-  metalinkPreDownloadHandler_;
+  std::stringstream rv;
+  for (const auto& e: elems) {
+    if (color || e.first != eColor) {
+      rv << e.second;
+    }
+  }
+  if (color) {
+    rv << colors::clear.str();
+  }
+  return rv.str();
+}
 
-  static std::shared_ptr<PostDownloadHandler>
-  metalinkPostDownloadHandler_;
-#endif // ENABLE_METALINK
-
-#ifdef ENABLE_BITTORRENT
-  static std::shared_ptr<PreDownloadHandler>
-  btPreDownloadHandler_;
-
-  static std::shared_ptr<PostDownloadHandler>
-  btPostDownloadHandler_;
-
-  static std::shared_ptr<PostDownloadHandler>
-  btMetadataPostDownloadHandler_;
-#endif // ENABLE_BITTORRENT
-public:
-#ifdef ENABLE_METALINK
-  static std::shared_ptr<PreDownloadHandler>
-  getMetalinkPreDownloadHandler();
-
-  static std::shared_ptr<PostDownloadHandler>
-  getMetalinkPostDownloadHandler();
-#endif // ENABLE_METALINK
-
-#ifdef ENABLE_BITTORRENT
-  static std::shared_ptr<PreDownloadHandler>
-  getBtPreDownloadHandler();
-
-  static std::shared_ptr<PostDownloadHandler>
-  getBtPostDownloadHandler();
-
-  static std::shared_ptr<PostDownloadHandler>
-  getUTMetadataPostDownloadHandler();
-#endif // ENABLE_BITTORRENT
-};
+std::string ColorizedStreamBuf::str(bool color, size_t max) const
+{
+  std::stringstream rv;
+  for (const auto& e: elems) {
+    if (e.first == eColor) {
+      if (color) {
+        rv << e.second;
+      }
+      continue;
+    }
+    auto size = e.second.size();
+    if (size > max) {
+      rv.write(e.second.c_str(), max);
+      break;
+    }
+    rv << e.second;
+    max -= size;
+    if (!max) {
+      break;
+    }
+  }
+  if (color) {
+    rv << colors::clear.str();
+  }
+  return rv.str();
+}
 
 } // namespace aria2
-
-#endif // D_DOWNLOAD_HANDLER_FACTORY_H

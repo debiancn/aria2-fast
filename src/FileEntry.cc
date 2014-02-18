@@ -66,27 +66,24 @@ bool FileEntry::RequestFaster::operator()
   return lspd > rspd || (lspd == rspd && lhs.get() < rhs.get());
 }
 
-FileEntry::FileEntry
-(const std::string& path,
- int64_t length,
- int64_t offset,
- const std::vector<std::string>& uris)
-  : path_(path),
-    uris_(uris.begin(), uris.end()),
-    length_(length),
+FileEntry::FileEntry(const std::string& path, int64_t length, int64_t offset,
+                     const std::vector<std::string>& uris)
+  : length_(length),
     offset_(offset),
-    requested_(true),
-    uniqueProtocol_(false),
+    uris_(uris.begin(), uris.end()),
+    path_(path),
+    lastFasterReplace_(0),
     maxConnectionPerServer_(1),
-    lastFasterReplace_(0)
+    requested_(true),
+    uniqueProtocol_(false)
 {}
 
 FileEntry::FileEntry()
  : length_(0),
    offset_(0),
+   maxConnectionPerServer_(1),
    requested_(false),
-   uniqueProtocol_(false),
-   maxConnectionPerServer_(1)
+   uniqueProtocol_(false)
 {}
 
 FileEntry::~FileEntry() {}
@@ -549,14 +546,14 @@ bool FileEntry::insertUri(const std::string& uri, size_t pos)
   return true;
 }
 
-void FileEntry::setPath(const std::string& path)
+void FileEntry::setPath(std::string path)
 {
-  path_ = path;
+  path_ = std::move(path);
 }
 
-void FileEntry::setContentType(const std::string& contentType)
+void FileEntry::setContentType(std::string contentType)
 {
-  contentType_ = contentType;
+  contentType_ = std::move(contentType);
 }
 
 size_t FileEntry::countInFlightRequest() const
@@ -569,9 +566,9 @@ size_t FileEntry::countPooledRequest() const
   return requestPool_.size();
 }
 
-void FileEntry::setOriginalName(const std::string& originalName)
+void FileEntry::setOriginalName(std::string originalName)
 {
-  originalName_ = originalName;
+  originalName_ = std::move(originalName);
 }
 
 bool FileEntry::emptyRequestUri() const
