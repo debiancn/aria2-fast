@@ -1,3 +1,11 @@
+aria2 (1.18.3-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Updated Standards-Version to 3.9.5
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 18 Feb 2014 11:12:09 +0530
+
 aria2 (1.18.1-1) unstable; urgency=medium
 
   * New upstream release.
