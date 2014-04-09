@@ -770,19 +770,23 @@
     "                              option is useful when the system does not have\n" \
     "                              /etc/resolv.conf and user does not have the\n" \
     "                              permission to create it.")
-#define TEXT_ENABLE_RPC                                             \
-  _(" --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"   \
-    "                              It is strongly recommended to set username and\n" \
-    "                              password using --rpc-user and --rpc-passwd\n" \
-    "                              option. See also --rpc-listen-port option.")
+#define TEXT_ENABLE_RPC                                               \
+  _(" --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n" \
+    "                              It is strongly recommended to set secret\n" \
+    "                              authorization token using --rpc-secret option.\n" \
+    "                              See also --rpc-listen-port option.")
 #define TEXT_RPC_MAX_REQUEST_SIZE                                   \
   _(" --rpc-max-request-size=SIZE  Set max size of JSON-RPC/XML-RPC request. If aria2\n" \
     "                              detects the request is more than SIZE bytes, it\n" \
     "                              drops connection.")
 #define TEXT_RPC_USER                               \
-  _(" --rpc-user=USER              Set JSON-RPC/XML-RPC user.")
+  _(" --rpc-user=USER              Set JSON-RPC/XML-RPC user. This option will be\n" \
+    "                              deprecated in the future release. Migrate to\n" \
+    "                              --rpc-secret option as soon as possible.")
 #define TEXT_RPC_PASSWD                                     \
-  _(" --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password.")
+  _(" --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password. This option will\n" \
+    "                              be deprecated in the future release. Migrate to\n" \
+    "                              --rpc-secret option as soon as possible.")
 #define TEXT_RPC_LISTEN_ALL                                         \
   _(" --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on all\n" \
     "                              network interfaces. If false is given, listen only\n" \
@@ -958,3 +962,18 @@
     "                              specified by --save-session option every SEC\n" \
     "                              seconds. If 0 is given, file will be saved only\n" \
     "                              when aria2 exits.")
+#define TEXT_ENABLE_COLOR                                               \
+  _(" --enable-color[=true|false]  Enable color output for a terminal.")
+#define TEXT_RPC_SECRET                                                 \
+  _(" --rpc-secret=TOKEN           Set RPC secret authorization token.")
+#define TEXT_DSCP                                                       \
+  _(" --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n" \
+    "                              BitTorrent traffic for QoS. This parameter sets\n" \
+    "                              only DSCP bits in TOS field of IP packets,\n" \
+    "                              not the whole field. If you take values\n" \
+    "                              from /usr/include/netinet/ip.h divide them by 4\n" \
+    "                              (otherwise values would be incorrect, e.g. your\n" \
+    "                              CS1 class would turn into CS4). If you take\n" \
+    "                              commonly used values from RFC, network vendors'\n" \
+    "                              documentation, Wikipedia or any other source,\n" \
+    "                              use them as they are.")

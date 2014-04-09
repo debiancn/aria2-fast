@@ -1,79 +1,27 @@
-commit 2571bf4a364834b01fb915d02528c322ff0b2622
+commit e5db3a4cbb8dbe0f535d4bcd01eb446d16362188
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
+AuthorDate: 2014-03-30
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
-
-    Update copyright year to 2014
-
-commit ab39ea4546d3247b5e02de91868cc3bd99f40d10
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
+CommitDate: 2014-03-30
 
     Update NEWS
 
-commit dcf98d519f2a1d4a1ab221e581570ffcb56b16c5
+commit 305ef84e5de5acd0281ae9636ad1239886e60b8f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
+AuthorDate: 2014-03-30
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
+CommitDate: 2014-03-30
 
-    Fix crash if unpause failed before assigning BtProgressInfoFile object
+    Bump up version number to 1.18.5
 
-commit b706722c592f9be1e69782a637bce1cd6ca364c3
+commit f0473dc34dfb4d36b92aee49a6373704582338b5
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
+AuthorDate: 2014-03-30
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
+CommitDate: 2014-03-30
 
-    Fix unitest crash
-
-commit b98a5d62b4ad6a2177db198354489509a235cfc9
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
-
-    Bump up version number to 1.18.3
-
-commit a052dd9ad08e28122ec881abdd4d8056ddad1175
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-01-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-01-05
-
-    Update NEWS
-
-commit 35ed2505fad543f253d37f783f01746a7e4fe068
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2014-01-02
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2014-01-02
-
-    makerelease-osx: Do not hardcode -Os into CXXFLAGS
-
-commit 1ca0712455651ff8cb37df735a67e591b7c4546d
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2013-12-31
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2014-01-02
-
-    Enable and check PIE in makerelease-osx
+    Ignore error when setting DSCP value
     
-    Position-independent Executables enable Address Space Layout
-    Randomization (ASLR) style security features, which makes it harder to
-    exploit certain security vulnerablities.
-    
-    Closes GH-174
-
-commit 8216bdba796802aea5c4c18ed1df934892eb1e7d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2013-12-31
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2013-12-31
-
-    Fix bug that numOpenFile_ is not reduced when MultiDiskAdaptor is deleted
-    
-    This bug caused assertion error in RequestGroupMan::ensureMaxOpenFileLimit
+    Setting DSCP is additional feature and failure to enable it should not
+    abort download entirely.  This change fixes the bug that windows build
+    does not perform bittorrent downloads.

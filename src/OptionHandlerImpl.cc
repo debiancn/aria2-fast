@@ -287,7 +287,8 @@ DefaultOptionHandler::DefaultOptionHandler
  char shortName)
   : AbstractOptionHandler(pref, description, defaultValue, argType,
                           shortName),
-    possibleValuesString_(possibleValuesString)
+    possibleValuesString_(possibleValuesString),
+    allowEmpty_(true)
 {}
 
 DefaultOptionHandler::~DefaultOptionHandler() {}
@@ -295,12 +296,20 @@ DefaultOptionHandler::~DefaultOptionHandler() {}
 void DefaultOptionHandler::parseArg(Option& option, const std::string& optarg)
   const
 {
+  if(!allowEmpty_ && optarg.empty()) {
+    throw DL_ABORT_EX("Empty string is not allowed");
+  }
   option.put(pref_, optarg);
 }
 
 std::string DefaultOptionHandler::createPossibleValuesString() const
 {
   return possibleValuesString_;
+}
+
+void DefaultOptionHandler::setAllowEmpty(bool allow)
+{
+  allowEmpty_ = allow;
 }
 
 CumulativeOptionHandler::CumulativeOptionHandler
@@ -578,8 +587,13 @@ std::string PrioritizePieceOptionHandler::createPossibleValuesString() const
 
 DeprecatedOptionHandler::DeprecatedOptionHandler
 (OptionHandler* depOptHandler,
- const OptionHandler* repOptHandler)
-  : depOptHandler_(depOptHandler), repOptHandler_(repOptHandler)
+ const OptionHandler* repOptHandler,
+ bool stillWork,
+ std::string additionalMessage)
+  : depOptHandler_(depOptHandler),
+    repOptHandler_(repOptHandler),
+    stillWork_(stillWork),
+    additionalMessage_(std::move(additionalMessage))
 {
   depOptHandler_->addTag(TAG_DEPRECATED);
 }
@@ -594,13 +608,21 @@ void DeprecatedOptionHandler::parse(Option& option, const std::string& arg)
   const
 {
   if(repOptHandler_) {
-    A2_LOG_WARN(fmt(_("--%s option is deprecated. Use --%s option instead."),
+    A2_LOG_WARN(fmt(_("--%s option is deprecated. Use --%s option instead. %s"),
                     depOptHandler_->getName(),
-                    repOptHandler_->getName()));
+                    repOptHandler_->getName(),
+                    additionalMessage_.c_str()));
     repOptHandler_->parse(option, arg);
+  } else if(stillWork_) {
+    A2_LOG_WARN(fmt(_("--%s option will be deprecated in the future release. "
+                      "%s"),
+                    depOptHandler_->getName(),
+                    additionalMessage_.c_str()));
+    depOptHandler_->parse(option, arg);
   } else {
-    A2_LOG_WARN(fmt(_("--%s option is deprecated."),
-                    depOptHandler_->getName()));
+    A2_LOG_WARN(fmt(_("--%s option is deprecated. %s"),
+                    depOptHandler_->getName(),
+                    additionalMessage_.c_str()));
   }
 }
 

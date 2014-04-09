@@ -168,6 +168,7 @@ Context::Context(bool standalone,
   LogFactory::setLogFile(op->get(PREF_LOG));
   LogFactory::setLogLevel(op->get(PREF_LOG_LEVEL));
   LogFactory::setConsoleLogLevel(op->get(PREF_CONSOLE_LOG_LEVEL));
+  LogFactory::setColorOutput(op->getAsBool(PREF_ENABLE_COLOR));
   if(op->getAsBool(PREF_QUIET)) {
     LogFactory::setConsoleOutput(false);
   }
@@ -184,6 +185,7 @@ Context::Context(bool standalone,
     // when none of network interface has IPv4 address.
     setDefaultAIFlags(0);
   }
+  SocketCore::setIpDscp(op->getAsInt(PREF_DSCP));
   net::checkAddrconfig();
   // Bind interface
   if(!op->get(PREF_INTERFACE).empty()) {

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2014-01-05 20:57+0900\n"
+"POT-Creation-Date: 2014-03-30 18:49+0900\n"
 "PO-Revision-Date: 2010-09-26 14:06+0000\n"
 "Last-Translator: Ridowan <Unknown>\n"
 "Language-Team: Bengali <bn@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-01-05 10:04+0000\n"
-"X-Generator: Launchpad (build 16877)\n"
+"X-Launchpad-Export-Date: 2014-03-30 09:43+0000\n"
+"X-Generator: Launchpad (build 16967)\n"
 
 #: src/DownloadEngine.cc:241
 msgid ""
@@ -27,57 +27,57 @@ msgstr "বন্ধ করার কার্যক্রম চলছে। �
 msgid "Emergency shutdown sequence commencing..."
 msgstr "জরুরি বন্ধ করার কার্যক্রম চলছে।"
 
-#: src/MultiUrlRequestInfo.cc:170
+#: src/MultiUrlRequestInfo.cc:171
 msgid "aria2 will resume download if the transfer is restarted."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:171
+#: src/MultiUrlRequestInfo.cc:172
 msgid ""
 "If there are any errors, then see the log file. See '-l' option in help/man "
 "page for details."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:334
+#: src/MultiUrlRequestInfo.cc:335
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:337
+#: src/MultiUrlRequestInfo.cc:338
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:333
+#: src/RequestGroupMan.cc:334
 #, c-format
 msgid "Download GID#%s paused"
 msgstr ""
 
-#: src/RequestGroupMan.cc:381
+#: src/RequestGroupMan.cc:382
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr ""
 
-#: src/RequestGroupMan.cc:623
+#: src/RequestGroupMan.cc:624
 msgid "Download Results:"
 msgstr "ডাউনলোডের ফলাফল :"
 
-#: src/RequestGroupMan.cc:670
+#: src/RequestGroupMan.cc:671
 msgid "Status Legend:"
 msgstr ""
 
-#: src/RequestGroupMan.cc:672
+#: src/RequestGroupMan.cc:673
 msgid "(OK):download completed."
 msgstr ""
 
-#: src/RequestGroupMan.cc:675
+#: src/RequestGroupMan.cc:676
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:678
+#: src/RequestGroupMan.cc:679
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:681
+#: src/RequestGroupMan.cc:682
 msgid "(RM):download removed."
 msgstr ""
 
@@ -1475,10 +1475,10 @@ msgstr ""
 #: src/usage_text.h:774
 msgid ""
 " --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"
-"                              It is strongly recommended to set username "
-"and\n"
-"                              password using --rpc-user and --rpc-passwd\n"
-"                              option. See also --rpc-listen-port option."
+"                              It is strongly recommended to set secret\n"
+"                              authorization token using --rpc-secret "
+"option.\n"
+"                              See also --rpc-listen-port option."
 msgstr ""
 
 #: src/usage_text.h:779
@@ -1491,14 +1491,23 @@ msgid ""
 msgstr ""
 
 #: src/usage_text.h:783
-msgid " --rpc-user=USER              Set JSON-RPC/XML-RPC user."
-msgstr ""
-
-#: src/usage_text.h:785
-msgid " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password."
+msgid ""
+" --rpc-user=USER              Set JSON-RPC/XML-RPC user. This option will "
+"be\n"
+"                              deprecated in the future release. Migrate to\n"
+"                              --rpc-secret option as soon as possible."
 msgstr ""
 
 #: src/usage_text.h:787
+msgid ""
+" --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password. This option "
+"will\n"
+"                              be deprecated in the future release. Migrate "
+"to\n"
+"                              --rpc-secret option as soon as possible."
+msgstr ""
+
+#: src/usage_text.h:791
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -1507,18 +1516,18 @@ msgid ""
 "                              on local loopback interface."
 msgstr ""
 
-#: src/usage_text.h:791
+#: src/usage_text.h:795
 msgid ""
 " --rpc-listen-port=PORT       Specify a port number for JSON-RPC/XML-RPC "
 "server\n"
 "                              to listen to."
 msgstr ""
 
-#: src/usage_text.h:794
+#: src/usage_text.h:798
 msgid " --show-console-readout[=true|false] Show console readout."
 msgstr ""
 
-#: src/usage_text.h:796
+#: src/usage_text.h:800
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -1528,7 +1537,7 @@ msgid ""
 "                              to a directory, URI must end with '/'."
 msgstr ""
 
-#: src/usage_text.h:801
+#: src/usage_text.h:805
 msgid ""
 " --stream-piece-selector=SELECTOR Specify piece selection algorithm\n"
 "                              used in HTTP/FTP download. Piece means fixed\n"
@@ -1566,25 +1575,25 @@ msgid ""
 "                              useful to view movie while downloading it."
 msgstr ""
 
-#: src/usage_text.h:828
+#: src/usage_text.h:832
 msgid ""
 " --truncate-console-readout[=true|false] Truncate console readout to fit in\n"
 "                              a single line."
 msgstr ""
 
-#: src/usage_text.h:831
+#: src/usage_text.h:835
 msgid ""
 " --pause[=true|false]         Pause download after added. This option is\n"
 "                              effective only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/usage_text.h:834
+#: src/usage_text.h:838
 msgid ""
 " --rpc-allow-origin-all[=true|false] Add Access-Control-Allow-Origin header\n"
 "                              field with value '*' to the RPC response."
 msgstr ""
 
-#: src/usage_text.h:837
+#: src/usage_text.h:841
 msgid ""
 " --download-result=OPT        This option changes the way \"Download Results"
 "\"\n"
@@ -1604,7 +1613,7 @@ msgid ""
 "                              each row."
 msgstr ""
 
-#: src/usage_text.h:849
+#: src/usage_text.h:853
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
@@ -1612,7 +1621,7 @@ msgid ""
 "                              or not download is complete."
 msgstr ""
 
-#: src/usage_text.h:853
+#: src/usage_text.h:857
 msgid ""
 " --checksum=TYPE=DIGEST       Set checksum. TYPE is hash type. The "
 "supported\n"
@@ -1625,7 +1634,7 @@ msgid ""
 "                              downloads."
 msgstr ""
 
-#: src/usage_text.h:862
+#: src/usage_text.h:866
 msgid ""
 " --piece-length=LENGTH        Set a piece length for HTTP/FTP downloads. "
 "This\n"
@@ -1637,7 +1646,7 @@ msgid ""
 "                              contains piece hashes."
 msgstr ""
 
-#: src/usage_text.h:869
+#: src/usage_text.h:873
 msgid ""
 " --stop-with-process=PID      Stop application when process PID is not "
 "running.\n"
@@ -1652,7 +1661,7 @@ msgid ""
 "                              itself."
 msgstr ""
 
-#: src/usage_text.h:876
+#: src/usage_text.h:880
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -1666,7 +1675,7 @@ msgid ""
 "                              options at startup."
 msgstr ""
 
-#: src/usage_text.h:884
+#: src/usage_text.h:888
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -1677,11 +1686,11 @@ msgid ""
 "                              your disk."
 msgstr ""
 
-#: src/usage_text.h:892
+#: src/usage_text.h:896
 msgid " --enable-mmap[=true|false]   Map files into memory."
 msgstr ""
 
-#: src/usage_text.h:894
+#: src/usage_text.h:898
 msgid ""
 " --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
 "                              The certificate must be in PEM format.\n"
@@ -1691,7 +1700,7 @@ msgid ""
 "                              encryption."
 msgstr ""
 
-#: src/usage_text.h:900
+#: src/usage_text.h:904
 msgid ""
 " --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
 "                              The private key must be decrypted and in PEM\n"
@@ -1699,7 +1708,7 @@ msgid ""
 "                              encryption. See also --rpc-certificate option."
 msgstr ""
 
-#: src/usage_text.h:905
+#: src/usage_text.h:909
 msgid ""
 " --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
 "                              The RPC clients must use https scheme to "
@@ -1710,7 +1719,7 @@ msgid ""
 "                              server certificate and private key."
 msgstr ""
 
-#: src/usage_text.h:912
+#: src/usage_text.h:916
 msgid ""
 " --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
 "                              metalink metadata in the directory specified\n"
@@ -1724,7 +1733,7 @@ msgid ""
 "                              --save-session option."
 msgstr ""
 
-#: src/usage_text.h:923
+#: src/usage_text.h:927
 msgid ""
 " --force-save[=true|false]    Save download with --save-session option even\n"
 "                              if the download is completed or removed. This\n"
@@ -1734,7 +1743,7 @@ msgid ""
 "                              completed state."
 msgstr ""
 
-#: src/usage_text.h:930
+#: src/usage_text.h:934
 msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
@@ -1755,7 +1764,7 @@ msgid ""
 "                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
 msgstr ""
 
-#: src/usage_text.h:943
+#: src/usage_text.h:947
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -1774,17 +1783,43 @@ msgid ""
 "                              by aria2."
 msgstr ""
 
-#: src/usage_text.h:955
+#: src/usage_text.h:959
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr ""
 
-#: src/usage_text.h:957
+#: src/usage_text.h:961
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
 "                              seconds. If 0 is given, file will be saved "
 "only\n"
 "                              when aria2 exits."
+msgstr ""
+
+#: src/usage_text.h:966
+msgid " --enable-color[=true|false]  Enable color output for a terminal."
+msgstr ""
+
+#: src/usage_text.h:968
+msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
+msgstr ""
+
+#: src/usage_text.h:970
+msgid ""
+" --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
+"                              BitTorrent traffic for QoS. This parameter "
+"sets\n"
+"                              only DSCP bits in TOS field of IP packets,\n"
+"                              not the whole field. If you take values\n"
+"                              from /usr/include/netinet/ip.h divide them by "
+"4\n"
+"                              (otherwise values would be incorrect, e.g. "
+"your\n"
+"                              CS1 class would turn into CS4). If you take\n"
+"                              commonly used values from RFC, network "
+"vendors'\n"
+"                              documentation, Wikipedia or any other source,\n"
+"                              use them as they are."
 msgstr ""
 
 #: src/version_usage.cc:56

@@ -305,6 +305,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
 #endif // ENABLE_ASYNC_DNS
+  {
+    OptionHandler* op(new BooleanOptionHandler
+                      (PREF_ENABLE_COLOR,
+                       TEXT_ENABLE_COLOR,
+                       A2_V_TRUE,
+                       OptionHandler::OPT_ARG));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
 #if defined(HAVE_MMAP) || defined(__MINGW32__)
   {
     OptionHandler* op(new BooleanOptionHandler
@@ -731,6 +740,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new NumberOptionHandler
+                      (PREF_DSCP,
+                       TEXT_DSCP,
+                       "0",
+                       0));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_SELECT_LEAST_USED_HOST,
                        NO_DESCRIPTION,
@@ -857,6 +875,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    DefaultOptionHandler* op(new DefaultOptionHandler
+                             (PREF_RPC_SECRET,
+                              TEXT_RPC_SECRET));
+    op->addTag(TAG_RPC);
+    op->setEraseAfterParse(true);
+    op->setAllowEmpty(false);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_RPC_SECURE,
                        TEXT_RPC_SECURE,
@@ -866,17 +893,22 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new DefaultOptionHandler
-                      (PREF_RPC_USER,
-                       TEXT_RPC_USER));
+    OptionHandler* op(new DeprecatedOptionHandler
+                      (new DefaultOptionHandler
+                       (PREF_RPC_USER,
+                        TEXT_RPC_USER),
+                       nullptr, true,
+                       "Migrate to --rpc-secret option as soon as possible."));
     op->addTag(TAG_RPC);
     op->setEraseAfterParse(true);
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new DefaultOptionHandler
-                      (PREF_RPC_PASSWD,
-                       TEXT_RPC_PASSWD));
+    OptionHandler* op(new DeprecatedOptionHandler
+                      (new DefaultOptionHandler
+                       (PREF_RPC_PASSWD,
+                        TEXT_RPC_PASSWD),
+                       nullptr, true));
     op->addTag(TAG_RPC);
     op->setEraseAfterParse(true);
     handlers.push_back(op);

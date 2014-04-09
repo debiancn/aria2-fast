@@ -926,9 +926,9 @@ RPC Options
 
 .. option:: --enable-rpc[=true|false]
 
-  Enable JSON-RPC/XML-RPC server.  It is strongly recommended to set username
-  and password using :option:`--rpc-user` and :option:`--rpc-passwd`
-  option. See also :option:`--rpc-listen-port` option.  Default: ``false``
+  Enable JSON-RPC/XML-RPC server.  It is strongly recommended to set
+  secret authorization token using :option:`--rpc-secret` option.  See
+  also :option:`--rpc-listen-port` option.  Default: ``false``
 
 .. option:: --pause[=true|false]
 
@@ -988,6 +988,12 @@ RPC Options
 
   Set JSON-RPC/XML-RPC password.
 
+  .. Warning::
+
+    :option:`--rpc-passwd` option will be deprecated in the future
+    release. Migrate to :option:`--rpc-secret` option as soon as
+    possible.
+
 .. option:: --rpc-private-key=<FILE>
 
   Use the private key in FILE for RPC server.  The private key must be
@@ -1004,6 +1010,11 @@ RPC Options
   :func:`aria2.addTorrent` or :func:`aria2.addMetalink` will not be
   saved by :option:`--save-session` option. Default: ``false``
 
+.. option:: --rpc-secret=<TOKEN>
+
+   Set RPC secret authorization token. Read :ref:`rpc_auth` to know
+   how this option value is used.
+
 .. option:: --rpc-secure[=true|false]
 
   RPC transport will be encrypted by SSL/TLS.  The RPC clients must
@@ -1015,6 +1026,12 @@ RPC Options
 .. option:: --rpc-user=<USER>
 
   Set JSON-RPC/XML-RPC user.
+
+  .. Warning::
+
+    :option:`--rpc-user` option will be deprecated in the future
+    release. Migrate to :option:`--rpc-secret` option as soon as
+    possible.
 
 Advanced Options
 ~~~~~~~~~~~~~~~~
@@ -1137,6 +1154,21 @@ Advanced Options
   progress and path/URI. The percentage of progress and path/URI are
   printed for each requested file in each row.
   Default: ``default``
+
+.. option:: --dscp=<DSCP>
+
+  Set DSCP value in outgoing IP packets of BitTorrent traffic for
+  QoS. This parameter sets only DSCP bits in TOS field of IP packets,
+  not the whole field. If you take values from
+  */usr/include/netinet/ip.h* divide them by 4 (otherwise values would
+  be incorrect, e.g. your ``CS1`` class would turn into ``CS4``). If
+  you take commonly used values from RFC, network vendors'
+  documentation, Wikipedia or any other source, use them as they are.
+
+.. option:: --enable-color[=true|false]
+
+  Enable color output for a terminal.
+  Default: ``true``
 
 .. option:: --enable-mmap[=true|false]
 
@@ -2016,13 +2048,40 @@ GID
   <--gid>` option. When querying download by GID, you can specify the
   prefix of GID as long as it is a unique prefix among others.
 
+.. _rpc_auth:
+
+RPC authorization secret token
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+As of 1.18.4, in addition to HTTP basic authorization, aria2 provides
+RPC method-level authorization. In the future release, HTTP basic
+authorization will be removed and RPC method-level authorization will
+become mandatory.
+
+To use RPC method-level authorization, user has to specify RPC secret
+authorization token using :option:`--rpc-secret` option. For each RPC
+method call, the caller has to include the token prefixed with
+``token:``. If :option:`--rpc-secret` option is not used and first
+parameter in the RPC method is a String and starts with ``token:``, it
+is removed from the parameter before being processed.
+
+For example, if RPC secret authorization token is ``$$secret$$``, to
+call `aria2.addUri` RPC method would look like this::
+
+  aria2.addUri("token::$$secret$$", ["http://example.org/file"])
+
+The `system.multicall` RPC method is treated specially. Since XML-RPC
+specification only allows one array as a paremter for this method, we
+don't specify token in its call. Instead, each nested method call has
+to provide token as 1st parameter as described above.
+
 Methods
 ~~~~~~~
 
 All code examples come from Python2.7 interpreter.
+For *secret* parameter, see :ref:`rpc_auth`.
 
-
-.. function:: aria2.addUri(uris[, options[, position]])
+.. function:: aria2.addUri([secret], uris[, options[, position]])
 
   This method adds new HTTP(S)/FTP/BitTorrent Magnet URI.  *uris* is of
   type array and its element is URI which is of type string.  For
@@ -2070,7 +2129,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.addUri(['http://example.org/file'], {}, 0)
     'ca3d829cee549a4d'
 
-.. function:: aria2.addTorrent(torrent[, uris[, options[, position]]])
+.. function:: aria2.addTorrent([secret], torrent[, uris[, options[, position]]])
 
   This method adds BitTorrent download by uploading ".torrent" file.
   If you want to add BitTorrent Magnet URI, use :func:`aria2.addUri`
@@ -2120,7 +2179,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.addTorrent(xmlrpclib.Binary(open('file.torrent').read()))
     '2089b05ecca3d829'
 
-.. function:: aria2.addMetalink(metalink[, options[, position]])
+.. function:: aria2.addMetalink([secret], metalink[, options[, position]])
 
   This method adds Metalink download by uploading ".metalink" file.
   *metalink* is of type base64 which contains Base64-encoded
@@ -2165,7 +2224,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.addMetalink(xmlrpclib.Binary(open('file.meta4').read()))
     ['2089b05ecca3d829']
 
-.. function:: aria2.remove(gid)
+.. function:: aria2.remove([secret], gid)
 
   This method removes the download denoted by *gid*. *gid* is of type
   string. If specified download is in progress, it is stopped at
@@ -2195,14 +2254,14 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.remove('2089b05ecca3d829')
     '2089b05ecca3d829'
 
-.. function:: aria2.forceRemove(gid)
+.. function:: aria2.forceRemove([secret], gid)
 
   This method removes the download denoted by *gid*.  This method
   behaves just like :func:`aria2.remove` except that this method removes
   download without any action which takes time such as contacting
   BitTorrent tracker.
 
-.. function:: aria2.pause(gid)
+.. function:: aria2.pause([secret], gid)
 
   This method pauses the download denoted by *gid*. *gid* is of type
   string. The status of paused download becomes ``paused``.  If the
@@ -2211,36 +2270,36 @@ All code examples come from Python2.7 interpreter.
   started.  To change status to ``waiting``, use :func:`aria2.unpause` method.
   This method returns GID of paused download.
 
-.. function:: aria2.pauseAll()
+.. function:: aria2.pauseAll([secret])
 
   This method is equal to calling :func:`aria2.pause` for every active/waiting
   download. This methods returns ``OK`` for success.
 
-.. function:: aria2.forcePause(pid)
+.. function:: aria2.forcePause([secret], pid)
 
   This method pauses the download denoted by *gid*.  This method
   behaves just like :func:`aria2.pause` except that this method pauses
   download without any action which takes time such as contacting
   BitTorrent tracker.
 
-.. function:: aria2.forcePauseAll()
+.. function:: aria2.forcePauseAll([secret])
 
   This method is equal to calling :func:`aria2.forcePause` for every
   active/waiting download. This methods returns ``OK`` for success.
 
-.. function:: aria2.unpause(gid)
+.. function:: aria2.unpause([secret], gid)
 
   This method changes the status of the download denoted by *gid* from
   ``paused`` to ``waiting``. This makes the download eligible to restart.
   *gid* is of type string.  This method returns GID of unpaused
   download.
 
-.. function:: aria2.unpauseAll()
+.. function:: aria2.unpauseAll([secret])
 
   This method is equal to calling :func:`aria2.unpause` for every active/waiting
   download. This methods returns ``OK`` for success.
 
-.. function:: aria2.tellStatus(gid[, keys])
+.. function:: aria2.tellStatus([secret], gid[, keys])
 
   This method returns download progress of the download denoted by
   *gid*. *gid* is of type string. *keys* is array of string. If it is
@@ -2438,7 +2497,7 @@ All code examples come from Python2.7 interpreter.
     >>> pprint(r)
     {'completedLength': '34896138', 'gid': '2089b05ecca3d829', 'totalLength': '34896138'}
 
-.. function:: aria2.getUris(gid)
+.. function:: aria2.getUris([secret], gid)
 
   This method returns URIs used in the download denoted by *gid*.  *gid*
   is of type string. The response is of type array and its element is of
@@ -2476,7 +2535,7 @@ All code examples come from Python2.7 interpreter.
     >>> pprint(r)
     [{'status': 'used', 'uri': 'http://example.org/file'}]
 
-.. function:: aria2.getFiles(gid)
+.. function:: aria2.getFiles([secret], gid)
 
   This method returns file list of the download denoted by *gid*. *gid*
   is of type string. The response is of type array and its element is of
@@ -2548,7 +2607,7 @@ All code examples come from Python2.7 interpreter.
       'uris': [{'status': 'used',
                 'uri': 'http://example.org/file'}]}]
 
-.. function:: aria2.getPeers(gid)
+.. function:: aria2.getPeers([secret], gid)
 
   This method returns peer list of the download denoted by *gid*. *gid*
   is of type string. This method is for BitTorrent only.  The response
@@ -2643,7 +2702,7 @@ All code examples come from Python2.7 interpreter.
       'seeder': 'false,
       'uploadSpeed': '6890'}]
 
-.. function:: aria2.getServers(gid)
+.. function:: aria2.getServers([secret], gid)
 
   This method returns currently connected HTTP(S)/FTP servers of the download denoted by *gid*. *gid* is of type string. The response
   is of type array and its element is of type struct and it contains
@@ -2696,14 +2755,14 @@ All code examples come from Python2.7 interpreter.
                    'downloadSpeed': '20285',
                    'uri': 'http://example.org/file'}]}]
 
-.. function:: aria2.tellActive([keys])
+.. function:: aria2.tellActive([secret], [keys])
 
   This method returns the list of active downloads.  The response is of
   type array and its element is the same struct returned by
   :func:`aria2.tellStatus` method. For *keys* parameter, please refer to
   :func:`aria2.tellStatus` method.
 
-.. function:: aria2.tellWaiting(offset, num, [keys])
+.. function:: aria2.tellWaiting([secret], offset, num, [keys])
 
   This method returns the list of waiting download, including paused
   downloads. *offset* is of type integer and specifies the offset from
@@ -2727,7 +2786,7 @@ All code examples come from Python2.7 interpreter.
   The response is of type array and its element is the same struct
   returned by :func:`aria2.tellStatus` method.
 
-.. function:: aria2.tellStopped(offset, num, [keys])
+.. function:: aria2.tellStopped([secret], offset, num, [keys])
 
   This method returns the list of stopped download.  *offset* is of type
   integer and specifies the offset from the oldest download. *num* is of
@@ -2740,7 +2799,7 @@ All code examples come from Python2.7 interpreter.
   The response is of type array and its element is the same struct
   returned by :func:`aria2.tellStatus` method.
 
-.. function:: aria2.changePosition(gid, pos, how)
+.. function:: aria2.changePosition([secret], gid, pos, how)
 
   This method changes the position of the download denoted by
   *gid*. *pos* is of type integer. *how* is of type string. If *how* is
@@ -2784,7 +2843,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.changePosition('2089b05ecca3d829', 0, 'POS_SET')
     0
 
-.. function:: aria2.changeUri(gid, fileIndex, delUris, addUris[, position])
+.. function:: aria2.changeUri([secret], gid, fileIndex, delUris, addUris[, position])
 
   This method removes URIs in *delUris* from and appends URIs in
   *addUris* to download denoted by *gid*. *delUris* and *addUris* are
@@ -2832,7 +2891,7 @@ All code examples come from Python2.7 interpreter.
                           ['http://example.org/file'])
     [0, 1]
 
-.. function:: aria2.getOption(gid)
+.. function:: aria2.getOption([secret], gid)
 
   This method returns options of the download denoted by *gid*.  The
   response is of type struct. Its key is the name of option.  The value
@@ -2877,7 +2936,7 @@ All code examples come from Python2.7 interpreter.
      'async-dns': 'true',
      ....
 
-.. function:: aria2.changeOption(gid, options)
+.. function:: aria2.changeOption([secret], gid, options)
 
   This method changes options of the download denoted by *gid*
   dynamically.  *gid* is of type string.  *options* is of type struct.
@@ -2928,7 +2987,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.changeOption('2089b05ecca3d829', {'max-download-limit':'20K'})
     'OK'
 
-.. function:: aria2.getGlobalOption()
+.. function:: aria2.getGlobalOption([secret])
 
   This method returns global options.  The response is of type
   struct. Its key is the name of option.  The value type is string.
@@ -2938,7 +2997,7 @@ All code examples come from Python2.7 interpreter.
   for the options of newly added download, the response contains keys
   returned by :func:`aria2.getOption` method.
 
-.. function:: aria2.changeGlobalOption(options)
+.. function:: aria2.changeGlobalOption([secret], options)
 
   This method changes global options dynamically.  *options* is of type
   struct.
@@ -2969,7 +3028,7 @@ All code examples come from Python2.7 interpreter.
   value. Note that log file is always opened in append mode. This method
   returns ``OK`` for success.
 
-.. function:: aria2.getGlobalStat()
+.. function:: aria2.getGlobalStat([secret])
 
   This method returns global statistics such as overall download and
   upload speed. The response is of type struct and contains following
@@ -2988,7 +3047,12 @@ All code examples come from Python2.7 interpreter.
     The number of waiting downloads.
 
   ``numStopped``
-    The number of stopped downloads.
+    The number of stopped downloads in the current session. This value
+    is capped by :option:`--max-download-result` option.
+
+  ``numStoppedTotal``
+    The number of stopped downloads in the current session and not
+    capped by :option:`--max-download-result` option.
 
   **JSON-RPC Example**
   ::
@@ -3021,12 +3085,12 @@ All code examples come from Python2.7 interpreter.
      'numWaiting': '0',
      'uploadSpeed': '0'}
 
-.. function:: aria2.purgeDownloadResult()
+.. function:: aria2.purgeDownloadResult([secret])
 
   This method purges completed/error/removed downloads to free memory.
   This method returns ``OK``.
 
-.. function:: aria2.removeDownloadResult(gid)
+.. function:: aria2.removeDownloadResult([secret], gid)
 
   This method removes completed/error/removed download denoted by *gid*
   from memory. This method returns ``OK`` for success.
@@ -3056,7 +3120,7 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.removeDownloadResult('2089b05ecca3d829')
     'OK'
 
-.. function:: aria2.getVersion()
+.. function:: aria2.getVersion([secret])
 
   This method returns version of the program and the list of enabled
   features. The response is of type struct and contains following keys.
@@ -3106,7 +3170,7 @@ All code examples come from Python2.7 interpreter.
                          'XML-RPC'],
      'version': '1.11.0'}
 
-.. function:: aria2.getSessionInfo()
+.. function:: aria2.getSessionInfo([secret])
 
   This method returns session information.
   The response is of type struct and contains following key.
@@ -3135,15 +3199,21 @@ All code examples come from Python2.7 interpreter.
     >>> s.aria2.getSessionInfo()
     {'sessionId': 'cd6a3bc6a1de28eb5bfa181e5f6b916d44af31a9'}
 
-.. function:: aria2.shutdown()
+.. function:: aria2.shutdown([secret])
 
   This method shutdowns aria2.  This method returns ``OK``.
 
-.. function:: aria2.forceShutdown()
+.. function:: aria2.forceShutdown([secret])
 
   This method shutdowns :func:`aria2. This method behaves like  aria2.shutdown`
   except that any actions which takes time such as contacting BitTorrent
   tracker are skipped. This method returns ``OK``.
+
+.. function:: aria2.saveSession([secret])
+
+  This method saves the current session to a file specified by
+  :option:`--save-session` option. This method returns ``OK`` if it
+  succeeds.
 
 .. function:: system.multicall(methods)
 
