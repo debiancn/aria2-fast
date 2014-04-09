@@ -1,3 +1,11 @@
+aria2 (1.18.5-1) unstable; urgency=medium
+
+  * New upstream release.
+  * debian/control:
+    + Build-Depends on libgnutls28-dev now.
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 09 Apr 2014 18:38:00 +0530
+
 aria2 (1.18.3-1) unstable; urgency=low
 
   * New upstream release.
