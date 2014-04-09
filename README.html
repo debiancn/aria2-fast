@@ -625,8 +625,10 @@ $ make check
 </div>
 <div class="section" id="cross-compiling-windows-binary">
 <h1>Cross-compiling Windows binary</h1>
-<p>In this section, we describe how to build a Windows binary using
-a mingw-w64 cross-compiler on Debian Linux.</p>
+<p>In this section, we describe how to build a Windows binary using a
+mingw-w64 (<a class="reference external" href="http://mingw-w64.sourceforge.net/">http://mingw-w64.sourceforge.net/</a>) cross-compiler on Debian
+Linux. The MinGW (<a class="reference external" href="http://www.mingw.org/">http://www.mingw.org/</a>) may not be able to build
+aria2.</p>
 <p>Basically, after compiling and installing depended libraries, you can
 do cross-compile just passing appropriate <tt class="docutils literal"><span class="pre">--host</span></tt> option and
 specifying <tt class="docutils literal">CPPFLAGS</tt>, <tt class="docutils literal">LDFLAGS</tt> and <tt class="docutils literal">PKG_CONFIG_LIBDIR</tt>
@@ -704,7 +706,7 @@ command-line for x86_64 Linux host.</p>
 </li>
 </ul>
 <p>Before running <tt class="docutils literal"><span class="pre">android-config</span></tt> and <tt class="docutils literal"><span class="pre">android-make</span></tt>,
-<tt class="docutils literal">$ANDOIRD_HOME</tt> environment variable must be set to point to the
+<tt class="docutils literal">$ANDROID_HOME</tt> environment variable must be set to point to the
 correct path.</p>
 <p>After <tt class="docutils literal"><span class="pre">android-config</span></tt>, run <tt class="docutils literal"><span class="pre">android-make</span></tt> to compile sources.</p>
 </div>

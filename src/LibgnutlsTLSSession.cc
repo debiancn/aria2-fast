@@ -60,18 +60,48 @@ GnuTLSSession::~GnuTLSSession()
   }
 }
 
+// GnuTLS version 3.1.3 - 3.1.18 and 3.2.0 - 3.2.8, inclusive, have a
+// bug which makes SSL/TLS handshake fail if OCSP status extension is
+// enabled and non-blocking socket is used.  To workaround this bug,
+// for these versions of GnuTLS, we disable OCSP status extension. We
+// expect that upcoming (at the time of this writing) 3.1.19 and 3.2.9
+// will fix this bug.  See
+// http://lists.gnutls.org/pipermail/gnutls-devel/2014-January/006679.html
+// for dtails.
+#if (GNUTLS_VERSION_NUMBER >= 0x030103 && GNUTLS_VERSION_NUMBER <= 0x030112) \
+  || (GNUTLS_VERSION_NUMBER >= 0x030200 && GNUTLS_VERSION_NUMBER <= 0x030208)
+# define A2_DISABLE_OCSP 1
+#endif
+
 int GnuTLSSession::init(sock_t sockfd)
 {
-  rv_ = gnutls_init(&sslSession_,
-                    tlsContext_->getSide() == TLS_CLIENT ?
-                    GNUTLS_CLIENT : GNUTLS_SERVER);
+  unsigned int flags = tlsContext_->getSide() == TLS_CLIENT ?
+    GNUTLS_CLIENT : GNUTLS_SERVER;
+#ifdef A2_DISABLE_OCSP
+  if(tlsContext_->getSide() == TLS_CLIENT) {
+    flags |= GNUTLS_NO_EXTENSIONS;
+  }
+#endif // A2_DISABLE_OCSP
+
+  rv_ = gnutls_init(&sslSession_, flags);
   if(rv_ != GNUTLS_E_SUCCESS) {
     return TLS_ERR_ERROR;
   }
+#ifdef A2_DISABLE_OCSP
+  if(tlsContext_->getSide() == TLS_CLIENT) {
+    // Enable session ticket extension manually because of
+    // GNUTLS_NO_EXTENSIONS.
+    rv_ = gnutls_session_ticket_enable_client(sslSession_);
+    if(rv_ != GNUTLS_E_SUCCESS) {
+      return TLS_ERR_ERROR;
+    }
+  }
+#endif // A2_DISABLE_OCSP
+
   // It seems err is not error message, but the argument string
   // which causes syntax error.
   const char* err;
-  rv_ = gnutls_priority_set_direct(sslSession_, "NORMAL", &err);
+  rv_ = gnutls_priority_set_direct(sslSession_, "SECURE128", &err);
   if(rv_ != GNUTLS_E_SUCCESS) {
     return TLS_ERR_ERROR;
   }
@@ -104,7 +134,7 @@ int GnuTLSSession::closeConnection()
   rv_ = gnutls_bye(sslSession_, GNUTLS_SHUT_WR);
   if(rv_ == GNUTLS_E_SUCCESS) {
     return TLS_ERR_OK;
-  } else if(rv_ == GNUTLS_E_AGAIN) {
+  } else if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {
     return TLS_ERR_WOULDBLOCK;
   } else {
     return TLS_ERR_ERROR;
@@ -125,7 +155,7 @@ ssize_t GnuTLSSession::writeData(const void* data, size_t len)
     ssize_t ret = rv_;
     rv_ = 0;
     return ret;
-  } else if(rv_ == GNUTLS_E_AGAIN) {
+  } else if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {
     return TLS_ERR_WOULDBLOCK;
   } else {
     return TLS_ERR_ERROR;
@@ -140,7 +170,7 @@ ssize_t GnuTLSSession::readData(void* data, size_t len)
     ssize_t ret = rv_;
     rv_ = 0;
     return ret;
-  } else if(rv_ == GNUTLS_E_AGAIN) {
+  } else if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {
     return TLS_ERR_WOULDBLOCK;
   } else {
     return TLS_ERR_ERROR;
@@ -151,11 +181,15 @@ int GnuTLSSession::tlsConnect(const std::string& hostname,
                            std::string& handshakeErr)
 {
   handshakeErr = "";
-  rv_ = gnutls_handshake(sslSession_);
-  if(rv_ < 0) {
-    if(rv_ == GNUTLS_E_AGAIN) {
+  for(;;) {
+    rv_ = gnutls_handshake(sslSession_);
+    if(rv_ == GNUTLS_E_SUCCESS) {
+      break;
+    }
+    if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {
       return TLS_ERR_WOULDBLOCK;
-    } else {
+    }
+    if(gnutls_error_is_fatal(rv_)) {
       return TLS_ERR_ERROR;
     }
   }
@@ -249,13 +283,17 @@ int GnuTLSSession::tlsConnect(const std::string& hostname,
 
 int GnuTLSSession::tlsAccept()
 {
-  rv_ = gnutls_handshake(sslSession_);
-  if(rv_ == GNUTLS_E_SUCCESS) {
-    return TLS_ERR_OK;
-  } else if(rv_ == GNUTLS_E_AGAIN) {
-    return TLS_ERR_WOULDBLOCK;
-  } else {
-    return TLS_ERR_ERROR;
+  for(;;) {
+    rv_ = gnutls_handshake(sslSession_);
+    if(rv_ == GNUTLS_E_SUCCESS) {
+      return TLS_ERR_OK;
+    }
+    if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {
+      return TLS_ERR_WOULDBLOCK;
+    }
+    if(gnutls_error_is_fatal(rv_)) {
+      return TLS_ERR_ERROR;
+    }
   }
 }
 

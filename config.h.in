@@ -45,6 +45,9 @@
 /* Define to 1 if XML-RPC support is enabled. */
 #undef ENABLE_XML_RPC
 
+/* Define to 1 if the system has the type `struct timespec'. */
+#undef HAVE_A2_STRUCT_TIMESPEC
+
 /* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
@@ -419,9 +422,6 @@
 
 /* Define to 1 if you have the `strtoull' function. */
 #undef HAVE_STRTOULL
-
-/* Define to 1 if the system has the type `struct timespec'. */
-#undef HAVE_STRUCT_TIMESPEC
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H

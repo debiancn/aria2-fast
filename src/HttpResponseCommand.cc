@@ -231,8 +231,8 @@ bool HttpResponseCommand::executeInternal()
 #endif // ENABLE_MESSAGE_DIGEST
   }
 
-  if (statusCode >= 300) {
-    if (statusCode == 404) {
+  if(statusCode >= 300) {
+    if(statusCode == 404) {
       grp->increaseAndValidateFileNotFoundCount();
     }
     return skipResponseBody(std::move(httpResponse));

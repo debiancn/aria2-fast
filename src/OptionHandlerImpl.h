@@ -127,6 +127,7 @@ public:
 class DefaultOptionHandler : public AbstractOptionHandler {
 private:
   std::string possibleValuesString_;
+  bool allowEmpty_;
 public:
   DefaultOptionHandler(PrefPtr pref,
                        const char* description = NO_DESCRIPTION,
@@ -138,6 +139,7 @@ public:
   virtual void parseArg(Option& option, const std::string& optarg) const
     CXX11_OVERRIDE;
   virtual std::string createPossibleValuesString() const CXX11_OVERRIDE;
+  void setAllowEmpty(bool allow);
 };
 
 class CumulativeOptionHandler : public AbstractOptionHandler {
@@ -265,13 +267,18 @@ class DeprecatedOptionHandler:public OptionHandler {
 private:
   OptionHandler* depOptHandler_;
   const OptionHandler* repOptHandler_;
+  bool stillWork_;
+  std::string additionalMessage_;
 public:
   // depOptHandler is deprecated option and repOptHandler is replacing
-  // new option. If there is no replacing option, omit second
-  // argument.
+  // new option. If there is no replacing option, specify nullptr.  If
+  // there is no replacing option, but the option still alives, give
+  // true to stillWork. Set additional message to additionalMessage.
   DeprecatedOptionHandler
   (OptionHandler* depOptHandler,
-   const OptionHandler* repOptHandler = nullptr);
+   const OptionHandler* repOptHandler = nullptr,
+   bool stillWork = false,
+   std::string additionalMessage = "");
   virtual ~DeprecatedOptionHandler();
   virtual void parse(Option& option, const std::string& arg) const
     CXX11_OVERRIDE;

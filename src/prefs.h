@@ -294,6 +294,12 @@ extern PrefPtr PREF_DISK_CACHE;
 extern PrefPtr PREF_GID;
 // values: 1*digit
 extern PrefPtr PREF_SAVE_SESSION_INTERVAL;
+// value: true |false
+extern PrefPtr PREF_ENABLE_COLOR;
+// value: string
+extern PrefPtr PREF_RPC_SECRET;
+// values: 1*digit
+extern PrefPtr PREF_DSCP;
 
 /**
  * FTP related preferences
