@@ -90,284 +90,297 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ANDROID_MIPS_TRUE@am__append_3 = android/mips-ftruncate64.S
 @ANDROID_X86_TRUE@am__append_4 = android/x86-ftruncate64.S android/x86-asm.h
 @MINGW_BUILD_TRUE@am__append_5 = WinConsoleFile.cc WinConsoleFile.h
-@ENABLE_WEBSOCKET_TRUE@am__append_6 = WebSocketSession.cc WebSocketSession.h\
-@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.cc WebSocketSessionMan.h\
+@ENABLE_WEBSOCKET_TRUE@am__append_6 = \
+@ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h\
 @ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.cc WebSocketResponseCommand.h\
-@ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.cc WebSocketInteractionCommand.h
+@ENABLE_WEBSOCKET_TRUE@	WebSocketSession.cc WebSocketSession.h\
+@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.cc WebSocketSessionMan.h
 
 @ENABLE_WEBSOCKET_FALSE@am__append_7 = NullWebSocketSessionMan.h
-@HAVE_SOME_XMLLIB_TRUE@am__append_8 = XmlAttr.cc XmlAttr.h\
-@HAVE_SOME_XMLLIB_TRUE@	XmlParser.cc XmlParser.h\
-@HAVE_SOME_XMLLIB_TRUE@	ParserStateMachine.h
+@HAVE_SOME_XMLLIB_TRUE@am__append_8 = \
+@HAVE_SOME_XMLLIB_TRUE@	ParserStateMachine.h\
+@HAVE_SOME_XMLLIB_TRUE@	XmlAttr.cc XmlAttr.h\
+@HAVE_SOME_XMLLIB_TRUE@	XmlParser.cc XmlParser.h
 
 @HAVE_LIBXML2_TRUE@am__append_9 = Xml2XmlParser.cc Xml2XmlParser.h
 @HAVE_LIBEXPAT_TRUE@am__append_10 = ExpatXmlParser.cc ExpatXmlParser.h
-@ENABLE_XML_RPC_TRUE@am__append_11 = XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h\
+@ENABLE_XML_RPC_TRUE@am__append_11 = \
+@ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserState.h\
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h\
-@ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h
+@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateMachine.cc XmlRpcRequestParserStateMachine.h
 
 @HAVE_SOME_FALLOCATE_TRUE@am__append_12 = FallocFileAllocationIterator.cc FallocFileAllocationIterator.h
 @HAVE_EPOLL_TRUE@am__append_13 = EpollEventPoll.cc EpollEventPoll.h
 @ENABLE_SSL_TRUE@am__append_14 = TLSContext.h TLSSession.h
 @USE_APPLE_MD_TRUE@am__append_15 = AppleMessageDigestImpl.cc
-@HAVE_APPLETLS_TRUE@am__append_16 = AppleTLSContext.cc AppleTLSContext.h \
-@HAVE_APPLETLS_TRUE@        AppleTLSSession.cc AppleTLSSession.h
+@HAVE_APPLETLS_TRUE@am__append_16 = \
+@HAVE_APPLETLS_TRUE@	AppleTLSContext.cc AppleTLSContext.h \
+@HAVE_APPLETLS_TRUE@	AppleTLSSession.cc AppleTLSSession.h
 
-@USE_WINDOWS_MD_TRUE@am__append_17 = WinMessageDigestImpl.cc
-@HAVE_WINTLS_TRUE@am__append_18 = WinTLSContext.cc WinTLSContext.h \
+@HAVE_WINTLS_TRUE@am__append_17 = \
+@HAVE_WINTLS_TRUE@	WinTLSContext.cc WinTLSContext.h \
 @HAVE_WINTLS_TRUE@	WinTLSSession.cc WinTLSSession.h
 
-@USE_INTERNAL_BIGNUM_TRUE@am__append_19 = InternalDHKeyExchange.cc InternalDHKeyExchange.h bignum.h
-@USE_INTERNAL_ARC4_TRUE@am__append_20 = InternalARC4Encryptor.cc InternalARC4Encryptor.h
-@USE_INTERNAL_MD_TRUE@am__append_21 = InternalMessageDigestImpl.cc sha1.c sha1.h md5.c md5.h
-@HAVE_LIBGNUTLS_TRUE@am__append_22 = LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+@USE_INTERNAL_BIGNUM_TRUE@am__append_18 = \
+@USE_INTERNAL_BIGNUM_TRUE@	bignum.h\
+@USE_INTERNAL_BIGNUM_TRUE@	InternalDHKeyExchange.cc InternalDHKeyExchange.h
+
+@USE_INTERNAL_ARC4_TRUE@am__append_19 = InternalARC4Encryptor.cc InternalARC4Encryptor.h
+@USE_INTERNAL_MD_TRUE@am__append_20 = \
+@USE_INTERNAL_MD_TRUE@	InternalMessageDigestImpl.cc\
+@USE_INTERNAL_MD_TRUE@	crypto_hash.cc crypto_hash.h
+
+@HAVE_LIBGNUTLS_TRUE@am__append_21 = \
+@HAVE_LIBGNUTLS_TRUE@	LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
 @HAVE_LIBGNUTLS_TRUE@        LibgnutlsTLSSession.cc LibgnutlsTLSSession.h
 
-@HAVE_LIBGCRYPT_TRUE@am__append_23 = LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+@HAVE_LIBGCRYPT_TRUE@am__append_22 = \
+@HAVE_LIBGCRYPT_TRUE@	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
 @HAVE_LIBGCRYPT_TRUE@        LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h
 
-@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_24 = LibgcryptMessageDigestImpl.cc
-@HAVE_LIBNETTLE_TRUE@am__append_25 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
-@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_26 = LibnettleMessageDigestImpl.cc
-@HAVE_LIBGMP_TRUE@am__append_27 = a2gmp.cc a2gmp.h \
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__append_23 = LibgcryptMessageDigestImpl.cc
+@HAVE_LIBNETTLE_TRUE@am__append_24 = LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__append_25 = LibnettleMessageDigestImpl.cc
+@HAVE_LIBGMP_TRUE@am__append_26 = \
+@HAVE_LIBGMP_TRUE@	a2gmp.cc a2gmp.h \
 @HAVE_LIBGMP_TRUE@        LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h
 
-@HAVE_OPENSSL_TRUE@am__append_28 = LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
+@HAVE_OPENSSL_TRUE@am__append_27 = \
+@HAVE_OPENSSL_TRUE@	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
 @HAVE_OPENSSL_TRUE@        LibsslDHKeyExchange.cc LibsslDHKeyExchange.h
 
-@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_29 = LibsslTLSContext.cc LibsslTLSContext.h \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__append_28 = \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSContext.cc LibsslTLSContext.h \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@        LibsslTLSSession.cc LibsslTLSSession.h
 
-@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_30 = LibsslMessageDigestImpl.cc
-@HAVE_ZLIB_TRUE@am__append_31 = GZipEncoder.cc GZipEncoder.h\
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__append_29 = LibsslMessageDigestImpl.cc
+@HAVE_ZLIB_TRUE@am__append_30 = \
 @HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
+@HAVE_ZLIB_TRUE@	GZipEncoder.cc GZipEncoder.h\
 @HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h
 
-@HAVE_SQLITE3_TRUE@am__append_32 = Sqlite3CookieParser.cc Sqlite3CookieParser.h\
+@HAVE_SQLITE3_TRUE@am__append_31 = \
+@HAVE_SQLITE3_TRUE@	Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_33 = AsyncNameResolver.cc AsyncNameResolver.h\
+@ENABLE_ASYNC_DNS_TRUE@am__append_32 = \
+@ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolver.cc AsyncNameResolver.h\
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.cc AsyncNameResolverMan.h
 
-@ENABLE_MESSAGE_DIGEST_TRUE@am__append_34 = IteratableChunkChecksumValidator.cc IteratableChunkChecksumValidator.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.cc IteratableChecksumValidator.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.cc CheckIntegrityDispatcherCommand.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.cc CheckIntegrityCommand.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	ChecksumCheckIntegrityEntry.cc ChecksumCheckIntegrityEntry.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	message_digest_helper.cc message_digest_helper.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.cc Checksum.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	ChunkChecksum.cc ChunkChecksum.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.cc MessageDigest.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestImpl.h\
-@ENABLE_MESSAGE_DIGEST_TRUE@	HashFuncEntry.h
-
-@ENABLE_BITTORRENT_TRUE@am__append_35 = PeerAbstractCommand.cc PeerAbstractCommand.h\
-@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
-@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.cc PeerInteractionCommand.h\
-@ENABLE_BITTORRENT_TRUE@	Peer.cc Peer.h\
-@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.cc PeerSessionResource.h\
-@ENABLE_BITTORRENT_TRUE@	PeerConnection.cc PeerConnection.h\
-@ENABLE_BITTORRENT_TRUE@	PeerListenCommand.cc PeerListenCommand.h\
-@ENABLE_BITTORRENT_TRUE@	BtRegistry.cc BtRegistry.h\
-@ENABLE_BITTORRENT_TRUE@	RequestSlot.cc RequestSlot.h\
-@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.cc TrackerWatcherCommand.h\
-@ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.cc PeerChokeCommand.h\
-@ENABLE_BITTORRENT_TRUE@	SeedCriteria.h\
-@ENABLE_BITTORRENT_TRUE@	TimeSeedCriteria.cc TimeSeedCriteria.h\
-@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.cc ShareRatioSeedCriteria.h\
-@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.cc UnionSeedCriteria.h\
-@ENABLE_BITTORRENT_TRUE@	SeedCheckCommand.cc SeedCheckCommand.h\
-@ENABLE_BITTORRENT_TRUE@	AnnounceTier.cc AnnounceTier.h\
-@ENABLE_BITTORRENT_TRUE@	AnnounceList.h AnnounceList.cc\
-@ENABLE_BITTORRENT_TRUE@	PeerStorage.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultPeerStorage.cc DefaultPeerStorage.h\
-@ENABLE_BITTORRENT_TRUE@	BtAnnounce.cc BtAnnounce.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultBtAnnounce.cc DefaultBtAnnounce.h\
-@ENABLE_BITTORRENT_TRUE@	BtRuntime.cc BtRuntime.h\
-@ENABLE_BITTORRENT_TRUE@	BtMessage.h\
+@ENABLE_BITTORRENT_TRUE@am__append_33 = \
 @ENABLE_BITTORRENT_TRUE@	AbstractBtMessage.cc AbstractBtMessage.h\
-@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.cc SimpleBtMessage.h\
+@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.cc ActivePeerConnectionCommand.h\
+@ENABLE_BITTORRENT_TRUE@	AnnounceList.h AnnounceList.cc\
+@ENABLE_BITTORRENT_TRUE@	AnnounceTier.cc AnnounceTier.h\
+@ENABLE_BITTORRENT_TRUE@	ARC4Encryptor.h\
+@ENABLE_BITTORRENT_TRUE@	bencode2.cc bencode2.h\
+@ENABLE_BITTORRENT_TRUE@	BencodeDiskWriter.h\
+@ENABLE_BITTORRENT_TRUE@	BencodeDiskWriterFactory.h\
+@ENABLE_BITTORRENT_TRUE@	BencodeParser.cc BencodeParser.h\
+@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.cc bittorrent_helper.h\
+@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.cc BtAbortOutstandingRequestEvent.h\
 @ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessage.cc BtAllowedFastMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtAnnounce.cc BtAnnounce.h\
 @ENABLE_BITTORRENT_TRUE@	BtBitfieldMessage.cc BtBitfieldMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.cc BtBitfieldMessageValidator.h\
 @ENABLE_BITTORRENT_TRUE@	BtCancelMessage.cc BtCancelMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtCancelSendingPieceEvent.h\
+@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.cc BtCheckIntegrityEntry.h\
 @ENABLE_BITTORRENT_TRUE@	BtChokeMessage.cc BtChokeMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtChokingEvent.h\
+@ENABLE_BITTORRENT_TRUE@	BtConstants.h\
+@ENABLE_BITTORRENT_TRUE@	BtDependency.cc BtDependency.h\
+@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.cc BtExtendedMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtFileAllocationEntry.cc BtFileAllocationEntry.h\
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.cc BtHandshakeMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.cc BtHandshakeMessageValidator.h\
 @ENABLE_BITTORRENT_TRUE@	BtHaveAllMessage.cc BtHaveAllMessage.h\
 @ENABLE_BITTORRENT_TRUE@	BtHaveMessage.cc BtHaveMessage.h\
 @ENABLE_BITTORRENT_TRUE@	BtHaveNoneMessage.cc BtHaveNoneMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtInteractive.h\
 @ENABLE_BITTORRENT_TRUE@	BtInterestedMessage.cc BtInterestedMessage.h\
 @ENABLE_BITTORRENT_TRUE@	BtKeepAliveMessage.cc BtKeepAliveMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtLeecherStateChoke.cc BtLeecherStateChoke.h\
+@ENABLE_BITTORRENT_TRUE@	BtMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtMessageDispatcher.h\
+@ENABLE_BITTORRENT_TRUE@	BtMessageFactory.h\
+@ENABLE_BITTORRENT_TRUE@	BtMessageReceiver.h\
+@ENABLE_BITTORRENT_TRUE@	BtMessageValidator.h\
 @ENABLE_BITTORRENT_TRUE@	BtNotInterestedMessage.cc BtNotInterestedMessage.h\
 @ENABLE_BITTORRENT_TRUE@	BtPieceMessage.cc BtPieceMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.cc BtPieceMessageValidator.h\
 @ENABLE_BITTORRENT_TRUE@	BtPortMessage.cc BtPortMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.cc BtPostDownloadHandler.h\
+@ENABLE_BITTORRENT_TRUE@	BtRegistry.cc BtRegistry.h\
 @ENABLE_BITTORRENT_TRUE@	BtRejectMessage.cc BtRejectMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtRequestFactory.h\
 @ENABLE_BITTORRENT_TRUE@	BtRequestMessage.cc BtRequestMessage.h\
+@ENABLE_BITTORRENT_TRUE@	BtRuntime.cc BtRuntime.h\
+@ENABLE_BITTORRENT_TRUE@	BtSeederStateChoke.cc BtSeederStateChoke.h\
+@ENABLE_BITTORRENT_TRUE@	BtSetup.cc BtSetup.h\
+@ENABLE_BITTORRENT_TRUE@	BtStopDownloadCommand.cc BtStopDownloadCommand.h\
 @ENABLE_BITTORRENT_TRUE@	BtSuggestPieceMessage.cc BtSuggestPieceMessage.h\
 @ENABLE_BITTORRENT_TRUE@	BtUnchokeMessage.cc BtUnchokeMessage.h\
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.cc BtHandshakeMessage.h\
-@ENABLE_BITTORRENT_TRUE@	BtMessageValidator.h\
-@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.cc BtBitfieldMessageValidator.h\
-@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.cc BtPieceMessageValidator.h\
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.cc BtHandshakeMessageValidator.h\
-@ENABLE_BITTORRENT_TRUE@	BtMessageFactory.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.cc DefaultBtMessageFactory.h\
-@ENABLE_BITTORRENT_TRUE@	BtMessageDispatcher.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageDispatcher.cc DefaultBtMessageDispatcher.h\
-@ENABLE_BITTORRENT_TRUE@	BtMessageReceiver.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageReceiver.cc DefaultBtMessageReceiver.h\
-@ENABLE_BITTORRENT_TRUE@	BtRequestFactory.h\
-@ENABLE_BITTORRENT_TRUE@	DefaultBtRequestFactory.cc DefaultBtRequestFactory.h\
-@ENABLE_BITTORRENT_TRUE@	BtCancelSendingPieceEvent.h\
-@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.cc BtAbortOutstandingRequestEvent.h\
-@ENABLE_BITTORRENT_TRUE@	BtChokingEvent.h\
-@ENABLE_BITTORRENT_TRUE@	BtInteractive.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultBtAnnounce.cc DefaultBtAnnounce.h\
 @ENABLE_BITTORRENT_TRUE@	DefaultBtInteractive.cc DefaultBtInteractive.h\
-@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.cc ActivePeerConnectionCommand.h\
-@ENABLE_BITTORRENT_TRUE@	BtDependency.cc BtDependency.h\
-@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.cc PeerReceiveHandshakeCommand.h\
-@ENABLE_BITTORRENT_TRUE@	BtSetup.cc BtSetup.h\
-@ENABLE_BITTORRENT_TRUE@	BtFileAllocationEntry.cc BtFileAllocationEntry.h\
-@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.cc BtPostDownloadHandler.h\
-@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.cc BtCheckIntegrityEntry.h\
-@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.cc BtExtendedMessage.h\
-@ENABLE_BITTORRENT_TRUE@	ExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	ExtensionMessageFactory.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageDispatcher.cc DefaultBtMessageDispatcher.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.cc DefaultBtMessageFactory.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageReceiver.cc DefaultBtMessageReceiver.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultBtRequestFactory.cc DefaultBtRequestFactory.h\
 @ENABLE_BITTORRENT_TRUE@	DefaultExtensionMessageFactory.cc DefaultExtensionMessageFactory.h\
-@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.cc HandshakeExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.cc UTPexExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.cc UTMetadataExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.cc\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.cc UTMetadataRejectExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.cc UTMetadataDataExtensionMessage.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.cc UTMetadataRequestTracker.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.cc UTMetadataRequestFactory.h\
-@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.cc UTMetadataPostDownloadHandler.h\
-@ENABLE_BITTORRENT_TRUE@	magnet.cc magnet.h\
-@ENABLE_BITTORRENT_TRUE@	DHTNode.cc DHTNode.h\
+@ENABLE_BITTORRENT_TRUE@	DefaultPeerStorage.cc DefaultPeerStorage.h\
+@ENABLE_BITTORRENT_TRUE@	DHKeyExchange.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractMessage.cc DHTAbstractMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractNodeLookupTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.cc DHTAbstractTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerMessage.cc DHTAnnouncePeerMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerReplyMessage.cc DHTAnnouncePeerReplyMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.cc DHTAutoSaveCommand.h\
 @ENABLE_BITTORRENT_TRUE@	DHTBucket.cc DHTBucket.h\
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.cc DHTRoutingTable.h\
-@ENABLE_BITTORRENT_TRUE@	DHTMessageEntry.cc DHTMessageEntry.h\
+@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.cc DHTBucketRefreshCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshTask.cc DHTBucketRefreshTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTBucketTree.cc DHTBucketTree.h\
+@ENABLE_BITTORRENT_TRUE@	DHTConnection.h\
+@ENABLE_BITTORRENT_TRUE@	DHTConnectionImpl.cc DHTConnectionImpl.h\
+@ENABLE_BITTORRENT_TRUE@	DHTConstants.h\
+@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.cc DHTEntryPointNameResolveCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.cc DHTFindNodeMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.cc DHTFindNodeReplyMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.cc DHTGetPeersCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.cc DHTGetPeersMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.cc DHTGetPeersReplyMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTIDCloser.h\
+@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.cc DHTInteractionCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTMessage.cc DHTMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTMessageCallback.h\
 @ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcher.h\
 @ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcherImpl.cc DHTMessageDispatcherImpl.h\
+@ENABLE_BITTORRENT_TRUE@	DHTMessageEntry.cc DHTMessageEntry.h\
+@ENABLE_BITTORRENT_TRUE@	DHTMessageFactory.h\
+@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.cc DHTMessageFactoryImpl.h\
 @ENABLE_BITTORRENT_TRUE@	DHTMessageReceiver.cc DHTMessageReceiver.h\
 @ENABLE_BITTORRENT_TRUE@	DHTMessageTracker.cc DHTMessageTracker.h\
 @ENABLE_BITTORRENT_TRUE@	DHTMessageTrackerEntry.cc DHTMessageTrackerEntry.h\
-@ENABLE_BITTORRENT_TRUE@	DHTMessage.cc DHTMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTConnection.h\
-@ENABLE_BITTORRENT_TRUE@	DHTConnectionImpl.cc DHTConnectionImpl.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractMessage.cc DHTAbstractMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.cc DHTQueryMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.cc DHTResponseMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.cc DHTPingMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.cc DHTPingReplyMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.cc DHTFindNodeMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.cc DHTFindNodeReplyMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.cc DHTGetPeersMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.cc DHTGetPeersReplyMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerMessage.cc DHTAnnouncePeerMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerReplyMessage.cc DHTAnnouncePeerReplyMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.cc DHTUnknownMessage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTMessageFactory.h\
-@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.cc DHTMessageFactoryImpl.h\
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.cc DHTNodeLookupTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTNode.cc DHTNode.h\
 @ENABLE_BITTORRENT_TRUE@	DHTNodeLookupEntry.cc DHTNodeLookupEntry.h\
-@ENABLE_BITTORRENT_TRUE@	DHTBucketTree.cc DHTBucketTree.h\
-@ENABLE_BITTORRENT_TRUE@	DHTMessageCallback.h\
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.cc DHTNodeLookupTask.h\
 @ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTaskCallback.cc DHTNodeLookupTaskCallback.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessageCallback.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.cc DHTPeerLookupTaskCallback.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.cc DHTAbstractTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPingTask.cc DHTPingTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTaskQueue.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.cc DHTTaskQueueImpl.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTaskExecutor.cc DHTTaskExecutor.h\
-@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshTask.cc DHTBucketRefreshTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractNodeLookupTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.cc DHTPeerLookupTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTSetup.cc DHTSetup.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTaskFactory.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.cc DHTTaskFactoryImpl.h\
-@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.cc DHTInteractionCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.cc DHTPeerAnnounceCommand.h\
 @ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceEntry.cc DHTPeerAnnounceEntry.h\
 @ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceStorage.cc DHTPeerAnnounceStorage.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTokenTracker.cc DHTTokenTracker.h\
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.cc DHTGetPeersCommand.h\
-@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.cc DHTTokenUpdateCommand.h\
-@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.cc DHTBucketRefreshCommand.h\
-@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.cc DHTPeerAnnounceCommand.h\
-@ENABLE_BITTORRENT_TRUE@	DHTReplaceNodeTask.cc DHTReplaceNodeTask.h\
-@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.cc DHTEntryPointNameResolveCommand.h\
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.cc DHTRoutingTableSerializer.h\
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableDeserializer.cc DHTRoutingTableDeserializer.h\
-@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.cc DHTAutoSaveCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.cc DHTPeerLookupTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.cc DHTPeerLookupTaskCallback.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.cc DHTPingMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.cc DHTPingReplyMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessageCallback.h\
+@ENABLE_BITTORRENT_TRUE@	DHTPingTask.cc DHTPingTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.cc DHTQueryMessage.h\
 @ENABLE_BITTORRENT_TRUE@	DHTRegistry.cc DHTRegistry.h\
-@ENABLE_BITTORRENT_TRUE@	DHTIDCloser.h\
-@ENABLE_BITTORRENT_TRUE@	DHTConstants.h\
-@ENABLE_BITTORRENT_TRUE@	XORCloser.h\
-@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.cc PeerAddrEntry.h\
-@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.cc InitiatorMSEHandshakeCommand.h\
-@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.cc ReceiverMSEHandshakeCommand.h\
-@ENABLE_BITTORRENT_TRUE@	MSEHandshake.cc MSEHandshake.h\
-@ENABLE_BITTORRENT_TRUE@	ARC4Encryptor.h\
-@ENABLE_BITTORRENT_TRUE@	DHKeyExchange.h\
-@ENABLE_BITTORRENT_TRUE@	BtConstants.h\
-@ENABLE_BITTORRENT_TRUE@	BtLeecherStateChoke.cc BtLeecherStateChoke.h\
-@ENABLE_BITTORRENT_TRUE@	BtSeederStateChoke.cc BtSeederStateChoke.h\
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.cc RangeBtMessage.h\
-@ENABLE_BITTORRENT_TRUE@	IndexBtMessage.cc IndexBtMessage.h\
-@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.cc ZeroBtMessage.h\
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.cc RangeBtMessageValidator.h\
-@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.cc IndexBtMessageValidator.h\
+@ENABLE_BITTORRENT_TRUE@	DHTReplaceNodeTask.cc DHTReplaceNodeTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.cc DHTResponseMessage.h\
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.cc DHTRoutingTable.h\
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableDeserializer.cc DHTRoutingTableDeserializer.h\
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.cc DHTRoutingTableSerializer.h\
+@ENABLE_BITTORRENT_TRUE@	DHTSetup.cc DHTSetup.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTask.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTaskExecutor.cc DHTTaskExecutor.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTaskFactory.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.cc DHTTaskFactoryImpl.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTaskQueue.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.cc DHTTaskQueueImpl.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTokenTracker.cc DHTTokenTracker.h\
+@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.cc DHTTokenUpdateCommand.h\
+@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.cc DHTUnknownMessage.h\
+@ENABLE_BITTORRENT_TRUE@	ExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	ExtensionMessageFactory.h\
 @ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistry.cc ExtensionMessageRegistry.h\
-@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.cc bittorrent_helper.h\
-@ENABLE_BITTORRENT_TRUE@	BtStopDownloadCommand.cc BtStopDownloadCommand.h\
-@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.cc PriorityPieceSelector.h\
+@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.cc HandshakeExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	IndexBtMessage.cc IndexBtMessage.h\
+@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.cc IndexBtMessageValidator.h\
+@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.cc InitiatorMSEHandshakeCommand.h\
+@ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.cc LpdDispatchMessageCommand.h\
+@ENABLE_BITTORRENT_TRUE@	LpdMessage.cc LpdMessage.h\
 @ENABLE_BITTORRENT_TRUE@	LpdMessageDispatcher.cc LpdMessageDispatcher.h\
 @ENABLE_BITTORRENT_TRUE@	LpdMessageReceiver.cc LpdMessageReceiver.h\
-@ENABLE_BITTORRENT_TRUE@	LpdMessage.cc LpdMessage.h\
 @ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.cc LpdReceiveMessageCommand.h\
-@ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.cc LpdDispatchMessageCommand.h\
-@ENABLE_BITTORRENT_TRUE@	bencode2.cc bencode2.h\
-@ENABLE_BITTORRENT_TRUE@	BencodeParser.cc BencodeParser.h\
-@ENABLE_BITTORRENT_TRUE@	ValueBaseBencodeParser.h\
-@ENABLE_BITTORRENT_TRUE@	BencodeDiskWriter.h\
-@ENABLE_BITTORRENT_TRUE@	BencodeDiskWriterFactory.h\
+@ENABLE_BITTORRENT_TRUE@	magnet.cc magnet.h\
 @ENABLE_BITTORRENT_TRUE@	MemoryBencodePreDownloadHandler.h\
+@ENABLE_BITTORRENT_TRUE@	MSEHandshake.cc MSEHandshake.h\
+@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.cc NameResolveCommand.h\
+@ENABLE_BITTORRENT_TRUE@	Peer.cc Peer.h\
+@ENABLE_BITTORRENT_TRUE@	PeerAbstractCommand.cc PeerAbstractCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.cc PeerAddrEntry.h\
+@ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.cc PeerChokeCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerConnection.cc PeerConnection.h\
+@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.cc PeerInitiateConnectionCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.cc PeerInteractionCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerListenCommand.cc PeerListenCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.cc PeerReceiveHandshakeCommand.h\
+@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.cc PeerSessionResource.h\
+@ENABLE_BITTORRENT_TRUE@	PeerStorage.h\
+@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.cc PriorityPieceSelector.h\
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.cc RangeBtMessage.h\
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.cc RangeBtMessageValidator.h\
+@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.cc ReceiverMSEHandshakeCommand.h\
+@ENABLE_BITTORRENT_TRUE@	RequestSlot.cc RequestSlot.h\
+@ENABLE_BITTORRENT_TRUE@	SeedCheckCommand.cc SeedCheckCommand.h\
+@ENABLE_BITTORRENT_TRUE@	SeedCriteria.h\
+@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.cc ShareRatioSeedCriteria.h\
+@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.cc SimpleBtMessage.h\
+@ENABLE_BITTORRENT_TRUE@	TimeSeedCriteria.cc TimeSeedCriteria.h\
+@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.cc TrackerWatcherCommand.h\
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.cc UDPTrackerClient.h\
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.cc UDPTrackerRequest.h\
-@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.cc NameResolveCommand.h
+@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.cc UnionSeedCriteria.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.cc UTMetadataDataExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.cc UTMetadataExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.cc UTMetadataPostDownloadHandler.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.cc UTMetadataRejectExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.cc\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.cc UTMetadataRequestFactory.h\
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.cc UTMetadataRequestTracker.h\
+@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.cc UTPexExtensionMessage.h\
+@ENABLE_BITTORRENT_TRUE@	ValueBaseBencodeParser.h\
+@ENABLE_BITTORRENT_TRUE@	XORCloser.h\
+@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.cc ZeroBtMessage.h
 
-@ENABLE_METALINK_TRUE@am__append_36 = Metalinker.cc Metalinker.h\
+@ENABLE_METALINK_TRUE@am__append_34 = \
+@ENABLE_METALINK_TRUE@	Metalink2RequestGroup.cc Metalink2RequestGroup.h\
 @ENABLE_METALINK_TRUE@	MetalinkEntry.cc MetalinkEntry.h\
-@ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
+@ENABLE_METALINK_TRUE@	Metalinker.cc Metalinker.h\
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.cc MetalinkMetaurl.h\
 @ENABLE_METALINK_TRUE@	MetalinkParserController.cc MetalinkParserController.h\
-@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.cc MetalinkParserStateMachine.h\
 @ENABLE_METALINK_TRUE@	MetalinkParserState.cc MetalinkParserState.h\
 @ENABLE_METALINK_TRUE@	MetalinkParserStateImpl.cc MetalinkParserStateImpl.h\
+@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.cc MetalinkParserStateMachine.h\
 @ENABLE_METALINK_TRUE@	MetalinkParserStateV3Impl.cc MetalinkParserStateV3Impl.h\
 @ENABLE_METALINK_TRUE@	MetalinkParserStateV4Impl.cc MetalinkParserStateV4Impl.h\
-@ENABLE_METALINK_TRUE@	Metalink2RequestGroup.cc Metalink2RequestGroup.h\
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.cc MetalinkPostDownloadHandler.h\
+@ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
 @ENABLE_METALINK_TRUE@	metalink_helper.cc metalink_helper.h
 
-@HAVE_ASCTIME_R_FALSE@am__append_37 = asctime_r.c asctime_r.h
-@HAVE_BASENAME_FALSE@am__append_38 = libgen.c libgen.h
-@HAVE_GETADDRINFO_FALSE@am__append_39 = getaddrinfo.c getaddrinfo.h
-@HAVE_GAI_STRERROR_FALSE@am__append_40 = gai_strerror.c gai_strerror.h
-@HAVE_GETTIMEOFDAY_FALSE@am__append_41 = gettimeofday.c gettimeofday.h
-@HAVE_LOCALTIME_R_FALSE@am__append_42 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_43 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_44 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_45 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_46 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_47 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_48 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_49 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_50 = KqueueEventPoll.cc KqueueEventPoll.h
-@HAVE_LIBUV_TRUE@am__append_51 = LibuvEventPoll.cc LibuvEventPoll.h
+@HAVE_ASCTIME_R_FALSE@am__append_35 = asctime_r.c asctime_r.h
+@HAVE_BASENAME_FALSE@am__append_36 = libgen.c libgen.h
+@HAVE_GETADDRINFO_FALSE@am__append_37 = getaddrinfo.c getaddrinfo.h
+@HAVE_GAI_STRERROR_FALSE@am__append_38 = gai_strerror.c gai_strerror.h
+@HAVE_GETTIMEOFDAY_FALSE@am__append_39 = gettimeofday.c gettimeofday.h
+@HAVE_LOCALTIME_R_FALSE@am__append_40 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_41 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_42 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_43 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_44 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_45 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_46 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_47 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_48 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_LIBUV_TRUE@am__append_49 = LibuvEventPoll.cc LibuvEventPoll.h
+@ENABLE_LIBARIA2_TRUE@am__append_50 = \
+@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h\
+@ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
+@ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h
+
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(srcdir)/libaria2.pc.in alloca.c $(top_srcdir)/depcomp
@@ -422,662 +435,661 @@ am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgconfigdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES) $(noinst_LTLIBRARIES)
 libaria2_la_DEPENDENCIES =
-am__libaria2_la_SOURCES_DIST = option_processing.cc version_usage.cc \
-	Context.cc Context.h SocketCore.cc SocketCore.h BinaryStream.h \
-	Command.cc Command.h AbstractCommand.cc AbstractCommand.h \
-	InitiateConnectionCommandFactory.cc \
-	InitiateConnectionCommandFactory.h DownloadCommand.cc \
-	DownloadCommand.h HttpInitiateConnectionCommand.cc \
-	HttpInitiateConnectionCommand.h HttpRequestCommand.cc \
-	HttpRequestCommand.h HttpResponseCommand.cc \
-	HttpResponseCommand.h HttpProxyRequestCommand.cc \
-	HttpProxyRequestCommand.h HttpProxyResponseCommand.cc \
-	HttpProxyResponseCommand.h HttpDownloadCommand.cc \
-	HttpDownloadCommand.h HttpHeader.cc HttpHeader.h \
-	HttpConnection.cc HttpConnection.h FtpConnection.cc \
-	FtpConnection.h FtpInitiateConnectionCommand.cc \
-	FtpInitiateConnectionCommand.h FtpNegotiationCommand.cc \
-	FtpNegotiationCommand.h FtpDownloadCommand.cc \
-	FtpDownloadCommand.h FtpTunnelRequestCommand.cc \
-	FtpTunnelRequestCommand.h FtpTunnelResponseCommand.cc \
-	FtpTunnelResponseCommand.h DownloadEngine.cc DownloadEngine.h \
-	Segment.h GrowSegment.cc GrowSegment.h PiecedSegment.cc \
-	PiecedSegment.h SegmentMan.cc SegmentMan.h util.cc util.h \
-	Request.cc Request.h common.h message.h Exception.cc \
-	Exception.h FatalException.cc FatalException.h \
-	RecoverableException.cc RecoverableException.h DlAbortEx.cc \
-	DlAbortEx.h DlRetryEx.cc DlRetryEx.h \
-	DownloadFailureException.cc DownloadFailureException.h \
-	Logger.cc Logger.h fmt.cc fmt.h DiskWriter.h \
-	DiskWriterFactory.h AbstractDiskWriter.cc AbstractDiskWriter.h \
-	DefaultDiskWriter.cc DefaultDiskWriter.h \
-	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h File.cc \
-	File.h Option.cc Option.h base64.h base32.cc base32.h \
-	LogFactory.cc LogFactory.h TimerA2.cc TimerA2.h TimeA2.cc \
-	TimeA2.h FeatureConfig.cc FeatureConfig.h \
-	DownloadEngineFactory.cc DownloadEngineFactory.h SpeedCalc.cc \
-	SpeedCalc.h PeerStat.cc PeerStat.h NetStat.cc NetStat.h \
-	BitfieldMan.cc BitfieldMan.h Randomizer.h SimpleRandomizer.cc \
-	SimpleRandomizer.h HttpResponse.cc HttpResponse.h \
-	HttpRequest.cc HttpRequest.h Range.cc Range.h \
-	AbstractProxyRequestCommand.cc AbstractProxyRequestCommand.h \
-	AbstractProxyResponseCommand.cc AbstractProxyResponseCommand.h \
-	Netrc.cc Netrc.h AuthConfig.cc AuthConfig.h AuthResolver.h \
+am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
+	a2iterator.h a2netcompat.h A2STR.cc A2STR.h a2time.h \
 	AbstractAuthResolver.cc AbstractAuthResolver.h \
-	DefaultAuthResolver.cc DefaultAuthResolver.h \
-	NetrcAuthResolver.cc NetrcAuthResolver.h AuthConfigFactory.cc \
-	AuthConfigFactory.h OptionParser.cc OptionParser.h \
-	OptionHandlerFactory.cc OptionHandlerFactory.h \
-	OptionHandler.cc OptionHandler.h OptionHandlerImpl.cc \
-	OptionHandlerImpl.h AbstractOptionHandler.cc \
-	AbstractOptionHandler.h NameResolver.cc NameResolver.h \
-	RequestGroup.cc RequestGroup.h RequestGroupMan.cc \
-	RequestGroupMan.h FileAllocationMan.h FileAllocationCommand.cc \
-	FileAllocationCommand.h FillRequestGroupCommand.cc \
-	FillRequestGroupCommand.h FileAllocationDispatcherCommand.cc \
-	FileAllocationDispatcherCommand.h FileAllocationEntry.cc \
-	FileAllocationEntry.h StreamFileAllocationEntry.cc \
-	StreamFileAllocationEntry.h MultiUrlRequestInfo.cc \
-	MultiUrlRequestInfo.h UriListParser.cc UriListParser.h \
-	RealtimeCommand.cc RealtimeCommand.h ProgressAwareEntry.h \
-	RequestGroupEntry.cc RequestGroupEntry.h Cookie.cc Cookie.h \
-	HttpHeaderProcessor.cc HttpHeaderProcessor.h FileEntry.cc \
-	FileEntry.h Platform.cc Platform.h TimeBasedCommand.cc \
-	TimeBasedCommand.h AutoSaveCommand.cc AutoSaveCommand.h \
-	PieceStorage.h DefaultPieceStorage.cc DefaultPieceStorage.h \
-	UnknownLengthPieceStorage.cc UnknownLengthPieceStorage.h \
-	PieceStatMan.cc PieceStatMan.h StatCalc.h ConsoleStatCalc.cc \
-	ConsoleStatCalc.h TransferStat.cc TransferStat.h Dependency.h \
-	BtProgressInfoFile.h DefaultBtProgressInfoFile.cc \
-	DefaultBtProgressInfoFile.h NullProgressInfoFile.h \
-	FileAllocationIterator.h SingleFileAllocationIterator.cc \
-	SingleFileAllocationIterator.h RequestGroupCriteria.h \
+	AbstractCommand.cc AbstractCommand.h AbstractDiskWriter.cc \
+	AbstractDiskWriter.h AbstractHttpServerResponseCommand.cc \
+	AbstractHttpServerResponseCommand.h AbstractOptionHandler.cc \
+	AbstractOptionHandler.h AbstractProxyRequestCommand.cc \
+	AbstractProxyRequestCommand.h AbstractProxyResponseCommand.cc \
+	AbstractProxyResponseCommand.h AbstractSingleDiskAdaptor.cc \
+	AbstractSingleDiskAdaptor.h AdaptiveFileAllocationIterator.cc \
+	AdaptiveFileAllocationIterator.h AdaptiveURISelector.cc \
+	AdaptiveURISelector.h AnonDiskWriterFactory.h array_fun.h \
+	AuthConfig.cc AuthConfig.h AuthConfigFactory.cc \
+	AuthConfigFactory.h AuthResolver.h AutoSaveCommand.cc \
+	AutoSaveCommand.h BackupIPv4ConnectCommand.h \
+	BackupIPv4ConnectCommand.cc base32.cc base32.h base64.h \
+	BinaryStream.h bitfield.cc bitfield.h BitfieldMan.cc \
+	BitfieldMan.h BtProgressInfoFile.h BufferedFile.cc \
+	BufferedFile.h ByteArrayDiskWriter.cc ByteArrayDiskWriter.h \
+	ByteArrayDiskWriterFactory.h CheckIntegrityCommand.cc \
+	CheckIntegrityCommand.h CheckIntegrityDispatcherCommand.cc \
+	CheckIntegrityDispatcherCommand.h CheckIntegrityEntry.cc \
+	CheckIntegrityEntry.h CheckIntegrityMan.h Checksum.cc \
+	Checksum.h ChecksumCheckIntegrityEntry.cc \
+	ChecksumCheckIntegrityEntry.h ChunkChecksum.cc ChunkChecksum.h \
+	ChunkedDecodingStreamFilter.cc ChunkedDecodingStreamFilter.h \
+	ColorizedStream.cc ColorizedStream.h Command.cc Command.h \
+	common.h ConnectCommand.cc ConnectCommand.h console.cc \
+	console.h ConsoleStatCalc.cc ConsoleStatCalc.h \
 	ContentTypeRequestGroupCriteria.cc \
-	ContentTypeRequestGroupCriteria.h DownloadHandler.cc \
+	ContentTypeRequestGroupCriteria.h Context.cc Context.h \
+	ContextAttribute.cc ContextAttribute.h ControlChain.h \
+	Cookie.cc Cookie.h CookieStorage.cc CookieStorage.h \
+	cookie_helper.cc cookie_helper.h CreateRequestCommand.cc \
+	CreateRequestCommand.h crypto_endian.h CUIDCounter.cc \
+	CUIDCounter.h DefaultAuthResolver.cc DefaultAuthResolver.h \
+	DefaultBtProgressInfoFile.cc DefaultBtProgressInfoFile.h \
+	DefaultDiskWriter.cc DefaultDiskWriter.h \
+	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h \
+	DefaultPieceStorage.cc DefaultPieceStorage.h \
+	DefaultStreamPieceSelector.cc DefaultStreamPieceSelector.h \
+	Dependency.h DirectDiskAdaptor.cc DirectDiskAdaptor.h \
+	DiskAdaptor.cc DiskAdaptor.h DiskWriter.h DiskWriterFactory.h \
+	DlAbortEx.cc DlAbortEx.h DlRetryEx.cc DlRetryEx.h DNSCache.cc \
+	DNSCache.h DownloadCommand.cc DownloadCommand.h \
+	DownloadContext.cc DownloadContext.h DownloadEngine.cc \
+	DownloadEngine.h DownloadEngineFactory.cc \
+	DownloadEngineFactory.h DownloadFailureException.cc \
+	DownloadFailureException.h DownloadHandler.cc \
 	DownloadHandler.h DownloadHandlerConstants.cc \
-	DownloadHandlerConstants.h download_handlers.cc \
-	download_handlers.h MemoryPreDownloadHandler.h \
-	MemoryBufferPreDownloadHandler.h HaveEraseCommand.cc \
-	HaveEraseCommand.h Piece.cc Piece.h CheckIntegrityMan.h \
-	CheckIntegrityEntry.cc CheckIntegrityEntry.h \
-	PieceHashCheckIntegrityEntry.cc PieceHashCheckIntegrityEntry.h \
-	StreamCheckIntegrityEntry.cc StreamCheckIntegrityEntry.h \
-	IteratableValidator.h DiskAdaptor.cc DiskAdaptor.h \
-	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h \
-	DirectDiskAdaptor.cc DirectDiskAdaptor.h MultiDiskAdaptor.cc \
-	MultiDiskAdaptor.h MultiFileAllocationIterator.cc \
-	MultiFileAllocationIterator.h ByteArrayDiskWriter.cc \
-	ByteArrayDiskWriter.h ByteArrayDiskWriterFactory.h \
-	DownloadContext.cc DownloadContext.h TimedHaltCommand.cc \
-	TimedHaltCommand.h CUIDCounter.cc CUIDCounter.h DNSCache.cc \
-	DNSCache.h DownloadResult.cc DownloadResult.h \
-	PostDownloadHandler.h PreDownloadHandler.h SingletonHolder.h \
-	a2algo.h a2functional.h a2io.h a2netcompat.h a2time.h \
-	array_fun.h help_tags.cc help_tags.h prefs.cc prefs.h \
-	usage_text.h ProtocolDetector.cc ProtocolDetector.h \
-	NullStatCalc.h HttpSkipResponseCommand.cc \
-	HttpSkipResponseCommand.h InitiateConnectionCommand.cc \
-	InitiateConnectionCommand.h FtpFinishDownloadCommand.cc \
-	FtpFinishDownloadCommand.h A2STR.cc A2STR.h \
-	RarestPieceSelector.cc RarestPieceSelector.h Signature.cc \
-	Signature.h ServerStat.cc ServerStat.h ServerStatMan.cc \
-	ServerStatMan.h URISelector.h AdaptiveURISelector.cc \
-	AdaptiveURISelector.h InorderURISelector.cc \
-	InorderURISelector.h FeedbackURISelector.cc \
-	FeedbackURISelector.h NsCookieParser.cc NsCookieParser.h \
-	CookieStorage.cc CookieStorage.h SocketBuffer.cc \
-	SocketBuffer.h SocketRecvBuffer.cc SocketRecvBuffer.h \
-	OptionHandlerException.cc OptionHandlerException.h \
-	URIResult.cc URIResult.h EventPoll.h SelectEventPoll.cc \
-	SelectEventPoll.h SequentialPicker.h \
-	SequentialDispatcherCommand.h PieceSelector.h \
+	DownloadHandlerConstants.h DownloadResult.cc DownloadResult.h \
+	download_handlers.cc download_handlers.h download_helper.cc \
+	download_helper.h error_code.h Event.h EventPoll.h \
+	Exception.cc Exception.h FatalException.cc FatalException.h \
+	FeatureConfig.cc FeatureConfig.h FeedbackURISelector.cc \
+	FeedbackURISelector.h File.cc File.h FileAllocationCommand.cc \
+	FileAllocationCommand.h FileAllocationDispatcherCommand.cc \
+	FileAllocationDispatcherCommand.h FileAllocationEntry.cc \
+	FileAllocationEntry.h FileAllocationIterator.h \
+	FileAllocationMan.h FileEntry.cc FileEntry.h \
+	FillRequestGroupCommand.cc FillRequestGroupCommand.h fmt.cc \
+	fmt.h FtpConnection.cc FtpConnection.h FtpDownloadCommand.cc \
+	FtpDownloadCommand.h FtpFinishDownloadCommand.cc \
+	FtpFinishDownloadCommand.h FtpInitiateConnectionCommand.cc \
+	FtpInitiateConnectionCommand.h FtpNegotiationCommand.cc \
+	FtpNegotiationCommand.h FtpNegotiationConnectChain.h \
+	FtpTunnelRequestCommand.cc FtpTunnelRequestCommand.h \
+	FtpTunnelRequestConnectChain.h FtpTunnelResponseCommand.cc \
+	FtpTunnelResponseCommand.h GenericParser.h \
+	GeomStreamPieceSelector.cc GeomStreamPieceSelector.h \
+	GroupId.cc GroupId.h GrowSegment.cc GrowSegment.h \
+	HashFuncEntry.h HaveEraseCommand.cc HaveEraseCommand.h \
+	help_tags.cc help_tags.h HttpConnection.cc HttpConnection.h \
+	HttpDownloadCommand.cc HttpDownloadCommand.h HttpHeader.cc \
+	HttpHeader.h HttpHeaderProcessor.cc HttpHeaderProcessor.h \
+	HttpInitiateConnectionCommand.cc \
+	HttpInitiateConnectionCommand.h HttpListenCommand.cc \
+	HttpListenCommand.h HttpProxyRequestCommand.cc \
+	HttpProxyRequestCommand.h HttpProxyRequestConnectChain.h \
+	HttpProxyResponseCommand.cc HttpProxyResponseCommand.h \
+	HttpRequest.cc HttpRequest.h HttpRequestCommand.cc \
+	HttpRequestCommand.h HttpRequestConnectChain.h HttpResponse.cc \
+	HttpResponse.h HttpResponseCommand.cc HttpResponseCommand.h \
+	HttpServer.cc HttpServer.h HttpServerBodyCommand.cc \
+	HttpServerBodyCommand.h HttpServerCommand.cc \
+	HttpServerCommand.h HttpServerResponseCommand.cc \
+	HttpServerResponseCommand.h HttpSkipResponseCommand.cc \
+	HttpSkipResponseCommand.h IndexedList.h \
+	InitiateConnectionCommand.cc InitiateConnectionCommand.h \
+	InitiateConnectionCommandFactory.cc \
+	InitiateConnectionCommandFactory.h \
+	InorderStreamPieceSelector.cc InorderStreamPieceSelector.h \
+	InorderURISelector.cc InorderURISelector.h IOFile.cc IOFile.h \
+	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
+	IteratableChunkChecksumValidator.cc \
+	IteratableChunkChecksumValidator.h IteratableValidator.h \
+	json.cc json.h JsonDiskWriter.h JsonParser.cc JsonParser.h \
+	Lock.h LogFactory.cc LogFactory.h Logger.cc Logger.h \
 	LongestSequencePieceSelector.cc LongestSequencePieceSelector.h \
-	bitfield.cc bitfield.h CreateRequestCommand.cc \
-	CreateRequestCommand.h error_code.h wallclock.cc wallclock.h \
-	download_helper.cc download_helper.h MetadataInfo.cc \
-	MetadataInfo.h SessionSerializer.cc SessionSerializer.h \
-	Event.h timespec.h ValueBase.cc ValueBase.h \
-	ContextAttribute.cc ContextAttribute.h TorrentAttribute.cc \
-	TorrentAttribute.h AdaptiveFileAllocationIterator.cc \
-	AdaptiveFileAllocationIterator.h \
-	TruncFileAllocationIterator.cc TruncFileAllocationIterator.h \
-	StreamFilter.cc StreamFilter.h SinkStreamFilter.cc \
-	SinkStreamFilter.h ChunkedDecodingStreamFilter.cc \
-	ChunkedDecodingStreamFilter.h NullSinkStreamFilter.cc \
-	NullSinkStreamFilter.h uri.cc uri.h uri_split.c uri_split.h \
-	cookie_helper.cc cookie_helper.h json.cc json.h JsonParser.cc \
-	JsonParser.h StructParserStateMachine.h GenericParser.h \
-	ValueBaseJsonParser.h ValueBaseStructParserState.h \
-	ValueBaseStructParserStateImpl.cc \
+	MemoryBufferPreDownloadHandler.h MemoryPreDownloadHandler.h \
+	message.h MessageDigest.cc MessageDigest.h MessageDigestImpl.h \
+	message_digest_helper.cc message_digest_helper.h \
+	MetadataInfo.cc MetadataInfo.h MetalinkHttpEntry.cc \
+	MetalinkHttpEntry.h MultiDiskAdaptor.cc MultiDiskAdaptor.h \
+	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h \
+	MultiUrlRequestInfo.cc MultiUrlRequestInfo.h NameResolver.cc \
+	NameResolver.h Netrc.cc Netrc.h NetrcAuthResolver.cc \
+	NetrcAuthResolver.h NetStat.cc NetStat.h Notifier.cc \
+	Notifier.h NsCookieParser.cc NsCookieParser.h NullHandle.h \
+	NullOutputFile.h NullProgressInfoFile.h \
+	NullSinkStreamFilter.cc NullSinkStreamFilter.h NullStatCalc.h \
+	Option.cc Option.h OptionHandler.cc OptionHandler.h \
+	OptionHandlerException.cc OptionHandlerException.h \
+	OptionHandlerFactory.cc OptionHandlerFactory.h \
+	OptionHandlerImpl.cc OptionHandlerImpl.h OptionParser.cc \
+	OptionParser.h option_processing.cc OutputFile.h \
+	paramed_string.cc paramed_string.h PeerStat.cc PeerStat.h \
+	Piece.cc Piece.h PiecedSegment.cc PiecedSegment.h \
+	PieceHashCheckIntegrityEntry.cc PieceHashCheckIntegrityEntry.h \
+	PieceSelector.h PieceStatMan.cc PieceStatMan.h PieceStorage.h \
+	Platform.cc Platform.h PostDownloadHandler.h \
+	PreDownloadHandler.h prefs.cc prefs.h ProgressAwareEntry.h \
+	ProtocolDetector.cc ProtocolDetector.h Randomizer.h Range.cc \
+	Range.h RarestPieceSelector.cc RarestPieceSelector.h \
+	RealtimeCommand.cc RealtimeCommand.h RecoverableException.cc \
+	RecoverableException.h Request.cc Request.h RequestGroup.cc \
+	RequestGroup.h RequestGroupCriteria.h RequestGroupEntry.cc \
+	RequestGroupEntry.h RequestGroupMan.cc RequestGroupMan.h \
+	RpcMethod.cc RpcMethod.h RpcMethodFactory.cc \
+	RpcMethodFactory.h RpcMethodImpl.cc RpcMethodImpl.h \
+	RpcRequest.cc RpcRequest.h RpcResponse.cc RpcResponse.h \
+	rpc_helper.cc rpc_helper.h SaveSessionCommand.h \
+	SaveSessionCommand.cc SegList.h Segment.h SegmentMan.cc \
+	SegmentMan.h SelectEventPoll.cc SelectEventPoll.h \
+	SequentialDispatcherCommand.h SequentialPicker.h ServerStat.cc \
+	ServerStat.h ServerStatMan.cc ServerStatMan.h \
+	SessionSerializer.cc SessionSerializer.h Signature.cc \
+	Signature.h SimpleRandomizer.cc SimpleRandomizer.h \
+	SingleFileAllocationIterator.cc SingleFileAllocationIterator.h \
+	SingletonHolder.h SinkStreamFilter.cc SinkStreamFilter.h \
+	SocketBuffer.cc SocketBuffer.h SocketCore.cc SocketCore.h \
+	SocketRecvBuffer.cc SocketRecvBuffer.h SpeedCalc.cc \
+	SpeedCalc.h StatCalc.h StreamCheckIntegrityEntry.cc \
+	StreamCheckIntegrityEntry.h StreamFileAllocationEntry.cc \
+	StreamFileAllocationEntry.h StreamFilter.cc StreamFilter.h \
+	StreamPieceSelector.h StructParserStateMachine.h TimeA2.cc \
+	TimeA2.h TimeBasedCommand.cc TimeBasedCommand.h \
+	TimedHaltCommand.cc TimedHaltCommand.h TimerA2.cc TimerA2.h \
+	timespec.h TorrentAttribute.cc TorrentAttribute.h \
+	TransferStat.cc TransferStat.h TruncFileAllocationIterator.cc \
+	TruncFileAllocationIterator.h UnknownLengthPieceStorage.cc \
+	UnknownLengthPieceStorage.h UnknownOptionException.cc \
+	UnknownOptionException.h uri.cc uri.h UriListParser.cc \
+	UriListParser.h URIResult.cc URIResult.h URISelector.h \
+	uri_split.c uri_split.h usage_text.h util.cc util.h \
+	util_security.cc util_security.h ValueBase.cc ValueBase.h \
+	ValueBaseDiskWriter.h ValueBaseJsonParser.h \
+	ValueBaseStructParserState.h ValueBaseStructParserStateImpl.cc \
 	ValueBaseStructParserStateImpl.h \
 	ValueBaseStructParserStateMachine.cc \
-	ValueBaseStructParserStateMachine.h JsonDiskWriter.h \
-	HttpServerBodyCommand.cc HttpServerBodyCommand.h RpcRequest.cc \
-	RpcRequest.h RpcMethod.cc RpcMethod.h RpcMethodImpl.cc \
-	RpcMethodImpl.h RpcMethodFactory.cc RpcMethodFactory.h \
-	RpcResponse.cc RpcResponse.h HttpListenCommand.cc \
-	HttpListenCommand.h HttpServerCommand.cc HttpServerCommand.h \
-	HttpServerResponseCommand.cc HttpServerResponseCommand.h \
-	AbstractHttpServerResponseCommand.cc \
-	AbstractHttpServerResponseCommand.h HttpServer.cc HttpServer.h \
-	StreamPieceSelector.h DefaultStreamPieceSelector.cc \
-	DefaultStreamPieceSelector.h InorderStreamPieceSelector.cc \
-	InorderStreamPieceSelector.h GeomStreamPieceSelector.cc \
-	GeomStreamPieceSelector.h MetalinkHttpEntry.cc \
-	MetalinkHttpEntry.h OutputFile.h NullOutputFile.h console.cc \
-	console.h ColorizedStream.cc ColorizedStream.h IOFile.cc \
-	IOFile.h BufferedFile.cc BufferedFile.h SegList.h NullHandle.h \
-	a2iterator.h paramed_string.cc paramed_string.h rpc_helper.cc \
-	rpc_helper.h WatchProcessCommand.cc WatchProcessCommand.h \
-	UnknownOptionException.cc UnknownOptionException.h Notifier.cc \
-	Notifier.h ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
+	ValueBaseStructParserStateMachine.h version_usage.cc \
+	wallclock.cc wallclock.h WatchProcessCommand.cc \
+	WatchProcessCommand.h WrDiskCache.cc WrDiskCache.h \
+	WrDiskCacheEntry.cc WrDiskCacheEntry.h \
 	XmlRpcRequestParserController.cc \
-	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
-	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
-	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
-	ConnectCommand.cc ConnectCommand.h ControlChain.h \
-	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
-	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
-	Lock.h android/android.c android/arm-ftruncate64.S \
-	android/mips-ftruncate64.S android/x86-ftruncate64.S \
-	android/x86-asm.h WinConsoleFile.cc WinConsoleFile.h \
-	WebSocketSession.cc WebSocketSession.h WebSocketSessionMan.cc \
-	WebSocketSessionMan.h WebSocketResponseCommand.cc \
-	WebSocketResponseCommand.h WebSocketInteractionCommand.cc \
-	WebSocketInteractionCommand.h NullWebSocketSessionMan.h \
-	XmlAttr.cc XmlAttr.h XmlParser.cc XmlParser.h \
-	ParserStateMachine.h Xml2XmlParser.cc Xml2XmlParser.h \
-	ExpatXmlParser.cc ExpatXmlParser.h \
+	XmlRpcRequestParserController.h OpenedFileCounter.cc \
+	OpenedFileCounter.h android/android.c \
+	android/arm-ftruncate64.S android/mips-ftruncate64.S \
+	android/x86-ftruncate64.S android/x86-asm.h WinConsoleFile.cc \
+	WinConsoleFile.h WebSocketInteractionCommand.cc \
+	WebSocketInteractionCommand.h WebSocketResponseCommand.cc \
+	WebSocketResponseCommand.h WebSocketSession.cc \
+	WebSocketSession.h WebSocketSessionMan.cc \
+	WebSocketSessionMan.h NullWebSocketSessionMan.h \
+	ParserStateMachine.h XmlAttr.cc XmlAttr.h XmlParser.cc \
+	XmlParser.h Xml2XmlParser.cc Xml2XmlParser.h ExpatXmlParser.cc \
+	ExpatXmlParser.h XmlRpcDiskWriter.cc XmlRpcDiskWriter.h \
+	XmlRpcRequestParserState.h XmlRpcRequestParserStateImpl.cc \
+	XmlRpcRequestParserStateImpl.h \
 	XmlRpcRequestParserStateMachine.cc \
-	XmlRpcRequestParserStateMachine.h XmlRpcRequestParserState.h \
-	XmlRpcRequestParserStateImpl.cc XmlRpcRequestParserStateImpl.h \
-	XmlRpcDiskWriter.cc XmlRpcDiskWriter.h \
+	XmlRpcRequestParserStateMachine.h \
 	FallocFileAllocationIterator.cc FallocFileAllocationIterator.h \
 	EpollEventPoll.cc EpollEventPoll.h TLSContext.h TLSSession.h \
 	AppleMessageDigestImpl.cc AppleTLSContext.cc AppleTLSContext.h \
-	AppleTLSSession.cc AppleTLSSession.h WinMessageDigestImpl.cc \
-	WinTLSContext.cc WinTLSContext.h WinTLSSession.cc \
-	WinTLSSession.h InternalDHKeyExchange.cc \
-	InternalDHKeyExchange.h bignum.h InternalARC4Encryptor.cc \
-	InternalARC4Encryptor.h InternalMessageDigestImpl.cc sha1.c \
-	sha1.h md5.c md5.h LibgnutlsTLSContext.cc \
-	LibgnutlsTLSContext.h LibgnutlsTLSSession.cc \
-	LibgnutlsTLSSession.h LibgcryptARC4Encryptor.cc \
-	LibgcryptARC4Encryptor.h LibgcryptDHKeyExchange.cc \
-	LibgcryptDHKeyExchange.h LibgcryptMessageDigestImpl.cc \
-	LibnettleARC4Encryptor.cc LibnettleARC4Encryptor.h \
-	LibnettleMessageDigestImpl.cc a2gmp.cc a2gmp.h \
-	LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
+	AppleTLSSession.cc AppleTLSSession.h WinTLSContext.cc \
+	WinTLSContext.h WinTLSSession.cc WinTLSSession.h bignum.h \
+	InternalDHKeyExchange.cc InternalDHKeyExchange.h \
+	InternalARC4Encryptor.cc InternalARC4Encryptor.h \
+	InternalMessageDigestImpl.cc crypto_hash.cc crypto_hash.h \
+	LibgnutlsTLSContext.cc LibgnutlsTLSContext.h \
+	LibgnutlsTLSSession.cc LibgnutlsTLSSession.h \
+	LibgcryptARC4Encryptor.cc LibgcryptARC4Encryptor.h \
+	LibgcryptDHKeyExchange.cc LibgcryptDHKeyExchange.h \
+	LibgcryptMessageDigestImpl.cc LibnettleARC4Encryptor.cc \
+	LibnettleARC4Encryptor.h LibnettleMessageDigestImpl.cc \
+	a2gmp.cc a2gmp.h LibgmpDHKeyExchange.cc LibgmpDHKeyExchange.h \
 	LibsslARC4Encryptor.cc LibsslARC4Encryptor.h \
 	LibsslDHKeyExchange.cc LibsslDHKeyExchange.h \
 	LibsslTLSContext.cc LibsslTLSContext.h LibsslTLSSession.cc \
-	LibsslTLSSession.h LibsslMessageDigestImpl.cc GZipEncoder.cc \
-	GZipEncoder.h GZipDecodingStreamFilter.cc \
-	GZipDecodingStreamFilter.h GZipFile.cc GZipFile.h \
+	LibsslTLSSession.h LibsslMessageDigestImpl.cc \
+	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h \
+	GZipEncoder.cc GZipEncoder.h GZipFile.cc GZipFile.h \
 	Sqlite3CookieParser.cc Sqlite3CookieParser.h \
 	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h \
 	AsyncNameResolver.cc AsyncNameResolver.h \
 	AsyncNameResolverMan.cc AsyncNameResolverMan.h \
-	IteratableChunkChecksumValidator.cc \
-	IteratableChunkChecksumValidator.h \
-	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
-	CheckIntegrityDispatcherCommand.cc \
-	CheckIntegrityDispatcherCommand.h CheckIntegrityCommand.cc \
-	CheckIntegrityCommand.h ChecksumCheckIntegrityEntry.cc \
-	ChecksumCheckIntegrityEntry.h message_digest_helper.cc \
-	message_digest_helper.h Checksum.cc Checksum.h \
-	ChunkChecksum.cc ChunkChecksum.h MessageDigest.cc \
-	MessageDigest.h MessageDigestImpl.h HashFuncEntry.h \
-	PeerAbstractCommand.cc PeerAbstractCommand.h \
-	PeerInitiateConnectionCommand.cc \
-	PeerInitiateConnectionCommand.h PeerInteractionCommand.cc \
-	PeerInteractionCommand.h Peer.cc Peer.h PeerSessionResource.cc \
-	PeerSessionResource.h PeerConnection.cc PeerConnection.h \
-	PeerListenCommand.cc PeerListenCommand.h BtRegistry.cc \
-	BtRegistry.h RequestSlot.cc RequestSlot.h \
-	TrackerWatcherCommand.cc TrackerWatcherCommand.h \
-	PeerChokeCommand.cc PeerChokeCommand.h SeedCriteria.h \
-	TimeSeedCriteria.cc TimeSeedCriteria.h \
-	ShareRatioSeedCriteria.cc ShareRatioSeedCriteria.h \
-	UnionSeedCriteria.cc UnionSeedCriteria.h SeedCheckCommand.cc \
-	SeedCheckCommand.h AnnounceTier.cc AnnounceTier.h \
-	AnnounceList.h AnnounceList.cc PeerStorage.h \
-	DefaultPeerStorage.cc DefaultPeerStorage.h BtAnnounce.cc \
-	BtAnnounce.h DefaultBtAnnounce.cc DefaultBtAnnounce.h \
-	BtRuntime.cc BtRuntime.h BtMessage.h AbstractBtMessage.cc \
-	AbstractBtMessage.h SimpleBtMessage.cc SimpleBtMessage.h \
-	BtAllowedFastMessage.cc BtAllowedFastMessage.h \
-	BtBitfieldMessage.cc BtBitfieldMessage.h BtCancelMessage.cc \
-	BtCancelMessage.h BtChokeMessage.cc BtChokeMessage.h \
+	AbstractBtMessage.cc AbstractBtMessage.h \
+	ActivePeerConnectionCommand.cc ActivePeerConnectionCommand.h \
+	AnnounceList.h AnnounceList.cc AnnounceTier.cc AnnounceTier.h \
+	ARC4Encryptor.h bencode2.cc bencode2.h BencodeDiskWriter.h \
+	BencodeDiskWriterFactory.h BencodeParser.cc BencodeParser.h \
+	bittorrent_helper.cc bittorrent_helper.h \
+	BtAbortOutstandingRequestEvent.cc \
+	BtAbortOutstandingRequestEvent.h BtAllowedFastMessage.cc \
+	BtAllowedFastMessage.h BtAnnounce.cc BtAnnounce.h \
+	BtBitfieldMessage.cc BtBitfieldMessage.h \
+	BtBitfieldMessageValidator.cc BtBitfieldMessageValidator.h \
+	BtCancelMessage.cc BtCancelMessage.h \
+	BtCancelSendingPieceEvent.h BtCheckIntegrityEntry.cc \
+	BtCheckIntegrityEntry.h BtChokeMessage.cc BtChokeMessage.h \
+	BtChokingEvent.h BtConstants.h BtDependency.cc BtDependency.h \
+	BtExtendedMessage.cc BtExtendedMessage.h \
+	BtFileAllocationEntry.cc BtFileAllocationEntry.h \
+	BtHandshakeMessage.cc BtHandshakeMessage.h \
+	BtHandshakeMessageValidator.cc BtHandshakeMessageValidator.h \
 	BtHaveAllMessage.cc BtHaveAllMessage.h BtHaveMessage.cc \
 	BtHaveMessage.h BtHaveNoneMessage.cc BtHaveNoneMessage.h \
-	BtInterestedMessage.cc BtInterestedMessage.h \
+	BtInteractive.h BtInterestedMessage.cc BtInterestedMessage.h \
 	BtKeepAliveMessage.cc BtKeepAliveMessage.h \
-	BtNotInterestedMessage.cc BtNotInterestedMessage.h \
-	BtPieceMessage.cc BtPieceMessage.h BtPortMessage.cc \
-	BtPortMessage.h BtRejectMessage.cc BtRejectMessage.h \
-	BtRequestMessage.cc BtRequestMessage.h \
-	BtSuggestPieceMessage.cc BtSuggestPieceMessage.h \
-	BtUnchokeMessage.cc BtUnchokeMessage.h BtHandshakeMessage.cc \
-	BtHandshakeMessage.h BtMessageValidator.h \
-	BtBitfieldMessageValidator.cc BtBitfieldMessageValidator.h \
+	BtLeecherStateChoke.cc BtLeecherStateChoke.h BtMessage.h \
+	BtMessageDispatcher.h BtMessageFactory.h BtMessageReceiver.h \
+	BtMessageValidator.h BtNotInterestedMessage.cc \
+	BtNotInterestedMessage.h BtPieceMessage.cc BtPieceMessage.h \
 	BtPieceMessageValidator.cc BtPieceMessageValidator.h \
-	BtHandshakeMessageValidator.cc BtHandshakeMessageValidator.h \
-	BtMessageFactory.h DefaultBtMessageFactory.cc \
-	DefaultBtMessageFactory.h BtMessageDispatcher.h \
+	BtPortMessage.cc BtPortMessage.h BtPostDownloadHandler.cc \
+	BtPostDownloadHandler.h BtRegistry.cc BtRegistry.h \
+	BtRejectMessage.cc BtRejectMessage.h BtRequestFactory.h \
+	BtRequestMessage.cc BtRequestMessage.h BtRuntime.cc \
+	BtRuntime.h BtSeederStateChoke.cc BtSeederStateChoke.h \
+	BtSetup.cc BtSetup.h BtStopDownloadCommand.cc \
+	BtStopDownloadCommand.h BtSuggestPieceMessage.cc \
+	BtSuggestPieceMessage.h BtUnchokeMessage.cc BtUnchokeMessage.h \
+	DefaultBtAnnounce.cc DefaultBtAnnounce.h \
+	DefaultBtInteractive.cc DefaultBtInteractive.h \
 	DefaultBtMessageDispatcher.cc DefaultBtMessageDispatcher.h \
-	BtMessageReceiver.h DefaultBtMessageReceiver.cc \
-	DefaultBtMessageReceiver.h BtRequestFactory.h \
+	DefaultBtMessageFactory.cc DefaultBtMessageFactory.h \
+	DefaultBtMessageReceiver.cc DefaultBtMessageReceiver.h \
 	DefaultBtRequestFactory.cc DefaultBtRequestFactory.h \
-	BtCancelSendingPieceEvent.h BtAbortOutstandingRequestEvent.cc \
-	BtAbortOutstandingRequestEvent.h BtChokingEvent.h \
-	BtInteractive.h DefaultBtInteractive.cc DefaultBtInteractive.h \
-	ActivePeerConnectionCommand.cc ActivePeerConnectionCommand.h \
-	BtDependency.cc BtDependency.h PeerReceiveHandshakeCommand.cc \
-	PeerReceiveHandshakeCommand.h BtSetup.cc BtSetup.h \
-	BtFileAllocationEntry.cc BtFileAllocationEntry.h \
-	BtPostDownloadHandler.cc BtPostDownloadHandler.h \
-	BtCheckIntegrityEntry.cc BtCheckIntegrityEntry.h \
-	BtExtendedMessage.cc BtExtendedMessage.h ExtensionMessage.h \
-	ExtensionMessageFactory.h DefaultExtensionMessageFactory.cc \
-	DefaultExtensionMessageFactory.h HandshakeExtensionMessage.cc \
-	HandshakeExtensionMessage.h UTPexExtensionMessage.cc \
-	UTPexExtensionMessage.h UTMetadataExtensionMessage.cc \
-	UTMetadataExtensionMessage.h \
-	UTMetadataRequestExtensionMessage.cc \
-	UTMetadataRequestExtensionMessage.h \
-	UTMetadataRejectExtensionMessage.cc \
-	UTMetadataRejectExtensionMessage.h \
-	UTMetadataDataExtensionMessage.cc \
-	UTMetadataDataExtensionMessage.h UTMetadataRequestTracker.cc \
-	UTMetadataRequestTracker.h UTMetadataRequestFactory.cc \
-	UTMetadataRequestFactory.h UTMetadataPostDownloadHandler.cc \
-	UTMetadataPostDownloadHandler.h magnet.cc magnet.h DHTNode.cc \
-	DHTNode.h DHTBucket.cc DHTBucket.h DHTRoutingTable.cc \
-	DHTRoutingTable.h DHTMessageEntry.cc DHTMessageEntry.h \
-	DHTMessageDispatcher.h DHTMessageDispatcherImpl.cc \
-	DHTMessageDispatcherImpl.h DHTMessageReceiver.cc \
-	DHTMessageReceiver.h DHTMessageTracker.cc DHTMessageTracker.h \
-	DHTMessageTrackerEntry.cc DHTMessageTrackerEntry.h \
-	DHTMessage.cc DHTMessage.h DHTConnection.h \
-	DHTConnectionImpl.cc DHTConnectionImpl.h DHTAbstractMessage.cc \
-	DHTAbstractMessage.h DHTQueryMessage.cc DHTQueryMessage.h \
-	DHTResponseMessage.cc DHTResponseMessage.h DHTPingMessage.cc \
-	DHTPingMessage.h DHTPingReplyMessage.cc DHTPingReplyMessage.h \
-	DHTFindNodeMessage.cc DHTFindNodeMessage.h \
-	DHTFindNodeReplyMessage.cc DHTFindNodeReplyMessage.h \
-	DHTGetPeersMessage.cc DHTGetPeersMessage.h \
-	DHTGetPeersReplyMessage.cc DHTGetPeersReplyMessage.h \
-	DHTAnnouncePeerMessage.cc DHTAnnouncePeerMessage.h \
-	DHTAnnouncePeerReplyMessage.cc DHTAnnouncePeerReplyMessage.h \
-	DHTUnknownMessage.cc DHTUnknownMessage.h DHTMessageFactory.h \
-	DHTMessageFactoryImpl.cc DHTMessageFactoryImpl.h \
-	DHTNodeLookupTask.cc DHTNodeLookupTask.h DHTNodeLookupEntry.cc \
-	DHTNodeLookupEntry.h DHTBucketTree.cc DHTBucketTree.h \
-	DHTMessageCallback.h DHTNodeLookupTaskCallback.cc \
-	DHTNodeLookupTaskCallback.h DHTPingReplyMessageCallback.h \
-	DHTPeerLookupTaskCallback.cc DHTPeerLookupTaskCallback.h \
-	DHTAbstractTask.cc DHTAbstractTask.h DHTTask.h DHTPingTask.cc \
-	DHTPingTask.h DHTTaskQueue.h DHTTaskQueueImpl.cc \
-	DHTTaskQueueImpl.h DHTTaskExecutor.cc DHTTaskExecutor.h \
+	DefaultExtensionMessageFactory.cc \
+	DefaultExtensionMessageFactory.h DefaultPeerStorage.cc \
+	DefaultPeerStorage.h DHKeyExchange.h DHTAbstractMessage.cc \
+	DHTAbstractMessage.h DHTAbstractNodeLookupTask.h \
+	DHTAbstractTask.cc DHTAbstractTask.h DHTAnnouncePeerMessage.cc \
+	DHTAnnouncePeerMessage.h DHTAnnouncePeerReplyMessage.cc \
+	DHTAnnouncePeerReplyMessage.h DHTAutoSaveCommand.cc \
+	DHTAutoSaveCommand.h DHTBucket.cc DHTBucket.h \
+	DHTBucketRefreshCommand.cc DHTBucketRefreshCommand.h \
 	DHTBucketRefreshTask.cc DHTBucketRefreshTask.h \
-	DHTAbstractNodeLookupTask.h DHTPeerLookupTask.cc \
-	DHTPeerLookupTask.h DHTSetup.cc DHTSetup.h DHTTaskFactory.h \
-	DHTTaskFactoryImpl.cc DHTTaskFactoryImpl.h \
-	DHTInteractionCommand.cc DHTInteractionCommand.h \
+	DHTBucketTree.cc DHTBucketTree.h DHTConnection.h \
+	DHTConnectionImpl.cc DHTConnectionImpl.h DHTConstants.h \
+	DHTEntryPointNameResolveCommand.cc \
+	DHTEntryPointNameResolveCommand.h DHTFindNodeMessage.cc \
+	DHTFindNodeMessage.h DHTFindNodeReplyMessage.cc \
+	DHTFindNodeReplyMessage.h DHTGetPeersCommand.cc \
+	DHTGetPeersCommand.h DHTGetPeersMessage.cc \
+	DHTGetPeersMessage.h DHTGetPeersReplyMessage.cc \
+	DHTGetPeersReplyMessage.h DHTIDCloser.h \
+	DHTInteractionCommand.cc DHTInteractionCommand.h DHTMessage.cc \
+	DHTMessage.h DHTMessageCallback.h DHTMessageDispatcher.h \
+	DHTMessageDispatcherImpl.cc DHTMessageDispatcherImpl.h \
+	DHTMessageEntry.cc DHTMessageEntry.h DHTMessageFactory.h \
+	DHTMessageFactoryImpl.cc DHTMessageFactoryImpl.h \
+	DHTMessageReceiver.cc DHTMessageReceiver.h \
+	DHTMessageTracker.cc DHTMessageTracker.h \
+	DHTMessageTrackerEntry.cc DHTMessageTrackerEntry.h DHTNode.cc \
+	DHTNode.h DHTNodeLookupEntry.cc DHTNodeLookupEntry.h \
+	DHTNodeLookupTask.cc DHTNodeLookupTask.h \
+	DHTNodeLookupTaskCallback.cc DHTNodeLookupTaskCallback.h \
+	DHTPeerAnnounceCommand.cc DHTPeerAnnounceCommand.h \
 	DHTPeerAnnounceEntry.cc DHTPeerAnnounceEntry.h \
 	DHTPeerAnnounceStorage.cc DHTPeerAnnounceStorage.h \
-	DHTTokenTracker.cc DHTTokenTracker.h DHTGetPeersCommand.cc \
-	DHTGetPeersCommand.h DHTTokenUpdateCommand.cc \
-	DHTTokenUpdateCommand.h DHTBucketRefreshCommand.cc \
-	DHTBucketRefreshCommand.h DHTPeerAnnounceCommand.cc \
-	DHTPeerAnnounceCommand.h DHTReplaceNodeTask.cc \
-	DHTReplaceNodeTask.h DHTEntryPointNameResolveCommand.cc \
-	DHTEntryPointNameResolveCommand.h DHTRoutingTableSerializer.cc \
-	DHTRoutingTableSerializer.h DHTRoutingTableDeserializer.cc \
-	DHTRoutingTableDeserializer.h DHTAutoSaveCommand.cc \
-	DHTAutoSaveCommand.h DHTRegistry.cc DHTRegistry.h \
-	DHTIDCloser.h DHTConstants.h XORCloser.h PeerAddrEntry.cc \
-	PeerAddrEntry.h InitiatorMSEHandshakeCommand.cc \
-	InitiatorMSEHandshakeCommand.h ReceiverMSEHandshakeCommand.cc \
-	ReceiverMSEHandshakeCommand.h MSEHandshake.cc MSEHandshake.h \
-	ARC4Encryptor.h DHKeyExchange.h BtConstants.h \
-	BtLeecherStateChoke.cc BtLeecherStateChoke.h \
-	BtSeederStateChoke.cc BtSeederStateChoke.h RangeBtMessage.cc \
-	RangeBtMessage.h IndexBtMessage.cc IndexBtMessage.h \
-	ZeroBtMessage.cc ZeroBtMessage.h RangeBtMessageValidator.cc \
-	RangeBtMessageValidator.h IndexBtMessageValidator.cc \
-	IndexBtMessageValidator.h ExtensionMessageRegistry.cc \
-	ExtensionMessageRegistry.h bittorrent_helper.cc \
-	bittorrent_helper.h BtStopDownloadCommand.cc \
-	BtStopDownloadCommand.h PriorityPieceSelector.cc \
-	PriorityPieceSelector.h LpdMessageDispatcher.cc \
-	LpdMessageDispatcher.h LpdMessageReceiver.cc \
-	LpdMessageReceiver.h LpdMessage.cc LpdMessage.h \
-	LpdReceiveMessageCommand.cc LpdReceiveMessageCommand.h \
+	DHTPeerLookupTask.cc DHTPeerLookupTask.h \
+	DHTPeerLookupTaskCallback.cc DHTPeerLookupTaskCallback.h \
+	DHTPingMessage.cc DHTPingMessage.h DHTPingReplyMessage.cc \
+	DHTPingReplyMessage.h DHTPingReplyMessageCallback.h \
+	DHTPingTask.cc DHTPingTask.h DHTQueryMessage.cc \
+	DHTQueryMessage.h DHTRegistry.cc DHTRegistry.h \
+	DHTReplaceNodeTask.cc DHTReplaceNodeTask.h \
+	DHTResponseMessage.cc DHTResponseMessage.h DHTRoutingTable.cc \
+	DHTRoutingTable.h DHTRoutingTableDeserializer.cc \
+	DHTRoutingTableDeserializer.h DHTRoutingTableSerializer.cc \
+	DHTRoutingTableSerializer.h DHTSetup.cc DHTSetup.h DHTTask.h \
+	DHTTaskExecutor.cc DHTTaskExecutor.h DHTTaskFactory.h \
+	DHTTaskFactoryImpl.cc DHTTaskFactoryImpl.h DHTTaskQueue.h \
+	DHTTaskQueueImpl.cc DHTTaskQueueImpl.h DHTTokenTracker.cc \
+	DHTTokenTracker.h DHTTokenUpdateCommand.cc \
+	DHTTokenUpdateCommand.h DHTUnknownMessage.cc \
+	DHTUnknownMessage.h ExtensionMessage.h \
+	ExtensionMessageFactory.h ExtensionMessageRegistry.cc \
+	ExtensionMessageRegistry.h HandshakeExtensionMessage.cc \
+	HandshakeExtensionMessage.h IndexBtMessage.cc IndexBtMessage.h \
+	IndexBtMessageValidator.cc IndexBtMessageValidator.h \
+	InitiatorMSEHandshakeCommand.cc InitiatorMSEHandshakeCommand.h \
 	LpdDispatchMessageCommand.cc LpdDispatchMessageCommand.h \
-	bencode2.cc bencode2.h BencodeParser.cc BencodeParser.h \
-	ValueBaseBencodeParser.h BencodeDiskWriter.h \
-	BencodeDiskWriterFactory.h MemoryBencodePreDownloadHandler.h \
+	LpdMessage.cc LpdMessage.h LpdMessageDispatcher.cc \
+	LpdMessageDispatcher.h LpdMessageReceiver.cc \
+	LpdMessageReceiver.h LpdReceiveMessageCommand.cc \
+	LpdReceiveMessageCommand.h magnet.cc magnet.h \
+	MemoryBencodePreDownloadHandler.h MSEHandshake.cc \
+	MSEHandshake.h NameResolveCommand.cc NameResolveCommand.h \
+	Peer.cc Peer.h PeerAbstractCommand.cc PeerAbstractCommand.h \
+	PeerAddrEntry.cc PeerAddrEntry.h PeerChokeCommand.cc \
+	PeerChokeCommand.h PeerConnection.cc PeerConnection.h \
+	PeerInitiateConnectionCommand.cc \
+	PeerInitiateConnectionCommand.h PeerInteractionCommand.cc \
+	PeerInteractionCommand.h PeerListenCommand.cc \
+	PeerListenCommand.h PeerReceiveHandshakeCommand.cc \
+	PeerReceiveHandshakeCommand.h PeerSessionResource.cc \
+	PeerSessionResource.h PeerStorage.h PriorityPieceSelector.cc \
+	PriorityPieceSelector.h RangeBtMessage.cc RangeBtMessage.h \
+	RangeBtMessageValidator.cc RangeBtMessageValidator.h \
+	ReceiverMSEHandshakeCommand.cc ReceiverMSEHandshakeCommand.h \
+	RequestSlot.cc RequestSlot.h SeedCheckCommand.cc \
+	SeedCheckCommand.h SeedCriteria.h ShareRatioSeedCriteria.cc \
+	ShareRatioSeedCriteria.h SimpleBtMessage.cc SimpleBtMessage.h \
+	TimeSeedCriteria.cc TimeSeedCriteria.h \
+	TrackerWatcherCommand.cc TrackerWatcherCommand.h \
 	UDPTrackerClient.cc UDPTrackerClient.h UDPTrackerRequest.cc \
-	UDPTrackerRequest.h NameResolveCommand.cc NameResolveCommand.h \
-	Metalinker.cc Metalinker.h MetalinkEntry.cc MetalinkEntry.h \
-	MetalinkResource.cc MetalinkResource.h MetalinkMetaurl.cc \
+	UDPTrackerRequest.h UnionSeedCriteria.cc UnionSeedCriteria.h \
+	UTMetadataDataExtensionMessage.cc \
+	UTMetadataDataExtensionMessage.h UTMetadataExtensionMessage.cc \
+	UTMetadataExtensionMessage.h UTMetadataPostDownloadHandler.cc \
+	UTMetadataPostDownloadHandler.h \
+	UTMetadataRejectExtensionMessage.cc \
+	UTMetadataRejectExtensionMessage.h \
+	UTMetadataRequestExtensionMessage.cc \
+	UTMetadataRequestExtensionMessage.h \
+	UTMetadataRequestFactory.cc UTMetadataRequestFactory.h \
+	UTMetadataRequestTracker.cc UTMetadataRequestTracker.h \
+	UTPexExtensionMessage.cc UTPexExtensionMessage.h \
+	ValueBaseBencodeParser.h XORCloser.h ZeroBtMessage.cc \
+	ZeroBtMessage.h Metalink2RequestGroup.cc \
+	Metalink2RequestGroup.h MetalinkEntry.cc MetalinkEntry.h \
+	Metalinker.cc Metalinker.h MetalinkMetaurl.cc \
 	MetalinkMetaurl.h MetalinkParserController.cc \
-	MetalinkParserController.h MetalinkParserStateMachine.cc \
-	MetalinkParserStateMachine.h MetalinkParserState.cc \
+	MetalinkParserController.h MetalinkParserState.cc \
 	MetalinkParserState.h MetalinkParserStateImpl.cc \
-	MetalinkParserStateImpl.h MetalinkParserStateV3Impl.cc \
+	MetalinkParserStateImpl.h MetalinkParserStateMachine.cc \
+	MetalinkParserStateMachine.h MetalinkParserStateV3Impl.cc \
 	MetalinkParserStateV3Impl.h MetalinkParserStateV4Impl.cc \
-	MetalinkParserStateV4Impl.h Metalink2RequestGroup.cc \
-	Metalink2RequestGroup.h MetalinkPostDownloadHandler.cc \
-	MetalinkPostDownloadHandler.h metalink_helper.cc \
-	metalink_helper.h asctime_r.c asctime_r.h libgen.c libgen.h \
-	getaddrinfo.c getaddrinfo.h gai_strerror.c gai_strerror.h \
-	gettimeofday.c gettimeofday.h localtime_r.c localtime_r.h \
-	strptime.c strptime.h timegm.c timegm.h daemon.cc daemon.h \
+	MetalinkParserStateV4Impl.h MetalinkPostDownloadHandler.cc \
+	MetalinkPostDownloadHandler.h MetalinkResource.cc \
+	MetalinkResource.h metalink_helper.cc metalink_helper.h \
+	asctime_r.c asctime_r.h libgen.c libgen.h getaddrinfo.c \
+	getaddrinfo.h gai_strerror.c gai_strerror.h gettimeofday.c \
+	gettimeofday.h localtime_r.c localtime_r.h strptime.c \
+	strptime.h timegm.c timegm.h daemon.cc daemon.h \
 	clock_gettime_mingw.cc clock_gettime_mingw.h \
 	clock_gettime_osx.cc clock_gettime_osx.h PollEventPoll.cc \
 	PollEventPoll.h PortEventPoll.cc PortEventPoll.h \
 	KqueueEventPoll.cc KqueueEventPoll.h LibuvEventPoll.cc \
-	LibuvEventPoll.h aria2api.cc aria2api.h KeepRunningCommand.cc \
-	KeepRunningCommand.h ApiCallbackDownloadEventListener.cc \
-	ApiCallbackDownloadEventListener.h
+	LibuvEventPoll.h ApiCallbackDownloadEventListener.cc \
+	ApiCallbackDownloadEventListener.h aria2api.cc aria2api.h \
+	KeepRunningCommand.cc KeepRunningCommand.h
 am__dirstamp = $(am__leading_dot)dirstamp
 @ANDROID_TRUE@am__objects_1 = android/android.lo
 @ANDROID_ARM_TRUE@am__objects_2 = android/arm-ftruncate64.lo
 @ANDROID_MIPS_TRUE@am__objects_3 = android/mips-ftruncate64.lo
 @ANDROID_X86_TRUE@am__objects_4 = android/x86-ftruncate64.lo
 @MINGW_BUILD_TRUE@am__objects_5 = WinConsoleFile.lo
-@ENABLE_WEBSOCKET_TRUE@am__objects_6 = WebSocketSession.lo \
-@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.lo \
+@ENABLE_WEBSOCKET_TRUE@am__objects_6 = WebSocketInteractionCommand.lo \
 @ENABLE_WEBSOCKET_TRUE@	WebSocketResponseCommand.lo \
-@ENABLE_WEBSOCKET_TRUE@	WebSocketInteractionCommand.lo
+@ENABLE_WEBSOCKET_TRUE@	WebSocketSession.lo \
+@ENABLE_WEBSOCKET_TRUE@	WebSocketSessionMan.lo
 am__objects_7 =
 @HAVE_SOME_XMLLIB_TRUE@am__objects_8 = XmlAttr.lo XmlParser.lo
 @HAVE_LIBXML2_TRUE@am__objects_9 = Xml2XmlParser.lo
 @HAVE_LIBEXPAT_TRUE@am__objects_10 = ExpatXmlParser.lo
-@ENABLE_XML_RPC_TRUE@am__objects_11 =  \
-@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateMachine.lo \
+@ENABLE_XML_RPC_TRUE@am__objects_11 = XmlRpcDiskWriter.lo \
 @ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateImpl.lo \
-@ENABLE_XML_RPC_TRUE@	XmlRpcDiskWriter.lo
+@ENABLE_XML_RPC_TRUE@	XmlRpcRequestParserStateMachine.lo
 @HAVE_SOME_FALLOCATE_TRUE@am__objects_12 =  \
 @HAVE_SOME_FALLOCATE_TRUE@	FallocFileAllocationIterator.lo
 @HAVE_EPOLL_TRUE@am__objects_13 = EpollEventPoll.lo
 @USE_APPLE_MD_TRUE@am__objects_14 = AppleMessageDigestImpl.lo
 @HAVE_APPLETLS_TRUE@am__objects_15 = AppleTLSContext.lo \
 @HAVE_APPLETLS_TRUE@	AppleTLSSession.lo
-@USE_WINDOWS_MD_TRUE@am__objects_16 = WinMessageDigestImpl.lo
-@HAVE_WINTLS_TRUE@am__objects_17 = WinTLSContext.lo WinTLSSession.lo
-@USE_INTERNAL_BIGNUM_TRUE@am__objects_18 = InternalDHKeyExchange.lo
-@USE_INTERNAL_ARC4_TRUE@am__objects_19 = InternalARC4Encryptor.lo
-@USE_INTERNAL_MD_TRUE@am__objects_20 = InternalMessageDigestImpl.lo \
-@USE_INTERNAL_MD_TRUE@	sha1.lo md5.lo
-@HAVE_LIBGNUTLS_TRUE@am__objects_21 = LibgnutlsTLSContext.lo \
+@HAVE_WINTLS_TRUE@am__objects_16 = WinTLSContext.lo WinTLSSession.lo
+@USE_INTERNAL_BIGNUM_TRUE@am__objects_17 = InternalDHKeyExchange.lo
+@USE_INTERNAL_ARC4_TRUE@am__objects_18 = InternalARC4Encryptor.lo
+@USE_INTERNAL_MD_TRUE@am__objects_19 = InternalMessageDigestImpl.lo \
+@USE_INTERNAL_MD_TRUE@	crypto_hash.lo
+@HAVE_LIBGNUTLS_TRUE@am__objects_20 = LibgnutlsTLSContext.lo \
 @HAVE_LIBGNUTLS_TRUE@	LibgnutlsTLSSession.lo
-@HAVE_LIBGCRYPT_TRUE@am__objects_22 = LibgcryptARC4Encryptor.lo \
+@HAVE_LIBGCRYPT_TRUE@am__objects_21 = LibgcryptARC4Encryptor.lo \
 @HAVE_LIBGCRYPT_TRUE@	LibgcryptDHKeyExchange.lo
-@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_23 = LibgcryptMessageDigestImpl.lo
-@HAVE_LIBNETTLE_TRUE@am__objects_24 = LibnettleARC4Encryptor.lo
-@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_25 = LibnettleMessageDigestImpl.lo
-@HAVE_LIBGMP_TRUE@am__objects_26 = a2gmp.lo LibgmpDHKeyExchange.lo
-@HAVE_OPENSSL_TRUE@am__objects_27 = LibsslARC4Encryptor.lo \
+@HAVE_LIBGCRYPT_TRUE@@USE_LIBGCRYPT_MD_TRUE@am__objects_22 = LibgcryptMessageDigestImpl.lo
+@HAVE_LIBNETTLE_TRUE@am__objects_23 = LibnettleARC4Encryptor.lo
+@HAVE_LIBNETTLE_TRUE@@USE_LIBNETTLE_MD_TRUE@am__objects_24 = LibnettleMessageDigestImpl.lo
+@HAVE_LIBGMP_TRUE@am__objects_25 = a2gmp.lo LibgmpDHKeyExchange.lo
+@HAVE_OPENSSL_TRUE@am__objects_26 = LibsslARC4Encryptor.lo \
 @HAVE_OPENSSL_TRUE@	LibsslDHKeyExchange.lo
-@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_28 =  \
+@HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@am__objects_27 =  \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSContext.lo \
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSSession.lo
-@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_29 = LibsslMessageDigestImpl.lo
-@HAVE_ZLIB_TRUE@am__objects_30 = GZipEncoder.lo \
-@HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.lo GZipFile.lo
-@HAVE_SQLITE3_TRUE@am__objects_31 = Sqlite3CookieParser.lo \
+@HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_28 = LibsslMessageDigestImpl.lo
+@HAVE_ZLIB_TRUE@am__objects_29 = GZipDecodingStreamFilter.lo \
+@HAVE_ZLIB_TRUE@	GZipEncoder.lo GZipFile.lo
+@HAVE_SQLITE3_TRUE@am__objects_30 = Sqlite3CookieParser.lo \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.lo
-@ENABLE_ASYNC_DNS_TRUE@am__objects_32 = AsyncNameResolver.lo \
+@ENABLE_ASYNC_DNS_TRUE@am__objects_31 = AsyncNameResolver.lo \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.lo
-@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_33 = IteratableChunkChecksumValidator.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidator.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityDispatcherCommand.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	CheckIntegrityCommand.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	ChecksumCheckIntegrityEntry.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	message_digest_helper.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	Checksum.lo ChunkChecksum.lo \
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigest.lo
-@ENABLE_BITTORRENT_TRUE@am__objects_34 = PeerAbstractCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.lo Peer.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerConnection.lo PeerListenCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	BtRegistry.lo RequestSlot.lo \
-@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerChokeCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	TimeSeedCriteria.lo \
-@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.lo \
-@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.lo \
-@ENABLE_BITTORRENT_TRUE@	SeedCheckCommand.lo AnnounceTier.lo \
-@ENABLE_BITTORRENT_TRUE@	AnnounceList.lo DefaultPeerStorage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtAnnounce.lo DefaultBtAnnounce.lo \
-@ENABLE_BITTORRENT_TRUE@	BtRuntime.lo AbstractBtMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessage.lo \
+@ENABLE_BITTORRENT_TRUE@am__objects_32 = AbstractBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	AnnounceList.lo AnnounceTier.lo \
+@ENABLE_BITTORRENT_TRUE@	bencode2.lo BencodeParser.lo \
+@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.lo \
+@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.lo \
+@ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessage.lo BtAnnounce.lo \
 @ENABLE_BITTORRENT_TRUE@	BtBitfieldMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtCancelMessage.lo BtChokeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	BtCancelMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	BtChokeMessage.lo BtDependency.lo \
+@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtFileAllocationEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.lo \
 @ENABLE_BITTORRENT_TRUE@	BtHaveAllMessage.lo BtHaveMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	BtHaveNoneMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	BtInterestedMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	BtKeepAliveMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtLeecherStateChoke.lo \
 @ENABLE_BITTORRENT_TRUE@	BtNotInterestedMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtPieceMessage.lo BtPortMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPieceMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPortMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.lo BtRegistry.lo \
 @ENABLE_BITTORRENT_TRUE@	BtRejectMessage.lo BtRequestMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	BtRuntime.lo BtSeederStateChoke.lo \
+@ENABLE_BITTORRENT_TRUE@	BtSetup.lo BtStopDownloadCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	BtSuggestPieceMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	BtUnchokeMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageValidator.lo \
-@ENABLE_BITTORRENT_TRUE@	BtPieceMessageValidator.lo \
-@ENABLE_BITTORRENT_TRUE@	BtHandshakeMessageValidator.lo \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtAnnounce.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtInteractive.lo \
 @ENABLE_BITTORRENT_TRUE@	DefaultBtMessageDispatcher.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultBtMessageFactory.lo \
 @ENABLE_BITTORRENT_TRUE@	DefaultBtMessageReceiver.lo \
 @ENABLE_BITTORRENT_TRUE@	DefaultBtRequestFactory.lo \
-@ENABLE_BITTORRENT_TRUE@	BtAbortOutstandingRequestEvent.lo \
-@ENABLE_BITTORRENT_TRUE@	DefaultBtInteractive.lo \
-@ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	BtDependency.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	BtSetup.lo BtFileAllocationEntry.lo \
-@ENABLE_BITTORRENT_TRUE@	BtPostDownloadHandler.lo \
-@ENABLE_BITTORRENT_TRUE@	BtCheckIntegrityEntry.lo \
-@ENABLE_BITTORRENT_TRUE@	BtExtendedMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	DefaultExtensionMessageFactory.lo \
-@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.lo \
-@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.lo \
-@ENABLE_BITTORRENT_TRUE@	magnet.lo DHTNode.lo DHTBucket.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.lo DHTMessageEntry.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcherImpl.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageReceiver.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageTracker.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageTrackerEntry.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessage.lo DHTConnectionImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DefaultPeerStorage.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTAbstractMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTAnnouncePeerReplyMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupEntry.lo DHTBucketTree.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTaskCallback.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTAbstractTask.lo DHTPingTask.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.lo DHTTaskExecutor.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.lo DHTBucket.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshTask.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.lo DHTSetup.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTBucketTree.lo DHTConnectionImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTFindNodeReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTGetPeersReplyMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTInteractionCommand.lo DHTMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageDispatcherImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageFactoryImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageReceiver.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTMessageTrackerEntry.lo DHTNode.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupEntry.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTNodeLookupTaskCallback.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceEntry.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceStorage.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTTokenTracker.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTGetPeersCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTBucketRefreshCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTPeerAnnounceCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPeerLookupTaskCallback.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPingMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTPingReplyMessage.lo DHTPingTask.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTQueryMessage.lo DHTRegistry.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTReplaceNodeTask.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTEntryPointNameResolveCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTResponseMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTable.lo \
 @ENABLE_BITTORRENT_TRUE@	DHTRoutingTableDeserializer.lo \
-@ENABLE_BITTORRENT_TRUE@	DHTAutoSaveCommand.lo DHTRegistry.lo \
-@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.lo \
-@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	MSEHandshake.lo BtLeecherStateChoke.lo \
-@ENABLE_BITTORRENT_TRUE@	BtSeederStateChoke.lo \
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.lo IndexBtMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.lo \
-@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTRoutingTableSerializer.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTSetup.lo DHTTaskExecutor.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTaskFactoryImpl.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTaskQueueImpl.lo DHTTokenTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTTokenUpdateCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	DHTUnknownMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistry.lo \
-@ENABLE_BITTORRENT_TRUE@	bittorrent_helper.lo \
-@ENABLE_BITTORRENT_TRUE@	BtStopDownloadCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.lo \
-@ENABLE_BITTORRENT_TRUE@	LpdMessageDispatcher.lo \
-@ENABLE_BITTORRENT_TRUE@	LpdMessageReceiver.lo LpdMessage.lo \
-@ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	HandshakeExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	IndexBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	IndexBtMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	InitiatorMSEHandshakeCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	LpdDispatchMessageCommand.lo \
-@ENABLE_BITTORRENT_TRUE@	bencode2.lo BencodeParser.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdMessage.lo LpdMessageDispatcher.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdMessageReceiver.lo \
+@ENABLE_BITTORRENT_TRUE@	LpdReceiveMessageCommand.lo magnet.lo \
+@ENABLE_BITTORRENT_TRUE@	MSEHandshake.lo NameResolveCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	Peer.lo PeerAbstractCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerAddrEntry.lo PeerChokeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerConnection.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerInitiateConnectionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerInteractionCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerListenCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerReceiveHandshakeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	PeerSessionResource.lo \
+@ENABLE_BITTORRENT_TRUE@	PriorityPieceSelector.lo \
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	RangeBtMessageValidator.lo \
+@ENABLE_BITTORRENT_TRUE@	ReceiverMSEHandshakeCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	RequestSlot.lo SeedCheckCommand.lo \
+@ENABLE_BITTORRENT_TRUE@	ShareRatioSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	SimpleBtMessage.lo TimeSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	TrackerWatcherCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerClient.lo \
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerRequest.lo \
-@ENABLE_BITTORRENT_TRUE@	NameResolveCommand.lo
-@ENABLE_METALINK_TRUE@am__objects_35 = Metalinker.lo MetalinkEntry.lo \
-@ENABLE_METALINK_TRUE@	MetalinkResource.lo MetalinkMetaurl.lo \
+@ENABLE_BITTORRENT_TRUE@	UnionSeedCriteria.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataDataExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataPostDownloadHandler.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRejectExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestFactory.lo \
+@ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.lo \
+@ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.lo \
+@ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.lo
+@ENABLE_METALINK_TRUE@am__objects_33 = Metalink2RequestGroup.lo \
+@ENABLE_METALINK_TRUE@	MetalinkEntry.lo Metalinker.lo \
+@ENABLE_METALINK_TRUE@	MetalinkMetaurl.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserController.lo \
-@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserState.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserStateImpl.lo \
+@ENABLE_METALINK_TRUE@	MetalinkParserStateMachine.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserStateV3Impl.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserStateV4Impl.lo \
-@ENABLE_METALINK_TRUE@	Metalink2RequestGroup.lo \
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.lo \
-@ENABLE_METALINK_TRUE@	metalink_helper.lo
-@HAVE_ASCTIME_R_FALSE@am__objects_36 = asctime_r.lo
-@HAVE_BASENAME_FALSE@am__objects_37 = libgen.lo
-@HAVE_GETADDRINFO_FALSE@am__objects_38 = getaddrinfo.lo
-@HAVE_GAI_STRERROR_FALSE@am__objects_39 = gai_strerror.lo
-@HAVE_GETTIMEOFDAY_FALSE@am__objects_40 = gettimeofday.lo
-@HAVE_LOCALTIME_R_FALSE@am__objects_41 = localtime_r.lo
-@HAVE_STRPTIME_FALSE@am__objects_42 = strptime.lo
-@HAVE_TIMEGM_FALSE@am__objects_43 = timegm.lo
-@HAVE_DAEMON_FALSE@am__objects_44 = daemon.lo
-@HAVE_TIMEGETTIME_TRUE@am__objects_45 = clock_gettime_mingw.lo
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_46 = clock_gettime_osx.lo
-@HAVE_POLL_TRUE@am__objects_47 = PollEventPoll.lo
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_48 = PortEventPoll.lo
-@HAVE_KQUEUE_TRUE@am__objects_49 = KqueueEventPoll.lo
-@HAVE_LIBUV_TRUE@am__objects_50 = LibuvEventPoll.lo
-am__objects_51 = option_processing.lo version_usage.lo Context.lo \
-	SocketCore.lo Command.lo AbstractCommand.lo \
-	InitiateConnectionCommandFactory.lo DownloadCommand.lo \
-	HttpInitiateConnectionCommand.lo HttpRequestCommand.lo \
-	HttpResponseCommand.lo HttpProxyRequestCommand.lo \
-	HttpProxyResponseCommand.lo HttpDownloadCommand.lo \
-	HttpHeader.lo HttpConnection.lo FtpConnection.lo \
-	FtpInitiateConnectionCommand.lo FtpNegotiationCommand.lo \
-	FtpDownloadCommand.lo FtpTunnelRequestCommand.lo \
-	FtpTunnelResponseCommand.lo DownloadEngine.lo GrowSegment.lo \
-	PiecedSegment.lo SegmentMan.lo util.lo Request.lo Exception.lo \
-	FatalException.lo RecoverableException.lo DlAbortEx.lo \
-	DlRetryEx.lo DownloadFailureException.lo Logger.lo fmt.lo \
-	AbstractDiskWriter.lo DefaultDiskWriter.lo \
-	DefaultDiskWriterFactory.lo File.lo Option.lo base32.lo \
-	LogFactory.lo TimerA2.lo TimeA2.lo FeatureConfig.lo \
-	DownloadEngineFactory.lo SpeedCalc.lo PeerStat.lo NetStat.lo \
-	BitfieldMan.lo SimpleRandomizer.lo HttpResponse.lo \
-	HttpRequest.lo Range.lo AbstractProxyRequestCommand.lo \
-	AbstractProxyResponseCommand.lo Netrc.lo AuthConfig.lo \
-	AbstractAuthResolver.lo DefaultAuthResolver.lo \
-	NetrcAuthResolver.lo AuthConfigFactory.lo OptionParser.lo \
-	OptionHandlerFactory.lo OptionHandler.lo OptionHandlerImpl.lo \
-	AbstractOptionHandler.lo NameResolver.lo RequestGroup.lo \
-	RequestGroupMan.lo FileAllocationCommand.lo \
-	FillRequestGroupCommand.lo FileAllocationDispatcherCommand.lo \
-	FileAllocationEntry.lo StreamFileAllocationEntry.lo \
-	MultiUrlRequestInfo.lo UriListParser.lo RealtimeCommand.lo \
-	RequestGroupEntry.lo Cookie.lo HttpHeaderProcessor.lo \
-	FileEntry.lo Platform.lo TimeBasedCommand.lo \
-	AutoSaveCommand.lo DefaultPieceStorage.lo \
-	UnknownLengthPieceStorage.lo PieceStatMan.lo \
-	ConsoleStatCalc.lo TransferStat.lo \
-	DefaultBtProgressInfoFile.lo SingleFileAllocationIterator.lo \
-	ContentTypeRequestGroupCriteria.lo DownloadHandler.lo \
-	DownloadHandlerConstants.lo download_handlers.lo \
-	HaveEraseCommand.lo Piece.lo CheckIntegrityEntry.lo \
-	PieceHashCheckIntegrityEntry.lo StreamCheckIntegrityEntry.lo \
-	DiskAdaptor.lo AbstractSingleDiskAdaptor.lo \
-	DirectDiskAdaptor.lo MultiDiskAdaptor.lo \
-	MultiFileAllocationIterator.lo ByteArrayDiskWriter.lo \
-	DownloadContext.lo TimedHaltCommand.lo CUIDCounter.lo \
-	DNSCache.lo DownloadResult.lo help_tags.lo prefs.lo \
-	ProtocolDetector.lo HttpSkipResponseCommand.lo \
-	InitiateConnectionCommand.lo FtpFinishDownloadCommand.lo \
-	A2STR.lo RarestPieceSelector.lo Signature.lo ServerStat.lo \
-	ServerStatMan.lo AdaptiveURISelector.lo InorderURISelector.lo \
-	FeedbackURISelector.lo NsCookieParser.lo CookieStorage.lo \
-	SocketBuffer.lo SocketRecvBuffer.lo OptionHandlerException.lo \
-	URIResult.lo SelectEventPoll.lo \
-	LongestSequencePieceSelector.lo bitfield.lo \
-	CreateRequestCommand.lo wallclock.lo download_helper.lo \
-	MetadataInfo.lo SessionSerializer.lo ValueBase.lo \
-	ContextAttribute.lo TorrentAttribute.lo \
-	AdaptiveFileAllocationIterator.lo \
-	TruncFileAllocationIterator.lo StreamFilter.lo \
-	SinkStreamFilter.lo ChunkedDecodingStreamFilter.lo \
-	NullSinkStreamFilter.lo uri.lo uri_split.lo cookie_helper.lo \
-	json.lo JsonParser.lo ValueBaseStructParserStateImpl.lo \
-	ValueBaseStructParserStateMachine.lo HttpServerBodyCommand.lo \
-	RpcRequest.lo RpcMethod.lo RpcMethodImpl.lo \
-	RpcMethodFactory.lo RpcResponse.lo HttpListenCommand.lo \
-	HttpServerCommand.lo HttpServerResponseCommand.lo \
-	AbstractHttpServerResponseCommand.lo HttpServer.lo \
-	DefaultStreamPieceSelector.lo InorderStreamPieceSelector.lo \
-	GeomStreamPieceSelector.lo MetalinkHttpEntry.lo console.lo \
-	ColorizedStream.lo IOFile.lo BufferedFile.lo paramed_string.lo \
-	rpc_helper.lo WatchProcessCommand.lo UnknownOptionException.lo \
-	Notifier.lo XmlRpcRequestParserController.lo WrDiskCache.lo \
-	WrDiskCacheEntry.lo GroupId.lo SaveSessionCommand.lo \
-	BackupIPv4ConnectCommand.lo ConnectCommand.lo $(am__objects_1) \
-	$(am__objects_2) $(am__objects_3) $(am__objects_4) \
-	$(am__objects_5) $(am__objects_6) $(am__objects_7) \
-	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
-	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
-	$(am__objects_7) $(am__objects_14) $(am__objects_15) \
-	$(am__objects_16) $(am__objects_17) $(am__objects_18) \
-	$(am__objects_19) $(am__objects_20) $(am__objects_21) \
-	$(am__objects_22) $(am__objects_23) $(am__objects_24) \
-	$(am__objects_25) $(am__objects_26) $(am__objects_27) \
-	$(am__objects_28) $(am__objects_29) $(am__objects_30) \
-	$(am__objects_31) $(am__objects_32) $(am__objects_33) \
-	$(am__objects_34) $(am__objects_35) $(am__objects_36) \
-	$(am__objects_37) $(am__objects_38) $(am__objects_39) \
-	$(am__objects_40) $(am__objects_41) $(am__objects_42) \
-	$(am__objects_43) $(am__objects_44) $(am__objects_45) \
-	$(am__objects_46) $(am__objects_47) $(am__objects_48) \
-	$(am__objects_49) $(am__objects_50)
-@ENABLE_LIBARIA2_FALSE@am_libaria2_la_OBJECTS = $(am__objects_51)
-@ENABLE_LIBARIA2_TRUE@am_libaria2_la_OBJECTS = $(am__objects_51) \
-@ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo \
-@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo
+@ENABLE_METALINK_TRUE@	MetalinkResource.lo metalink_helper.lo
+@HAVE_ASCTIME_R_FALSE@am__objects_34 = asctime_r.lo
+@HAVE_BASENAME_FALSE@am__objects_35 = libgen.lo
+@HAVE_GETADDRINFO_FALSE@am__objects_36 = getaddrinfo.lo
+@HAVE_GAI_STRERROR_FALSE@am__objects_37 = gai_strerror.lo
+@HAVE_GETTIMEOFDAY_FALSE@am__objects_38 = gettimeofday.lo
+@HAVE_LOCALTIME_R_FALSE@am__objects_39 = localtime_r.lo
+@HAVE_STRPTIME_FALSE@am__objects_40 = strptime.lo
+@HAVE_TIMEGM_FALSE@am__objects_41 = timegm.lo
+@HAVE_DAEMON_FALSE@am__objects_42 = daemon.lo
+@HAVE_TIMEGETTIME_TRUE@am__objects_43 = clock_gettime_mingw.lo
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_44 = clock_gettime_osx.lo
+@HAVE_POLL_TRUE@am__objects_45 = PollEventPoll.lo
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_46 = PortEventPoll.lo
+@HAVE_KQUEUE_TRUE@am__objects_47 = KqueueEventPoll.lo
+@HAVE_LIBUV_TRUE@am__objects_48 = LibuvEventPoll.lo
+@ENABLE_LIBARIA2_TRUE@am__objects_49 =  \
+@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo \
+@ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo
+am__objects_50 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
+	AbstractDiskWriter.lo AbstractHttpServerResponseCommand.lo \
+	AbstractOptionHandler.lo AbstractProxyRequestCommand.lo \
+	AbstractProxyResponseCommand.lo AbstractSingleDiskAdaptor.lo \
+	AdaptiveFileAllocationIterator.lo AdaptiveURISelector.lo \
+	AuthConfig.lo AuthConfigFactory.lo AutoSaveCommand.lo \
+	BackupIPv4ConnectCommand.lo base32.lo bitfield.lo \
+	BitfieldMan.lo BufferedFile.lo ByteArrayDiskWriter.lo \
+	CheckIntegrityCommand.lo CheckIntegrityDispatcherCommand.lo \
+	CheckIntegrityEntry.lo Checksum.lo \
+	ChecksumCheckIntegrityEntry.lo ChunkChecksum.lo \
+	ChunkedDecodingStreamFilter.lo ColorizedStream.lo Command.lo \
+	ConnectCommand.lo console.lo ConsoleStatCalc.lo \
+	ContentTypeRequestGroupCriteria.lo Context.lo \
+	ContextAttribute.lo Cookie.lo CookieStorage.lo \
+	cookie_helper.lo CreateRequestCommand.lo CUIDCounter.lo \
+	DefaultAuthResolver.lo DefaultBtProgressInfoFile.lo \
+	DefaultDiskWriter.lo DefaultDiskWriterFactory.lo \
+	DefaultPieceStorage.lo DefaultStreamPieceSelector.lo \
+	DirectDiskAdaptor.lo DiskAdaptor.lo DlAbortEx.lo DlRetryEx.lo \
+	DNSCache.lo DownloadCommand.lo DownloadContext.lo \
+	DownloadEngine.lo DownloadEngineFactory.lo \
+	DownloadFailureException.lo DownloadHandler.lo \
+	DownloadHandlerConstants.lo DownloadResult.lo \
+	download_handlers.lo download_helper.lo Exception.lo \
+	FatalException.lo FeatureConfig.lo FeedbackURISelector.lo \
+	File.lo FileAllocationCommand.lo \
+	FileAllocationDispatcherCommand.lo FileAllocationEntry.lo \
+	FileEntry.lo FillRequestGroupCommand.lo fmt.lo \
+	FtpConnection.lo FtpDownloadCommand.lo \
+	FtpFinishDownloadCommand.lo FtpInitiateConnectionCommand.lo \
+	FtpNegotiationCommand.lo FtpTunnelRequestCommand.lo \
+	FtpTunnelResponseCommand.lo GeomStreamPieceSelector.lo \
+	GroupId.lo GrowSegment.lo HaveEraseCommand.lo help_tags.lo \
+	HttpConnection.lo HttpDownloadCommand.lo HttpHeader.lo \
+	HttpHeaderProcessor.lo HttpInitiateConnectionCommand.lo \
+	HttpListenCommand.lo HttpProxyRequestCommand.lo \
+	HttpProxyResponseCommand.lo HttpRequest.lo \
+	HttpRequestCommand.lo HttpResponse.lo HttpResponseCommand.lo \
+	HttpServer.lo HttpServerBodyCommand.lo HttpServerCommand.lo \
+	HttpServerResponseCommand.lo HttpSkipResponseCommand.lo \
+	InitiateConnectionCommand.lo \
+	InitiateConnectionCommandFactory.lo \
+	InorderStreamPieceSelector.lo InorderURISelector.lo IOFile.lo \
+	IteratableChecksumValidator.lo \
+	IteratableChunkChecksumValidator.lo json.lo JsonParser.lo \
+	LogFactory.lo Logger.lo LongestSequencePieceSelector.lo \
+	MessageDigest.lo message_digest_helper.lo MetadataInfo.lo \
+	MetalinkHttpEntry.lo MultiDiskAdaptor.lo \
+	MultiFileAllocationIterator.lo MultiUrlRequestInfo.lo \
+	NameResolver.lo Netrc.lo NetrcAuthResolver.lo NetStat.lo \
+	Notifier.lo NsCookieParser.lo NullSinkStreamFilter.lo \
+	Option.lo OptionHandler.lo OptionHandlerException.lo \
+	OptionHandlerFactory.lo OptionHandlerImpl.lo OptionParser.lo \
+	option_processing.lo paramed_string.lo PeerStat.lo Piece.lo \
+	PiecedSegment.lo PieceHashCheckIntegrityEntry.lo \
+	PieceStatMan.lo Platform.lo prefs.lo ProtocolDetector.lo \
+	Range.lo RarestPieceSelector.lo RealtimeCommand.lo \
+	RecoverableException.lo Request.lo RequestGroup.lo \
+	RequestGroupEntry.lo RequestGroupMan.lo RpcMethod.lo \
+	RpcMethodFactory.lo RpcMethodImpl.lo RpcRequest.lo \
+	RpcResponse.lo rpc_helper.lo SaveSessionCommand.lo \
+	SegmentMan.lo SelectEventPoll.lo ServerStat.lo \
+	ServerStatMan.lo SessionSerializer.lo Signature.lo \
+	SimpleRandomizer.lo SingleFileAllocationIterator.lo \
+	SinkStreamFilter.lo SocketBuffer.lo SocketCore.lo \
+	SocketRecvBuffer.lo SpeedCalc.lo StreamCheckIntegrityEntry.lo \
+	StreamFileAllocationEntry.lo StreamFilter.lo TimeA2.lo \
+	TimeBasedCommand.lo TimedHaltCommand.lo TimerA2.lo \
+	TorrentAttribute.lo TransferStat.lo \
+	TruncFileAllocationIterator.lo UnknownLengthPieceStorage.lo \
+	UnknownOptionException.lo uri.lo UriListParser.lo URIResult.lo \
+	uri_split.lo util.lo util_security.lo ValueBase.lo \
+	ValueBaseStructParserStateImpl.lo \
+	ValueBaseStructParserStateMachine.lo version_usage.lo \
+	wallclock.lo WatchProcessCommand.lo WrDiskCache.lo \
+	WrDiskCacheEntry.lo XmlRpcRequestParserController.lo \
+	OpenedFileCounter.lo $(am__objects_1) $(am__objects_2) \
+	$(am__objects_3) $(am__objects_4) $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9) $(am__objects_10) $(am__objects_11) \
+	$(am__objects_12) $(am__objects_13) $(am__objects_7) \
+	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
+	$(am__objects_17) $(am__objects_18) $(am__objects_19) \
+	$(am__objects_20) $(am__objects_21) $(am__objects_22) \
+	$(am__objects_23) $(am__objects_24) $(am__objects_25) \
+	$(am__objects_26) $(am__objects_27) $(am__objects_28) \
+	$(am__objects_29) $(am__objects_30) $(am__objects_31) \
+	$(am__objects_32) $(am__objects_33) $(am__objects_34) \
+	$(am__objects_35) $(am__objects_36) $(am__objects_37) \
+	$(am__objects_38) $(am__objects_39) $(am__objects_40) \
+	$(am__objects_41) $(am__objects_42) $(am__objects_43) \
+	$(am__objects_44) $(am__objects_45) $(am__objects_46) \
+	$(am__objects_47) $(am__objects_48) $(am__objects_49)
+am_libaria2_la_OBJECTS = $(am__objects_50)
 libaria2_la_OBJECTS = $(am_libaria2_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -1409,191 +1421,195 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 SUBDIRS = includes
 aria2c_SOURCES = main.cc
-SRCS = option_processing.cc version_usage.cc Context.cc Context.h \
-	SocketCore.cc SocketCore.h BinaryStream.h Command.cc Command.h \
-	AbstractCommand.cc AbstractCommand.h \
-	InitiateConnectionCommandFactory.cc \
-	InitiateConnectionCommandFactory.h DownloadCommand.cc \
-	DownloadCommand.h HttpInitiateConnectionCommand.cc \
-	HttpInitiateConnectionCommand.h HttpRequestCommand.cc \
-	HttpRequestCommand.h HttpResponseCommand.cc \
-	HttpResponseCommand.h HttpProxyRequestCommand.cc \
-	HttpProxyRequestCommand.h HttpProxyResponseCommand.cc \
-	HttpProxyResponseCommand.h HttpDownloadCommand.cc \
-	HttpDownloadCommand.h HttpHeader.cc HttpHeader.h \
-	HttpConnection.cc HttpConnection.h FtpConnection.cc \
-	FtpConnection.h FtpInitiateConnectionCommand.cc \
-	FtpInitiateConnectionCommand.h FtpNegotiationCommand.cc \
-	FtpNegotiationCommand.h FtpDownloadCommand.cc \
-	FtpDownloadCommand.h FtpTunnelRequestCommand.cc \
-	FtpTunnelRequestCommand.h FtpTunnelResponseCommand.cc \
-	FtpTunnelResponseCommand.h DownloadEngine.cc DownloadEngine.h \
-	Segment.h GrowSegment.cc GrowSegment.h PiecedSegment.cc \
-	PiecedSegment.h SegmentMan.cc SegmentMan.h util.cc util.h \
-	Request.cc Request.h common.h message.h Exception.cc \
-	Exception.h FatalException.cc FatalException.h \
-	RecoverableException.cc RecoverableException.h DlAbortEx.cc \
-	DlAbortEx.h DlRetryEx.cc DlRetryEx.h \
-	DownloadFailureException.cc DownloadFailureException.h \
-	Logger.cc Logger.h fmt.cc fmt.h DiskWriter.h \
-	DiskWriterFactory.h AbstractDiskWriter.cc AbstractDiskWriter.h \
-	DefaultDiskWriter.cc DefaultDiskWriter.h \
-	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h File.cc \
-	File.h Option.cc Option.h base64.h base32.cc base32.h \
-	LogFactory.cc LogFactory.h TimerA2.cc TimerA2.h TimeA2.cc \
-	TimeA2.h FeatureConfig.cc FeatureConfig.h \
-	DownloadEngineFactory.cc DownloadEngineFactory.h SpeedCalc.cc \
-	SpeedCalc.h PeerStat.cc PeerStat.h NetStat.cc NetStat.h \
-	BitfieldMan.cc BitfieldMan.h Randomizer.h SimpleRandomizer.cc \
-	SimpleRandomizer.h HttpResponse.cc HttpResponse.h \
-	HttpRequest.cc HttpRequest.h Range.cc Range.h \
-	AbstractProxyRequestCommand.cc AbstractProxyRequestCommand.h \
-	AbstractProxyResponseCommand.cc AbstractProxyResponseCommand.h \
-	Netrc.cc Netrc.h AuthConfig.cc AuthConfig.h AuthResolver.h \
-	AbstractAuthResolver.cc AbstractAuthResolver.h \
-	DefaultAuthResolver.cc DefaultAuthResolver.h \
-	NetrcAuthResolver.cc NetrcAuthResolver.h AuthConfigFactory.cc \
-	AuthConfigFactory.h OptionParser.cc OptionParser.h \
-	OptionHandlerFactory.cc OptionHandlerFactory.h \
-	OptionHandler.cc OptionHandler.h OptionHandlerImpl.cc \
-	OptionHandlerImpl.h AbstractOptionHandler.cc \
-	AbstractOptionHandler.h NameResolver.cc NameResolver.h \
-	RequestGroup.cc RequestGroup.h RequestGroupMan.cc \
-	RequestGroupMan.h FileAllocationMan.h FileAllocationCommand.cc \
-	FileAllocationCommand.h FillRequestGroupCommand.cc \
-	FillRequestGroupCommand.h FileAllocationDispatcherCommand.cc \
-	FileAllocationDispatcherCommand.h FileAllocationEntry.cc \
-	FileAllocationEntry.h StreamFileAllocationEntry.cc \
-	StreamFileAllocationEntry.h MultiUrlRequestInfo.cc \
-	MultiUrlRequestInfo.h UriListParser.cc UriListParser.h \
-	RealtimeCommand.cc RealtimeCommand.h ProgressAwareEntry.h \
-	RequestGroupEntry.cc RequestGroupEntry.h Cookie.cc Cookie.h \
-	HttpHeaderProcessor.cc HttpHeaderProcessor.h FileEntry.cc \
-	FileEntry.h Platform.cc Platform.h TimeBasedCommand.cc \
-	TimeBasedCommand.h AutoSaveCommand.cc AutoSaveCommand.h \
-	PieceStorage.h DefaultPieceStorage.cc DefaultPieceStorage.h \
-	UnknownLengthPieceStorage.cc UnknownLengthPieceStorage.h \
-	PieceStatMan.cc PieceStatMan.h StatCalc.h ConsoleStatCalc.cc \
-	ConsoleStatCalc.h TransferStat.cc TransferStat.h Dependency.h \
-	BtProgressInfoFile.h DefaultBtProgressInfoFile.cc \
-	DefaultBtProgressInfoFile.h NullProgressInfoFile.h \
-	FileAllocationIterator.h SingleFileAllocationIterator.cc \
-	SingleFileAllocationIterator.h RequestGroupCriteria.h \
+SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
+	A2STR.cc A2STR.h a2time.h AbstractAuthResolver.cc \
+	AbstractAuthResolver.h AbstractCommand.cc AbstractCommand.h \
+	AbstractDiskWriter.cc AbstractDiskWriter.h \
+	AbstractHttpServerResponseCommand.cc \
+	AbstractHttpServerResponseCommand.h AbstractOptionHandler.cc \
+	AbstractOptionHandler.h AbstractProxyRequestCommand.cc \
+	AbstractProxyRequestCommand.h AbstractProxyResponseCommand.cc \
+	AbstractProxyResponseCommand.h AbstractSingleDiskAdaptor.cc \
+	AbstractSingleDiskAdaptor.h AdaptiveFileAllocationIterator.cc \
+	AdaptiveFileAllocationIterator.h AdaptiveURISelector.cc \
+	AdaptiveURISelector.h AnonDiskWriterFactory.h array_fun.h \
+	AuthConfig.cc AuthConfig.h AuthConfigFactory.cc \
+	AuthConfigFactory.h AuthResolver.h AutoSaveCommand.cc \
+	AutoSaveCommand.h BackupIPv4ConnectCommand.h \
+	BackupIPv4ConnectCommand.cc base32.cc base32.h base64.h \
+	BinaryStream.h bitfield.cc bitfield.h BitfieldMan.cc \
+	BitfieldMan.h BtProgressInfoFile.h BufferedFile.cc \
+	BufferedFile.h ByteArrayDiskWriter.cc ByteArrayDiskWriter.h \
+	ByteArrayDiskWriterFactory.h CheckIntegrityCommand.cc \
+	CheckIntegrityCommand.h CheckIntegrityDispatcherCommand.cc \
+	CheckIntegrityDispatcherCommand.h CheckIntegrityEntry.cc \
+	CheckIntegrityEntry.h CheckIntegrityMan.h Checksum.cc \
+	Checksum.h ChecksumCheckIntegrityEntry.cc \
+	ChecksumCheckIntegrityEntry.h ChunkChecksum.cc ChunkChecksum.h \
+	ChunkedDecodingStreamFilter.cc ChunkedDecodingStreamFilter.h \
+	ColorizedStream.cc ColorizedStream.h Command.cc Command.h \
+	common.h ConnectCommand.cc ConnectCommand.h console.cc \
+	console.h ConsoleStatCalc.cc ConsoleStatCalc.h \
 	ContentTypeRequestGroupCriteria.cc \
-	ContentTypeRequestGroupCriteria.h DownloadHandler.cc \
+	ContentTypeRequestGroupCriteria.h Context.cc Context.h \
+	ContextAttribute.cc ContextAttribute.h ControlChain.h \
+	Cookie.cc Cookie.h CookieStorage.cc CookieStorage.h \
+	cookie_helper.cc cookie_helper.h CreateRequestCommand.cc \
+	CreateRequestCommand.h crypto_endian.h CUIDCounter.cc \
+	CUIDCounter.h DefaultAuthResolver.cc DefaultAuthResolver.h \
+	DefaultBtProgressInfoFile.cc DefaultBtProgressInfoFile.h \
+	DefaultDiskWriter.cc DefaultDiskWriter.h \
+	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h \
+	DefaultPieceStorage.cc DefaultPieceStorage.h \
+	DefaultStreamPieceSelector.cc DefaultStreamPieceSelector.h \
+	Dependency.h DirectDiskAdaptor.cc DirectDiskAdaptor.h \
+	DiskAdaptor.cc DiskAdaptor.h DiskWriter.h DiskWriterFactory.h \
+	DlAbortEx.cc DlAbortEx.h DlRetryEx.cc DlRetryEx.h DNSCache.cc \
+	DNSCache.h DownloadCommand.cc DownloadCommand.h \
+	DownloadContext.cc DownloadContext.h DownloadEngine.cc \
+	DownloadEngine.h DownloadEngineFactory.cc \
+	DownloadEngineFactory.h DownloadFailureException.cc \
+	DownloadFailureException.h DownloadHandler.cc \
 	DownloadHandler.h DownloadHandlerConstants.cc \
-	DownloadHandlerConstants.h download_handlers.cc \
-	download_handlers.h MemoryPreDownloadHandler.h \
-	MemoryBufferPreDownloadHandler.h HaveEraseCommand.cc \
-	HaveEraseCommand.h Piece.cc Piece.h CheckIntegrityMan.h \
-	CheckIntegrityEntry.cc CheckIntegrityEntry.h \
-	PieceHashCheckIntegrityEntry.cc PieceHashCheckIntegrityEntry.h \
-	StreamCheckIntegrityEntry.cc StreamCheckIntegrityEntry.h \
-	IteratableValidator.h DiskAdaptor.cc DiskAdaptor.h \
-	AbstractSingleDiskAdaptor.cc AbstractSingleDiskAdaptor.h \
-	DirectDiskAdaptor.cc DirectDiskAdaptor.h MultiDiskAdaptor.cc \
-	MultiDiskAdaptor.h MultiFileAllocationIterator.cc \
-	MultiFileAllocationIterator.h ByteArrayDiskWriter.cc \
-	ByteArrayDiskWriter.h ByteArrayDiskWriterFactory.h \
-	DownloadContext.cc DownloadContext.h TimedHaltCommand.cc \
-	TimedHaltCommand.h CUIDCounter.cc CUIDCounter.h DNSCache.cc \
-	DNSCache.h DownloadResult.cc DownloadResult.h \
-	PostDownloadHandler.h PreDownloadHandler.h SingletonHolder.h \
-	a2algo.h a2functional.h a2io.h a2netcompat.h a2time.h \
-	array_fun.h help_tags.cc help_tags.h prefs.cc prefs.h \
-	usage_text.h ProtocolDetector.cc ProtocolDetector.h \
-	NullStatCalc.h HttpSkipResponseCommand.cc \
-	HttpSkipResponseCommand.h InitiateConnectionCommand.cc \
-	InitiateConnectionCommand.h FtpFinishDownloadCommand.cc \
-	FtpFinishDownloadCommand.h A2STR.cc A2STR.h \
-	RarestPieceSelector.cc RarestPieceSelector.h Signature.cc \
-	Signature.h ServerStat.cc ServerStat.h ServerStatMan.cc \
-	ServerStatMan.h URISelector.h AdaptiveURISelector.cc \
-	AdaptiveURISelector.h InorderURISelector.cc \
-	InorderURISelector.h FeedbackURISelector.cc \
-	FeedbackURISelector.h NsCookieParser.cc NsCookieParser.h \
-	CookieStorage.cc CookieStorage.h SocketBuffer.cc \
-	SocketBuffer.h SocketRecvBuffer.cc SocketRecvBuffer.h \
-	OptionHandlerException.cc OptionHandlerException.h \
-	URIResult.cc URIResult.h EventPoll.h SelectEventPoll.cc \
-	SelectEventPoll.h SequentialPicker.h \
-	SequentialDispatcherCommand.h PieceSelector.h \
+	DownloadHandlerConstants.h DownloadResult.cc DownloadResult.h \
+	download_handlers.cc download_handlers.h download_helper.cc \
+	download_helper.h error_code.h Event.h EventPoll.h \
+	Exception.cc Exception.h FatalException.cc FatalException.h \
+	FeatureConfig.cc FeatureConfig.h FeedbackURISelector.cc \
+	FeedbackURISelector.h File.cc File.h FileAllocationCommand.cc \
+	FileAllocationCommand.h FileAllocationDispatcherCommand.cc \
+	FileAllocationDispatcherCommand.h FileAllocationEntry.cc \
+	FileAllocationEntry.h FileAllocationIterator.h \
+	FileAllocationMan.h FileEntry.cc FileEntry.h \
+	FillRequestGroupCommand.cc FillRequestGroupCommand.h fmt.cc \
+	fmt.h FtpConnection.cc FtpConnection.h FtpDownloadCommand.cc \
+	FtpDownloadCommand.h FtpFinishDownloadCommand.cc \
+	FtpFinishDownloadCommand.h FtpInitiateConnectionCommand.cc \
+	FtpInitiateConnectionCommand.h FtpNegotiationCommand.cc \
+	FtpNegotiationCommand.h FtpNegotiationConnectChain.h \
+	FtpTunnelRequestCommand.cc FtpTunnelRequestCommand.h \
+	FtpTunnelRequestConnectChain.h FtpTunnelResponseCommand.cc \
+	FtpTunnelResponseCommand.h GenericParser.h \
+	GeomStreamPieceSelector.cc GeomStreamPieceSelector.h \
+	GroupId.cc GroupId.h GrowSegment.cc GrowSegment.h \
+	HashFuncEntry.h HaveEraseCommand.cc HaveEraseCommand.h \
+	help_tags.cc help_tags.h HttpConnection.cc HttpConnection.h \
+	HttpDownloadCommand.cc HttpDownloadCommand.h HttpHeader.cc \
+	HttpHeader.h HttpHeaderProcessor.cc HttpHeaderProcessor.h \
+	HttpInitiateConnectionCommand.cc \
+	HttpInitiateConnectionCommand.h HttpListenCommand.cc \
+	HttpListenCommand.h HttpProxyRequestCommand.cc \
+	HttpProxyRequestCommand.h HttpProxyRequestConnectChain.h \
+	HttpProxyResponseCommand.cc HttpProxyResponseCommand.h \
+	HttpRequest.cc HttpRequest.h HttpRequestCommand.cc \
+	HttpRequestCommand.h HttpRequestConnectChain.h HttpResponse.cc \
+	HttpResponse.h HttpResponseCommand.cc HttpResponseCommand.h \
+	HttpServer.cc HttpServer.h HttpServerBodyCommand.cc \
+	HttpServerBodyCommand.h HttpServerCommand.cc \
+	HttpServerCommand.h HttpServerResponseCommand.cc \
+	HttpServerResponseCommand.h HttpSkipResponseCommand.cc \
+	HttpSkipResponseCommand.h IndexedList.h \
+	InitiateConnectionCommand.cc InitiateConnectionCommand.h \
+	InitiateConnectionCommandFactory.cc \
+	InitiateConnectionCommandFactory.h \
+	InorderStreamPieceSelector.cc InorderStreamPieceSelector.h \
+	InorderURISelector.cc InorderURISelector.h IOFile.cc IOFile.h \
+	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
+	IteratableChunkChecksumValidator.cc \
+	IteratableChunkChecksumValidator.h IteratableValidator.h \
+	json.cc json.h JsonDiskWriter.h JsonParser.cc JsonParser.h \
+	Lock.h LogFactory.cc LogFactory.h Logger.cc Logger.h \
 	LongestSequencePieceSelector.cc LongestSequencePieceSelector.h \
-	bitfield.cc bitfield.h CreateRequestCommand.cc \
-	CreateRequestCommand.h error_code.h wallclock.cc wallclock.h \
-	download_helper.cc download_helper.h MetadataInfo.cc \
-	MetadataInfo.h SessionSerializer.cc SessionSerializer.h \
-	Event.h timespec.h ValueBase.cc ValueBase.h \
-	ContextAttribute.cc ContextAttribute.h TorrentAttribute.cc \
-	TorrentAttribute.h AdaptiveFileAllocationIterator.cc \
-	AdaptiveFileAllocationIterator.h \
-	TruncFileAllocationIterator.cc TruncFileAllocationIterator.h \
-	StreamFilter.cc StreamFilter.h SinkStreamFilter.cc \
-	SinkStreamFilter.h ChunkedDecodingStreamFilter.cc \
-	ChunkedDecodingStreamFilter.h NullSinkStreamFilter.cc \
-	NullSinkStreamFilter.h uri.cc uri.h uri_split.c uri_split.h \
-	cookie_helper.cc cookie_helper.h json.cc json.h JsonParser.cc \
-	JsonParser.h StructParserStateMachine.h GenericParser.h \
-	ValueBaseJsonParser.h ValueBaseStructParserState.h \
-	ValueBaseStructParserStateImpl.cc \
+	MemoryBufferPreDownloadHandler.h MemoryPreDownloadHandler.h \
+	message.h MessageDigest.cc MessageDigest.h MessageDigestImpl.h \
+	message_digest_helper.cc message_digest_helper.h \
+	MetadataInfo.cc MetadataInfo.h MetalinkHttpEntry.cc \
+	MetalinkHttpEntry.h MultiDiskAdaptor.cc MultiDiskAdaptor.h \
+	MultiFileAllocationIterator.cc MultiFileAllocationIterator.h \
+	MultiUrlRequestInfo.cc MultiUrlRequestInfo.h NameResolver.cc \
+	NameResolver.h Netrc.cc Netrc.h NetrcAuthResolver.cc \
+	NetrcAuthResolver.h NetStat.cc NetStat.h Notifier.cc \
+	Notifier.h NsCookieParser.cc NsCookieParser.h NullHandle.h \
+	NullOutputFile.h NullProgressInfoFile.h \
+	NullSinkStreamFilter.cc NullSinkStreamFilter.h NullStatCalc.h \
+	Option.cc Option.h OptionHandler.cc OptionHandler.h \
+	OptionHandlerException.cc OptionHandlerException.h \
+	OptionHandlerFactory.cc OptionHandlerFactory.h \
+	OptionHandlerImpl.cc OptionHandlerImpl.h OptionParser.cc \
+	OptionParser.h option_processing.cc OutputFile.h \
+	paramed_string.cc paramed_string.h PeerStat.cc PeerStat.h \
+	Piece.cc Piece.h PiecedSegment.cc PiecedSegment.h \
+	PieceHashCheckIntegrityEntry.cc PieceHashCheckIntegrityEntry.h \
+	PieceSelector.h PieceStatMan.cc PieceStatMan.h PieceStorage.h \
+	Platform.cc Platform.h PostDownloadHandler.h \
+	PreDownloadHandler.h prefs.cc prefs.h ProgressAwareEntry.h \
+	ProtocolDetector.cc ProtocolDetector.h Randomizer.h Range.cc \
+	Range.h RarestPieceSelector.cc RarestPieceSelector.h \
+	RealtimeCommand.cc RealtimeCommand.h RecoverableException.cc \
+	RecoverableException.h Request.cc Request.h RequestGroup.cc \
+	RequestGroup.h RequestGroupCriteria.h RequestGroupEntry.cc \
+	RequestGroupEntry.h RequestGroupMan.cc RequestGroupMan.h \
+	RpcMethod.cc RpcMethod.h RpcMethodFactory.cc \
+	RpcMethodFactory.h RpcMethodImpl.cc RpcMethodImpl.h \
+	RpcRequest.cc RpcRequest.h RpcResponse.cc RpcResponse.h \
+	rpc_helper.cc rpc_helper.h SaveSessionCommand.h \
+	SaveSessionCommand.cc SegList.h Segment.h SegmentMan.cc \
+	SegmentMan.h SelectEventPoll.cc SelectEventPoll.h \
+	SequentialDispatcherCommand.h SequentialPicker.h ServerStat.cc \
+	ServerStat.h ServerStatMan.cc ServerStatMan.h \
+	SessionSerializer.cc SessionSerializer.h Signature.cc \
+	Signature.h SimpleRandomizer.cc SimpleRandomizer.h \
+	SingleFileAllocationIterator.cc SingleFileAllocationIterator.h \
+	SingletonHolder.h SinkStreamFilter.cc SinkStreamFilter.h \
+	SocketBuffer.cc SocketBuffer.h SocketCore.cc SocketCore.h \
+	SocketRecvBuffer.cc SocketRecvBuffer.h SpeedCalc.cc \
+	SpeedCalc.h StatCalc.h StreamCheckIntegrityEntry.cc \
+	StreamCheckIntegrityEntry.h StreamFileAllocationEntry.cc \
+	StreamFileAllocationEntry.h StreamFilter.cc StreamFilter.h \
+	StreamPieceSelector.h StructParserStateMachine.h TimeA2.cc \
+	TimeA2.h TimeBasedCommand.cc TimeBasedCommand.h \
+	TimedHaltCommand.cc TimedHaltCommand.h TimerA2.cc TimerA2.h \
+	timespec.h TorrentAttribute.cc TorrentAttribute.h \
+	TransferStat.cc TransferStat.h TruncFileAllocationIterator.cc \
+	TruncFileAllocationIterator.h UnknownLengthPieceStorage.cc \
+	UnknownLengthPieceStorage.h UnknownOptionException.cc \
+	UnknownOptionException.h uri.cc uri.h UriListParser.cc \
+	UriListParser.h URIResult.cc URIResult.h URISelector.h \
+	uri_split.c uri_split.h usage_text.h util.cc util.h \
+	util_security.cc util_security.h ValueBase.cc ValueBase.h \
+	ValueBaseDiskWriter.h ValueBaseJsonParser.h \
+	ValueBaseStructParserState.h ValueBaseStructParserStateImpl.cc \
 	ValueBaseStructParserStateImpl.h \
 	ValueBaseStructParserStateMachine.cc \
-	ValueBaseStructParserStateMachine.h JsonDiskWriter.h \
-	HttpServerBodyCommand.cc HttpServerBodyCommand.h RpcRequest.cc \
-	RpcRequest.h RpcMethod.cc RpcMethod.h RpcMethodImpl.cc \
-	RpcMethodImpl.h RpcMethodFactory.cc RpcMethodFactory.h \
-	RpcResponse.cc RpcResponse.h HttpListenCommand.cc \
-	HttpListenCommand.h HttpServerCommand.cc HttpServerCommand.h \
-	HttpServerResponseCommand.cc HttpServerResponseCommand.h \
-	AbstractHttpServerResponseCommand.cc \
-	AbstractHttpServerResponseCommand.h HttpServer.cc HttpServer.h \
-	StreamPieceSelector.h DefaultStreamPieceSelector.cc \
-	DefaultStreamPieceSelector.h InorderStreamPieceSelector.cc \
-	InorderStreamPieceSelector.h GeomStreamPieceSelector.cc \
-	GeomStreamPieceSelector.h MetalinkHttpEntry.cc \
-	MetalinkHttpEntry.h OutputFile.h NullOutputFile.h console.cc \
-	console.h ColorizedStream.cc ColorizedStream.h IOFile.cc \
-	IOFile.h BufferedFile.cc BufferedFile.h SegList.h NullHandle.h \
-	a2iterator.h paramed_string.cc paramed_string.h rpc_helper.cc \
-	rpc_helper.h WatchProcessCommand.cc WatchProcessCommand.h \
-	UnknownOptionException.cc UnknownOptionException.h Notifier.cc \
-	Notifier.h ValueBaseDiskWriter.h AnonDiskWriterFactory.h \
+	ValueBaseStructParserStateMachine.h version_usage.cc \
+	wallclock.cc wallclock.h WatchProcessCommand.cc \
+	WatchProcessCommand.h WrDiskCache.cc WrDiskCache.h \
+	WrDiskCacheEntry.cc WrDiskCacheEntry.h \
 	XmlRpcRequestParserController.cc \
-	XmlRpcRequestParserController.h WrDiskCache.cc WrDiskCache.h \
-	WrDiskCacheEntry.cc WrDiskCacheEntry.h GroupId.cc GroupId.h \
-	IndexedList.h SaveSessionCommand.h SaveSessionCommand.cc \
-	BackupIPv4ConnectCommand.h BackupIPv4ConnectCommand.cc \
-	ConnectCommand.cc ConnectCommand.h ControlChain.h \
-	HttpRequestConnectChain.h HttpProxyRequestConnectChain.h \
-	FtpNegotiationConnectChain.h FtpTunnelRequestConnectChain.h \
-	Lock.h $(am__append_1) $(am__append_2) $(am__append_3) \
-	$(am__append_4) $(am__append_5) $(am__append_6) \
-	$(am__append_7) $(am__append_8) $(am__append_9) \
-	$(am__append_10) $(am__append_11) $(am__append_12) \
-	$(am__append_13) $(am__append_14) $(am__append_15) \
-	$(am__append_16) $(am__append_17) $(am__append_18) \
-	$(am__append_19) $(am__append_20) $(am__append_21) \
-	$(am__append_22) $(am__append_23) $(am__append_24) \
-	$(am__append_25) $(am__append_26) $(am__append_27) \
-	$(am__append_28) $(am__append_29) $(am__append_30) \
-	$(am__append_31) $(am__append_32) $(am__append_33) \
-	$(am__append_34) $(am__append_35) $(am__append_36) \
-	$(am__append_37) $(am__append_38) $(am__append_39) \
-	$(am__append_40) $(am__append_41) $(am__append_42) \
-	$(am__append_43) $(am__append_44) $(am__append_45) \
-	$(am__append_46) $(am__append_47) $(am__append_48) \
-	$(am__append_49) $(am__append_50) $(am__append_51)
+	XmlRpcRequestParserController.h OpenedFileCounter.cc \
+	OpenedFileCounter.h $(am__append_1) $(am__append_2) \
+	$(am__append_3) $(am__append_4) $(am__append_5) \
+	$(am__append_6) $(am__append_7) $(am__append_8) \
+	$(am__append_9) $(am__append_10) $(am__append_11) \
+	$(am__append_12) $(am__append_13) $(am__append_14) \
+	$(am__append_15) $(am__append_16) $(am__append_17) \
+	$(am__append_18) $(am__append_19) $(am__append_20) \
+	$(am__append_21) $(am__append_22) $(am__append_23) \
+	$(am__append_24) $(am__append_25) $(am__append_26) \
+	$(am__append_27) $(am__append_28) $(am__append_29) \
+	$(am__append_30) $(am__append_31) $(am__append_32) \
+	$(am__append_33) $(am__append_34) $(am__append_35) \
+	$(am__append_36) $(am__append_37) $(am__append_38) \
+	$(am__append_39) $(am__append_40) $(am__append_41) \
+	$(am__append_42) $(am__append_43) $(am__append_44) \
+	$(am__append_45) $(am__append_46) $(am__append_47) \
+	$(am__append_48) $(am__append_49) $(am__append_50)
 @ENABLE_LIBARIA2_TRUE@pkgconfigdir = $(libdir)/pkgconfig
 @ENABLE_LIBARIA2_TRUE@pkgconfig_DATA = libaria2.pc
 @ENABLE_LIBARIA2_TRUE@DISTCLEANFILES = $(pkgconfig_DATA)
 @ENABLE_LIBARIA2_TRUE@lib_LTLIBRARIES = libaria2.la
-@ENABLE_LIBARIA2_FALSE@libaria2_la_SOURCES = $(SRCS)
-@ENABLE_LIBARIA2_TRUE@libaria2_la_SOURCES = $(SRCS) \
-@ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
-@ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h \
-@ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h
-
 @ENABLE_LIBARIA2_FALSE@noinst_LTLIBRARIES = libaria2.la
+libaria2_la_SOURCES = $(SRCS)
 libaria2_la_LIBADD = @WSLAY_LIBS@
 LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
 #aria2c_LDFLAGS = -pg
@@ -2032,6 +2048,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Notifier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NsCookieParser.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NullSinkStreamFilter.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OpenedFileCounter.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Option.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandler.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/OptionHandlerException.Plo@am__quote@
@@ -2130,7 +2147,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSession.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WebSocketSessionMan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinConsoleFile.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinMessageDigestImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinTLSContext.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WinTLSSession.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/WrDiskCache.Plo@am__quote@
@@ -2154,6 +2170,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/clock_gettime_osx.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/console.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cookie_helper.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/crypto_hash.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/daemon.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/download_handlers.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/download_helper.Plo@am__quote@
@@ -2167,19 +2184,18 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localtime_r.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/magnet.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/main.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/md5.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/message_digest_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/metalink_helper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/option_processing.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/paramed_string.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/prefs.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/rpc_helper.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sha1.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/strptime.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/timegm.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/uri_split.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/util_security.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/version_usage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/wallclock.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@android/$(DEPDIR)/android.Plo@am__quote@

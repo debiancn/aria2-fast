@@ -196,8 +196,8 @@ private:
   // returns error_code::UNKNOWN_ERROR.
   error_code::Value downloadResult() const;
 
-  void removeDefunctControlFile(
-      const std::shared_ptr<BtProgressInfoFile>& progressInfoFile);
+  void removeDefunctControlFile
+  (const std::shared_ptr<BtProgressInfoFile>& progressInfoFile);
 
 public:
   RequestGroup(const std::shared_ptr<GroupId>& gid,
@@ -240,6 +240,11 @@ public:
   int64_t getTotalLength() const;
 
   int64_t getCompletedLength() const;
+
+  inline int64_t getPendingLength() const
+  {
+    return getTotalLength() - getCompletedLength();
+  }
 
   /**
    * Compares expected filename with specified actualFilename.
@@ -291,8 +296,8 @@ public:
 
   void setPieceStorage(const std::shared_ptr<PieceStorage>& pieceStorage);
 
-  void setProgressInfoFile(
-      const std::shared_ptr<BtProgressInfoFile>& progressInfoFile);
+  void setProgressInfoFile
+  (const std::shared_ptr<BtProgressInfoFile>& progressInfoFile);
 
   void increaseStreamCommand();
 
@@ -387,10 +392,10 @@ public:
 
   void clearPreDownloadHandler();
 
-  void processCheckIntegrityEntry(
-      std::vector<std::unique_ptr<Command>>& commands,
-      std::unique_ptr<CheckIntegrityEntry> entry,
-      DownloadEngine* e);
+  void processCheckIntegrityEntry
+  (std::vector<std::unique_ptr<Command>>& commands,
+   std::unique_ptr<CheckIntegrityEntry> entry,
+   DownloadEngine* e);
 
   // Initializes pieceStorage_ and segmentMan_.  We guarantee that
   // either both of pieceStorage_ and segmentMan_ are initialized or

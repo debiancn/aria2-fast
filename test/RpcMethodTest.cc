@@ -200,6 +200,14 @@ void RpcMethodTest::testAuthorize()
     auto res = m.execute(std::move(req), e_.get());
     CPPUNIT_ASSERT_EQUAL(1, res.code);
   }
+  // secret token set and bad token: prefixed parameter is given, but preauthorized
+  {
+    auto req = createReq(GetVersionRpcMethod::getMethodName());
+    req.authorization = RpcRequest::PREAUTHORIZED;
+    req.params->append("token:foo2");
+    auto res = m.execute(std::move(req), e_.get());
+    CPPUNIT_ASSERT_EQUAL(0, res.code);
+  }
 }
 
 void RpcMethodTest::testAddUri()
@@ -470,11 +478,9 @@ void RpcMethodTest::testAddMetalink()
     CPPUNIT_ASSERT_EQUAL
       (0, GroupId::toNumericId
        (gid4, downcast<String>(resParams->get(1))->s().c_str()));
-#ifdef ENABLE_MESSAGE_DIGEST
     CPPUNIT_ASSERT
       (File(e_->getOption()->get(PREF_DIR)+
             "/c908634fbc257fd56f0114912c2772aeeb4064f4.meta4").exists());
-#endif // ENABLE_MESSAGE_DIGEST
 
     auto tar = findReservedGroup(e_->getRequestGroupMan().get(), gid3);
     CPPUNIT_ASSERT(tar);
@@ -507,10 +513,8 @@ void RpcMethodTest::testAddMetalink()
                          findReservedGroup
                          (e_->getRequestGroupMan().get(), gid5)->
                          getFirstFilePath());
-#ifdef ENABLE_MESSAGE_DIGEST
     CPPUNIT_ASSERT
       (File(dir+"/c908634fbc257fd56f0114912c2772aeeb4064f4.meta4").exists());
-#endif // ENABLE_MESSAGE_DIGEST
   }
 }
 
@@ -727,7 +731,7 @@ void RpcMethodTest::testChangeGlobalOption_withNotAllowedOption()
 void RpcMethodTest::testNoSuchMethod()
 {
   NoSuchMethodRpcMethod m;
-  auto res = m.execute(createReq("make.hamburger"), nullptr);
+  auto res = m.execute(createReq("make.hamburger"), e_.get());
   CPPUNIT_ASSERT_EQUAL(1, res.code);
   CPPUNIT_ASSERT_EQUAL(std::string("No such method: make.hamburger"),
                        getString(downcast<Dict>(res.param), "faultString"));

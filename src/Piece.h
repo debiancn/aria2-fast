@@ -50,32 +50,20 @@ class BitfieldMan;
 class WrDiskCache;
 class WrDiskCacheEntry;
 class DiskAdaptor;
-
-#ifdef ENABLE_MESSAGE_DIGEST
-
 class MessageDigest;
-
-#endif // ENABLE_MESSAGE_DIGEST
 
 class Piece {
 private:
   BitfieldMan* bitfield_;
   WrDiskCacheEntry* wrCache_;
-#ifdef ENABLE_MESSAGE_DIGEST
   std::unique_ptr<MessageDigest> mdctx_;
-#endif // ENABLE_MESSAGE_DIGEST
   std::vector<cuid_t> users_;
-#ifdef ENABLE_MESSAGE_DIGEST
   std::string hashType_;
-#endif // ENABLE_MESSAGE_DIGEST
 
   size_t index_;
 
-  int32_t length_;
-  int32_t blockLength_;
-#ifdef ENABLE_MESSAGE_DIGEST
-  int32_t nextBegin_;
-#endif // ENABLE_MESSAGE_DIGEST
+  int64_t length_;
+  int64_t nextBegin_;
 
   bool usedBySegment_;
 
@@ -86,7 +74,7 @@ public:
   static const int32_t BLOCK_LENGTH  = 16*1024;
 
   Piece();
-  Piece(size_t index, int32_t length, int32_t blockLength = BLOCK_LENGTH);
+  Piece(size_t index, int64_t length, int32_t blockLength = BLOCK_LENGTH);
 
   ~Piece();
 
@@ -138,9 +126,9 @@ public:
 
   void setIndex(size_t index) { index_ = index; }
 
-  int32_t getLength() const { return length_; }
+  int64_t getLength() const { return length_; }
 
-  void setLength(int32_t length) { length_ = length; }
+  void setLength(int64_t length) { length_ = length; }
 
   const unsigned char* getBitfield() const;
 
@@ -156,16 +144,14 @@ public:
   bool isBlockUsed(size_t index) const;
 
   // Calculates completed length
-  int32_t getCompletedLength();
-
-#ifdef ENABLE_MESSAGE_DIGEST
+  int64_t getCompletedLength();
 
   void setHashType(const std::string& hashType);
 
   // Updates hash value. This function compares begin and private variable
   // nextBegin_ and only when they are equal, hash is updated eating data and
   // returns true. Otherwise returns false.
-  bool updateHash(int32_t begin, const unsigned char* data, size_t dataLength);
+  bool updateHash(int64_t begin, const unsigned char* data, size_t dataLength);
 
   bool isHashCalculated() const;
 
@@ -181,12 +167,10 @@ public:
   // cached data and data on disk.
   std::string getDigestWithWrCache(size_t pieceLength,
                                    const std::shared_ptr<DiskAdaptor>& adaptor);
-#endif // ENABLE_MESSAGE_DIGEST
-
   /**
    * Loses current bitfield state.
    */
-  void reconfigure(int32_t length);
+  void reconfigure(int64_t length);
 
   void addUser(cuid_t cuid);
   void removeUser(cuid_t cuid);

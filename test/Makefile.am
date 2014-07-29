@@ -16,6 +16,7 @@ aria2c_SOURCES = AllTest.cc\
 	DefaultBtProgressInfoFileTest.cc\
 	RequestGroupTest.cc\
 	UtilTest.cc\
+	UtilSecurityTest.cc\
 	UriListParserTest.cc\
 	HttpHeaderProcessorTest.cc\
 	RequestTest.cc\
@@ -76,6 +77,7 @@ aria2c_SOURCES = AllTest.cc\
 	ValueBaseJsonParserTest.cc\
 	RpcResponseTest.cc\
 	RpcMethodTest.cc\
+	HttpServerTest.cc\
 	BufferedFileTest.cc\
 	GeomStreamPieceSelectorTest.cc\
 	SegListTest.cc\
@@ -108,12 +110,10 @@ if HAVE_SQLITE3
 aria2c_SOURCES += Sqlite3CookieParserTest.cc
 endif # HAVE_SQLITE3
 
-if ENABLE_MESSAGE_DIGEST
 aria2c_SOURCES += MessageDigestHelperTest.cc\
 	IteratableChunkChecksumValidatorTest.cc\
 	IteratableChecksumValidatorTest.cc\
 	MessageDigestTest.cc
-endif # ENABLE_MESSAGE_DIGEST
 
 if ENABLE_BITTORRENT
 aria2c_SOURCES += BtAllowedFastMessageTest.cc\

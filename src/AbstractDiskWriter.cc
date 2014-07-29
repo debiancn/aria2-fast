@@ -38,6 +38,7 @@
 #ifdef HAVE_MMAP
 #  include <sys/mman.h>
 #endif // HAVE_MMAP
+#include <fcntl.h>
 
 #include <cerrno>
 #include <cstring>
@@ -220,23 +221,14 @@ int openFileWithFlags(const std::string& filename, int flags,
                                    util::safeStrerror(errNum).c_str()),
                        errCode);
   }
-  // This may reduce memory consumption on Mac OS X. Not tested.
 #if defined(__APPLE__) && defined(__MACH__)
-  fcntl(fd, F_GLOBAL_NOCACHE, 1);
+  // This may reduce memory consumption on Mac OS X.
+  fcntl(fd, F_NOCACHE, 1);
 #endif // __APPLE__ && __MACH__
   return fd;
 }
 #endif // !__MINGW32__
 } // namespace
-
-#ifdef __MINGW32__
-namespace {
-HANDLE getWin32Handle(int fd)
-{
-  return reinterpret_cast<HANDLE>(_get_osfhandle(fd));
-}
-} // namespace
-#endif // __MINGW32__
 
 void AbstractDiskWriter::openExistingFile(int64_t totalLength)
 {
@@ -319,6 +311,7 @@ ssize_t AbstractDiskWriter::readDataInternal(unsigned char* data, size_t len,
 
 void AbstractDiskWriter::seek(int64_t offset)
 {
+  assert(offset >= 0);
 #ifdef __MINGW32__
   LARGE_INTEGER fileLength;
   fileLength.QuadPart = offset;
@@ -483,6 +476,32 @@ void AbstractDiskWriter::allocate(int64_t offset, int64_t length, bool sparse)
 #ifdef  HAVE_SOME_FALLOCATE
 # ifdef __MINGW32__
   truncate(offset+length);
+# elif defined(__APPLE__) && defined(__MACH__)
+  auto toalloc = offset + length - size();
+  while (toalloc > 0) {
+    fstore_t fstore = {
+      F_ALLOCATECONTIG | F_ALLOCATEALL,
+      F_PEOFPOSMODE,
+      0,
+      // Allocate in 1GB chunks or else some OSX versions may choke.
+      std::min(toalloc, (int64_t)1<<30),
+      0
+    };
+    if (fcntl(fd_, F_PREALLOCATE, &fstore) == -1) {
+      // Retry non-contig.
+      fstore.fst_flags = F_ALLOCATEALL;
+      if (fcntl(fd_, F_PREALLOCATE, &fstore) == -1) {
+        int err = errno;
+        throw DL_ABORT_EX3(err,
+                          fmt("fcntl(F_PREALLOCATE) of %" PRId64 " failed. cause: %s",
+                              fstore.fst_length, util::safeStrerror(err).c_str()),
+                          error_code::FILE_IO_ERROR);
+      }
+    }
+    toalloc -= fstore.fst_bytesalloc;
+  }
+  // This forces the allocation on disk.
+  ftruncate(fd_, offset + length);
 # elif HAVE_FALLOCATE
   // For linux, we use fallocate to detect file system supports
   // fallocate or not.
@@ -527,6 +546,13 @@ void AbstractDiskWriter::disableReadOnly()
 void AbstractDiskWriter::enableMmap()
 {
   enableMmap_ = true;
+}
+
+void AbstractDiskWriter::dropCache(int64_t len, int64_t offset)
+{
+#ifdef HAVE_POSIX_FADVISE
+  posix_fadvise(fd_, offset, len, POSIX_FADV_DONTNEED);
+#endif // HAVE_POSIX_FADVISE
 }
 
 } // namespace aria2

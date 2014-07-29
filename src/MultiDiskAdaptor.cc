@@ -51,7 +51,7 @@
 #include "LogFactory.h"
 #include "SimpleRandomizer.h"
 #include "WrDiskCacheEntry.h"
-#include "RequestGroupMan.h"
+#include "OpenedFileCounter.h"
 
 namespace aria2 {
 
@@ -226,8 +226,9 @@ void MultiDiskAdaptor::openIfNot
   if(!entry->isOpen()) {
         // A2_LOG_NOTICE(fmt("DiskWriterEntry: Cache MISS. offset=%s",
         //        util::itos(entry->getFileEntry()->getOffset()).c_str()));
-    if(getRequestGroupMan()) {
-      getRequestGroupMan()->ensureMaxOpenFileLimit(1);
+    auto& openedFileCounter = getOpenedFileCounter();
+    if(openedFileCounter) {
+      openedFileCounter->ensureMaxOpenFileLimit(1);
     }
     (entry->*open)();
     openedDiskWriterEntries_.push_back(entry);
@@ -278,8 +279,9 @@ void MultiDiskAdaptor::closeFile()
       dwent->closeFile();
     }
   }
-  if(getRequestGroupMan()) {
-    getRequestGroupMan()->reduceNumOfOpenedFile(n);
+  auto& openedFileCounter = getOpenedFileCounter();
+  if(openedFileCounter) {
+    openedFileCounter->reduceNumOfOpenedFile(n);
   }
 }
 
@@ -365,6 +367,18 @@ void MultiDiskAdaptor::writeData(const unsigned char* data, size_t len,
 ssize_t MultiDiskAdaptor::readData
 (unsigned char* data, size_t len, int64_t offset)
 {
+  return readData(data, len, offset, false);
+}
+
+ssize_t MultiDiskAdaptor::readDataDropCache
+(unsigned char* data, size_t len, int64_t offset)
+{
+  return readData(data, len, offset, true);
+}
+
+ssize_t MultiDiskAdaptor::readData
+(unsigned char* data, size_t len, int64_t offset, bool dropCache)
+{
   auto first = findFirstDiskWriterEntry(diskWriterEntries_, offset);
   ssize_t rem = len;
   ssize_t totalReadLength = 0;
@@ -375,9 +389,26 @@ ssize_t MultiDiskAdaptor::readData
     if(!(*i)->isOpen()) {
       throwOnDiskWriterNotOpened((*i).get(), offset+(len-rem));
     }
-    totalReadLength +=
-      (*i)->getDiskWriter()->readData(data+(len-rem), readLength, fileOffset);
-    rem -= readLength;
+
+    while(readLength > 0) {
+      auto nread = (*i)->getDiskWriter()->readData(data+(len-rem),
+                                                   readLength, fileOffset);
+
+      if(nread == 0) {
+        return totalReadLength;
+      }
+
+      totalReadLength += nread;
+
+      if(dropCache) {
+        (*i)->getDiskWriter()->dropCache(nread, fileOffset);
+      }
+
+      readLength -= nread;
+      rem -= nread;
+      fileOffset += nread;
+    }
+
     fileOffset = 0;
     if(rem == 0) {
       break;
@@ -405,6 +436,9 @@ void MultiDiskAdaptor::writeCache(const WrDiskCacheEntry* entry)
   for(; dent != eod; ++dent) {
     int64_t lstart = 0, lp = 0;
     auto& fent = (*dent)->getFileEntry();
+    if(fent->getLength() == 0) {
+      continue;
+    }
     for(; i != eoi;) {
       if(std::max(fent->getOffset(),
                   static_cast<int64_t>((*i)->goff + celloff)) <

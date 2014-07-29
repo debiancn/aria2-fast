@@ -198,6 +198,8 @@ void BittorrentHelperTest::testGetFileEntriesSingle() {
                        fileEntry1->getPath());
   CPPUNIT_ASSERT_EQUAL(std::string("aria2-0.8.2.tar.bz2"),
                        fileEntry1->getOriginalName());
+  CPPUNIT_ASSERT_EQUAL(std::string("aria2-0.8.2.tar.bz2"),
+                       fileEntry1->getSuffixPath());
   CPPUNIT_ASSERT_EQUAL(10, fileEntry1->getMaxConnectionPerServer());
 }
 
@@ -319,23 +321,20 @@ void BittorrentHelperTest::testComputeFastSet()
   int fastSetSize = 10;
   size_t numPieces = 1000;
   {
-    std::vector<size_t> fastSet;
-    computeFastSet(fastSet, ipaddr, numPieces, infoHash, fastSetSize);
+    auto fastSet = computeFastSet(ipaddr, numPieces, infoHash, fastSetSize);
     size_t ans[] = { 686, 459, 278, 200, 404, 834, 64, 203, 760, 950 };
     CPPUNIT_ASSERT(std::equal(fastSet.begin(), fastSet.end(), std::begin(ans)));
   }
   ipaddr = "10.0.0.1";
   {
-    std::vector<size_t> fastSet;
-    computeFastSet(fastSet, ipaddr, numPieces, infoHash, fastSetSize);
+    auto fastSet = computeFastSet(ipaddr, numPieces, infoHash, fastSetSize);
     size_t ans[] = { 568, 188, 466, 452, 550, 662, 109, 226, 398, 11 };
     CPPUNIT_ASSERT(std::equal(fastSet.begin(), fastSet.end(), std::begin(ans)));
   }
   // See when pieces < fastSetSize
   numPieces = 9;
   {
-    std::vector<size_t> fastSet;
-    computeFastSet(fastSet, ipaddr, numPieces, infoHash, fastSetSize);
+    auto fastSet = computeFastSet(ipaddr, numPieces, infoHash, fastSetSize);
     size_t ans[] = { 8, 6, 7, 5, 1, 4, 0, 2, 3 };
     CPPUNIT_ASSERT(std::equal(fastSet.begin(), fastSet.end(), std::begin(ans)));
   }
@@ -355,6 +354,8 @@ void BittorrentHelperTest::testGetFileEntries_multiFileUrlList() {
   const std::shared_ptr<FileEntry>& fileEntry1 = *itr;
   CPPUNIT_ASSERT_EQUAL(std::string("./aria2-test@/aria2@/src@/aria2c@"),
                        fileEntry1->getPath());
+  CPPUNIT_ASSERT_EQUAL(std::string("aria2-test@/aria2@/src@/aria2c@"),
+                       fileEntry1->getSuffixPath());
   const std::deque<std::string>& uris1 = fileEntry1->getRemainingUris();
   CPPUNIT_ASSERT_EQUAL((size_t)2, uris1.size());
   CPPUNIT_ASSERT_EQUAL(std::string("http://localhost/dist/aria2-test%40/aria2%40/src%40/aria2c%40"),
@@ -435,6 +436,9 @@ void BittorrentHelperTest::testLoadFromMemory_multiFileNonUtf8Path()
     (std::string("./%1B%24B%25O%25m%21%3C%1B%28B/path/%90%A2%8AE"),
      fe->getPath());
   CPPUNIT_ASSERT_EQUAL
+    (std::string("%1B%24B%25O%25m%21%3C%1B%28B/path/%90%A2%8AE"),
+     fe->getSuffixPath());
+  CPPUNIT_ASSERT_EQUAL
     (std::string("./%1B%24B%25O%25m%21%3C%1B%28B"), dctx->getBasePath());
 }
 
@@ -452,6 +456,7 @@ void BittorrentHelperTest::testLoadFromMemory_singleFileNonUtf8Path()
 
   const std::shared_ptr<FileEntry>& fe = dctx->getFirstFileEntry();
   CPPUNIT_ASSERT_EQUAL(std::string("./%90%A2%8AE"), fe->getPath());
+  CPPUNIT_ASSERT_EQUAL(std::string("%90%A2%8AE"), fe->getSuffixPath());
 }
 
 void BittorrentHelperTest::testLoadFromMemory()
@@ -647,20 +652,16 @@ void BittorrentHelperTest::testSetFileFilter_single()
   load(A2_TEST_DIR"/single.torrent", dctx, option_);
 
   CPPUNIT_ASSERT(dctx->getFirstFileEntry()->isRequested());
-  SegList<int> sgl;
-  dctx->setFileFilter(sgl);
+
+  dctx->setFileFilter(SegList<int>());
   CPPUNIT_ASSERT(dctx->getFirstFileEntry()->isRequested());
 
-  sgl.clear();
-  sgl.add(1, 2);
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(util::parseIntSegments("1,2"));
   CPPUNIT_ASSERT(dctx->getFirstFileEntry()->isRequested());
 
   // For single file torrent, file is always selected whatever range
   // is passed.
-  sgl.clear();
-  sgl.add(2, 3);
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(util::parseIntSegments("2,3"));
   CPPUNIT_ASSERT(dctx->getFirstFileEntry()->isRequested());
 }
 
@@ -672,25 +673,19 @@ void BittorrentHelperTest::testSetFileFilter_multi()
   CPPUNIT_ASSERT(dctx->getFileEntries()[0]->isRequested());
   CPPUNIT_ASSERT(dctx->getFileEntries()[1]->isRequested());
 
-  SegList<int> sgl;
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(SegList<int>());
   CPPUNIT_ASSERT(dctx->getFileEntries()[0]->isRequested());
   CPPUNIT_ASSERT(dctx->getFileEntries()[1]->isRequested());
 
-  sgl.add(2, 3);
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(util::parseIntSegments("2,3"));
   CPPUNIT_ASSERT(!dctx->getFileEntries()[0]->isRequested());
   CPPUNIT_ASSERT(dctx->getFileEntries()[1]->isRequested());
 
-  sgl.clear();
-  sgl.add(3, 4);
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(util::parseIntSegments("3,4"));
   CPPUNIT_ASSERT(!dctx->getFileEntries()[0]->isRequested());
   CPPUNIT_ASSERT(!dctx->getFileEntries()[1]->isRequested());
 
-  sgl.clear();
-  util::parseIntSegments(sgl, "1,2");
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(util::parseIntSegments("1,2"));
   CPPUNIT_ASSERT(dctx->getFileEntries()[0]->isRequested());
   CPPUNIT_ASSERT(dctx->getFileEntries()[1]->isRequested());
 }

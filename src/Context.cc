@@ -66,6 +66,7 @@
 #include "fmt.h"
 #include "console.h"
 #include "UriListParser.h"
+#include "message_digest_helper.h"
 #ifdef ENABLE_BITTORRENT
 # include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
@@ -73,9 +74,6 @@
 # include "metalink_helper.h"
 # include "MetalinkEntry.h"
 #endif // ENABLE_METALINK
-#ifdef ENABLE_MESSAGE_DIGEST
-# include "message_digest_helper.h"
-#endif // ENABLE_MESSAGE_DIGEST
 
 extern char* optarg;
 extern int optind, opterr, optopt;
@@ -176,7 +174,10 @@ Context::Context(bool standalone,
   A2_LOG_INFO("<<--- --- --- ---");
   A2_LOG_INFO("  --- --- --- ---");
   A2_LOG_INFO("  --- --- --- --->>");
-  A2_LOG_INFO(fmt("%s %s %s", PACKAGE, PACKAGE_VERSION, TARGET));
+  A2_LOG_INFO(fmt("%s %s", PACKAGE, PACKAGE_VERSION));
+  A2_LOG_INFO(usedCompilerAndPlatform());
+  A2_LOG_INFO(getOperatingSystemInfo());
+  A2_LOG_INFO(usedLibs());
   A2_LOG_INFO(MSG_LOGGING_STARTED);
 
   if(op->getAsBool(PREF_DISABLE_IPV6)) {

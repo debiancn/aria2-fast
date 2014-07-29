@@ -66,12 +66,12 @@ bool FileEntry::RequestFaster::operator()
   return lspd > rspd || (lspd == rspd && lhs.get() < rhs.get());
 }
 
-FileEntry::FileEntry(const std::string& path, int64_t length, int64_t offset,
+FileEntry::FileEntry(std::string path, int64_t length, int64_t offset,
                      const std::vector<std::string>& uris)
   : length_(length),
     offset_(offset),
     uris_(uris.begin(), uris.end()),
-    path_(path),
+    path_(std::move(path)),
     lastFasterReplace_(0),
     maxConnectionPerServer_(1),
     requested_(true),
@@ -115,10 +115,11 @@ int64_t FileEntry::gtoloff(int64_t goff) const
   return goff-offset_;
 }
 
-void FileEntry::getUris(std::vector<std::string>& uris) const
+std::vector<std::string> FileEntry::getUris() const
 {
-  uris.insert(uris.end(), spentUris_.begin(), spentUris_.end());
-  uris.insert(uris.end(), uris_.begin(), uris_.end());
+  std::vector<std::string> uris(std::begin(spentUris_), std::end(spentUris_));
+  uris.insert(std::end(uris), std::begin(uris_), std::end(uris_));
+  return uris;
 }
 
 namespace {
@@ -295,7 +296,8 @@ FileEntry::findFasterRequest
     std::shared_ptr<Request> fastestRequest(new Request());
     const std::string& uri = fastCands.front().second;
     A2_LOG_DEBUG(fmt("Selected %s from fastCands", uri.c_str()));
-    fastestRequest->setUri(uri);
+    // Candidate URIs where already parsed when populating fastCands.
+    (void)fastestRequest->setUri(uri);
     fastestRequest->setReferer(base->getReferer());
     uris_.erase(std::find(uris_.begin(), uris_.end(), uri));
     spentUris_.push_back(uri);
@@ -571,6 +573,11 @@ void FileEntry::setOriginalName(std::string originalName)
   originalName_ = std::move(originalName);
 }
 
+void FileEntry::setSuffixPath(std::string suffixPath)
+{
+  suffixPath_ = std::move(suffixPath);
+}
+
 bool FileEntry::emptyRequestUri() const
 {
   return uris_.empty() && inFlightRequests_.empty() && requestPool_.empty();
@@ -582,8 +589,7 @@ void writeFilePath
  bool memory)
 {
   if(entry->getPath().empty()) {
-    std::vector<std::string> uris;
-    entry->getUris(uris);
+    auto uris = entry->getUris();
     if(uris.empty()) {
       o << "n/a";
     } else {

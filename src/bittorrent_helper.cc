@@ -227,6 +227,13 @@ void extractFileEntries
         throw DL_ABORT_EX2(fmt(MSG_MISSING_BT_INFO, C_LENGTH),
                            error_code::BITTORRENT_PARSE_ERROR);
       }
+
+      if(fileLengthData->i() < 0) {
+        throw DL_ABORT_EX2
+          (fmt(MSG_NEGATIVE_LENGTH_BT_INFO, C_LENGTH, fileLengthData->i()),
+           error_code::BITTORRENT_PARSE_ERROR);
+      }
+
       if(length > std::numeric_limits<int64_t>::max() - fileLengthData->i()) {
         throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, length));
       }
@@ -271,11 +278,15 @@ void extractFileEntries
                              (util::percentEncode)));
       std::vector<std::string> uris;
       createUri(urlList.begin(), urlList.end(),std::back_inserter(uris),pePath);
-      std::shared_ptr<FileEntry> fileEntry
-        (new FileEntry(util::applyDir(option->get(PREF_DIR),
-                                      util::escapePath(utf8Path)),
-                       fileLengthData->i(), offset, uris));
+
+      auto suffixPath = util::escapePath(utf8Path);
+
+      auto fileEntry =
+        std::make_shared<FileEntry>(util::applyDir(option->get(PREF_DIR),
+                                                   suffixPath),
+                                    fileLengthData->i(), offset, uris);
       fileEntry->setOriginalName(utf8Path);
+      fileEntry->setSuffixPath(suffixPath);
       fileEntry->setMaxConnectionPerServer(maxConn);
       fileEntries.push_back(fileEntry);
       offset += fileEntry->getLength();
@@ -289,6 +300,13 @@ void extractFileEntries
                          error_code::BITTORRENT_PARSE_ERROR);
     }
     int64_t totalLength = lengthData->i();
+
+    if(totalLength < 0) {
+      throw DL_ABORT_EX2
+        (fmt(MSG_NEGATIVE_LENGTH_BT_INFO, C_LENGTH, totalLength),
+         error_code::BITTORRENT_PARSE_ERROR);
+    }
+
     if(totalLength > std::numeric_limits<a2_off_t>::max()) {
       throw DOWNLOAD_FAILURE_EXCEPTION(fmt(EX_TOO_LARGE_FILE, totalLength));
     }
@@ -302,11 +320,15 @@ void extractFileEntries
         uris.push_back(elem);
       }
     }
-    std::shared_ptr<FileEntry> fileEntry
-      (new FileEntry(util::applyDir(option->get(PREF_DIR),
-                                    util::escapePath(utf8Name)),
-                     totalLength, 0, uris));
+
+    auto suffixPath = util::escapePath(utf8Name);
+
+    auto fileEntry =
+      std::make_shared<FileEntry>(util::applyDir(option->get(PREF_DIR),
+                                                 suffixPath),
+                                  totalLength, 0, uris);
     fileEntry->setOriginalName(utf8Name);
+    fileEntry->setSuffixPath(suffixPath);
     fileEntry->setMaxConnectionPerServer(maxConn);
     fileEntries.push_back(fileEntry);
   }
@@ -432,6 +454,13 @@ void processRootDictionary
     throw DL_ABORT_EX2(fmt(MSG_MISSING_BT_INFO, C_PIECE_LENGTH),
                        error_code::BITTORRENT_PARSE_ERROR);
   }
+
+  if(pieceLengthData->i() < 0) {
+    throw DL_ABORT_EX2
+      (fmt(MSG_NEGATIVE_LENGTH_BT_INFO, C_PIECE_LENGTH, pieceLengthData->i()),
+       error_code::BITTORRENT_PARSE_ERROR);
+  }
+
   size_t pieceLength = pieceLengthData->i();
   ctx->setPieceLength(pieceLength);
   // retrieve piece hashes
@@ -629,14 +658,15 @@ getInfoHashString(DownloadContext* dctx)
   return util::toHex(getTorrentAttrs(dctx)->infoHash);
 }
 
-void computeFastSet
-(std::vector<size_t>& fastSet, const std::string& ipaddr,
+std::vector<size_t> computeFastSet
+(const std::string& ipaddr,
  size_t numPieces, const unsigned char* infoHash, size_t fastSetSize)
 {
+  std::vector<size_t> fastSet;
   unsigned char compact[COMPACT_LEN_IPV6];
   int compactlen = packcompact(compact, ipaddr, 0);
   if(compactlen != COMPACT_LEN_IPV4) {
-    return;
+    return fastSet;
   }
   if(numPieces < fastSetSize) {
     fastSetSize = numPieces;
@@ -660,7 +690,9 @@ void computeFastSet
       memcpy(&ny, x+j, 4);
       uint32_t y = ntohl(ny);
       size_t index = y%numPieces;
-      if(std::find(fastSet.begin(), fastSet.end(), index) == fastSet.end()) {
+      if(std::find(std::begin(fastSet), std::end(fastSet), index) ==
+         std::end(fastSet)) {
+
         fastSet.push_back(index);
       }
     }
@@ -669,6 +701,8 @@ void computeFastSet
     message_digest::digest(temp, sizeof(temp), sha1.get(), x, sizeof(x));
     memcpy(x, temp, sizeof(x));
   }
+
+  return fastSet;
 }
 
 std::string generatePeerId(const std::string& peerIdPrefix)

@@ -43,21 +43,17 @@ GrowSegment::GrowSegment(const std::shared_ptr<Piece>& piece):
 
 GrowSegment::~GrowSegment() {}
 
-void GrowSegment::updateWrittenLength(int32_t bytes)
+void GrowSegment::updateWrittenLength(int64_t bytes)
 {
   writtenLength_ += bytes;
   piece_->reconfigure(writtenLength_);
   piece_->setAllBlock();
 }
 
-#ifdef ENABLE_MESSAGE_DIGEST
-
 std::string GrowSegment::getDigest()
 {
   return A2STR::NIL;
 }
-
-#endif // ENABLE_MESSAGE_DIGEST
 
 void GrowSegment::clear(WrDiskCache* diskCache)
 {

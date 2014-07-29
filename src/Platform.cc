@@ -71,6 +71,7 @@
 #define A2_MIN_GCRYPT_VERSION "1.2.4"
 
 namespace {
+#ifdef HAVE_LIBGNUTLS
   void gnutls_log_callback(int level, const char *str)
   {
     using namespace aria2;
@@ -79,6 +80,7 @@ namespace {
     msg.resize(msg.size() - 1);
     A2_LOG_DEBUG(fmt("GnuTLS: <%d> %s", level, msg.c_str()));
   }
+#endif // HAVE_LIBGNUTLS
 }
 
 
@@ -156,7 +158,9 @@ bool Platform::setUp()
 #endif // HAVE_WINSOCK2_H
 
 #ifdef __MINGW32__
-  unsigned int _CRT_fmode = _O_BINARY;
+  (void)_setmode(_fileno(stdin), _O_BINARY);
+  (void)_setmode(_fileno(stdout), _O_BINARY);
+  (void)_setmode(_fileno(stderr), _O_BINARY);
 #endif // __MINGW32__
 
   return true;

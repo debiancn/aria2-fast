@@ -186,11 +186,15 @@ error_code::Value option_processing(Option& op, bool standalone,
     bool noConf = false;
     std::string ucfname;
     std::stringstream cmdstream;
-    oparser->parseArg(cmdstream, uris, argc, argv);
     {
       // first evaluate --no-conf and --conf-path options.
       Option op;
-      oparser->parse(op, cmdstream);
+      if(argc == 0) {
+        oparser->parse(op, options);
+      } else {
+        oparser->parseArg(cmdstream, uris, argc, argv);
+        oparser->parse(op, cmdstream);
+      }
       noConf = op.getAsBool(PREF_NO_CONF);
       ucfname = op.get(PREF_CONF_PATH);
       if(standalone) {
@@ -311,7 +315,18 @@ error_code::Value option_processing(Option& op, bool standalone,
     }
   }
   if(standalone && op.getAsBool(PREF_DAEMON)) {
-    if(daemon(0, 0) < 0) {
+#if defined(__GNUC__) && defined(__APPLE__)
+    // daemon() is deprecated on OSX since... forever.
+    // Silence the warning for good, so that -Werror becomes feasible.
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif // defined(__GNUC__) && defined(__APPLE__)
+    const auto daemonized = daemon(0, 0);
+#if defined(__GNUC__) && defined(__APPLE__)
+#pragma GCC diagnostic pop
+#endif // defined(__GNUC__) && defined(__APPLE__)
+
+    if(daemonized < 0) {
       perror(MSG_DAEMON_FAILED);
       return error_code::UNKNOWN_ERROR;
     }

@@ -18,12 +18,9 @@ class PieceTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testGetCompletedLength);
   CPPUNIT_TEST(testFlushWrCache);
   CPPUNIT_TEST(testAppendWrCache);
-#ifdef ENABLE_MESSAGE_DIGEST
 
   CPPUNIT_TEST(testGetDigestWithWrCache);
   CPPUNIT_TEST(testUpdateHash);
-
-#endif // ENABLE_MESSAGE_DIGEST
 
   CPPUNIT_TEST_SUITE_END();
 private:
@@ -43,12 +40,8 @@ public:
   void testFlushWrCache();
   void testAppendWrCache();
 
-#ifdef ENABLE_MESSAGE_DIGEST
-
   void testGetDigestWithWrCache();
   void testUpdateHash();
-
-#endif // ENABLE_MESSAGE_DIGEST
 };
 
 
@@ -74,7 +67,7 @@ void PieceTest::testGetCompletedLength()
   p.completeBlock(9);
   p.completeBlock(10); // <-- 100 bytes
 
-  CPPUNIT_ASSERT_EQUAL(blockLength*3+100, p.getCompletedLength());
+  CPPUNIT_ASSERT_EQUAL((int64_t)(blockLength*3+100), p.getCompletedLength());
 }
 
 void PieceTest::testFlushWrCache()
@@ -119,8 +112,6 @@ void PieceTest::testAppendWrCache()
   p.flushWrCache(&dc);
   CPPUNIT_ASSERT_EQUAL(std::string("foobar"), writer_->getString());
 }
-
-#ifdef ENABLE_MESSAGE_DIGEST
 
 void PieceTest::testGetDigestWithWrCache()
 {
@@ -167,7 +158,5 @@ void PieceTest::testUpdateHash()
   CPPUNIT_ASSERT_EQUAL(std::string("d9189aff79e075a2e60271b9556a710dc1bc7de7"),
                        util::toHex(p.getDigest()));
 }
-
-#endif // ENABLE_MESSAGE_DIGEST
 
 } // namespace aria2

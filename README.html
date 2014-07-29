@@ -416,7 +416,7 @@ completely</li>
 <li>Netrc support</li>
 <li>Configuration file support</li>
 <li>Download URIs found in a text file or stdin and the destination
-directory and output filename can be specified optionally</li>
+directory and output file name can be specified optionally</li>
 <li>Parameterized URI support</li>
 <li>IPv6 support with Happy Eyeballs</li>
 <li>Disk cache to reduce disk activity</li>
@@ -491,13 +491,15 @@ like to disable this behavior, run configure with
 <p>GnuTLS has precedence over OpenSSL if both libraries are installed.
 If you prefer OpenSSL, run configure with <tt class="docutils literal"><span class="pre">--without-gnutls</span></tt>
 <tt class="docutils literal"><span class="pre">--with-openssl</span></tt>.</p>
-<p class="last">On Windows there is an experimental SSL implementation available that
-is based on the native Windows SSL capabilities (Schannel). Run
-configure with <tt class="docutils literal"><span class="pre">--with-wintls</span></tt> to use.</p>
+<p class="last">On Windows there is SSL implementation available that is based on
+the native Windows SSL capabilities (Schannel) and it will be
+preferred.  Hence neither GnuTLS nor OpenSSL are required on that
+platform.  If you'd like to disable this behavior, run configure
+with <tt class="docutils literal"><span class="pre">--without-wintls</span></tt>.</p>
 </div>
 <div class="note">
 <p class="first admonition-title">Note</p>
-<p>On Apple OSX the OS-level checksumming support will be preferred,
+<p>On Apple OSX the OS-level checksum support will be preferred,
 unless aria2 is configured with <tt class="docutils literal"><span class="pre">--without-appletls</span></tt>.</p>
 <p>libnettle has precedence over libgcrypt if both libraries are
 installed.  If you prefer libgcrypt, run configure with
@@ -505,9 +507,9 @@ installed.  If you prefer libgcrypt, run configure with
 GnuTLS, neither libnettle nor libgcrypt will be used.</p>
 <p>If none of the optional dependencies are installed, an internal
 implementation that only supports md5 and sha1 will be used.</p>
-<p class="last">On Windows there is an experimental implementation available that is
-based on the native Windows capabilities. Run configure with
-<tt class="docutils literal"><span class="pre">--with-wintls</span></tt> to use.</p>
+<p class="last">On Windows there is SSL implementation available that is based on
+the native Windows capabilities and it will be preferred, unless
+aria2 is configured with <tt class="docutils literal"><span class="pre">--without-wintls</span></tt>.</p>
 </div>
 <p>A user can have one of the following configurations for SSL and crypto
 libraries:</p>
@@ -534,7 +536,7 @@ standard. The current source code requires C++11 aware compiler. For
 well-known compilers, such as g++ and clang, the <tt class="docutils literal"><span class="pre">-std=c++11</span></tt> or
 <tt class="docutils literal"><span class="pre">-std=c++0x</span></tt> flag must be supported.</p>
 <p>In order to build aria2 from the source package, you need following
-development packages(package name may vary depending on the
+development packages (package name may vary depending on the
 distribution you use):</p>
 <ul class="simple">
 <li>libgnutls-dev    (Required for HTTPS, BitTorrent, Checksum support)</li>
@@ -587,7 +589,7 @@ $ make
 <p>See <a class="reference internal" href="#cross-compiling-windows-binary">Cross-compiling Windows binary</a> to create a Windows binary.
 See <a class="reference internal" href="#cross-compiling-android-binary">Cross-compiling Android binary</a> to create an Android binary.</p>
 <p>The configure script checks available libraries and enables as many
-features as possible execept for experimental features not enabled by
+features as possible except for experimental features not enabled by
 default.</p>
 <p>Since 1.1.0, aria2 checks the certificate of HTTPS servers by default.
 If you build with OpenSSL or the recent version of GnuTLS which has
@@ -697,11 +699,13 @@ environment variable which must fulfill the following conditions:</p>
 do this:</p>
 <pre class="literal-block">
 $NDK/build/tools/make-standalone-toolchain.sh --platform=android-18 --toolchain=arm-linux-androideabi-4.8 --install-dir=$ANDROID_HOME/toolchain
+
+$NDK/build/tools/make-standalone-toolchain.sh --install-dir=$ANDROID_HOME/toolchain --toolchain=arm-linux-androideabi-4.8 --llvm-version=3.4
 </pre>
 <p>You may need to add <tt class="docutils literal"><span class="pre">--system=linux-x86_64</span></tt> to the above
 command-line for x86_64 Linux host.</p>
 </li>
-<li><p class="first">The dependant libraries must be installed under
+<li><p class="first">The dependent libraries must be installed under
 <tt class="docutils literal">$ANDROID_HOME/usr/local</tt>.</p>
 </li>
 </ul>
@@ -720,17 +724,17 @@ page by <tt class="docutils literal">make html</tt>. The HTML version manual is 
 translation</a>,
 <a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese translation</a>).</p>
 </div>
-<div class="section" id="bittorrrent">
-<h1>BitTorrrent</h1>
-<div class="section" id="about-filenames">
-<h2>About filenames</h2>
-<p>The filename of the downloaded file is determined as follows:</p>
+<div class="section" id="bittorrent">
+<h1>BitTorrent</h1>
+<div class="section" id="about-file-names">
+<h2>About file names</h2>
+<p>The file name of the downloaded file is determined as follows:</p>
 <dl class="docutils">
 <dt>single-file mode</dt>
-<dd>If &quot;name&quot; key is present in .torrent file, filename is the value
-of &quot;name&quot; key. Otherwise, filename is the basename of .torrent
+<dd>If &quot;name&quot; key is present in .torrent file, file name is the value
+of &quot;name&quot; key. Otherwise, file name is the base name of .torrent
 file appended by &quot;.file&quot;. For example, .torrent file is
-&quot;test.torrrent&quot;, then filename is &quot;test.torrent.file&quot;.  The
+&quot;test.torrent&quot;, then file name is &quot;test.torrent.file&quot;.  The
 directory to store the downloaded file can be specified by -d
 option.</dd>
 <dt>multi-file mode</dt>
@@ -760,8 +764,8 @@ option to change the port number.</p>
 <div class="section" id="other-things-should-be-noted">
 <h2>Other things should be noted</h2>
 <ul class="simple">
-<li><tt class="docutils literal"><span class="pre">-o</span></tt> option is used to change the filename of .torrent file itself,
-not a filename of a file in .torrent file. For this purpose, use
+<li><tt class="docutils literal"><span class="pre">-o</span></tt> option is used to change the file name of .torrent file itself,
+not a file name of a file in .torrent file. For this purpose, use
 <tt class="docutils literal"><span class="pre">--index-out</span></tt> option instead.</li>
 <li>The port numbers that aria2 uses by default are 6881-6999 for TCP
 and UDP.</li>
@@ -790,8 +794,8 @@ protocol and os.</p>
 validates chunks of data during download. This behavior can be turned
 off by a command-line option.</p>
 <p>If signature is included in a Metalink file, aria2 saves it as a file
-after the completion of the download.  The filename is download
-filename + &quot;.sig&quot;. If same file already exists, the signature file is
+after the completion of the download.  The file name is download
+file name + &quot;.sig&quot;. If same file already exists, the signature file is
 not saved.</p>
 <p>In Metalink4, multi-file torrent could appear in metalink:metaurl
 element.  Since aria2 cannot download 2 same torrents at the same

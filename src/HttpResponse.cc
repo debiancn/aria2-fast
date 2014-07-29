@@ -59,9 +59,7 @@
 #include "MetalinkHttpEntry.h"
 #include "base64.h"
 #include "array_fun.h"
-#ifdef ENABLE_MESSAGE_DIGEST
 #include "MessageDigest.h"
-#endif // ENABLE_MESSAGE_DIGEST
 #ifdef HAVE_ZLIB
 # include "GZipDecodingStreamFilter.h"
 #endif // HAVE_ZLIB
@@ -120,13 +118,13 @@ void HttpResponse::validateResponse() const
 
 std::string HttpResponse::determineFilename() const
 {
-  std::string contentDisposition = util::getContentDispositionFilename(
-      httpHeader_->find(HttpHeader::CONTENT_DISPOSITION));
+  std::string contentDisposition = util::getContentDispositionFilename
+    (httpHeader_->find(HttpHeader::CONTENT_DISPOSITION));
   if (contentDisposition.empty()) {
     auto file = httpRequest_->getFile();
     file = util::percentDecode(file.begin(), file.end());
     if (file.empty()) {
-      return "index.html";
+      return Request::DEFAULT_FILE;
     }
     return file;
   }
@@ -142,11 +140,11 @@ void HttpResponse::retrieveCookie()
   Time now;
   auto r = httpHeader_->equalRange(HttpHeader::SET_COOKIE);
   for (; r.first != r.second; ++r.first) {
-    httpRequest_->getCookieStorage()->parseAndStore(
-        (*r.first).second,
-        httpRequest_->getHost(),
-        httpRequest_->getDir(),
-        now.getTime());
+    httpRequest_->getCookieStorage()->parseAndStore
+      ((*r.first).second,
+       httpRequest_->getHost(),
+       httpRequest_->getDir(),
+       now.getTime());
   }
 }
 
@@ -364,9 +362,9 @@ bool parseMetalinkHttpLink(MetalinkHttpEntry& result, const std::string& s)
 
 // Metalink/HTTP is defined by http://tools.ietf.org/html/rfc6249.
 // Link header field is defined by http://tools.ietf.org/html/rfc5988.
-void HttpResponse::getMetalinKHttpEntries(
-    std::vector<MetalinkHttpEntry>& result,
-    const std::shared_ptr<Option>& option) const
+void HttpResponse::getMetalinKHttpEntries
+(std::vector<MetalinkHttpEntry>& result,
+ const std::shared_ptr<Option>& option) const
 {
   auto p = httpHeader_->equalRange(HttpHeader::LINK);
   for (; p.first != p.second; ++p.first) {
@@ -395,7 +393,6 @@ void HttpResponse::getMetalinKHttpEntries(
   std::sort(result.begin(), result.end());
 }
 
-#ifdef ENABLE_MESSAGE_DIGEST
 // Digest header field is defined by
 // http://tools.ietf.org/html/rfc3230.
 void HttpResponse::getDigest(std::vector<Checksum>& result) const
@@ -445,6 +442,5 @@ void HttpResponse::getDigest(std::vector<Checksum>& result) const
   }
   std::swap(temp, result);
 }
-#endif // ENABLE_MESSAGE_DIGEST
 
 } // namespace aria2

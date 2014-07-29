@@ -66,10 +66,9 @@
 #include "base64.h"
 #include "BitfieldMan.h"
 #include "SessionSerializer.h"
-#ifdef ENABLE_MESSAGE_DIGEST
-# include "MessageDigest.h"
-# include "message_digest_helper.h"
-#endif // ENABLE_MESSAGE_DIGEST
+#include "MessageDigest.h"
+#include "message_digest_helper.h"
+#include "OpenedFileCounter.h"
 #ifdef ENABLE_BITTORRENT
 # include "bittorrent_helper.h"
 # include "BtRegistry.h"
@@ -86,7 +85,6 @@ namespace rpc {
 namespace {
 const char VLB_TRUE[] = "true";
 const char VLB_FALSE[] = "false";
-const char VLB_OK[]  = "OK";
 const char VLB_ACTIVE[] = "active";
 const char VLB_WAITING[] = "waiting";
 const char VLB_PAUSED[] = "paused";
@@ -255,7 +253,6 @@ std::unique_ptr<ValueBase> AddUriRpcMethod::process
   }
 }
 
-#ifdef ENABLE_MESSAGE_DIGEST
 namespace {
 std::string getHexSha1(const std::string& s)
 {
@@ -265,7 +262,6 @@ std::string getHexSha1(const std::string& s)
   return util::toHex(hash, sizeof(hash));
 }
 } // namespace
-#endif // ENABLE_MESSAGE_DIGEST
 
 #ifdef ENABLE_BITTORRENT
 std::unique_ptr<ValueBase> AddTorrentRpcMethod::process
@@ -342,7 +338,6 @@ std::unique_ptr<ValueBase> AddMetalinkRpcMethod::process
   size_t pos = posGiven ? posParam->i() : 0;
 
   std::vector<std::shared_ptr<RequestGroup>> result;
-#ifdef ENABLE_MESSAGE_DIGEST
   std::string filename;
   if(requestOption->getAsBool(PREF_RPC_SAVE_UPLOAD_METADATA)) {
     // TODO RFC5854 Metalink has the extension .meta4 and Metalink
@@ -366,9 +361,6 @@ std::unique_ptr<ValueBase> AddMetalinkRpcMethod::process
   } else {
     createRequestGroupForMetalink(result, requestOption, metalinkParam->s());
   }
-#else // !ENABLE_MESSAGE_DIGEST
-  createRequestGroupForMetalink(result, requestOption, metalinkParam->s());
-#endif // !ENABLE_MESSAGE_DIGEST
   auto gids = List::g();
   if(!result.empty()) {
     if(posGiven) {
@@ -1370,6 +1362,7 @@ std::unique_ptr<ValueBase> SystemMulticallRpcMethod::process
 {
   const List* methodSpecs = checkRequiredParam<List>(req, 0);
   auto list = List::g();
+  auto auth = RpcRequest::MUST_AUTHORIZE;
   for(auto & methodSpec : *methodSpecs) {
     Dict* methodDict = downcast<Dict>(methodSpec);
     if(!methodDict) {
@@ -1397,12 +1390,19 @@ std::unique_ptr<ValueBase> SystemMulticallRpcMethod::process
     } else {
       paramsList = List::g();
     }
-    RpcResponse res = getMethod(methodName->s())->execute
-      ({methodName->s(), std::move(paramsList), nullptr, req.jsonRpc}, e);
+    RpcRequest r = {
+      methodName->s(),
+      std::move(paramsList),
+      nullptr,
+      auth,
+      req.jsonRpc
+    };
+    RpcResponse res = getMethod(methodName->s())->execute(std::move(r), e);
     if(res.code == 0) {
       auto l = List::g();
       l->append(std::move(res.param));
       list->append(std::move(l));
+      auth = RpcRequest::PREAUTHORIZED;
     } else {
       list->append(std::move(res.param));
     }
@@ -1458,10 +1458,9 @@ void changeOption
     dctx->setDigest(hashType, util::fromHex(p.second.first, p.second.second));
   }
   if(option.defined(PREF_SELECT_FILE)) {
-    SegList<int> sgl;
-    util::parseIntSegments(sgl, grOption->get(PREF_SELECT_FILE));
+    auto sgl = util::parseIntSegments(grOption->get(PREF_SELECT_FILE));
     sgl.normalize();
-    dctx->setFileFilter(sgl);
+    dctx->setFileFilter(std::move(sgl));
   }
   if(option.defined(PREF_SPLIT)) {
     group->setNumConcurrentCommand(grOption->getAsInt(PREF_SPLIT));
@@ -1474,14 +1473,36 @@ void changeOption
     }
   }
   if(option.defined(PREF_DIR) || option.defined(PREF_OUT)) {
-    if(dctx->getFileEntries().size() == 1
+    if(!group->getMetadataInfo()) {
+
+      assert(dctx->getFileEntries().size() == 1);
+
+      auto& fileEntry = dctx->getFirstFileEntry();
+
+      if(!grOption->blank(PREF_OUT)) {
+        fileEntry->setPath
+          (util::applyDir(grOption->get(PREF_DIR), grOption->get(PREF_OUT)));
+        fileEntry->setSuffixPath(A2STR::NIL);
+      } else if(fileEntry->getSuffixPath().empty()) {
+        fileEntry->setPath(A2STR::NIL);
+      } else {
+        fileEntry->setPath
+          (util::applyDir(grOption->get(PREF_DIR),
+                          fileEntry->getSuffixPath()));
+      }
+    } else if(group->getMetadataInfo()
 #ifdef ENABLE_BITTORRENT
-       && !dctx->hasAttribute(CTX_ATTR_BT)
+              && !dctx->hasAttribute(CTX_ATTR_BT)
 #endif // ENABLE_BITTORRENT
-       ) {
-      dctx->getFirstFileEntry()->setPath
-        (grOption->blank(PREF_OUT) ? A2STR::NIL :
-         util::applyDir(grOption->get(PREF_DIR), grOption->get(PREF_OUT)));
+              ) {
+      // In case of Metalink
+      for(auto& fileEntry : dctx->getFileEntries()) {
+        // PREF_OUT is not applicable to Metalink.  We have always
+        // suffixPath set.
+        fileEntry->setPath
+          (util::applyDir(grOption->get(PREF_DIR),
+                          fileEntry->getSuffixPath()));
+      }
     }
   }
 #ifdef ENABLE_BITTORRENT
@@ -1546,6 +1567,11 @@ void changeGlobalOption(const Option& option, DownloadEngine* e)
     } catch(RecoverableException& e) {
       // TODO no exception handling
     }
+  }
+  if(option.defined(PREF_BT_MAX_OPEN_FILES)) {
+    auto& openedFileCounter = e->getRequestGroupMan()->getOpenedFileCounter();
+    openedFileCounter->setMaxOpenFiles
+      (option.getAsInt(PREF_BT_MAX_OPEN_FILES));
   }
 }
 

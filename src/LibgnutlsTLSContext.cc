@@ -110,14 +110,14 @@ bool GnuTLSContext::addCredentialFile(const std::string& certfile,
 bool GnuTLSContext::addP12CredentialFile(const std::string& p12file)
 {
   std::stringstream ss;
-  BufferedFile(p12file.c_str(), "rb").transfer(ss);
+  BufferedFile(p12file.c_str(), BufferedFile::READ).transfer(ss);
   auto datastr = ss.str();
   const gnutls_datum_t data = {
     (unsigned char*)datastr.c_str(),
     (unsigned int)datastr.length()
   };
-  int err = gnutls_certificate_set_x509_simple_pkcs12_mem(
-      certCred_, &data, GNUTLS_X509_FMT_DER, "");
+  int err = gnutls_certificate_set_x509_simple_pkcs12_mem
+    (certCred_, &data, GNUTLS_X509_FMT_DER, "");
   if (err != GNUTLS_E_SUCCESS) {
     A2_LOG_ERROR("Failed to import PKCS12 file. "
                  "If you meant to use PEM, you'll also have to specify "
