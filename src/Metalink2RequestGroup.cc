@@ -64,10 +64,8 @@
 # include "BtDependency.h"
 # include "download_helper.h"
 #endif // ENABLE_BITTORRENT
-#ifdef ENABLE_MESSAGE_DIGEST
-# include "Checksum.h"
-# include "ChunkChecksum.h"
-#endif // ENABLE_MESSAGE_DIGEST
+#include "Checksum.h"
+#include "ChunkChecksum.h"
 
 namespace aria2 {
 
@@ -188,8 +186,7 @@ Metalink2RequestGroup::createRequestGroup
         (preferredProtocol, -MetalinkResource::getLowestPriority());
     }
   }
-  SegList<int> sgl;
-  util::parseIntSegments(sgl, optionTemplate->get(PREF_SELECT_FILE));
+  auto sgl = util::parseIntSegments(optionTemplate->get(PREF_SELECT_FILE));
   sgl.normalize();
   if(sgl.hasNext()) {
     size_t inspoint = 0;
@@ -255,15 +252,11 @@ Metalink2RequestGroup::createRequestGroup
       // If piece hash is specified in the metalink,
       // make segment size equal to piece hash size.
       int32_t pieceLength;
-#ifdef ENABLE_MESSAGE_DIGEST
       if(!entry->chunkChecksum) {
         pieceLength = option->getAsInt(PREF_PIECE_LENGTH);
       } else {
         pieceLength = entry->chunkChecksum->getPieceLength();
       }
-#else
-      pieceLength = option->getAsInt(PREF_PIECE_LENGTH);
-#endif // ENABLE_MESSAGE_DIGEST
       dctx = std::make_shared<DownloadContext>
         (pieceLength,
          entry->getLength(),
@@ -271,10 +264,11 @@ Metalink2RequestGroup::createRequestGroup
                         entry->file->getPath()));
       dctx->getFirstFileEntry()->setUris(uris);
       dctx->getFirstFileEntry()->setMaxConnectionPerServer(maxConn);
+      dctx->getFirstFileEntry()->setSuffixPath(entry->file->getPath());
+
       if(option->getAsBool(PREF_METALINK_ENABLE_UNIQUE_PROTOCOL)) {
         dctx->getFirstFileEntry()->setUniqueProtocol(true);
       }
-#ifdef ENABLE_MESSAGE_DIGEST
       if(entry->checksum) {
         dctx->setDigest(entry->checksum->getHashType(),
                         entry->checksum->getDigest());
@@ -285,7 +279,6 @@ Metalink2RequestGroup::createRequestGroup
            std::begin(entry->chunkChecksum->getPieceHashes()),
            std::end(entry->chunkChecksum->getPieceHashes()));
       }
-#endif // ENABLE_MESSAGE_DIGEST
       dctx->setSignature(entry->popSignature());
       rg->setNumConcurrentCommand
         (entry->maxConnections < 0 ?
@@ -315,6 +308,7 @@ Metalink2RequestGroup::createRequestGroup
           fe->setUniqueProtocol(true);
         }
         fe->setOriginalName(entry->metaurls[0]->name);
+        fe->setSuffixPath(entry->file->getPath());
         fileEntries.push_back(fe);
         if(offset >
            std::numeric_limits<int64_t>::max() - entry->file->getLength()) {
@@ -326,7 +320,11 @@ Metalink2RequestGroup::createRequestGroup
       rg->setNumConcurrentCommand(numSplit);
     }
     rg->setDownloadContext(dctx);
-    rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+
+    if(option->getAsBool(PREF_ENABLE_RPC)) {
+      rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+    }
+
     removeOneshotOption(option);
     // remove "metalink" from Accept Type list to avoid loop in
     // tranparent metalink

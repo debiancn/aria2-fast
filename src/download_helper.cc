@@ -143,7 +143,6 @@ std::shared_ptr<RequestGroup> createRequestGroup
   dctx->getFirstFileEntry()->setUris(uris);
   dctx->getFirstFileEntry()->setMaxConnectionPerServer
     (option->getAsInt(PREF_MAX_CONNECTION_PER_SERVER));
-#ifdef ENABLE_MESSAGE_DIGEST
   const std::string& checksum = option->get(PREF_CHECKSUM);
   if(!checksum.empty()) {
     auto p = util::divide(std::begin(checksum), std::end(checksum), '=');
@@ -153,9 +152,12 @@ std::shared_ptr<RequestGroup> createRequestGroup
     dctx->setDigest(hashType,
                     util::fromHex(std::begin(hexDigest), std::end(hexDigest)));
   }
-#endif // ENABLE_MESSAGE_DIGEST
   rg->setDownloadContext(dctx);
-  rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+
+  if(option->getAsBool(PREF_ENABLE_RPC)) {
+    rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+  }
+
   removeOneshotOption(option);
   return rg;
 }
@@ -203,10 +205,9 @@ createBtRequestGroup(const std::string& metaInfoUri,
   if(adjustAnnounceUri) {
     bittorrent::adjustAnnounceUri(bittorrent::getTorrentAttrs(dctx), option);
   }
-  SegList<int> sgl;
-  util::parseIntSegments(sgl, option->get(PREF_SELECT_FILE));
+  auto sgl = util::parseIntSegments(option->get(PREF_SELECT_FILE));
   sgl.normalize();
-  dctx->setFileFilter(sgl);
+  dctx->setFileFilter(std::move(sgl));
   std::istringstream indexOutIn(option->get(PREF_INDEX_OUT));
   auto indexPaths = util::createIndexPaths(indexOutIn);
   for(const auto& i : indexPaths) {
@@ -214,7 +215,11 @@ createBtRequestGroup(const std::string& metaInfoUri,
       (i.first, util::applyDir(option->get(PREF_DIR), i.second));
   }
   rg->setDownloadContext(dctx);
-  rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+
+  if(option->getAsBool(PREF_ENABLE_RPC)) {
+    rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+  }
+
   // Remove "metalink" from Accept Type list to avoid server from
   // responding Metalink file for web-seeding URIs.
   dctx->setAcceptMetalink(false);
@@ -232,8 +237,8 @@ createBtMagnetRequestGroup
   auto option = util::copy(optionTemplate);
   auto gid = getGID(option);
   auto rg = std::make_shared<RequestGroup>(gid, option);
-  auto dctx = std::make_shared<DownloadContext>(METADATA_PIECE_SIZE, 0,
-                                                A2STR::NIL);
+  auto dctx = std::make_shared<DownloadContext>(METADATA_PIECE_SIZE, 0);
+
   // We only know info hash. Total Length is unknown at this moment.
   dctx->markTotalLengthIsUnknown();
   rg->setFileAllocationEnabled(false);
@@ -249,7 +254,11 @@ createBtMagnetRequestGroup
   rg->setDiskWriterFactory(std::make_shared<ByteArrayDiskWriterFactory>());
   rg->setMetadataInfo(createMetadataInfo(gid, magnetLink));
   rg->markInMemoryDownload();
-  rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+
+  if(option->getAsBool(PREF_ENABLE_RPC)) {
+    rg->setPauseRequested(option->getAsBool(PREF_PAUSE));
+  }
+
   removeOneshotOption(option);
   return rg;
 }
@@ -334,10 +343,10 @@ private:
   bool throwOnError_;
 public:
   AccRequestGroup(std::vector<std::shared_ptr<RequestGroup>>& requestGroups,
-                  const std::shared_ptr<Option>& option,
+                  std::shared_ptr<Option> option,
                   bool ignoreLocalPath = false,
                   bool throwOnError = false):
-    requestGroups_(requestGroups), option_(option),
+    requestGroups_(requestGroups), option_(std::move(option)),
     ignoreLocalPath_(ignoreLocalPath),
     throwOnError_(throwOnError)
   {}
@@ -534,8 +543,7 @@ createMetadataInfoFromFirstFileEntry
   if(dctx->getFileEntries().empty()) {
     return nullptr;
   } else {
-    std::vector<std::string> uris;
-    dctx->getFileEntries()[0]->getUris(uris);
+    auto uris = dctx->getFileEntries()[0]->getUris();
     if(uris.empty()) {
       return nullptr;
     }

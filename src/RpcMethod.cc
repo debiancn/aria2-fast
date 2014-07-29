@@ -85,11 +85,11 @@ void RpcMethod::authorize(RpcRequest& req, DownloadEngine* e)
       }
     }
   }
-  if(e && e->getOption()->defined(PREF_RPC_SECRET)) {
-    if(token != e->getOption()->get(PREF_RPC_SECRET)) {
-      throw DL_ABORT_EX("Unauthorized");
-    }
+  if (!e || (req.authorization != RpcRequest::PREAUTHORIZED &&
+        !e->validateToken(token))) {
+    throw DL_ABORT_EX("Unauthorized");
   }
+  req.authorization = RpcRequest::PREAUTHORIZED;
 }
 
 RpcResponse RpcMethod::execute(RpcRequest req, DownloadEngine* e)

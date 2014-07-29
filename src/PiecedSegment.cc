@@ -71,16 +71,16 @@ int64_t PiecedSegment::getPositionToWrite() const
   return getPosition()+writtenLength_;
 }
 
-int32_t PiecedSegment::getLength() const
+int64_t PiecedSegment::getLength() const
 {
   return piece_->getLength();
 }
 
-void PiecedSegment::updateWrittenLength(int32_t bytes)
+void PiecedSegment::updateWrittenLength(int64_t bytes)
 {
-  int32_t newWrittenLength = writtenLength_+bytes;
+  auto newWrittenLength = writtenLength_+bytes;
   assert(newWrittenLength <= piece_->getLength());
-  for(size_t i = writtenLength_/piece_->getBlockLength(),
+  for(auto i = writtenLength_/piece_->getBlockLength(),
         end = newWrittenLength/piece_->getBlockLength(); i < end; ++i) {
     piece_->completeBlock(i);
   }
@@ -90,10 +90,8 @@ void PiecedSegment::updateWrittenLength(int32_t bytes)
   writtenLength_ = newWrittenLength;
 }
 
-#ifdef ENABLE_MESSAGE_DIGEST
-
 bool PiecedSegment::updateHash
-(int32_t begin,
+(int64_t begin,
  const unsigned char* data,
  size_t dataLength)
 {
@@ -110,18 +108,12 @@ std::string PiecedSegment::getDigest()
   return piece_->getDigest();
 }
 
-#endif // ENABLE_MESSAGE_DIGEST
-
 void PiecedSegment::clear(WrDiskCache* diskCache)
 {
   writtenLength_ = 0;
   piece_->clearAllBlock(diskCache);
 
-#ifdef ENABLE_MESSAGE_DIGEST
-
   piece_->destroyHashContext();
-
-#endif // ENABLE_MESSAGE_DIGEST
 }
 
 std::shared_ptr<Piece> PiecedSegment::getPiece() const

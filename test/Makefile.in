@@ -89,12 +89,7 @@ check_PROGRAMS = $(am__EXEEXT_1)
 @HAVE_ZLIB_TRUE@	GZipFileTest.cc
 
 @HAVE_SQLITE3_TRUE@am__append_4 = Sqlite3CookieParserTest.cc
-@ENABLE_MESSAGE_DIGEST_TRUE@am__append_5 = MessageDigestHelperTest.cc\
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChunkChecksumValidatorTest.cc\
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidatorTest.cc\
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestTest.cc
-
-@ENABLE_BITTORRENT_TRUE@am__append_6 = BtAllowedFastMessageTest.cc\
+@ENABLE_BITTORRENT_TRUE@am__append_5 = BtAllowedFastMessageTest.cc\
 @ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageTest.cc\
 @ENABLE_BITTORRENT_TRUE@	BtCancelMessageTest.cc\
 @ENABLE_BITTORRENT_TRUE@	BtChokeMessageTest.cc\
@@ -194,7 +189,7 @@ check_PROGRAMS = $(am__EXEEXT_1)
 @ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistryTest.cc\
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerClientTest.cc
 
-@ENABLE_METALINK_TRUE@am__append_7 = MetalinkerTest.cc\
+@ENABLE_METALINK_TRUE@am__append_6 = MetalinkerTest.cc\
 @ENABLE_METALINK_TRUE@	MetalinkEntryTest.cc\
 @ENABLE_METALINK_TRUE@	Metalink2RequestGroupTest.cc\
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandlerTest.cc\
@@ -202,9 +197,9 @@ check_PROGRAMS = $(am__EXEEXT_1)
 @ENABLE_METALINK_TRUE@	MetalinkParserControllerTest.cc\
 @ENABLE_METALINK_TRUE@	MetalinkProcessorTest.cc
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_8 = AsyncNameResolverTest.cc
-@HAVE_TIMEGM_FALSE@am__append_9 = TimegmTest.cc
-@ENABLE_LIBARIA2_TRUE@am__append_10 = Aria2ApiTest.cc
+@ENABLE_ASYNC_DNS_TRUE@am__append_7 = AsyncNameResolverTest.cc
+@HAVE_TIMEGM_FALSE@am__append_8 = TimegmTest.cc
+@ENABLE_LIBARIA2_TRUE@am__append_9 = Aria2ApiTest.cc
 subdir = test
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(top_srcdir)/test-driver
@@ -235,17 +230,18 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 	SegmentTest.cc GrowSegmentTest.cc \
 	SingleFileAllocationIteratorTest.cc \
 	DefaultBtProgressInfoFileTest.cc RequestGroupTest.cc \
-	UtilTest.cc UriListParserTest.cc HttpHeaderProcessorTest.cc \
-	RequestTest.cc HttpRequestTest.cc RequestGroupManTest.cc \
-	AuthConfigFactoryTest.cc NetrcAuthResolverTest.cc \
-	DefaultAuthResolverTest.cc OptionHandlerTest.cc \
-	SegmentManTest.cc BitfieldManTest.cc NetrcTest.cc \
-	SingletonHolderTest.cc HttpHeaderTest.cc HttpResponseTest.cc \
-	FileTest.cc OptionTest.cc DefaultDiskWriterTest.cc \
-	FeatureConfigTest.cc SpeedCalcTest.cc MultiDiskAdaptorTest.cc \
-	MultiFileAllocationIteratorTest.cc FixedNumberRandomizer.h \
-	ProtocolDetectorTest.cc ExceptionTest.cc FmtTest.cc \
-	DownloadHandlersTest.cc SignatureTest.cc ServerStatManTest.cc \
+	UtilTest.cc UtilSecurityTest.cc UriListParserTest.cc \
+	HttpHeaderProcessorTest.cc RequestTest.cc HttpRequestTest.cc \
+	RequestGroupManTest.cc AuthConfigFactoryTest.cc \
+	NetrcAuthResolverTest.cc DefaultAuthResolverTest.cc \
+	OptionHandlerTest.cc SegmentManTest.cc BitfieldManTest.cc \
+	NetrcTest.cc SingletonHolderTest.cc HttpHeaderTest.cc \
+	HttpResponseTest.cc FileTest.cc OptionTest.cc \
+	DefaultDiskWriterTest.cc FeatureConfigTest.cc SpeedCalcTest.cc \
+	MultiDiskAdaptorTest.cc MultiFileAllocationIteratorTest.cc \
+	FixedNumberRandomizer.h ProtocolDetectorTest.cc \
+	ExceptionTest.cc FmtTest.cc DownloadHandlersTest.cc \
+	SignatureTest.cc ServerStatManTest.cc \
 	FeedbackURISelectorTest.cc InorderURISelectorTest.cc \
 	ServerStatTest.cc NsCookieParserTest.cc \
 	DirectDiskAdaptorTest.cc CookieTest.cc CookieStorageTest.cc \
@@ -258,11 +254,12 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 	ChunkedDecodingStreamFilterTest.cc UriTest.cc UriSplitTest.cc \
 	MockSegment.h CookieHelperTest.cc JsonTest.cc \
 	ValueBaseJsonParserTest.cc RpcResponseTest.cc RpcMethodTest.cc \
-	BufferedFileTest.cc GeomStreamPieceSelectorTest.cc \
-	SegListTest.cc ParamedStringTest.cc RpcHelperTest.cc \
-	AbstractCommandTest.cc SinkStreamFilterTest.cc \
-	WrDiskCacheTest.cc WrDiskCacheEntryTest.cc GroupIdTest.cc \
-	IndexedListTest.cc XmlRpcRequestParserControllerTest.cc \
+	HttpServerTest.cc BufferedFileTest.cc \
+	GeomStreamPieceSelectorTest.cc SegListTest.cc \
+	ParamedStringTest.cc RpcHelperTest.cc AbstractCommandTest.cc \
+	SinkStreamFilterTest.cc WrDiskCacheTest.cc \
+	WrDiskCacheEntryTest.cc GroupIdTest.cc IndexedListTest.cc \
+	XmlRpcRequestParserControllerTest.cc \
 	FallocFileAllocationIteratorTest.cc GZipDecoder.cc \
 	GZipDecoder.h GZipDecoderTest.cc GZipEncoderTest.cc \
 	GZipDecodingStreamFilterTest.cc GZipFileTest.cc \
@@ -333,12 +330,7 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 @HAVE_ZLIB_TRUE@	GZipDecodingStreamFilterTest.$(OBJEXT) \
 @HAVE_ZLIB_TRUE@	GZipFileTest.$(OBJEXT)
 @HAVE_SQLITE3_TRUE@am__objects_4 = Sqlite3CookieParserTest.$(OBJEXT)
-@ENABLE_MESSAGE_DIGEST_TRUE@am__objects_5 =  \
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestHelperTest.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChunkChecksumValidatorTest.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	IteratableChecksumValidatorTest.$(OBJEXT) \
-@ENABLE_MESSAGE_DIGEST_TRUE@	MessageDigestTest.$(OBJEXT)
-@ENABLE_BITTORRENT_TRUE@am__objects_6 =  \
+@ENABLE_BITTORRENT_TRUE@am__objects_5 =  \
 @ENABLE_BITTORRENT_TRUE@	BtAllowedFastMessageTest.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	BtBitfieldMessageTest.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	BtCancelMessageTest.$(OBJEXT) \
@@ -419,17 +411,17 @@ am__aria2c_SOURCES_DIST = AllTest.cc TestUtil.cc TestUtil.h \
 @ENABLE_BITTORRENT_TRUE@	ValueBaseBencodeParserTest.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	ExtensionMessageRegistryTest.$(OBJEXT) \
 @ENABLE_BITTORRENT_TRUE@	UDPTrackerClientTest.$(OBJEXT)
-@ENABLE_METALINK_TRUE@am__objects_7 = MetalinkerTest.$(OBJEXT) \
+@ENABLE_METALINK_TRUE@am__objects_6 = MetalinkerTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkEntryTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	Metalink2RequestGroupTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandlerTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkHelperTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkParserControllerTest.$(OBJEXT) \
 @ENABLE_METALINK_TRUE@	MetalinkProcessorTest.$(OBJEXT)
-@ENABLE_ASYNC_DNS_TRUE@am__objects_8 =  \
+@ENABLE_ASYNC_DNS_TRUE@am__objects_7 =  \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverTest.$(OBJEXT)
-@HAVE_TIMEGM_FALSE@am__objects_9 = TimegmTest.$(OBJEXT)
-@ENABLE_LIBARIA2_TRUE@am__objects_10 = Aria2ApiTest.$(OBJEXT)
+@HAVE_TIMEGM_FALSE@am__objects_8 = TimegmTest.$(OBJEXT)
+@ENABLE_LIBARIA2_TRUE@am__objects_9 = Aria2ApiTest.$(OBJEXT)
 am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	SocketCoreTest.$(OBJEXT) array_funTest.$(OBJEXT) \
 	Base64Test.$(OBJEXT) Base32Test.$(OBJEXT) \
@@ -439,9 +431,10 @@ am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	SingleFileAllocationIteratorTest.$(OBJEXT) \
 	DefaultBtProgressInfoFileTest.$(OBJEXT) \
 	RequestGroupTest.$(OBJEXT) UtilTest.$(OBJEXT) \
-	UriListParserTest.$(OBJEXT) HttpHeaderProcessorTest.$(OBJEXT) \
-	RequestTest.$(OBJEXT) HttpRequestTest.$(OBJEXT) \
-	RequestGroupManTest.$(OBJEXT) AuthConfigFactoryTest.$(OBJEXT) \
+	UtilSecurityTest.$(OBJEXT) UriListParserTest.$(OBJEXT) \
+	HttpHeaderProcessorTest.$(OBJEXT) RequestTest.$(OBJEXT) \
+	HttpRequestTest.$(OBJEXT) RequestGroupManTest.$(OBJEXT) \
+	AuthConfigFactoryTest.$(OBJEXT) \
 	NetrcAuthResolverTest.$(OBJEXT) \
 	DefaultAuthResolverTest.$(OBJEXT) OptionHandlerTest.$(OBJEXT) \
 	SegmentManTest.$(OBJEXT) BitfieldManTest.$(OBJEXT) \
@@ -470,16 +463,18 @@ am_aria2c_OBJECTS = AllTest.$(OBJEXT) TestUtil.$(OBJEXT) \
 	UriSplitTest.$(OBJEXT) CookieHelperTest.$(OBJEXT) \
 	JsonTest.$(OBJEXT) ValueBaseJsonParserTest.$(OBJEXT) \
 	RpcResponseTest.$(OBJEXT) RpcMethodTest.$(OBJEXT) \
-	BufferedFileTest.$(OBJEXT) \
+	HttpServerTest.$(OBJEXT) BufferedFileTest.$(OBJEXT) \
 	GeomStreamPieceSelectorTest.$(OBJEXT) SegListTest.$(OBJEXT) \
 	ParamedStringTest.$(OBJEXT) RpcHelperTest.$(OBJEXT) \
 	AbstractCommandTest.$(OBJEXT) SinkStreamFilterTest.$(OBJEXT) \
 	WrDiskCacheTest.$(OBJEXT) WrDiskCacheEntryTest.$(OBJEXT) \
 	GroupIdTest.$(OBJEXT) IndexedListTest.$(OBJEXT) \
 	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_4) $(am__objects_5) $(am__objects_6) \
-	$(am__objects_7) $(am__objects_8) $(am__objects_9) \
-	$(am__objects_10)
+	$(am__objects_4) MessageDigestHelperTest.$(OBJEXT) \
+	IteratableChunkChecksumValidatorTest.$(OBJEXT) \
+	IteratableChecksumValidatorTest.$(OBJEXT) \
+	MessageDigestTest.$(OBJEXT) $(am__objects_5) $(am__objects_6) \
+	$(am__objects_7) $(am__objects_8) $(am__objects_9)
 aria2c_OBJECTS = $(am_aria2c_OBJECTS)
 aria2c_DEPENDENCIES = ../src/libaria2.la
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -961,17 +956,18 @@ aria2c_SOURCES = AllTest.cc TestUtil.cc TestUtil.h SocketCoreTest.cc \
 	SegmentTest.cc GrowSegmentTest.cc \
 	SingleFileAllocationIteratorTest.cc \
 	DefaultBtProgressInfoFileTest.cc RequestGroupTest.cc \
-	UtilTest.cc UriListParserTest.cc HttpHeaderProcessorTest.cc \
-	RequestTest.cc HttpRequestTest.cc RequestGroupManTest.cc \
-	AuthConfigFactoryTest.cc NetrcAuthResolverTest.cc \
-	DefaultAuthResolverTest.cc OptionHandlerTest.cc \
-	SegmentManTest.cc BitfieldManTest.cc NetrcTest.cc \
-	SingletonHolderTest.cc HttpHeaderTest.cc HttpResponseTest.cc \
-	FileTest.cc OptionTest.cc DefaultDiskWriterTest.cc \
-	FeatureConfigTest.cc SpeedCalcTest.cc MultiDiskAdaptorTest.cc \
-	MultiFileAllocationIteratorTest.cc FixedNumberRandomizer.h \
-	ProtocolDetectorTest.cc ExceptionTest.cc FmtTest.cc \
-	DownloadHandlersTest.cc SignatureTest.cc ServerStatManTest.cc \
+	UtilTest.cc UtilSecurityTest.cc UriListParserTest.cc \
+	HttpHeaderProcessorTest.cc RequestTest.cc HttpRequestTest.cc \
+	RequestGroupManTest.cc AuthConfigFactoryTest.cc \
+	NetrcAuthResolverTest.cc DefaultAuthResolverTest.cc \
+	OptionHandlerTest.cc SegmentManTest.cc BitfieldManTest.cc \
+	NetrcTest.cc SingletonHolderTest.cc HttpHeaderTest.cc \
+	HttpResponseTest.cc FileTest.cc OptionTest.cc \
+	DefaultDiskWriterTest.cc FeatureConfigTest.cc SpeedCalcTest.cc \
+	MultiDiskAdaptorTest.cc MultiFileAllocationIteratorTest.cc \
+	FixedNumberRandomizer.h ProtocolDetectorTest.cc \
+	ExceptionTest.cc FmtTest.cc DownloadHandlersTest.cc \
+	SignatureTest.cc ServerStatManTest.cc \
 	FeedbackURISelectorTest.cc InorderURISelectorTest.cc \
 	ServerStatTest.cc NsCookieParserTest.cc \
 	DirectDiskAdaptorTest.cc CookieTest.cc CookieStorageTest.cc \
@@ -984,14 +980,17 @@ aria2c_SOURCES = AllTest.cc TestUtil.cc TestUtil.h SocketCoreTest.cc \
 	ChunkedDecodingStreamFilterTest.cc UriTest.cc UriSplitTest.cc \
 	MockSegment.h CookieHelperTest.cc JsonTest.cc \
 	ValueBaseJsonParserTest.cc RpcResponseTest.cc RpcMethodTest.cc \
-	BufferedFileTest.cc GeomStreamPieceSelectorTest.cc \
-	SegListTest.cc ParamedStringTest.cc RpcHelperTest.cc \
-	AbstractCommandTest.cc SinkStreamFilterTest.cc \
-	WrDiskCacheTest.cc WrDiskCacheEntryTest.cc GroupIdTest.cc \
-	IndexedListTest.cc $(am__append_1) $(am__append_2) \
-	$(am__append_3) $(am__append_4) $(am__append_5) \
-	$(am__append_6) $(am__append_7) $(am__append_8) \
-	$(am__append_9) $(am__append_10)
+	HttpServerTest.cc BufferedFileTest.cc \
+	GeomStreamPieceSelectorTest.cc SegListTest.cc \
+	ParamedStringTest.cc RpcHelperTest.cc AbstractCommandTest.cc \
+	SinkStreamFilterTest.cc WrDiskCacheTest.cc \
+	WrDiskCacheEntryTest.cc GroupIdTest.cc IndexedListTest.cc \
+	$(am__append_1) $(am__append_2) $(am__append_3) \
+	$(am__append_4) MessageDigestHelperTest.cc \
+	IteratableChunkChecksumValidatorTest.cc \
+	IteratableChecksumValidatorTest.cc MessageDigestTest.cc \
+	$(am__append_5) $(am__append_6) $(am__append_7) \
+	$(am__append_8) $(am__append_9)
 aria2c_LDADD = ../src/libaria2.la @LIBINTL@ @CPPUNIT_LIBS@
 AM_CPPFLAGS = -Wall\
 	-I$(top_srcdir)/src\
@@ -1193,6 +1192,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpHeaderTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpRequestTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpResponseTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HttpServerTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IndexedListTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/InorderURISelectorTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/IteratableChecksumValidatorTest.Po@am__quote@
@@ -1265,6 +1265,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UriListParserTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UriSplitTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UriTest.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilSecurityTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/UtilTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseBencodeParserTest.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ValueBaseJsonParserTest.Po@am__quote@

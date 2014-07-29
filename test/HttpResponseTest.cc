@@ -53,9 +53,7 @@ class HttpResponseTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testRetrieveCookie);
   CPPUNIT_TEST(testSupportsPersistentConnection);
   CPPUNIT_TEST(testGetMetalinKHttpEntries);
-#ifdef ENABLE_MESSAGE_DIGEST
   CPPUNIT_TEST(testGetDigest);
-#endif // ENABLE_MESSAGE_DIGEST
   CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -88,9 +86,7 @@ public:
   void testRetrieveCookie();
   void testSupportsPersistentConnection();
   void testGetMetalinKHttpEntries();
-#ifdef ENABLE_MESSAGE_DIGEST
   void testGetDigest();
-#endif // ENABLE_MESSAGE_DIGEST
 };
 
 
@@ -667,7 +663,6 @@ void HttpResponseTest::testGetMetalinKHttpEntries()
   CPPUNIT_ASSERT(e.geo.empty());
 }
 
-#ifdef ENABLE_MESSAGE_DIGEST
 void HttpResponseTest::testGetDigest()
 {
   HttpResponse httpResponse;
@@ -690,24 +685,17 @@ void HttpResponseTest::testGetDigest()
      "MD5=LJDK2+9ClF8Nz/K5WZd/+A==");
   std::vector<Checksum> result;
   httpResponse.getDigest(result);
-#ifdef USE_INTERNAL_MD
-  CPPUNIT_ASSERT_EQUAL((size_t)2, result.size());
-#else
   CPPUNIT_ASSERT_EQUAL((size_t)3, result.size());
-#endif
 
   Checksum c = result[0];
-#ifndef USE_INTERNAL_MD
   CPPUNIT_ASSERT_EQUAL(std::string("sha-256"), c.getHashType());
   CPPUNIT_ASSERT_EQUAL(std::string("f83f271ae773dc6fe4a6454a41e0eb237c43e7bbf451e426cc60993a4d379ec5"),
                        util::toHex(c.getDigest()));
 
   c = result[1];
-#endif
   CPPUNIT_ASSERT_EQUAL(std::string("sha-1"), c.getHashType());
   CPPUNIT_ASSERT_EQUAL(std::string("f36003f22b462ffa184390533c500d8989e9f681"),
                        util::toHex(c.getDigest()));
 }
-#endif // ENABLE_MESSAGE_DIGEST
 
 } // namespace aria2

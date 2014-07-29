@@ -97,7 +97,7 @@ public:
   // should be escaped with util::escapePath(...).
   DownloadContext(int32_t pieceLength,
                   int64_t totalLength,
-                  const std::string& path = A2STR::NIL);
+                  std::string path = A2STR::NIL);
 
   ~DownloadContext();
 
@@ -183,7 +183,7 @@ public:
   }
 
   // sgl must be normalized before the call.
-  void setFileFilter(SegList<int>& sgl);
+  void setFileFilter(SegList<int> sgl);
 
   // Sets file path for specified index. index starts from 1. The
   // index is the same used in setFileFilter(). path is not escaped by

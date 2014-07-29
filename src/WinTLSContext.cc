@@ -44,26 +44,38 @@
 #include "message.h"
 #include "util.h"
 
+#ifndef SP_PROT_TLS1_1_CLIENT
+#define SP_PROT_TLS1_1_CLIENT 0x00000200
+#endif
+#ifndef SP_PROT_TLS1_1_SERVER
+#define SP_PROT_TLS1_1_SERVER 0x00000100
+#endif
+#ifndef SP_PROT_TLS1_2_CLIENT
+#define SP_PROT_TLS1_2_CLIENT 0x00000800
+#endif
+#ifndef SP_PROT_TLS1_2_SERVER
+#define SP_PROT_TLS1_2_SERVER 0x00000400
+#endif
+
+#ifndef SCH_USE_STRONG_CRYPTO
+#define SCH_USE_STRONG_CRYPTO 0x00400000
+#endif
+
 namespace aria2 {
 
-WinTLSContext::WinTLSContext(TLSSessionSide side)
-  : side_(side), store_(0)
+WinTLSContext::WinTLSContext(TLSSessionSide side) : side_(side), store_(0)
 {
   memset(&credentials_, 0, sizeof(credentials_));
   credentials_.dwVersion = SCHANNEL_CRED_VERSION;
   if (side_ == TLS_CLIENT) {
     credentials_.grbitEnabledProtocols =
-      SP_PROT_SSL3_CLIENT |
-      SP_PROT_TLS1_CLIENT |
-      SP_PROT_TLS1_1_CLIENT |
-      SP_PROT_TLS1_2_CLIENT;
+        SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT |
+        SP_PROT_TLS1_2_CLIENT;
   }
   else {
     credentials_.grbitEnabledProtocols =
-      SP_PROT_SSL3_SERVER |
-      SP_PROT_TLS1_SERVER |
-      SP_PROT_TLS1_1_SERVER |
-      SP_PROT_TLS1_2_SERVER;
+        SP_PROT_SSL3_SERVER | SP_PROT_TLS1_SERVER | SP_PROT_TLS1_1_SERVER |
+        SP_PROT_TLS1_2_SERVER;
   }
   credentials_.dwMinimumCipherStrength = 128; // bit
 
@@ -90,21 +102,21 @@ bool WinTLSContext::getVerifyPeer() const
 
 void WinTLSContext::setVerifyPeer(bool verify)
 {
-  if (side_ == TLS_CLIENT && verify) {
-    credentials_.dwFlags =
-      SCH_CRED_NO_DEFAULT_CREDS |
-      SCH_CRED_AUTO_CRED_VALIDATION |
-      SCH_CRED_REVOCATION_CHECK_CHAIN;
-  }
-  else {
-    credentials_.dwFlags =
-      SCH_CRED_NO_DEFAULT_CREDS |
-      SCH_CRED_MANUAL_CRED_VALIDATION |
-      SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
-      SCH_CRED_IGNORE_REVOCATION_OFFLINE |
-      SCH_CRED_NO_SERVERNAME_CHECK;
-  }
   cred_.reset();
+
+  if (side_ != TLS_CLIENT || !verify) {
+    credentials_.dwFlags = SCH_CRED_NO_DEFAULT_CREDS |
+                           SCH_CRED_MANUAL_CRED_VALIDATION |
+                           SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
+                           SCH_CRED_IGNORE_REVOCATION_OFFLINE |
+                           SCH_CRED_NO_SERVERNAME_CHECK | SCH_USE_STRONG_CRYPTO;
+    return;
+  }
+
+  credentials_.dwFlags =
+      SCH_CRED_NO_DEFAULT_CREDS | SCH_CRED_AUTO_CRED_VALIDATION |
+      SCH_CRED_REVOCATION_CHECK_CHAIN | SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
+      SCH_USE_STRONG_CRYPTO;
 }
 
 CredHandle* WinTLSContext::getCredHandle()
@@ -150,7 +162,7 @@ CredHandle* WinTLSContext::getCredHandle()
 }
 
 bool WinTLSContext::addCredentialFile(const std::string& certfile,
-                                        const std::string& keyfile)
+                                      const std::string& keyfile)
 {
   std::stringstream ss;
   BufferedFile(certfile.c_str(), "rb").transfer(ss);
@@ -163,11 +175,11 @@ bool WinTLSContext::addCredentialFile(const std::string& certfile,
     A2_LOG_ERROR("Not a valid PKCS12 file");
     return false;
   }
-  HCERTSTORE store = ::PFXImportCertStore(&blob, L"",
-                                          CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
+  HCERTSTORE store =
+      ::PFXImportCertStore(&blob, L"", CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
   if (!store_) {
-    store = ::PFXImportCertStore(&blob, nullptr,
-                                  CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
+    store = ::PFXImportCertStore(
+        &blob, nullptr, CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
   }
   if (!store) {
     A2_LOG_ERROR("Failed to import PKCS12 store");
@@ -192,7 +204,7 @@ bool WinTLSContext::addCredentialFile(const std::string& certfile,
 
 bool WinTLSContext::addTrustedCACertFile(const std::string& certfile)
 {
-  A2_LOG_INFO("TLS CA bundle files are not supported. "
+  A2_LOG_WARN("TLS CA bundle files are not supported. "
               "The system trust store will be used.");
   return false;
 }

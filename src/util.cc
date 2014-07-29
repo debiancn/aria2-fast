@@ -85,10 +85,8 @@
 #include "SocketCore.h"
 #include "Lock.h"
 
-#ifdef ENABLE_MESSAGE_DIGEST
-# include "MessageDigest.h"
-# include "message_digest_helper.h"
-#endif // ENABLE_MESSAGE_DIGEST
+#include "MessageDigest.h"
+#include "message_digest_helper.h"
 
 // For libc6 which doesn't define ULLONG_MAX properly because of broken limits.h
 #ifndef ULLONG_MAX
@@ -586,8 +584,9 @@ bool parseLLIntNoThrow(int64_t& res, const std::string& s, int base)
   }
 }
 
-void parseIntSegments(SegList<int>& sgl, const std::string& src)
+SegList<int> parseIntSegments(const std::string& src)
 {
+  SegList<int> sgl;
   for(std::string::const_iterator i = src.begin(), eoi = src.end(); i != eoi;) {
     std::string::const_iterator j = std::find(i, eoi, ',');
     if(j == i) {
@@ -618,6 +617,7 @@ void parseIntSegments(SegList<int>& sgl, const std::string& src)
     }
     i = j+1;
   }
+  return sgl;
 }
 
 namespace {
@@ -1553,6 +1553,7 @@ void generateRandomDataRandom(unsigned char* data, size_t length)
 }
 } // namespace
 
+#ifndef __MINGW32__
 namespace {
 void generateRandomDataUrandom
 (unsigned char* data, size_t length, std::ifstream& devUrand)
@@ -1560,6 +1561,7 @@ void generateRandomDataUrandom
   devUrand.read(reinterpret_cast<char*>(data), length);
 }
 } // namespace
+#endif
 
 void generateRandomData(unsigned char* data, size_t length)
 {
@@ -1641,14 +1643,10 @@ std::string fixTaintedBasename(const std::string& src)
 
 void generateRandomKey(unsigned char* key)
 {
-#ifdef ENABLE_MESSAGE_DIGEST
   unsigned char bytes[40];
   generateRandomData(bytes, sizeof(bytes));
   message_digest::digest(key, 20, MessageDigest::sha1().get(), bytes,
                          sizeof(bytes));
-#else // !ENABLE_MESSAGE_DIGEST
-  generateRandomData(key, 20);
-#endif // !ENABLE_MESSAGE_DIGEST
 }
 
 // Returns true is given numeric ipv4addr is in Private Address Space.
@@ -1880,6 +1878,13 @@ std::string createSafePath
                              util::fixTaintedBasename(filename) :
                              util::escapePath(util::percentEncode(filename))
                         );
+}
+
+std::string createSafePath(const std::string& filename)
+{
+  return util::isUtf8(filename) ?
+    util::fixTaintedBasename(filename) :
+    util::escapePath(util::percentEncode(filename));
 }
 
 std::string encodeNonUtf8(const std::string& s)

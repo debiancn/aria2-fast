@@ -140,7 +140,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
   }
-#ifdef ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_CHECK_INTEGRITY,
@@ -158,7 +157,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
-#endif // ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_CONDITIONAL_GET,
@@ -426,7 +424,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setInitialOption(true);
     handlers.push_back(op);
   }
-#ifdef ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_HASH_CHECK_ONLY,
@@ -443,7 +440,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
-#endif // ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_HUMAN_READABLE,
@@ -685,6 +681,19 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
   {
     OptionHandler* op(new BooleanOptionHandler
+                      (PREF_PAUSE_METADATA,
+                       TEXT_PAUSE_METADATA,
+                       A2_V_FALSE,
+                       OptionHandler::OPT_ARG));
+    op->addTag(TAG_ADVANCED);
+    op->addTag(TAG_RPC);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new BooleanOptionHandler
                       (PREF_QUIET,
                        TEXT_QUIET,
                        A2_V_FALSE,
@@ -693,7 +702,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
   }
-#ifdef ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_REALTIME_CHUNK_CHECKSUM,
@@ -707,7 +715,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
-#endif // ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_REMOVE_CONTROL_FILE,
@@ -875,9 +882,9 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    DefaultOptionHandler* op(new DefaultOptionHandler
+    auto op = new DefaultOptionHandler
                              (PREF_RPC_SECRET,
-                              TEXT_RPC_SECRET));
+                              TEXT_RPC_SECRET);
     op->addTag(TAG_RPC);
     op->setEraseAfterParse(true);
     op->setAllowEmpty(false);
@@ -914,7 +921,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   // HTTP/FTP options
-#ifdef ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new ChecksumOptionHandler
                       (PREF_CHECKSUM,
@@ -926,7 +932,6 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
-#endif // ENABLE_MESSAGE_DIGEST
   {
     OptionHandler* op(new NumberOptionHandler
                       (PREF_CONNECT_TIMEOUT,

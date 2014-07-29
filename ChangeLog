@@ -1,27 +1,81 @@
-commit e5db3a4cbb8dbe0f535d4bcd01eb446d16362188
+commit 24ae459523e4a41c711990b04bd9ed6f1222f559
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-03-30
+AuthorDate: 2014-07-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-03-30
+CommitDate: 2014-07-22
 
     Update NEWS
 
-commit 305ef84e5de5acd0281ae9636ad1239886e60b8f
+commit da2cc9d3a9b2d98c947d4facef9863998e63909a
+Merge: 93ceb5f 9b1667f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-03-30
+AuthorDate: 2014-07-21
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-03-30
+CommitDate: 2014-07-21
 
-    Bump up version number to 1.18.5
+    Merge branch 'diadistis-master'
 
-commit f0473dc34dfb4d36b92aee49a6373704582338b5
+commit 9b1667fe81aadcac8a9e5ba66f62933040cafb50
+Author:     diadistis <bsotirid@gmail.com>
+AuthorDate: 2014-07-20
+Commit:     diadistis <bsotirid@gmail.com>
+CommitDate: 2014-07-20
+
+    Fixed segfault unsupported encodings
+
+commit 93ceb5f448c5d1710a3f68313900c8dbf971f922
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-03-30
+AuthorDate: 2014-07-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-03-30
+CommitDate: 2014-07-20
 
-    Ignore error when setting DSCP value
+    Update NEWS
+
+commit 53718f169f6d74b3967760d2c37d0dfa397e9038
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-20
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-20
+
+    Bump up version number to 1.18.7
+
+commit d69764879ef0c2eca973479f2dd3cccbaefc8281
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-20
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-20
+
+    Fix regression 100% CPU utility when -V is used and download is multi-file BT
     
-    Setting DSCP is additional feature and failure to enable it should not
-    abort download entirely.  This change fixes the bug that windows build
-    does not perform bittorrent downloads.
+    This is regression of a3426821c8a7f9cf8d80a81726157d4eb844f661
+
+commit b611cd2bdc44b9990ecb165f234b4c6495c0b12b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-15
+
+    UnknownLengthPieceStorage: Use std::make_shared
+
+commit a6b7bd03421b09c87c48c56440be35060d53d1fd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-15
+
+    Show bitfield for unknown length download in aria2.tellStatus RPC method
+    
+    Generally, bitfield is not available for download whose total length
+    is unknown.  We create bitfield when download is completed (usually
+    connection EOF) so that we can use it to show additional info in RPC
+    aria2.tellStatus response.  Specifically, bitfield is now shown.  And
+    completedLength under files key (or completedLength in
+    aria2.getFiles() response) is correctly shown.
+
+commit 98681552fc811b797045851ff5b921d31dc5ca5f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-14
+
+    Fix compile error on big endian platform

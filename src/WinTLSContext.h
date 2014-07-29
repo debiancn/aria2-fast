@@ -48,58 +48,53 @@
 #include "TLSContext.h"
 #include "DlAbortEx.h"
 
-#ifndef SP_PROT_TLS1_1_CLIENT
-#define SP_PROT_TLS1_1_CLIENT 0x00000200
-#endif
-#ifndef SP_PROT_TLS1_1_SERVER
-#define SP_PROT_TLS1_1_SERVER 0x00000100
-#endif
-#ifndef SP_PROT_TLS1_2_CLIENT
-#define SP_PROT_TLS1_2_CLIENT 0x00000800
-#endif
-#ifndef SP_PROT_TLS1_2_SERVER
-#define SP_PROT_TLS1_2_SERVER 0x00000400
-#endif
-
 namespace aria2 {
 
 namespace wintls {
-  struct cred_deleter{
-    void operator()(CredHandle* handle) {
-      if (handle) {
-        FreeCredentialsHandle(handle);
-        delete handle;
-      }
+struct cred_deleter
+{
+  void operator()(CredHandle* handle)
+  {
+    if (handle) {
+      FreeCredentialsHandle(handle);
+      delete handle;
     }
-  };
-  typedef std::unique_ptr<CredHandle, cred_deleter> CredPtr;
+  }
+};
+typedef std::unique_ptr<CredHandle, cred_deleter> CredPtr;
 } // namespace wintls
 
-class WinTLSContext : public TLSContext {
+class WinTLSContext : public TLSContext
+{
 public:
   WinTLSContext(TLSSessionSide side);
+
   virtual ~WinTLSContext();
 
   // private key `keyfile' must be decrypted.
   virtual bool addCredentialFile(const std::string& certfile,
                                  const std::string& keyfile) CXX11_OVERRIDE;
 
-  virtual bool addSystemTrustedCACerts() CXX11_OVERRIDE {
+  virtual bool addSystemTrustedCACerts() CXX11_OVERRIDE
+  {
     return true;
   }
 
   // certfile can contain multiple certificates.
-  virtual bool addTrustedCACertFile(const std::string& certfile)
-    CXX11_OVERRIDE;
+  virtual bool addTrustedCACertFile(const std::string& certfile) CXX11_OVERRIDE;
 
-  virtual bool good() const CXX11_OVERRIDE {
+  virtual bool good() const CXX11_OVERRIDE
+  {
     return true;
   }
-  virtual TLSSessionSide getSide() const CXX11_OVERRIDE {
+
+  virtual TLSSessionSide getSide() const CXX11_OVERRIDE
+  {
     return side_;
   }
 
   virtual bool getVerifyPeer() const CXX11_OVERRIDE;
+
   virtual void setVerifyPeer(bool verify) CXX11_OVERRIDE;
 
   CredHandle* getCredHandle();

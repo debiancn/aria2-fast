@@ -29,28 +29,26 @@ public:
     return 0;
   }
 
-  virtual int32_t getLength() const CXX11_OVERRIDE
+  virtual int64_t getLength() const CXX11_OVERRIDE
   {
     return 0;
   }
 
-  virtual int32_t getSegmentLength() const CXX11_OVERRIDE
+  virtual int64_t getSegmentLength() const CXX11_OVERRIDE
   {
     return 0;
   }
 
-  virtual int32_t getWrittenLength() const CXX11_OVERRIDE
+  virtual int64_t getWrittenLength() const CXX11_OVERRIDE
   {
     return 0;
   }
 
-  virtual void updateWrittenLength(int32_t bytes) CXX11_OVERRIDE {}
-
-#ifdef ENABLE_MESSAGE_DIGEST
+  virtual void updateWrittenLength(int64_t bytes) CXX11_OVERRIDE {}
 
   // `begin' is a offset inside this segment.
   virtual bool updateHash
-  (int32_t begin, const unsigned char* data, size_t dataLength) CXX11_OVERRIDE
+  (int64_t begin, const unsigned char* data, size_t dataLength) CXX11_OVERRIDE
   {
     return false;
   }
@@ -64,8 +62,6 @@ public:
   {
     return A2STR::NIL;
   }
-
-#endif // ENABLE_MESSAGE_DIGEST
 
   virtual void clear(WrDiskCache* diskCache) CXX11_OVERRIDE {}
 

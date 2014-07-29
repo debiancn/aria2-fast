@@ -34,12 +34,12 @@
 /* copyright --> */
 #include "DiskAdaptor.h"
 #include "FileEntry.h"
+#include "OpenedFileCounter.h"
 
 namespace aria2 {
 
 DiskAdaptor::DiskAdaptor()
-  : fileAllocationMethod_(FILE_ALLOC_ADAPTIVE),
-    requestGroupMan_(nullptr)
+  : fileAllocationMethod_(FILE_ALLOC_ADAPTIVE)
 {}
 
 DiskAdaptor::~DiskAdaptor() {}

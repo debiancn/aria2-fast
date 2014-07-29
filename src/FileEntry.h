@@ -85,6 +85,9 @@ private:
   std::string path_;
   std::string contentType_;
   std::string originalName_;
+  // path_ without parent directory component.  This is primarily used
+  // to change directory (PREF_DIR option).
+  std::string suffixPath_;
 
   Timer lastFasterReplace_;
   int maxConnectionPerServer_;
@@ -96,7 +99,7 @@ private:
 public:
   FileEntry();
 
-  FileEntry(const std::string& path, int64_t length, int64_t offset,
+  FileEntry(std::string path, int64_t length, int64_t offset,
             const std::vector<std::string>& uris = std::vector<std::string>());
 
   ~FileEntry();
@@ -164,8 +167,8 @@ public:
 
   bool insertUri(const std::string& uri, size_t pos);
 
-  // Inserts uris_ and spentUris_ into uris.
-  void getUris(std::vector<std::string>& uris) const;
+  // Returns uris_ and spentUris_ in single std::vector<std::string>.
+  std::vector<std::string> getUris() const;
 
   void setContentType(std::string contentType);
 
@@ -262,6 +265,13 @@ public:
   const std::string& getOriginalName() const
   {
     return originalName_;
+  }
+
+  void setSuffixPath(std::string suffixPath);
+
+  const std::string& getSuffixPath() const
+  {
+    return suffixPath_;
   }
 
   bool removeUri(const std::string& uri);

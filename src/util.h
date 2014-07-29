@@ -156,14 +156,20 @@ std::string strip
 template<typename InputIterator>
 std::pair<std::pair<InputIterator, InputIterator>,
           std::pair<InputIterator, InputIterator>>
-divide(InputIterator first, InputIterator last, char delim)
+divide(InputIterator first, InputIterator last, char delim, bool strip=true)
 {
   auto dpos = std::find(first, last, delim);
-  if(dpos == last) {
-    return {stripIter(first, last), {last, last}};
-  } else {
-    return {stripIter(first, dpos), stripIter(dpos+1, last)};
+  if (dpos == last) {
+    if (strip) {
+      return {stripIter(first, last), {last, last}};
+    }
+    return {{first, last}, {last, last}};
   }
+
+  if (strip) {
+    return {stripIter(first, dpos), stripIter(dpos + 1, last)};
+  }
+  return {{first, dpos}, {dpos + 1, last}};
 }
 
 template<typename T>
@@ -271,7 +277,7 @@ bool parseUIntNoThrow(uint32_t& res, const std::string& s, int base = 10);
 
 bool parseLLIntNoThrow(int64_t& res, const std::string& s, int base = 10);
 
-void parseIntSegments(SegList<int>& sgl, const std::string& src);
+SegList<int> parseIntSegments(const std::string& src);
 
 // Parses string which specifies the range of piece index for higher
 // priority and appends those indexes into result.  The input string
@@ -784,6 +790,8 @@ void executeHookByOptName
 (const RequestGroup* group, const Option* option, PrefPtr pref);
 
 std::string createSafePath(const std::string& dir, const std::string& filename);
+
+std::string createSafePath(const std::string& filename);
 
 std::string encodeNonUtf8(const std::string& s);
 

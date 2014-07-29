@@ -79,12 +79,11 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-@HAVE_RST2HTML_TRUE@am__append_1 = README.html
 subdir = .
 DIST_COMMON = INSTALL NEWS README AUTHORS ChangeLog \
 	$(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in ABOUT-NLS $(am__dist_doc_DATA_DIST) \
+	$(srcdir)/config.h.in ABOUT-NLS $(dist_doc_DATA) \
 	$(dist_noinst_DATA) COPYING compile config.guess config.rpath \
 	config.sub install-sh missing ltmain.sh
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -136,7 +135,6 @@ am__can_run_installinfo = \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
-am__dist_doc_DATA_DIST = README README.rst README.html
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
     $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
@@ -433,7 +431,7 @@ EXTRA_DIST = config.rpath \
 	     makerelease-osx.mk osx-package/DS_Store osx-package/etc/paths.d/aria2c osx-package/etc/manpaths.d/aria2 \
 	     examples/libaria2ex.cc examples/libaria2wx.cc
 
-dist_doc_DATA = README README.rst $(am__append_1)
+dist_doc_DATA = README README.rst README.html
 dist_noinst_DATA = LICENSE.OpenSSL
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive
@@ -942,7 +940,11 @@ uninstall-am: uninstall-dist_docDATA
 
 
 @HAVE_RST2HTML_TRUE@README.html: README.rst
-@HAVE_RST2HTML_TRUE@	$(RST2HTML)  $< > README.html
+@HAVE_RST2HTML_TRUE@	$(RST2HTML)  $< > $@
+@HAVE_RST2HTML_FALSE@README.html: README.rst
+@HAVE_RST2HTML_FALSE@	@echo Warning: rst2html not installed. Placing only a dummy file for $@
+@HAVE_RST2HTML_FALSE@	echo "<!doctype html>" > $@
+@HAVE_RST2HTML_FALSE@	echo "<p>Readme has not been built!.<br>Instead see <a href='README.rst'>README.rst</a></p>" >> $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

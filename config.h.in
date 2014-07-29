@@ -3,6 +3,9 @@
 /* Define if building universal (internal helper macro) */
 #undef AC_APPLE_UNIVERSAL_BUILD
 
+/* Define build-type */
+#undef BUILD
+
 /* Define to choose default CA bundle. */
 #undef CA_BUNDLE
 
@@ -25,9 +28,6 @@
 
 /* Define to 1 if BitTorrent support is enabled. */
 #undef ENABLE_BITTORRENT
-
-/* Define to 1 if message digest support is enabled. */
-#undef ENABLE_MESSAGE_DIGEST
 
 /* Define to 1 if Metalink support is enabled. */
 #undef ENABLE_METALINK
@@ -172,6 +172,9 @@
 /* Define to 1 if you have the `gettimeofday' function. */
 #undef HAVE_GETTIMEOFDAY
 
+/* Define to 1 if you have a GMP with sec functions. */
+#undef HAVE_GMP_SEC
+
 /* Define to 1 if you have the `gnutls_certificate_set_x509_system_trust'
    function. */
 #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_SYSTEM_TRUST
@@ -301,6 +304,9 @@
 
 /* Define to 1 if you have the <port.h> header file. */
 #undef HAVE_PORT_H
+
+/* Define to 1 if you have the `posix_fadvise' function. */
+#undef HAVE_POSIX_FADVISE
 
 /* Define to 1 if you have the `posix_fallocate' function. */
 #undef HAVE_POSIX_FALLOCATE
@@ -450,6 +456,9 @@
 /* Define to 1 if you have the <sys/uio.h> header file. */
 #undef HAVE_SYS_UIO_H
 
+/* Define to 1 if you have the <sys/utsname.h> header file. */
+#undef HAVE_SYS_UTSNAME_H
+
 /* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
@@ -524,6 +533,12 @@
 
 /* Define to 1 if you have the `__argz_stringify' function. */
 #undef HAVE___ARGZ_STRINGIFY
+
+/* Define to 1 if you have the `__gmpz_powm_sec' function. */
+#undef HAVE___GMPZ_POWM_SEC
+
+/* Define build-type */
+#undef HOST
 
 /* Define to 1 if struct kevent.udata is intptr_t */
 #undef KEVENT_UDATA_INTPTR_T
@@ -631,9 +646,6 @@
 # undef __EXTENSIONS__
 #endif
 
-
-/* What message digest implementation to use */
-#undef USE_WINDOWS_MD
 
 /* Version number of package */
 #undef VERSION

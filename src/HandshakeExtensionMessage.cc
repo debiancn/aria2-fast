@@ -188,6 +188,11 @@ HandshakeExtensionMessage::create(const unsigned char* data, size_t length)
     for(auto & elem : *extDict) {
       const Integer* extId = downcast<Integer>(elem.second);
       if(extId) {
+        if(extId->i() < 0 || extId->i() > 255) {
+          A2_LOG_DEBUG(fmt("Extension ID=%" PRId64 " is invalid", extId->i()));
+          continue;
+        }
+
         int key = keyBtExtension(elem.first.c_str());
         if(key == ExtensionMessageRegistry::MAX_EXTENSION) {
           A2_LOG_DEBUG(fmt("Unsupported BitTorrent extension %s=%" PRId64,
@@ -199,9 +204,20 @@ HandshakeExtensionMessage::create(const unsigned char* data, size_t length)
     }
   }
   const Integer* metadataSize = downcast<Integer>(dict->get("metadata_size"));
-  // Only accept metadata smaller than 1MiB
-  if(metadataSize && metadataSize->i() <= 1024*1024) {
-    msg->metadataSize_ = metadataSize->i();
+
+  if(metadataSize) {
+    auto size = metadataSize->i();
+
+    if(size < 0) {
+      throw DL_ABORT_EX(fmt("Negative metadataSize %" PRId64 " was received",
+                            size));
+    }
+
+    // Only accept metadata smaller than 1MiB.  Be aware that broken
+    // clinet can send negative size!
+    if(size > 0 && size <= 1024*1024) {
+      msg->metadataSize_ = size;
+    }
   }
   return msg;
 }
