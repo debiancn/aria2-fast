@@ -1,3 +1,9 @@
+aria2 (1.18.7-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 29 Jul 2014 12:29:30 +0000
+
 aria2 (1.18.5-1) unstable; urgency=medium
 
   * New upstream release.
