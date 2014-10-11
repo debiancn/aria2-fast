@@ -476,12 +476,12 @@ am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h \
 	DefaultPieceStorage.cc DefaultPieceStorage.h \
 	DefaultStreamPieceSelector.cc DefaultStreamPieceSelector.h \
-	Dependency.h DirectDiskAdaptor.cc DirectDiskAdaptor.h \
-	DiskAdaptor.cc DiskAdaptor.h DiskWriter.h DiskWriterFactory.h \
-	DlAbortEx.cc DlAbortEx.h DlRetryEx.cc DlRetryEx.h DNSCache.cc \
-	DNSCache.h DownloadCommand.cc DownloadCommand.h \
-	DownloadContext.cc DownloadContext.h DownloadEngine.cc \
-	DownloadEngine.h DownloadEngineFactory.cc \
+	DelayedCommand.h Dependency.h DirectDiskAdaptor.cc \
+	DirectDiskAdaptor.h DiskAdaptor.cc DiskAdaptor.h DiskWriter.h \
+	DiskWriterFactory.h DlAbortEx.cc DlAbortEx.h DlRetryEx.cc \
+	DlRetryEx.h DNSCache.cc DNSCache.h DownloadCommand.cc \
+	DownloadCommand.h DownloadContext.cc DownloadContext.h \
+	DownloadEngine.cc DownloadEngine.h DownloadEngineFactory.cc \
 	DownloadEngineFactory.h DownloadFailureException.cc \
 	DownloadFailureException.h DownloadHandler.cc \
 	DownloadHandler.h DownloadHandlerConstants.cc \
@@ -1462,12 +1462,12 @@ SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	DefaultDiskWriterFactory.cc DefaultDiskWriterFactory.h \
 	DefaultPieceStorage.cc DefaultPieceStorage.h \
 	DefaultStreamPieceSelector.cc DefaultStreamPieceSelector.h \
-	Dependency.h DirectDiskAdaptor.cc DirectDiskAdaptor.h \
-	DiskAdaptor.cc DiskAdaptor.h DiskWriter.h DiskWriterFactory.h \
-	DlAbortEx.cc DlAbortEx.h DlRetryEx.cc DlRetryEx.h DNSCache.cc \
-	DNSCache.h DownloadCommand.cc DownloadCommand.h \
-	DownloadContext.cc DownloadContext.h DownloadEngine.cc \
-	DownloadEngine.h DownloadEngineFactory.cc \
+	DelayedCommand.h Dependency.h DirectDiskAdaptor.cc \
+	DirectDiskAdaptor.h DiskAdaptor.cc DiskAdaptor.h DiskWriter.h \
+	DiskWriterFactory.h DlAbortEx.cc DlAbortEx.h DlRetryEx.cc \
+	DlRetryEx.h DNSCache.cc DNSCache.h DownloadCommand.cc \
+	DownloadCommand.h DownloadContext.cc DownloadContext.h \
+	DownloadEngine.cc DownloadEngine.h DownloadEngineFactory.cc \
 	DownloadEngineFactory.h DownloadFailureException.cc \
 	DownloadFailureException.h DownloadHandler.cc \
 	DownloadHandler.h DownloadHandlerConstants.cc \

@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.18.7],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.18.8],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -32,6 +32,9 @@ case "$host" in
     # C++ headers defines __USE_MINGW_ANSI_STDIO to 1 unconditionally.
     # We have to use it as well nonetheless.
     CPPFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CPPFLAGS"
+    # Build with ASLR (dynamicbase) and NX compatiblity (nxcompat)
+    # Enable pie once upstream/binutils gets fixed to produce correct binaries with it.
+    LDFLAGS="$LDFLAGS -Wl,--dynamicbase -Wl,--nxcompat"
     ;;
 esac
 
@@ -646,6 +649,7 @@ AC_CHECK_HEADERS([argz.h \
                   strings.h \
                   sys/ioctl.h \
                   sys/param.h \
+                  sys/resource.h \
                   sys/signal.h \
                   sys/socket.h \
                   sys/time.h \

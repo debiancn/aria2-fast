@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "July 22, 2014" "1.18.7" "aria2"
+.TH "ARIA2C" "1" "September 12, 2014" "1.18.8" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1416,6 +1416,29 @@ not the whole field. If you take values from
 be incorrect, e.g. your \fBCS1\fP class would turn into \fBCS4\fP). If
 you take commonly used values from RFC, network vendors\(aq
 documentation, Wikipedia or any other source, use them as they are.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-rlimit\-nofile=NUM
+Set the soft limit of open file descriptors.
+This open will only have effect when:
+.INDENT 7.0
+.INDENT 3.5
+.INDENT 0.0
+.IP a. 3
+The system supports it (posix)
+.IP b. 3
+The limit does not exceed the hard limit.
+.IP c. 3
+The specified limit is larger than the current soft limit.
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.sp
+This is equivalent to setting nofile via ulimit,
+except that it will never decrease the limit.
+.sp
+This option is only available on systems supporting the rlimit API.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -5191,8 +5214,6 @@ $ aria2c \-\-bt\-min\-crypto\-level=arc4 \-\-bt\-require\-crypto=true file.torre
 .SH SEE ALSO
 .sp
 Project Web Site: \fI\%http://aria2.sourceforge.net/\fP
-.sp
-aria2 Wiki: \fI\%http://sourceforge.net/apps/trac/aria2/wiki\fP
 .sp
 Metalink Homepage: \fI\%http://www.metalinker.org/\fP
 .sp

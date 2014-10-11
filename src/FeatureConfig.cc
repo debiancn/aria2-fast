@@ -293,7 +293,7 @@ std::string getOperatingSystemInfo()
     return rv.str();
   }
   if(ovi.dwMajorVersion < 6) {
-    rv << "Legcacy, probably XP";
+    rv << "Legacy, probably XP";
     return rv.str();
   }
   switch(ovi.dwMinorVersion) {
@@ -333,6 +333,7 @@ std::string getOperatingSystemInfo()
 #ifdef _WIN64
   rv << " (x86_64)";
 #endif // _WIN64
+  rv << " (" << ovi.dwMajorVersion << "." << ovi.dwMinorVersion << ")";
   return rv.str();
 #else //! _WIN32
 #ifdef HAVE_SYS_UTSNAME_H
