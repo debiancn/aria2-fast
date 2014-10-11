@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2009 Tatsuhiro Tsujikawa
+ * Copyright (C) 2014 Nils Maier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,50 +32,44 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_HTTP_SERVER_BODY_COMMAND_H
-#define D_HTTP_SERVER_BODY_COMMAND_H
 
-#include "Command.h"
+#ifndef D_DELAYED_COMMAND_H
+#define D_DELAYED_COMMAND_H
 
-#include <memory>
+#include "TimeBasedCommand.h"
 
-#include "TimerA2.h"
-#include "ValueBase.h"
-#include "RpcResponse.h"
+namespace aria2
+{
 
-namespace aria2 {
-
-class DownloadEngine;
-class SocketCore;
-class HttpServer;
-
-class HttpServerBodyCommand : public Command {
+class DelayedCommand : public TimeBasedCommand
+{
 private:
-  DownloadEngine* e_;
-  std::shared_ptr<SocketCore> socket_;
-  std::shared_ptr<HttpServer> httpServer_;
-  Timer timeoutTimer_;
-  bool writeCheck_;
+  std::unique_ptr<Command> command_;
+  bool noWait_;
 
-  void sendJsonRpcResponse
-  (const rpc::RpcResponse& res,
-   const std::string& callback);
-  void sendJsonRpcBatchResponse
-  (const std::vector<rpc::RpcResponse>& results,
-   const std::string& callback);
-  void addHttpServerResponseCommand(bool delayed);
-  void updateWriteCheck();
 public:
-  HttpServerBodyCommand(cuid_t cuid,
-                        const std::shared_ptr<HttpServer>& httpServer,
-                        DownloadEngine* e,
-                        const std::shared_ptr<SocketCore>& socket);
+  virtual void process() CXX11_OVERRIDE
+  {
+    auto e = getDownloadEngine();
+    e->addCommand(std::move(command_));
+    if (noWait_) {
+      e->setNoWait(true);
+    }
+    enableExit();
+  }
 
-  virtual ~HttpServerBodyCommand();
+public:
+  DelayedCommand(cuid_t cuid, DownloadEngine* e, time_t delay,
+                 std::unique_ptr<Command> command, bool noWait)
+    : TimeBasedCommand(cuid, e, delay),
+      command_{std::move(command)},
+      noWait_{noWait}
+  {
+  }
 
-  virtual bool execute() CXX11_OVERRIDE;
+  virtual ~DelayedCommand() {}
 };
 
 } // namespace aria2
 
-#endif // D_HTTP_SERVER_BODY_COMMAND_H
+#endif // D_DELAYED_COMMAND_H

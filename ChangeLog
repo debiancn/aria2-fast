@@ -1,81 +1,206 @@
-commit 24ae459523e4a41c711990b04bd9ed6f1222f559
+commit 9658255a303008faba26c4a3b121134f278963d8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-12
+
+    Update bash_completion
+
+commit c0b8b471ab715676953b7e70fd7e2484cb78f5a3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-11
+
+    Fix hash function comparator
+
+commit 528cf5395bc98f3609c93269d4e5ceccad09f46f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-11
+
+    Update NEWS
+
+commit 011dbe228dbc7d0f3c496f36427e5fa2f1bc5819
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-11
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-11
+
+    Bump up version number to 1.18.8
+
+commit e0d6d04fe81248e7a4cd224b571f7de3679dd3d2
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-09-10
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-09-10
+
+    WinTLS: Fix abrupt connection closing and closing in general.
+    
+    Fixes GH-277
+
+commit 04f875e2730265261347b2ced210ba08870817ad
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-10
+
+    WinTLS: Return 0 if eof_ is true and decBuf_ is empty
+
+commit 83c78c497b9c6c02d5dc5f9314fc18d7e58578dd
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-10
+
+    LibsslTLSSession: Treat 0 from readData as EOF
+
+commit e7e80e5ec6232fa18713907830271dd824c62816
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-09-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-09-10
+
+    WinTLS: Fix busy loop on EOF
+    
+    Fixes gh#277
+
+commit 33bb7254a5c55a9d9ce9aa5dfa3af49776bf274a
+Merge: fbdd2a3 19ec70b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-08-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-08-31
+
+    Merge branch 'ITriskTI-patch-1'
+
+commit 19ec70b196dbe772556ebd8fd16cbe1985050fa5
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2014-08-30
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2014-08-30
+
+    Update aria2c.rst
+
+commit fbdd2a3fc82e2e27bd8848e97e6752ea98447fa1
+Merge: 0f805fb cb868b2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-08-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-08-30
+
+    Merge branch 'win-hardening'
+
+commit cb868b2baa4c20e61e713aa410a786039c6a29a7
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-08-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-08-30
+
+    Enable dynamicbase and nxcompat in Windows binaries
+
+commit 0f805fb9626eb37db54f8bed0cf4c9a951cb66e6
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-08-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-08-30
+
+    Silence some compiler warnings in SessionSerializer.
+
+commit bd29fd2c3063ec1b8e2558d394efc40fd5d98ebe
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-08-30
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-08-30
+
+    Always include raw OS version number on Windows
+
+commit bc5d9e54660bf9c4f5bd32c6f29b2421aae8a79e
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-08-22
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-08-30
+
+    Fix typo in FeatureConfig/OS detection
+
+commit ae631513f33da0bba2a2d9a9b0b9207358568cc6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-08-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-08-29
+
+    Replace A2_ARRAY_LEN with constexpr arraySize
+
+commit b8b291187d45ce985f218688edbd1cffc479c6d5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-08-29
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-08-29
+
+    Remove trac-wiki link
+    
+    sf.net pulled the plug of hosted apps including trac-wiki.  The link
+    to the wiki has not worked for some time now.  We submit issue to
+    sf.net to migrate the wiki content to current sf.net standard wiki.
+    When the migration is done, we'll add the link to it in the doc.
+
+commit e74b39deaf1aeb162ac2012b48be6bf137823f5a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-30
+
+    Fix crash in OpenedFileCounter::ensureMaxOpenFileLimit()
+    
+    The crash happens if PieceStorage and/or DiskAdaptor are not
+    initialized in one of active RequestGroups.
+
+commit bd0a3960dfacda0c96dda0b4d0e9d88e7de800a9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2014-07-30
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-30
+
+    mingw32: Fix bug that aria2 does not read piped stdin
+
+commit c659fe939df2b0830f83f39429d6e7814ac82157
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
 AuthorDate: 2014-07-22
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2014-07-26
+
+    Fix std::length_error when no_proxy is used
+    
+    This is regression introduced in 8cada497.
+
+commit 8732a244335488e672cf6dcdddf23d6b7454ce8d
+Author:     Nils Maier <maierman@web.de>
+AuthorDate: 2014-07-15
+Commit:     Nils Maier <maierman@web.de>
 CommitDate: 2014-07-22
 
-    Update NEWS
+    Try to set sane limits for RLIMIT_NO_FILE
+    
+    E.g. on OSX the default is 256, which isn't exactly compatible with
+    torrent downloads.
+    
+    Closes GH-257
 
-commit da2cc9d3a9b2d98c947d4facef9863998e63909a
-Merge: 93ceb5f 9b1667f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+commit 70a80b1455e11e5572eac4bd4b7ca647c45bbf81
+Author:     Nils Maier <maierman@web.de>
 AuthorDate: 2014-07-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-21
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-07-22
 
-    Merge branch 'diadistis-master'
+    Remove request pre-authorization again
 
-commit 9b1667fe81aadcac8a9e5ba66f62933040cafb50
-Author:     diadistis <bsotirid@gmail.com>
-AuthorDate: 2014-07-20
-Commit:     diadistis <bsotirid@gmail.com>
-CommitDate: 2014-07-20
-
-    Fixed segfault unsupported encodings
-
-commit 93ceb5f448c5d1710a3f68313900c8dbf971f922
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-07-20
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-20
-
-    Update NEWS
-
-commit 53718f169f6d74b3967760d2c37d0dfa397e9038
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-07-20
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-20
-
-    Bump up version number to 1.18.7
-
-commit d69764879ef0c2eca973479f2dd3cccbaefc8281
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-07-20
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-20
-
-    Fix regression 100% CPU utility when -V is used and download is multi-file BT
-    
-    This is regression of a3426821c8a7f9cf8d80a81726157d4eb844f661
-
-commit b611cd2bdc44b9990ecb165f234b4c6495c0b12b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+commit 8f2af33b6dd33e7937480e37f06d325e812dee8f
+Author:     Nils Maier <maierman@web.de>
 AuthorDate: 2014-07-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-15
+Commit:     Nils Maier <maierman@web.de>
+CommitDate: 2014-07-22
 
-    UnknownLengthPieceStorage: Use std::make_shared
-
-commit a6b7bd03421b09c87c48c56440be35060d53d1fd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-07-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-15
-
-    Show bitfield for unknown length download in aria2.tellStatus RPC method
+    Delay auth failures instead of PBKDF2
     
-    Generally, bitfield is not available for download whose total length
-    is unknown.  We create bitfield when download is completed (usually
-    connection EOF) so that we can use it to show additional info in RPC
-    aria2.tellStatus response.  Specifically, bitfield is now shown.  And
-    completedLength under files key (or completedLength in
-    aria2.getFiles() response) is correctly shown.
-
-commit 98681552fc811b797045851ff5b921d31dc5ca5f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2014-07-14
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2014-07-14
-
-    Fix compile error on big endian platform
+    Closes GH-256

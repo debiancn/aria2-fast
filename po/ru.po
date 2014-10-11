@@ -10,25 +10,25 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2014-07-22 23:39+0900\n"
-"PO-Revision-Date: 2014-04-06 06:48+0000\n"
+"POT-Creation-Date: 2014-09-12 01:26+0900\n"
+"PO-Revision-Date: 2014-08-30 10:02+0000\n"
 "Last-Translator: ITriskTI <Unknown>\n"
 "Language-Team: <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-07-22 14:34+0000\n"
-"X-Generator: Launchpad (build 17114)\n"
+"X-Launchpad-Export-Date: 2014-09-11 16:24+0000\n"
+"X-Generator: Launchpad (build 17196)\n"
 
-#: src/DownloadEngine.cc:252
+#: src/DownloadEngine.cc:243
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Завершается выполнение программы... Нажмите Ctrl-C для экстренного "
 "завершения."
 
-#: src/DownloadEngine.cc:262
+#: src/DownloadEngine.cc:253
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Экстренное завершение..."
 
@@ -112,6 +112,9 @@ msgid ""
 "                              the -Z option is used, this option will be \n"
 "                              ignored."
 msgstr ""
+" -o, --out=FILE               Сохранить загруженный файл под\n"
+"                              указанным именем. Данный параметр\n"
+"                              игнорируется, когда используется параметр -Z."
 
 #: src/usage_text.h:43
 msgid ""
@@ -155,6 +158,20 @@ msgid ""
 "the\n"
 "                              --min-split-size option."
 msgstr ""
+" -s, --split=N                Загружать файл, используя N соединений.\n"
+"                              Если задано более чем N URI, будут "
+"использоваться\n"
+"                              первые N URI, а оставшиеся URI будут в "
+"резерве.\n"
+"                              Если задано менее чем N URI, то URI будут\n"
+"                              использованы более одного раза, так чтобы "
+"были\n"
+"                              задействованы все N соединений одновременно.\n"
+"                              Количество соединений к одному и тому же "
+"хосту\n"
+"                              ограничивается параметром --max-connection-per-"
+"server.\n"
+"                              Смотрите также параметр --min-split-size."
 
 #: src/usage_text.h:61
 msgid ""
@@ -185,6 +202,11 @@ msgid ""
 "                              See also the --all-proxy option.\n"
 "                              This affects all http downloads."
 msgstr ""
+" --http-proxy=PROXY           Использовать указанный прокси-сервер\n"
+"                              для HTTP. Для отмены ранее определенного\n"
+"                              адреса используйте \"\". Смотрите также "
+"параметр\n"
+"                              --all-proxy. Влияет на все HTTP-загрузки."
 
 #: src/usage_text.h:74
 msgid ""
@@ -193,6 +215,11 @@ msgid ""
 "                              See also the --all-proxy option.\n"
 "                              This affects all https downloads."
 msgstr ""
+" --https-proxy=PROXY          Использовать указанный прокси-сервер\n"
+"                              для HTTPS. Для отмены ранее определенного\n"
+"                              адреса используйте \"\". Смотрите также "
+"параметр\n"
+"                              --all-proxy. Влияет на все HTTPS-загрузки."
 
 #: src/usage_text.h:79
 msgid ""
@@ -201,6 +228,11 @@ msgid ""
 "                              See also the --all-proxy option.\n"
 "                              This affects all ftp downloads."
 msgstr ""
+" --ftp-proxy=PROXY            Использовать указанный прокси-сервер\n"
+"                              для FTP. Для отмены ранее определенного\n"
+"                              адреса используйте \"\". Смотрите также "
+"параметр\n"
+"                              --all-proxy. Влияет на все FTP-загрузки."
 
 #: src/usage_text.h:84
 msgid ""
@@ -215,6 +247,15 @@ msgid ""
 "                              options.\n"
 "                              This affects all downloads."
 msgstr ""
+" --all-proxy=PROXY            Использовать указанный прокси-сервер для\n"
+"                              всех протоколов. Для отмены ранее "
+"определенного\n"
+"                              адреса используйте \"\".  Вы также можете "
+"отменить\n"
+"                              эту настройку и указать прокси-сервер для\n"
+"                              отдельного протокола, используя параметры\n"
+"                              --http-proxy, --https-proxy и --ftp-proxy.\n"
+"                              Влияет на все загрузки."
 
 #: src/usage_text.h:92
 msgid " --http-user=USER             Set HTTP user. This affects all URLs."
@@ -242,6 +283,20 @@ msgid ""
 "                              This may be useful when used together with\n"
 "                              the -P option."
 msgstr ""
+" --referer=REFERER            Set an http referrrer (Referer). This affects\n"
+"                              all http/https downloads. If \"*\" is given,\n"
+"                              the download URI is also used as the "
+"referrer.\n"
+"                              This may be useful when used together with\n"
+"                              the -P option.\n"
+"                                          Задать HTTP источник запроса "
+"(Referer).\n"
+"                              Влияет на все HTTP/HTTPS-загрузки.\n"
+"                              Если задано ``*``, то URI загрузки\n"
+"                              будет также использован как источник\n"
+"                              запроса.\n"
+"                              Это может быть полезно при использовании\n"
+"                              вместе с параметром -P."
 
 #: src/usage_text.h:104
 msgid " --ftp-user=USER              Set FTP user. This affects all URLs."
@@ -1857,34 +1912,35 @@ msgstr ""
 #: src/usage_text.h:637
 msgid " --all-proxy-user=USER        Set user for --all-proxy."
 msgstr ""
+" --all-proxy-user=USER        Задать пользователя для параметра --all-proxy."
 
 #: src/usage_text.h:639
 msgid " --all-proxy-passwd=PASSWD    Set password for --all-proxy."
-msgstr ""
+msgstr " --all-proxy-passwd=PASSWD    Задать пароль для параметра --all-proxy."
 
 #: src/usage_text.h:641
 msgid " --http-proxy-user=USER       Set user for --http-proxy."
-msgstr ""
+msgstr " --http-proxy-user=USER       Задать пользователя для --http-proxy."
 
 #: src/usage_text.h:643
 msgid " --http-proxy-passwd=PASSWD   Set password for --http-proxy."
-msgstr ""
+msgstr " --http-proxy-passwd=PASSWD   Задать пароль для --http-proxy."
 
 #: src/usage_text.h:645
 msgid " --https-proxy-user=USER      Set user for --https-proxy."
-msgstr ""
+msgstr " --https-proxy-user=USER      Задать пользователя для --https-proxy."
 
 #: src/usage_text.h:647
 msgid " --https-proxy-passwd=PASSWD  Set password for --https-proxy."
-msgstr ""
+msgstr " --https-proxy-passwd=PASSWD  Задать пароль для --https-proxy."
 
 #: src/usage_text.h:649
 msgid " --ftp-proxy-user=USER        Set user for --ftp-proxy."
-msgstr ""
+msgstr " --ftp-proxy-user=USER        Задать пользователя для --ftp-proxy."
 
 #: src/usage_text.h:651
 msgid " --ftp-proxy-passwd=PASSWD    Set password for --ftp-proxy."
-msgstr ""
+msgstr " --ftp-proxy-passwd=PASSWD    Задать пароль для --ftp-proxy."
 
 #: src/usage_text.h:653
 msgid ""
@@ -2851,6 +2907,34 @@ msgstr ""
 
 #: src/usage_text.h:984
 msgid ""
+"  --rlimit-nofile=NUM         Set the soft limit of open file descriptors.\n"
+"                              This open will only have effect when:\n"
+"                                a) The system supports it (posix)\n"
+"                                b) The limit does not exceed the hard "
+"limit.\n"
+"                                c) The specified limit is larger than the\n"
+"                                   current soft limit.\n"
+"                              This is equivalent to setting nofile via "
+"ulimit,\n"
+"                              except that it will never decrease the limit."
+msgstr ""
+"  --rlimit-nofile=NUM         Задать мягкое (soft) ограничение для\n"
+"                              дескрипторов открытых файлов.\n"
+"                              Ограничение будет иметь эффект только, если:\n"
+"                                a) Операционная система поддерживает\n"
+"                                   его (posix).\n"
+"                                b) Ограничение не превышает жёсткое (hard)\n"
+"                                   ограничение.\n"
+"                                c) Указанное ограничение больше, чем "
+"текущее\n"
+"                                   мягкое ограничение.\n"
+"                              Это эквивалентно установке nofile через "
+"ulimit,\n"
+"                              за исключением того, оно никогда не будет\n"
+"                              уменьшать ограничение."
+
+#: src/usage_text.h:993
+msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
 "metadata\n"
@@ -2866,6 +2950,20 @@ msgid ""
 "effective\n"
 "                              only when --enable-rpc=true is given."
 msgstr ""
+" --pause-metadata[=true|false]\n"
+"                              Приостановить загрузки, созданные в "
+"результате\n"
+"                              загрузки метаданных. Есть 3 типа метаданных\n"
+"                              загрузок в aria2:\n"
+"                              (1) загрузка .torrent-файла.\n"
+"                              (2) загрузка метаданных торрента, используя\n"
+"                              magnet-ссылку.\n"
+"                              (3) загрузка metalink-файла. Эти загрузки\n"
+"                              метаданных будут генерировать загрузки,\n"
+"                              используя их метаданные. Этот параметр\n"
+"                              приостанавливает эти последующие загрузки.\n"
+"                              Этот параметр действует только когда задано\n"
+"                              --enable-rpc=true."
 
 #: src/version_usage.cc:54
 msgid " version "
@@ -2915,11 +3013,11 @@ msgstr "Библиотеки"
 
 #: src/version_usage.cc:75
 msgid "Compiler"
-msgstr ""
+msgstr "Компилятор"
 
 #: src/version_usage.cc:77
 msgid "System"
-msgstr ""
+msgstr "Система"
 
 #: src/version_usage.cc:80
 #, c-format
@@ -3200,7 +3298,7 @@ msgstr "Сегмент файла успешно сохранен."
 #: src/message.h:112
 #, c-format
 msgid "Loading the segment file %s."
-msgstr "Загрузка сегмента файл %s."
+msgstr "Загрузка сегмента файла %s."
 
 #: src/message.h:113
 msgid "The segment file was loaded successfully."
@@ -3234,7 +3332,7 @@ msgstr "Файл не найден"
 
 #: src/message.h:118
 msgid "Not a directory"
-msgstr "Это не каталог"
+msgstr "Не является каталогом"
 
 #: src/message.h:119
 #, c-format
@@ -3385,7 +3483,7 @@ msgstr "Пропущен %s в metainfo торрента."
 #: src/message.h:152
 #, c-format
 msgid "%s does not allow negative integer %<PRId64>"
-msgstr ""
+msgstr "%s не допускает отрицательное целое число %<PRId64>"
 
 #: src/message.h:153
 msgid "Tracker returned null data."

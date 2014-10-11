@@ -43,6 +43,7 @@
 #include "RequestGroupMan.h"
 #include "RecoverableException.h"
 #include "HttpServerResponseCommand.h"
+#include "DelayedCommand.h"
 #include "OptionParser.h"
 #include "OptionHandler.h"
 #include "wallclock.h"
@@ -104,6 +105,7 @@ void HttpServerBodyCommand::sendJsonRpcResponse
 (const rpc::RpcResponse& res,
  const std::string& callback)
 {
+  bool notauthorized = rpc::not_authorized(res);
   bool gzip = httpServer_->supportsGZip();
   std::string responseData = rpc::toJson(res, callback, gzip);
   if(res.code == 0) {
@@ -126,24 +128,32 @@ void HttpServerBodyCommand::sendJsonRpcResponse
                               std::move(responseData),
                               getJsonRpcContentType(!callback.empty()));
   }
-  addHttpServerResponseCommand();
+  addHttpServerResponseCommand(notauthorized);
 }
 
 void HttpServerBodyCommand::sendJsonRpcBatchResponse
 (const std::vector<rpc::RpcResponse>& results,
  const std::string& callback)
 {
+  bool notauthorized = rpc::any_not_authorized(results.begin(), results.end());
   bool gzip = httpServer_->supportsGZip();
   std::string responseData = rpc::toJsonBatch(results, callback, gzip);
   httpServer_->feedResponse(std::move(responseData),
                             getJsonRpcContentType(!callback.empty()));
-  addHttpServerResponseCommand();
+  addHttpServerResponseCommand(notauthorized);
 }
 
-void HttpServerBodyCommand::addHttpServerResponseCommand()
+void HttpServerBodyCommand::addHttpServerResponseCommand(bool delayed)
 {
-  e_->addCommand(make_unique<HttpServerResponseCommand>
-                 (getCuid(), httpServer_, e_, socket_));
+  auto resp =
+    make_unique<HttpServerResponseCommand>(getCuid(), httpServer_, e_, socket_);
+  if (delayed) {
+    e_->addCommand(
+        make_unique<DelayedCommand>(getCuid(), e_, 1, std::move(resp), true));
+    return;
+  }
+
+  e_->addCommand(std::move(resp));
   e_->setNoWait(true);
 }
 
@@ -201,7 +211,7 @@ bool HttpServerBodyCommand::execute()
             }
           }
           httpServer_->feedResponse(200, accessControlHeaders);
-          addHttpServerResponseCommand();
+          addHttpServerResponseCommand(false);
           return true;
         }
 
@@ -223,7 +233,7 @@ bool HttpServerBodyCommand::execute()
               (fmt("CUID#%" PRId64 " - Failed to parse XML-RPC request",
                    getCuid()));
             httpServer_->feedResponse(400);
-            addHttpServerResponseCommand();
+            addHttpServerResponseCommand(false);
             return true;
           }
           A2_LOG_INFO(fmt("Executing RPC method %s", req.methodName.c_str()));
@@ -232,10 +242,10 @@ bool HttpServerBodyCommand::execute()
           bool gzip = httpServer_->supportsGZip();
           std::string responseData = rpc::toXml(res, gzip);
           httpServer_->feedResponse(std::move(responseData), "text/xml");
-          addHttpServerResponseCommand();
+          addHttpServerResponseCommand(false);
 #else // !ENABLE_XML_RPC
           httpServer_->feedResponse(404);
-          addHttpServerResponseCommand();
+          addHttpServerResponseCommand(false);
 #endif // !ENABLE_XML_RPC
           return true;
         }
@@ -243,7 +253,6 @@ bool HttpServerBodyCommand::execute()
         case RPC_TYPE_JSONP: {
           std::string callback;
           std::unique_ptr<ValueBase> json;
-          auto preauthorized = rpc::RpcRequest::MUST_AUTHORIZE;
           ssize_t error = 0;
           if(httpServer_->getRequestType() == RPC_TYPE_JSONP) {
             json::JsonGetParam param = json::decodeGetParams(query);
@@ -274,8 +283,7 @@ bool HttpServerBodyCommand::execute()
           }
           Dict* jsondict = downcast<Dict>(json);
           if(jsondict) {
-            rpc::RpcResponse res =
-              rpc::processJsonRpcRequest(jsondict, e_, preauthorized);
+            auto res = rpc::processJsonRpcRequest(jsondict, e_);
             sendJsonRpcResponse(res, callback);
           } else {
             List* jsonlist = downcast<List>(json);
@@ -287,10 +295,7 @@ bool HttpServerBodyCommand::execute()
                 Dict* jsondict = downcast<Dict>(*i);
                 if (jsondict) {
                   auto resp =
-                      rpc::processJsonRpcRequest(jsondict, e_, preauthorized);
-                  if (resp.code == 0) {
-                    preauthorized = rpc::RpcRequest::PREAUTHORIZED;
-                  }
+                      rpc::processJsonRpcRequest(jsondict, e_);
                   results.push_back(std::move(resp));
                 }
               }
@@ -306,7 +311,7 @@ bool HttpServerBodyCommand::execute()
         }
         default:
           httpServer_->feedResponse(404);
-          addHttpServerResponseCommand();
+          addHttpServerResponseCommand(false);
           return true;
         }
       } else {
