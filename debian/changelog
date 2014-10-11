@@ -1,3 +1,12 @@
+aria2 (1.18.8-1) unstable; urgency=medium
+
+  * New upstream release:
+    + Fix crash on $no_proxy (Closes: #763760)
+  * debian/control:
+    + Updated Standards-Version to 3.9.6
+
+ -- Kartik Mistry <kartik@debian.org>  Sat, 11 Oct 2014 13:09:59 +0530
+
 aria2 (1.18.7-1) unstable; urgency=low
 
   * New upstream release.
