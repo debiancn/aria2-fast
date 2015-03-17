@@ -85,7 +85,7 @@ static inline const char* protoToString(SSLProtocol proto)
   case kSSLProtocol2:
     return "SSLv2 (!)";
   case kSSLProtocol3:
-    return "SSLv3";
+    return "SSLv3 (!)";
   case kTLSProtocol1:
     return "TLSv1";
   case kTLSProtocol11:
@@ -276,6 +276,7 @@ static inline std::string suiteToString(const SSLCipherSuite suite)
       return s.name;
     }
   }
+
   std::stringstream ss;
   ss << "Unknown suite (0x" << std::hex << suite
      << ") like TLS_NULL_WITH_NULL_NULL";
@@ -298,6 +299,7 @@ static inline bool isBlockedSuite(SSLCipherSuite suite)
       return true;
     }
   }
+
   return false;
 }
 
@@ -357,19 +359,46 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
 #else
   lastError_ = SSLNewContext(ctx->getSide() == TLS_SERVER, &sslCtx_);
 #endif
+
   if (lastError_ != noErr) {
     state_ = st_error;
     return;
   }
+
 #if defined(__MAC_10_8)
-  (void)SSLSetProtocolVersionMin(sslCtx_, kSSLProtocol3);
-  (void)SSLSetProtocolVersionMax(sslCtx_, kTLSProtocol12);
+  switch (ctx->getMinTLSVersion()) {
+  case TLS_PROTO_SSL3:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kSSLProtocol3);
+    break;
+  case TLS_PROTO_TLS10:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol1);
+    break;
+  case TLS_PROTO_TLS11:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol11);
+    break;
+  case TLS_PROTO_TLS12:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol12);
+    break;
+  default:
+    break;
+  }
 #else
   (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocolAll, false);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocol3, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol1, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol11, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol12, true);
+  switch (ctx->getMinTLSVersion()) {
+  case TLS_PROTO_SSL3:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocol3, true);
+    // fall through
+  case TLS_PROTO_TLS10:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol1, true);
+    // fall through
+  case TLS_PROTO_TLS11:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol11, true);
+    // fall through
+  case TLS_PROTO_TLS12:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol12, true);
+  default:
+    break;
+  }
 #endif
 
   // BEAST
@@ -420,12 +449,14 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
     state_ = st_error;
     return;
   }
+
   CFArrayRef certs = CFArrayCreate(nullptr, (const void**)&creds, 1, nullptr);
   if (!certs) {
     A2_LOG_ERROR("AppleTLS: Failed to setup credentials");
     state_ = st_error;
     return;
   }
+
   std::unique_ptr<void, decltype(&CFRelease)> del_certs((void*)certs,
                                                         CFRelease);
   lastError_ = SSLSetCertificate(sslCtx_, certs);
@@ -467,17 +498,20 @@ int AppleTLSSession::init(sock_t sockfd)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
+  sockfd_ = sockfd;
   lastError_ = SSLSetIOFuncs(sslCtx_, SocketRead, SocketWrite);
   if (lastError_ != noErr) {
     state_ = st_error;
     return TLS_ERR_ERROR;
   }
+
   lastError_ = SSLSetConnection(sslCtx_, this);
   if (lastError_ != noErr) {
     state_ = st_error;
     return TLS_ERR_ERROR;
   }
-  sockfd_ = sockfd;
+
   state_ = st_initialized;
   return TLS_ERR_OK;
 }
@@ -488,6 +522,7 @@ int AppleTLSSession::setSNIHostname(const std::string& hostname)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   lastError_ =
       SSLSetPeerDomainName(sslCtx_, hostname.c_str(), hostname.length());
   return (lastError_ != noErr) ? TLS_ERR_ERROR : TLS_ERR_OK;
@@ -499,6 +534,7 @@ int AppleTLSSession::closeConnection()
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   lastError_ = SSLClose(sslCtx_);
   state_ = st_closed;
   return lastError_ == noErr ? TLS_ERR_OK : TLS_ERR_ERROR;
@@ -530,6 +566,7 @@ ssize_t AppleTLSSession::writeData(const void* data, size_t len)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   size_t processed = 0;
   if (writeBuffered_) {
     lastError_ = SSLWrite(sslCtx_, nullptr, 0, &processed);
@@ -574,6 +611,7 @@ ssize_t AppleTLSSession::writeData(const void* data, size_t len)
     return TLS_ERR_ERROR;
   }
 }
+
 OSStatus AppleTLSSession::sockWrite(const void* data, size_t* len)
 {
   size_t remain = *len;
@@ -596,12 +634,14 @@ OSStatus AppleTLSSession::sockWrite(const void* data, size_t* len)
   }
   return noErr;
 }
+
 ssize_t AppleTLSSession::readData(void* data, size_t len)
 {
   if (state_ != st_connected) {
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   size_t processed = 0;
   lastError_ = SSLRead(sslCtx_, data, len, &processed);
   switch (lastError_) {
@@ -659,11 +699,13 @@ OSStatus AppleTLSSession::sockRead(void* data, size_t* len)
 }
 
 int AppleTLSSession::tlsConnect(const std::string& hostname,
+                                TLSVersion& version,
                                 std::string& handshakeErr)
 {
   if (state_ != st_initialized) {
     return TLS_ERR_ERROR;
   }
+
   if (!hostname.empty()) {
     setSNIHostname(hostname);
   }
@@ -676,12 +718,14 @@ int AppleTLSSession::tlsConnect(const std::string& hostname,
     return TLS_ERR_WOULDBLOCK;
 
   case errSSLServerAuthCompleted:
-    return tlsConnect(hostname, handshakeErr);
+    return tlsConnect(hostname, version, handshakeErr);
 
   default:
     handshakeErr = getLastErrorString();
+    state_ = st_error;
     return TLS_ERR_ERROR;
   }
+
   state_ = st_connected;
 
   SSLProtocol proto = kSSLProtocolUnknown;
@@ -693,13 +737,31 @@ int AppleTLSSession::tlsConnect(const std::string& hostname,
                   protoToString(proto),
                   suiteToString(suite).c_str()));
 
+  switch (proto) {
+    case kSSLProtocol3:
+      version = TLS_PROTO_SSL3;
+      break;
+    case kTLSProtocol1:
+      version = TLS_PROTO_TLS10;
+      break;
+    case kTLSProtocol11:
+      version = TLS_PROTO_TLS11;
+      break;
+    case kTLSProtocol12:
+      version = TLS_PROTO_TLS12;
+      break;
+    default:
+      version = TLS_PROTO_NONE;
+      break;
+  }
+
   return TLS_ERR_OK;
 }
 
-int AppleTLSSession::tlsAccept()
+int AppleTLSSession::tlsAccept(TLSVersion& version)
 {
   std::string hostname, err;
-  return tlsConnect(hostname, err);
+  return tlsConnect(hostname, version, err);
 }
 
 std::string AppleTLSSession::getLastErrorString()
@@ -776,4 +838,5 @@ std::string AppleTLSSession::getLastErrorString()
     return fmt("Unspecified error %ld", (long)lastError_);
   }
 }
+
 } // namespace aria2

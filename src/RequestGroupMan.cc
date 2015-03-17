@@ -105,8 +105,9 @@ RequestGroupMan::RequestGroupMan
  int maxSimultaneousDownloads,
  const Option* option)
   : maxSimultaneousDownloads_(maxSimultaneousDownloads),
+    numActive_(0),
     option_(option),
-    serverStatMan_(new ServerStatMan()),
+    serverStatMan_(std::make_shared<ServerStatMan>()),
     maxOverallDownloadSpeedLimit_
     (option->getAsInt(PREF_MAX_OVERALL_DOWNLOAD_LIMIT)),
     maxOverallUploadSpeedLimit_(option->getAsInt
@@ -116,7 +117,6 @@ RequestGroupMan::RequestGroupMan
     removedErrorResult_(0),
     removedLastErrorResult_(error_code::FINISHED),
     maxDownloadResult_(option->getAsInt(PREF_MAX_DOWNLOAD_RESULT)),
-    wrDiskCache_(nullptr),
     openedFileCounter_(std::make_shared<OpenedFileCounter>
                        (this, option->getAsInt(PREF_BT_MAX_OPEN_FILES))),
     numStoppedTotal_(0)
@@ -128,7 +128,6 @@ RequestGroupMan::RequestGroupMan
 RequestGroupMan::~RequestGroupMan()
 {
   openedFileCounter_->deactivate();
-  delete wrDiskCache_;
 }
 
 bool RequestGroupMan::downloadFinished()
@@ -142,6 +141,7 @@ bool RequestGroupMan::downloadFinished()
 void RequestGroupMan::addRequestGroup
 (const std::shared_ptr<RequestGroup>& group)
 {
+  ++numActive_;
   requestGroups_.push_back(group->getGID(), group);
 }
 
@@ -322,6 +322,11 @@ public:
     if(group->getNumCommand() == 0) {
       collectStat(group);
       const std::shared_ptr<DownloadContext>& dctx = group->getDownloadContext();
+
+      if(!group->isSeedOnlyEnabled()) {
+        e_->getRequestGroupMan()->decreaseNumActive();
+      }
+
       // DownloadContext::resetDownloadStopTime() is only called when
       // download completed. If
       // DownloadContext::getDownloadStopTime().isZero() is true, then
@@ -400,7 +405,7 @@ public:
                                    PREF_ON_DOWNLOAD_PAUSE);
         notifyDownloadEvent(EVENT_ON_DOWNLOAD_PAUSE, group);
         // TODO Should we have to prepend spend uris to remaining uris
-        // in case PREF_REUSE_URI is disabed?
+        // in case PREF_REUSE_URI is disabled?
       } else {
         std::shared_ptr<DownloadResult> dr = group->createDownloadResult();
         e_->getRequestGroupMan()->addDownloadResult(dr);
@@ -455,11 +460,11 @@ std::vector<std::unique_ptr<Command>> createInitialCommand
 void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
 {
   removeStoppedGroup(e);
-  if(static_cast<size_t>(maxSimultaneousDownloads_) <= requestGroups_.size()) {
+  if(static_cast<size_t>(maxSimultaneousDownloads_) <= numActive_) {
     return;
   }
   int count = 0;
-  int num = maxSimultaneousDownloads_-requestGroups_.size();
+  int num = maxSimultaneousDownloads_ - numActive_;
   std::vector<std::shared_ptr<RequestGroup> > pending;
 
   while(count < num && (uriListParser_ || !reservedGroups_.empty())) {
@@ -490,6 +495,7 @@ void RequestGroupMan::fillRequestGroupFromReserver(DownloadEngine* e)
     configureRequestGroup(groupToAdd);
     groupToAdd->setRequestGroupMan(this);
     groupToAdd->setState(RequestGroup::STATE_ACTIVE);
+    ++numActive_;
     requestGroups_.push_back(groupToAdd->getGID(), groupToAdd);
     try {
       auto res = createInitialCommand(groupToAdd, e);
@@ -871,7 +877,7 @@ RequestGroupMan::getOrCreateServerStat(const std::string& hostname,
 {
   std::shared_ptr<ServerStat> ss = findServerStat(hostname, protocol);
   if(!ss) {
-    ss.reset(new ServerStat(hostname, protocol));
+    ss = std::make_shared<ServerStat>(hostname, protocol);
     addServerStat(ss);
   }
   return ss;
@@ -960,11 +966,17 @@ void RequestGroupMan::setUriListParser
 
 void RequestGroupMan::initWrDiskCache()
 {
-  assert(wrDiskCache_ == nullptr);
+  assert(!wrDiskCache_);
   size_t limit = option_->getAsInt(PREF_DISK_CACHE);
   if(limit > 0) {
-    wrDiskCache_ = new WrDiskCache(limit);
+    wrDiskCache_ = make_unique<WrDiskCache>(limit);
   }
+}
+
+void RequestGroupMan::decreaseNumActive()
+{
+  assert(numActive_ > 0);
+  --numActive_;
 }
 
 } // namespace aria2

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "September 12, 2014" "1.18.8" "aria2"
+.TH "ARIA2C" "1" "February 23, 2015" "1.18.10" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -731,6 +731,17 @@ In case of ".torrent" file, additional information
 .SS BitTorrent Specific Options
 .INDENT 0.0
 .TP
+.B \-\-bt\-detach\-seed\-only[=true|false]
+Exclude seed only downloads when counting concurrent active
+downloads (See \fI\%\-j\fP option).  This means that if \fB\-j3\fP is
+given and this option is turned on and 3 downloads are active and
+one of those enters seed mode, then it is excluded from active
+download count (thus it becomes 2), and the next download waiting in
+queue gets started. But be aware that seeding item is still
+recognized as active download in RPC method.  Default: \fBfalse\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-bt\-enable\-lpd[=true|false]
 Enable Local Peer Discovery.  If a private flag is set in a torrent,
 aria2 doesn\(aqt use this feature for that download even if \fBtrue\fP is
@@ -751,6 +762,16 @@ command\-line, don\(aqt forget to escape or quote it.  See also
 Specify the external IP address to report to a BitTorrent
 tracker. Although this function is named \fBexternal\fP, it can accept
 any kind of IP addresses. IPADDRESS must be a numeric IP address.
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-bt\-force\-encryption[=true|false]
+Requires BitTorrent message payload encryption with arc4.  This is a
+shorthand of \fI\%\-\-bt\-require\-crypto\fP
+\fI\%\-\-bt\-min\-crypto\-level\fP=arc4.  This option does not change
+the option value of those options.  If \fBtrue\fP is given, deny
+legacy BitTorrent handshake and only use Obfuscation handshake and
+always encrypt message payload.  Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -824,8 +845,8 @@ Default: \fBfalse\fP
 .INDENT 0.0
 .TP
 .B \-\-bt\-require\-crypto[=true|false]
-If true is given, aria2 doesn\(aqt accept and establish connection with legacy
-BitTorrent handshake(19BitTorrent protocol).
+If \fBtrue\fP is given, aria2 doesn\(aqt accept and establish connection with legacy
+BitTorrent handshake(\e19BitTorrent protocol).
 Thus aria2 always uses Obfuscation handshake.
 Default: \fBfalse\fP
 .UNINDENT
@@ -1025,7 +1046,10 @@ BitTorrent is 20 byte length. If more than 20
 bytes are specified, only first 20 bytes are
 used. If less than 20 bytes are specified, random
 byte data are added to make its length 20 bytes.
-Default: \fBaria2/$VERSION\-\fP, $VERSION is replaced by package version.
+.sp
+Default: \fBA2\-$MAJOR\-$MINOR\-$PATCH\-\fP, $MAJOR, $MINOR and $PATCH are
+replaced by major, minor and patch version number respectively.  For
+instance, aria2 version 1.18.8 has prefix ID \fBA2\-1\-18\-8\-\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1419,7 +1443,7 @@ documentation, Wikipedia or any other source, use them as they are.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B \-\-rlimit\-nofile=NUM
+.B \-\-rlimit\-nofile=<NUM>
 Set the soft limit of open file descriptors.
 This open will only have effect when:
 .INDENT 7.0
@@ -1560,6 +1584,13 @@ scratch when aria2 detects N number of URIs that does not support
 resume. If N is \fB0\fP, aria2 downloads file from scratch when all
 given URIs do not support resume.  See \fI\%\-\-always\-resume\fP option.
 Default: \fB0\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-min\-tls\-version=<VERSION>
+Specify minimum SSL/TLS version to enable.
+Possible Values: \fBSSLv3\fP, \fBTLSv1\fP, \fBTLSv1.1\fP, \fBTLSv1.2\fP
+Default: \fBTLSv1\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2202,6 +2233,8 @@ of URIs. These optional lines must start with white space(s).
 .IP \(bu 2
 \fI\%bt\-external\-ip\fP
 .IP \(bu 2
+\fI\%bt\-force\-encryption\fP
+.IP \(bu 2
 \fI\%bt\-hash\-check\-seed\fP
 .IP \(bu 2
 \fI\%bt\-max\-peers\fP
@@ -2247,10 +2280,10 @@ of URIs. These optional lines must start with white space(s).
 \fI\%dry\-run\fP
 .IP \(bu 2
 \fI\%enable\-http\-keep\-alive\fP
-.IP \(bu 2
-\fI\%enable\-http\-pipelining\fP
 .UNINDENT
 .INDENT 2.0
+.IP \(bu 2
+\fI\%enable\-http\-pipelining\fP
 .IP \(bu 2
 \fI\%enable\-mmap\fP
 .IP \(bu 2
@@ -2319,10 +2352,10 @@ of URIs. These optional lines must start with white space(s).
 \fI\%max\-file\-not\-found\fP
 .IP \(bu 2
 \fI\%max\-resume\-failure\-tries\fP
-.IP \(bu 2
-\fI\%max\-tries\fP
 .UNINDENT
 .INDENT 2.0
+.IP \(bu 2
+\fI\%max\-tries\fP
 .IP \(bu 2
 \fI\%max\-upload\-limit\fP
 .IP \(bu 2
@@ -2542,7 +2575,7 @@ calling \fIaria2.addUri\fP RPC method would have to look like this:
 .sp
 .nf
 .ft C
-aria2.addUri("token::$$secret$$", ["http://example.org/file"])
+aria2.addUri("token:$$secret$$", ["http://example.org/file"])
 .ft P
 .fi
 .UNINDENT
@@ -2838,7 +2871,7 @@ download. This methods returns \fBOK\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
-.B aria2.forcePause([secret], pid)
+.B aria2.forcePause([secret], gid)
 This method pauses the download denoted by \fIgid\fP\&.  This method
 behaves just like \fI\%aria2.pause()\fP except that this method pauses
 downloads without performing any actions which take time, such as contacting

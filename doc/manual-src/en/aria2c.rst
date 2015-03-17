@@ -595,6 +595,16 @@ BitTorrent/Metalink Options
 BitTorrent Specific Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. option:: --bt-detach-seed-only[=true|false]
+
+  Exclude seed only downloads when counting concurrent active
+  downloads (See :option:`-j` option).  This means that if ``-j3`` is
+  given and this option is turned on and 3 downloads are active and
+  one of those enters seed mode, then it is excluded from active
+  download count (thus it becomes 2), and the next download waiting in
+  queue gets started. But be aware that seeding item is still
+  recognized as active download in RPC method.  Default: ``false``
+
 .. option:: --bt-enable-lpd[=true|false]
 
   Enable Local Peer Discovery.  If a private flag is set in a torrent,
@@ -614,6 +624,15 @@ BitTorrent Specific Options
   Specify the external IP address to report to a BitTorrent
   tracker. Although this function is named ``external``, it can accept
   any kind of IP addresses. IPADDRESS must be a numeric IP address.
+
+.. option:: --bt-force-encryption[=true|false]
+
+  Requires BitTorrent message payload encryption with arc4.  This is a
+  shorthand of :option:`--bt-require-crypto`
+  :option:`--bt-min-crypto-level`\=arc4.  This option does not change
+  the option value of those options.  If ``true`` is given, deny
+  legacy BitTorrent handshake and only use Obfuscation handshake and
+  always encrypt message payload.  Default: ``false``
 
 .. option:: --bt-hash-check-seed[=true|false]
 
@@ -678,8 +697,8 @@ BitTorrent Specific Options
 
 .. option:: --bt-require-crypto[=true|false]
 
-  If true is given, aria2 doesn't accept and establish connection with legacy
-  BitTorrent handshake(\19BitTorrent protocol).
+  If ``true`` is given, aria2 doesn't accept and establish connection with legacy
+  BitTorrent handshake(\\19BitTorrent protocol).
   Thus aria2 always uses Obfuscation handshake.
   Default: ``false`` 
 
@@ -849,7 +868,10 @@ BitTorrent Specific Options
   bytes are specified, only first 20 bytes are
   used. If less than 20 bytes are specified, random
   byte data are added to make its length 20 bytes.
-  Default: ``aria2/$VERSION-``, $VERSION is replaced by package version.
+
+  Default: ``A2-$MAJOR-$MINOR-$PATCH-``, $MAJOR, $MINOR and $PATCH are
+  replaced by major, minor and patch version number respectively.  For
+  instance, aria2 version 1.18.8 has prefix ID ``A2-1-18-8-``.
 
 .. option:: --seed-ratio=<RATIO>
 
@@ -1186,7 +1208,7 @@ Advanced Options
   you take commonly used values from RFC, network vendors'
   documentation, Wikipedia or any other source, use them as they are.
 
-.. option:: --rlimit-nofile=NUM
+.. option:: --rlimit-nofile=<NUM>
 
   Set the soft limit of open file descriptors.
   This open will only have effect when:
@@ -1307,6 +1329,12 @@ Advanced Options
   resume. If N is ``0``, aria2 downloads file from scratch when all
   given URIs do not support resume.  See :option:`--always-resume` option.
   Default: ``0``
+
+.. option:: --min-tls-version=<VERSION>
+
+  Specify minimum SSL/TLS version to enable.
+  Possible Values: ``SSLv3``, ``TLSv1``, ``TLSv1.1``, ``TLSv1.2``
+  Default: ``TLSv1``
 
 .. option:: --log-level=<LEVEL>
 
@@ -1875,6 +1903,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`bt-enable-lpd <--bt-enable-lpd>`
   * :option:`bt-exclude-tracker <--bt-exclude-tracker>`
   * :option:`bt-external-ip <--bt-external-ip>`
+  * :option:`bt-force-encryption <--bt-force-encryption>`
   * :option:`bt-hash-check-seed <--bt-hash-check-seed>`
   * :option:`bt-max-peers <--bt-max-peers>`
   * :option:`bt-metadata-only <--bt-metadata-only>`
@@ -2105,7 +2134,7 @@ will removed from the parameter list before the request is being processed.
 For example, if the RPC secret authorization token is ``$$secret$$``,
 calling `aria2.addUri` RPC method would have to look like this::
 
-  aria2.addUri("token::$$secret$$", ["http://example.org/file"])
+  aria2.addUri("token:$$secret$$", ["http://example.org/file"])
 
 The `system.multicall` RPC method is treated specially. Since the XML-RPC
 specification only allows a single array as a parameter for this method, we
@@ -2321,7 +2350,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
   This method is equal to calling :func:`aria2.pause` for every active/waiting
   download. This methods returns ``OK``.
 
-.. function:: aria2.forcePause([secret], pid)
+.. function:: aria2.forcePause([secret], gid)
 
   This method pauses the download denoted by *gid*.  This method
   behaves just like :func:`aria2.pause` except that this method pauses

@@ -64,6 +64,10 @@
 #include "fmt.h"
 #include "prefs.h"
 
+#ifdef ENABLE_SSL
+#include "TLSContext.h"
+#endif // ENABLE_SSL
+
 #ifndef HAVE_SIGACTION
 #  define sigset_t int
 #endif // HAVE_SIGACTION
@@ -104,6 +108,9 @@ std::wstring utf8ToWChar(const std::string& src);
 std::wstring utf8ToWChar(const char* str);
 
 std::string wCharToUtf8(const std::wstring& wsrc);
+
+// replace any backslash '\' in |src| with '/' and returns it.
+std::string toForwardSlash(const std::string &src);
 #else // !__MINGW32__
 # define utf8ToWChar(src) src
 # define utf8ToNative(src) src
@@ -879,6 +886,10 @@ bool noProxyDomainMatch(const std::string& hostname, const std::string& domain);
 
 // Checks hostname matches pattern as described in RFC 6125.
 bool tlsHostnameMatch(const std::string& pattern, const std::string& hostname);
+
+#ifdef ENABLE_SSL
+TLSVersion toTLSVersion(const std::string& ver);
+#endif // ENABLE_SSL
 
 } // namespace util
 

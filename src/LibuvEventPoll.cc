@@ -73,6 +73,11 @@ namespace {
     uv_stop(handle->loop);
   }
 
+  static void timer_callback(uv_timer_t* handle)
+  {
+    timer_callback(handle, 0);
+  }
+
 #else // !defined(UV_VERSION_MINOR) || UV_VERSION_MINOR <= 10
 
   static void timer_callback(uv_timer_t* handle)
@@ -159,9 +164,10 @@ void LibuvEventPoll::poll(const struct timeval& tv)
   // their API. So we call ares_process_fd for all ares_channel and
   // re-register their sockets.
   for (auto& r: nameResolverEntries_) {
-    r->processTimeout();
-    r->removeSocketEvents(this);
-    r->addSocketEvents(this);
+    auto& ent = r.second;
+    ent.processTimeout();
+    ent.removeSocketEvents(this);
+    ent.addSocketEvents(this);
   }
 #endif // ENABLE_ASYNC_DNS
 
@@ -229,11 +235,11 @@ void LibuvEventPoll::pollCallback(KPoll* poll, int status, int events)
 bool LibuvEventPoll::addEvents(sock_t socket,
                                const LibuvEventPoll::KEvent& event)
 {
-  auto socketEntry = std::make_shared<KSocketEntry>(socket);
-  auto i = socketEntries_.lower_bound(socketEntry);
+  auto i = socketEntries_.lower_bound(socket);
 
-  if (i != socketEntries_.end() && **i == *socketEntry) {
-    event.addSelf(*i);
+  if (i != socketEntries_.end() && i->first == socket) {
+    auto& socketEntry = i->second;
+    event.addSelf(&socketEntry);
     auto poll = polls_.find(socket);
     if (poll == polls_.end()) {
       throw std::logic_error("Invalid socket");
@@ -242,9 +248,10 @@ bool LibuvEventPoll::addEvents(sock_t socket,
     return true;
   }
 
-  socketEntries_.insert(i, socketEntry);
-  event.addSelf(socketEntry);
-  auto poll = new KPoll(this, socketEntry.get(), socket);
+  i = socketEntries_.insert(i, std::make_pair(socket, KSocketEntry(socket)));
+  auto& socketEntry = i->second;
+  event.addSelf(&socketEntry);
+  auto poll = new KPoll(this, &socketEntry, socket);
   polls_[socket] = poll;
   poll->start();
   return true;
@@ -267,22 +274,22 @@ bool LibuvEventPoll::addEvents(sock_t socket, Command* command, int events,
 bool LibuvEventPoll::deleteEvents(sock_t socket,
                                   const LibuvEventPoll::KEvent& event)
 {
-  auto socketEntry = std::make_shared<KSocketEntry>(socket);
-  auto i = socketEntries_.find(socketEntry);
+  auto i = socketEntries_.find(socket);
 
   if (i == socketEntries_.end()) {
     A2_LOG_DEBUG(fmt("Socket %d is not found in SocketEntries.", socket));
     return false;
   }
 
-  event.removeSelf(*i);
+  auto& socketEntry = (*i).second;
+  event.removeSelf(&socketEntry);
 
   auto poll = polls_.find(socket);
   if (poll == polls_.end()) {
     return false;
   }
 
-  if ((*i)->eventEmpty()) {
+  if (socketEntry.eventEmpty()) {
     poll->second->close();
     polls_.erase(poll);
     socketEntries_.erase(i);
@@ -312,25 +319,29 @@ bool LibuvEventPoll::deleteEvents(sock_t socket, Command* command,
 bool LibuvEventPoll::addNameResolver(const std::shared_ptr<AsyncNameResolver>& resolver,
                                      Command* command)
 {
-  auto entry = std::make_shared<KAsyncNameResolverEntry>(resolver, command);
-  auto itr = nameResolverEntries_.lower_bound(entry);
-  if (itr != nameResolverEntries_.end() && *(*itr) == *entry) {
+  auto key = std::make_pair(resolver.get(), command);
+  auto itr = nameResolverEntries_.lower_bound(key);
+
+  if(itr != std::end(nameResolverEntries_) && (*itr).first == key) {
     return false;
   }
-  nameResolverEntries_.insert(itr, entry);
-  entry->addSocketEvents(this);
+
+  itr = nameResolverEntries_.insert
+    (itr, std::make_pair(key, KAsyncNameResolverEntry(resolver, command)));
+  (*itr).second.addSocketEvents(this);
   return true;
 }
 
 bool LibuvEventPoll::deleteNameResolver(const std::shared_ptr<AsyncNameResolver>& resolver,
                                         Command* command)
 {
-  auto entry = std::make_shared<KAsyncNameResolverEntry>(resolver, command);
-  auto itr = nameResolverEntries_.find(entry);
-  if (itr == nameResolverEntries_.end()) {
+  auto key = std::make_pair(resolver.get(), command);
+  auto itr = nameResolverEntries_.find(key);
+  if(itr == std::end(nameResolverEntries_)) {
     return false;
   }
-  (*itr)->removeSocketEvents(this);
+
+  (*itr).second.removeSocketEvents(this);
   nameResolverEntries_.erase(itr);
   return true;
 }

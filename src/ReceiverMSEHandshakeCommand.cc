@@ -61,16 +61,14 @@ ReceiverMSEHandshakeCommand::ReceiverMSEHandshakeCommand
 
   PeerAbstractCommand(cuid, peer, e, s),
   sequence_(RECEIVER_IDENTIFY_HANDSHAKE),
-  mseHandshake_(new MSEHandshake(cuid, s, e->getOption()))
+  mseHandshake_(make_unique<MSEHandshake>(cuid, s, e->getOption()))
 {
   setTimeout(e->getOption()->getAsInt(PREF_PEER_CONNECTION_TIMEOUT));
   mseHandshake_->setWantRead(true);
 }
 
 ReceiverMSEHandshakeCommand::~ReceiverMSEHandshakeCommand()
-{
-  delete mseHandshake_;
-}
+{}
 
 bool ReceiverMSEHandshakeCommand::exitBeforeExecute()
 {
@@ -98,7 +96,9 @@ bool ReceiverMSEHandshakeCommand::executeInternal()
         sequence_ = RECEIVER_WAIT_KEY;
         break;
       case MSEHandshake::HANDSHAKE_LEGACY: {
-        if(getDownloadEngine()->getOption()->getAsBool(PREF_BT_REQUIRE_CRYPTO)){
+        const auto option = getDownloadEngine()->getOption();
+        if(option->getAsBool(PREF_BT_FORCE_ENCRYPTION) ||
+           option->getAsBool(PREF_BT_REQUIRE_CRYPTO)){
           throw DL_ABORT_EX
             ("The legacy BitTorrent handshake is not acceptable by the"
              " preference.");

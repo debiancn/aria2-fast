@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2014-09-12 01:26+0900\n"
+"POT-Creation-Date: 2015-02-23 23:39+0900\n"
 "PO-Revision-Date: 2014-07-20 22:50+0000\n"
 "Last-Translator: gsavix <gsavix@gmail.com>\n"
 "Language-Team: Portuguese <pt@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-09-11 16:24+0000\n"
-"X-Generator: Launchpad (build 17196)\n"
+"X-Launchpad-Export-Date: 2015-02-23 14:36+0000\n"
+"X-Generator: Launchpad (build 17355)\n"
 
 #: src/DownloadEngine.cc:243
 msgid ""
@@ -41,47 +41,47 @@ msgstr ""
 "Se ocorrerem erros, veja o ficheiro de registo. Veja a opção '-l'  na página "
 "help/man para detalhes."
 
-#: src/MultiUrlRequestInfo.cc:335
+#: src/MultiUrlRequestInfo.cc:339
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "Sessão serializada com sucesso para '%s' ."
 
-#: src/MultiUrlRequestInfo.cc:338
+#: src/MultiUrlRequestInfo.cc:342
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "Falhou na serialização da sessão para '%s'"
 
-#: src/RequestGroupMan.cc:338
+#: src/RequestGroupMan.cc:343
 #, c-format
 msgid "Download GID#%s paused"
 msgstr "Transferência de GID#%s parada"
 
-#: src/RequestGroupMan.cc:386
+#: src/RequestGroupMan.cc:391
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr "Transferência de GID#%s não terminada: %s"
 
-#: src/RequestGroupMan.cc:628
+#: src/RequestGroupMan.cc:634
 msgid "Download Results:"
 msgstr "Resultado da transferência:"
 
-#: src/RequestGroupMan.cc:675
+#: src/RequestGroupMan.cc:681
 msgid "Status Legend:"
 msgstr "Legenda de estado:"
 
-#: src/RequestGroupMan.cc:677
+#: src/RequestGroupMan.cc:683
 msgid "(OK):download completed."
 msgstr "(OK):transferência terminada."
 
-#: src/RequestGroupMan.cc:680
+#: src/RequestGroupMan.cc:686
 msgid "(ERR):error occurred."
 msgstr "(ERR):ocorreu erro."
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:689
 msgid "(INPR):download in-progress."
 msgstr "(INPR):transferência em curso."
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:692
 msgid "(RM):download removed."
 msgstr "(RM):transferência removida."
 
@@ -1868,7 +1868,7 @@ msgstr ""
 
 #: src/usage_text.h:984
 msgid ""
-"  --rlimit-nofile=NUM         Set the soft limit of open file descriptors.\n"
+" --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
 "                                a) The system supports it (posix)\n"
 "                                b) The limit does not exceed the hard "
@@ -1896,6 +1896,44 @@ msgid ""
 "                              subsequent downloads. This option is "
 "effective\n"
 "                              only when --enable-rpc=true is given."
+msgstr ""
+
+#: src/usage_text.h:1004
+msgid ""
+" --bt-detach-seed-only[=true|false]\n"
+"                              Exclude seed only downloads when counting\n"
+"                              concurrent active downloads (See -j option).\n"
+"                              This means that if -j3 is given and this "
+"option\n"
+"                              is turned on and 3 downloads are active and "
+"one\n"
+"                              of those enters seed mode, then it is "
+"excluded\n"
+"                              from active download count (thus it becomes "
+"2),\n"
+"                              and the next download waiting in queue gets\n"
+"                              started. But be aware that seeding item is "
+"still\n"
+"                              recognized as active download in RPC method."
+msgstr ""
+
+#: src/usage_text.h:1015
+msgid ""
+" --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
+msgstr ""
+
+#: src/usage_text.h:1017
+msgid ""
+" --bt-force-encryption[=true|false]\n"
+"                              Requires BitTorrent message payload "
+"encryption\n"
+"                              with arc4. This is a shorthand of\n"
+"                              --bt-require-crypto --bt-min-crypto-"
+"level=arc4.\n"
+"                              If true is given, deny legacy BitTorrent\n"
+"                              handshake and only use Obfuscation handshake "
+"and\n"
+"                              always encrypt message payload."
 msgstr ""
 
 #: src/version_usage.cc:54
@@ -2126,7 +2164,7 @@ msgstr ""
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:377
+#: src/RequestGroup.cc:378
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
@@ -2134,7 +2172,7 @@ msgstr ""
 "Para os URI Magnet de BitTorrent, deve ativar a opção DHT. Consulte a opção "
 "--enable-dht."
 
-#: src/RequestGroup.cc:647
+#: src/RequestGroup.cc:648
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -2468,353 +2506,370 @@ msgid ""
 "--ca-certificate and --check-certificate option."
 msgstr ""
 
-#: src/message.h:186
+#: src/message.h:187
+#, c-format
+msgid ""
+"aria2c had to connect to the other side using an unknown TLS protocol. The "
+"integrity and confidentiality of the connection might be compromised.\n"
+"Peer: %s"
+msgstr ""
+
+#: src/message.h:191
+#, c-format
+msgid ""
+"aria2c had to connect to the other side using an old and vulnerable TLS "
+"protocol. The integrity and confidentiality of the connection might be "
+"compromised.\n"
+"Protocol: %s, Peer: %s"
+msgstr ""
+
+#: src/message.h:194
 #, c-format
 msgid "Printing the contents of file '%s'..."
 msgstr "A imprimir o conteúdo de %s..."
 
-#: src/message.h:187
+#: src/message.h:195
 msgid "This file is neither Torrent nor Metalink file. Skipping."
 msgstr "Este ficheiro não é um torrent ou metalink. A ignorar..."
 
-#: src/message.h:192
+#: src/message.h:200
 #, c-format
 msgid "Is '%s' a file?"
 msgstr "%s é um ficheiro?"
 
-#: src/message.h:193
+#: src/message.h:201
 #, c-format
 msgid "Failed to find given interface %s, cause: %s"
 msgstr ""
 
-#: src/message.h:195
+#: src/message.h:203
 #, c-format
 msgid "Saved metadata as %s."
 msgstr ""
 
-#: src/message.h:196
+#: src/message.h:204
 #, c-format
 msgid "Saving metadata as %s failed. Maybe file already exists."
 msgstr ""
 
-#: src/message.h:198
+#: src/message.h:206
 #, c-format
 msgid "Detected directory traversal directive in %s"
 msgstr ""
 
-#: src/message.h:201
+#: src/message.h:209
 #, c-format
 msgid "GID#%s - Removing unselected file."
 msgstr ""
 
-#: src/message.h:202
+#: src/message.h:210
 #, c-format
 msgid "File %s removed."
 msgstr "Ficheiro %s removido."
 
-#: src/message.h:203
+#: src/message.h:211
 #, c-format
 msgid "File %s could not be removed."
 msgstr "O ficheiro %s não foi removido."
 
-#: src/message.h:205
+#: src/message.h:213
 msgid "Timeout."
 msgstr ""
 
-#: src/message.h:206
+#: src/message.h:214
 msgid "Invalid chunk size."
 msgstr "Tamanho inválido."
 
-#: src/message.h:207
+#: src/message.h:215
 #, c-format
 msgid "Too large chunk. size=%d"
 msgstr "Muito grande. Tamanho=%d"
 
-#: src/message.h:208
+#: src/message.h:216
 msgid "Invalid header."
 msgstr "Cabeçalho inválido."
 
-#: src/message.h:209
+#: src/message.h:217
 msgid "Invalid response."
 msgstr "Resposta inválida."
 
-#: src/message.h:210
+#: src/message.h:218
 msgid "No header found."
 msgstr "Cabeçalho não encontrado."
 
-#: src/message.h:211
+#: src/message.h:219
 msgid "No status header."
 msgstr ""
 
-#: src/message.h:212
+#: src/message.h:220
 msgid "Proxy connection failed."
 msgstr "Falha de ligação proxy."
 
-#: src/message.h:213
+#: src/message.h:221
 msgid "Connection failed."
 msgstr "Falha de ligação."
 
-#: src/message.h:214
+#: src/message.h:222
 #, c-format
 msgid ""
 "The requested filename and the previously registered one are not same. "
 "Expected:%s Actual:%s"
 msgstr ""
 
-#: src/message.h:215
+#: src/message.h:223
 #, c-format
 msgid "The response status is not successful. status=%d"
 msgstr ""
 
-#: src/message.h:217
+#: src/message.h:225
 #, c-format
 msgid "Transfer encoding %s is not supported."
 msgstr ""
 
-#: src/message.h:218
+#: src/message.h:226
 #, c-format
 msgid "SSL initialization failed: %s"
 msgstr "Falha ao iniciar SSL: %s"
 
-#: src/message.h:219
+#: src/message.h:227
 msgid "SSL I/O error"
 msgstr "Erro I/O de SSL"
 
-#: src/message.h:220
+#: src/message.h:228
 msgid "SSL protocol error"
 msgstr "Erro de protocolo SSL"
 
-#: src/message.h:221
+#: src/message.h:229
 #, c-format
 msgid "SSL unknown error %d"
 msgstr "Erro SSL desconhecido %d"
 
-#: src/message.h:222
+#: src/message.h:230
 #, c-format
 msgid "SSL initialization failed: OpenSSL connect error %d"
 msgstr "Falha ao iniciar SSL. erro de ligação OpenSSL %d"
 
-#: src/message.h:224
+#: src/message.h:232
 msgid "Authorization failed."
 msgstr "Falha na autorização."
 
-#: src/message.h:225
+#: src/message.h:233
 msgid "Got EOF from the server."
 msgstr "Servidor devolveu EOF."
 
-#: src/message.h:226
+#: src/message.h:234
 msgid "Got EOF from peer."
 msgstr "\"Peer\" devolveu EOF."
 
-#: src/message.h:227
+#: src/message.h:235
 msgid "Malformed meta info."
 msgstr ""
 
-#: src/message.h:229
+#: src/message.h:237
 #, c-format
 msgid "Failed to open the file %s, cause: %s"
 msgstr "Falha ao abrir o ficheiro %s. Causa: %s"
 
-#: src/message.h:230
+#: src/message.h:238
 #, c-format
 msgid "Failed to write into the file %s, cause: %s"
 msgstr ""
 
-#: src/message.h:231
+#: src/message.h:239
 #, c-format
 msgid "Failed to read from the file %s, cause: %s"
 msgstr ""
 
-#: src/message.h:232
+#: src/message.h:240
 msgid "Failed to read data from disk."
 msgstr ""
 
-#: src/message.h:233
+#: src/message.h:241
 #, c-format
 msgid "Failed to calculate SHA1 digest of or a part of the file %s, cause: %s"
 msgstr ""
 
-#: src/message.h:234
+#: src/message.h:242
 #, c-format
 msgid "Failed to seek the file %s, cause: %s"
 msgstr ""
 
-#: src/message.h:236
+#: src/message.h:244
 #, c-format
 msgid "%s is not a directory."
 msgstr "%s não é um diretório."
 
-#: src/message.h:237
+#: src/message.h:245
 #, c-format
 msgid "Failed to make the directory %s, cause: %s"
 msgstr "Ocorreu um erro ao criar o diretório %s. Causa: %s"
 
-#: src/message.h:241
+#: src/message.h:249
 #, c-format
 msgid "Failed to open a socket, cause: %s"
 msgstr "Ocorreu um erro ao abrir o \"socket\". Causa: %s"
 
-#: src/message.h:242
+#: src/message.h:250
 #, c-format
 msgid "Failed to set a socket option, cause: %s"
 msgstr "Ocorreu um erro ao definir a opção do \"socket\". Causa: %s"
 
-#: src/message.h:243
+#: src/message.h:251
 #, c-format
 msgid "Failed to set a socket as blocking, cause: %s"
 msgstr "Ocorreu um erro ao definir o \"socket\" como bloqueador. Causa: %s"
 
-#: src/message.h:244
+#: src/message.h:252
 #, c-format
 msgid "Failed to set a socket as non-blocking, cause: %s"
 msgstr "Falha ao definir \"socket\" como não bloqueadora. Causa: %s"
 
-#: src/message.h:245
+#: src/message.h:253
 #, c-format
 msgid "Failed to bind a socket, cause: %s"
 msgstr "Falha ao associar \"socket\". Causa: %s"
 
-#: src/message.h:246
+#: src/message.h:254
 #, c-format
 msgid "Failed to listen to a socket, cause: %s"
 msgstr "Falha ao receber do \"socket\". Causa: %s"
 
-#: src/message.h:247
+#: src/message.h:255
 #, c-format
 msgid "Failed to accept a peer connection, cause: %s"
 msgstr "Falha ao aceitar a ligação \"peer\". Causa: %s"
 
-#: src/message.h:248
+#: src/message.h:256
 #, c-format
 msgid "Failed to get the name of socket, cause: %s"
 msgstr "Falha ao obter nome do socket. Causa: %s"
 
-#: src/message.h:249
+#: src/message.h:257
 #, c-format
 msgid "Failed to get the name of connected peer, cause: %s"
 msgstr "Falha ao obter o nome do \"peer\" ligado. Causa: %s"
 
-#: src/message.h:250
+#: src/message.h:258
 #, c-format
 msgid "Failed to resolve the hostname %s, cause: %s"
 msgstr "Ocorreu um erro ao processar o servidor %s. Causa: %s"
 
-#: src/message.h:251
+#: src/message.h:259
 #, c-format
 msgid "Failed to connect to the host %s, cause: %s"
 msgstr "Ocorreu um erro ao ligar ao servidor %s. Causa: %s"
 
-#: src/message.h:252
+#: src/message.h:260
 #, c-format
 msgid "Failed to check whether the socket is writable, cause: %s"
 msgstr "Falha ao verificar permissões de escrita no \"socket\". Causa: %s"
 
-#: src/message.h:253
+#: src/message.h:261
 #, c-format
 msgid "Failed to check whether the socket is readable, cause: %s"
 msgstr "Falha ao verificar as permissões de leitura no \"socket\". Causa: %s"
 
-#: src/message.h:254
+#: src/message.h:262
 #, c-format
 msgid "Failed to send data, cause: %s"
 msgstr "Falha ao enviar dados. Causa: %s"
 
-#: src/message.h:255
+#: src/message.h:263
 #, c-format
 msgid "Failed to receive data, cause: %s"
 msgstr "Falha ao receber dados. Causa: %s"
 
-#: src/message.h:256
+#: src/message.h:264
 #, c-format
 msgid "Failed to peek data, cause: %s"
 msgstr "Falha ao espreitar dados. Causa: %s"
 
-#: src/message.h:257
+#: src/message.h:265
 #, c-format
 msgid "Unknown socket error %d (0x%x)"
 msgstr "Erro desconhecido de \"socket\" %d (0x%x)"
 
-#: src/message.h:258
+#: src/message.h:266
 #, c-format
 msgid "File %s exists, but %s does not exist."
 msgstr "O ficheiro %s existe mas %s  não."
 
-#: src/message.h:260
+#: src/message.h:268
 #, c-format
 msgid "Invalid payload size for %s, size=%lu. It should be %lu."
 msgstr ""
 
-#: src/message.h:261
+#: src/message.h:269
 #, c-format
 msgid "Invalid ID=%d for %s. It should be %d."
 msgstr "ID inválida=%d para %s. Devia ser %d."
 
-#: src/message.h:263
+#: src/message.h:271
 msgid "Download aborted."
 msgstr "Transferência abortada."
 
-#: src/message.h:264
+#: src/message.h:272
 #, c-format
 msgid "File %s is being downloaded by other command."
 msgstr "O ficheiro %s está a ser transferido por outro comando."
 
-#: src/message.h:265
+#: src/message.h:273
 msgid "Insufficient checksums."
 msgstr "Checksum insuficiente."
 
-#: src/message.h:266
+#: src/message.h:274
 #, c-format
 msgid "Tracker returned failure reason: %s"
 msgstr "O \"tracker\" retornou a falha: %s"
 
-#: src/message.h:267
+#: src/message.h:275
 msgid "Flooding detected."
 msgstr ""
 
-#: src/message.h:269
+#: src/message.h:277
 #, c-format
 msgid ""
 "Drop connection because no request/piece messages were exchanged in a "
 "certain period(%ld seconds)."
 msgstr ""
 
-#: src/message.h:271
+#: src/message.h:279
 msgid "The infoHash in torrent file doesn't match to one in .aria2 file."
 msgstr "O infoHash no ficheiro torrent não coincide com o do ficheiro .aria2."
 
-#: src/message.h:272
+#: src/message.h:280
 #, c-format
 msgid "No such file entry %s"
 msgstr "Nenhuma entrada %s"
 
-#: src/message.h:273
+#: src/message.h:281
 #, c-format
 msgid "Too slow Downloading speed: %d <= %d(B/s), host:%s"
 msgstr "Velocidade de receção muito baixa: %d <= %d(B/s), servidor:%s"
 
-#: src/message.h:274
+#: src/message.h:282
 msgid "No HttpRequestEntry found."
 msgstr "Nenhuma HttpRequestEntry encontrada."
 
-#: src/message.h:275
+#: src/message.h:283
 #, c-format
 msgid "Got %d status, but no location header provided."
 msgstr "Obtid o estado %d, mas sem cabeçalho fornecido."
 
-#: src/message.h:277
+#: src/message.h:285
 msgid "No file matched with your preference."
 msgstr "Nenhum ficheiro coincidente com a sua preferência."
 
-#: src/message.h:278
+#: src/message.h:286
 msgid "Exception caught"
 msgstr "Exceção encontrada"
 
-#: src/message.h:279
+#: src/message.h:287
 #, c-format
 msgid "Max payload length exceeded or invalid. length = %u"
 msgstr "Quantidade máxima excedida ou inválida. quantidade = %u"
 
-#: src/message.h:280
+#: src/message.h:288
 #, c-format
 msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""

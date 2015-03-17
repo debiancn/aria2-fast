@@ -40,6 +40,26 @@
 #include "util.h"
 #include "SocketCore.h"
 
+namespace {
+using namespace aria2;
+
+TLSVersion getProtocolFromSession(gnutls_session_t& session) {
+  auto proto = gnutls_protocol_get_version(session);
+  switch(proto) {
+    case GNUTLS_SSL3:
+      return TLS_PROTO_SSL3;
+    case GNUTLS_TLS1_0:
+      return TLS_PROTO_TLS10;
+    case GNUTLS_TLS1_1:
+      return TLS_PROTO_TLS11;
+    case GNUTLS_TLS1_2:
+      return TLS_PROTO_TLS12;
+    default:
+      return TLS_PROTO_NONE;
+  }
+}
+} // namespace
+
 namespace aria2 {
 
 TLSSession* TLSSession::make(TLSContext* ctx)
@@ -67,7 +87,7 @@ GnuTLSSession::~GnuTLSSession()
 // expect that upcoming (at the time of this writing) 3.1.19 and 3.2.9
 // will fix this bug.  See
 // http://lists.gnutls.org/pipermail/gnutls-devel/2014-January/006679.html
-// for dtails.
+// for details.
 #if (GNUTLS_VERSION_NUMBER >= 0x030103 && GNUTLS_VERSION_NUMBER <= 0x030112) \
   || (GNUTLS_VERSION_NUMBER >= 0x030200 && GNUTLS_VERSION_NUMBER <= 0x030208)
 # define A2_DISABLE_OCSP 1
@@ -107,7 +127,20 @@ int GnuTLSSession::init(sock_t sockfd)
   // It seems err is not error message, but the argument string
   // which causes syntax error.
   const char* err;
-  rv_ = gnutls_priority_set_direct(sslSession_, "SECURE128", &err);
+  std::string pri = "SECURE128";
+  switch(tlsContext_->getMinTLSVersion()) {
+  case TLS_PROTO_TLS12:
+    pri += ":-VERS-TLS1.1";
+    // fall through
+  case TLS_PROTO_TLS11:
+    pri += ":-VERS-TLS1.0";
+    // fall through
+  case TLS_PROTO_TLS10:
+    pri += ":-VERS-SSL3.0";
+  default:
+    break;
+  };
+  rv_ = gnutls_priority_set_direct(sslSession_, pri.c_str(), &err);
   if(rv_ != GNUTLS_E_SUCCESS) {
     return TLS_ERR_ERROR;
   }
@@ -184,7 +217,8 @@ ssize_t GnuTLSSession::readData(void* data, size_t len)
 }
 
 int GnuTLSSession::tlsConnect(const std::string& hostname,
-                           std::string& handshakeErr)
+                              TLSVersion& version,
+                              std::string& handshakeErr)
 {
   handshakeErr = "";
   for(;;) {
@@ -284,14 +318,18 @@ int GnuTLSSession::tlsConnect(const std::string& hostname,
       return TLS_ERR_ERROR;
     }
   }
+
+  version = getProtocolFromSession(sslSession_);
+
   return TLS_ERR_OK;
 }
 
-int GnuTLSSession::tlsAccept()
+int GnuTLSSession::tlsAccept(TLSVersion& version)
 {
   for(;;) {
     rv_ = gnutls_handshake(sslSession_);
     if(rv_ == GNUTLS_E_SUCCESS) {
+      version = getProtocolFromSession(sslSession_);
       return TLS_ERR_OK;
     }
     if(rv_ == GNUTLS_E_AGAIN || rv_ == GNUTLS_E_INTERRUPTED) {

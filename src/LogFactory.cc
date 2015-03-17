@@ -54,7 +54,7 @@ void LogFactory::openLogger(const std::shared_ptr<Logger>& logger)
 {
   if(filename_ != DEV_NULL) {
     // don't open file DEV_NULL for performance sake.
-    // This avoids costly unecessary message formatting and write.
+    // This avoids costly unnecessary message formatting and write.
     logger->openFile(filename_);
   }
   logger->setLogLevel(logLevel_);
@@ -94,7 +94,7 @@ void LogFactory::reconfigure()
 const std::shared_ptr<Logger>& LogFactory::getInstance()
 {
   if(!logger_) {
-    std::shared_ptr<Logger> slogger(new Logger());
+    auto slogger = std::make_shared<Logger>();
     openLogger(slogger);
     logger_.swap(slogger);
   }

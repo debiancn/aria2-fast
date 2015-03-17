@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.11: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.12: http://docutils.sourceforge.net/" />
 <title>aria2 - The ultra fast download utility</title>
 <meta name="author" content="Tatsuhiro Tsujikawa" />
 <style type="text/css">
@@ -427,7 +427,7 @@ directory and output file name can be specified optionally</li>
 <a class="reference external" href="https://github.com/tatsuhiro-t/aria2">https://github.com/tatsuhiro-t/aria2</a></p>
 <p>To get the latest source code, run following command:</p>
 <pre class="literal-block">
-$ git clone git://github.com/tatsuhiro-t/aria2.git
+$ git clone https://github.com/tatsuhiro-t/aria2.git
 </pre>
 <p>This will create aria2 directory in your current directory and source
 files are stored there.</p>
@@ -630,6 +630,9 @@ $ make check
 mingw-w64 (<a class="reference external" href="http://mingw-w64.sourceforge.net/">http://mingw-w64.sourceforge.net/</a>) cross-compiler on Debian
 Linux. The MinGW (<a class="reference external" href="http://www.mingw.org/">http://www.mingw.org/</a>) may not be able to build
 aria2.</p>
+<p>The easiest way to build Windows binary is use Dockerfile.mingw.  See
+Dockerfile.mingw how to build binary.  If you cannot use Dockerfile,
+then continue to read following paragraphs.</p>
 <p>Basically, after compiling and installing depended libraries, you can
 do cross-compile just passing appropriate <tt class="docutils literal"><span class="pre">--host</span></tt> option and
 specifying <tt class="docutils literal">CPPFLAGS</tt>, <tt class="docutils literal">LDFLAGS</tt> and <tt class="docutils literal">PKG_CONFIG_LIBDIR</tt>
@@ -641,7 +644,6 @@ We use it to create official Windows build.  This script assumes
 following libraries have been built for cross-compile:</p>
 <ul class="simple">
 <li>c-ares</li>
-<li>openssl</li>
 <li>expat</li>
 <li>sqlite3</li>
 <li>zlib</li>
@@ -697,9 +699,10 @@ environment variable which must fulfill the following conditions:</p>
 <p>For example, to install toolchain under <tt class="docutils literal">$ANDROID_HOME/toolchain</tt>,
 do this:</p>
 <pre class="literal-block">
-$NDK/build/tools/make-standalone-toolchain.sh --platform=android-18 --toolchain=arm-linux-androideabi-4.8 --install-dir=$ANDROID_HOME/toolchain
-
-$NDK/build/tools/make-standalone-toolchain.sh --install-dir=$ANDROID_HOME/toolchain --toolchain=arm-linux-androideabi-4.8 --llvm-version=3.4
+$NDK/build/tools/make-standalone-toolchain.sh \
+  --install-dir=$ANDROID_HOME/toolchain \
+  --toolchain=arm-linux-androideabi-4.9 \
+  --platform=android-16
 </pre>
 <p>You may need to add <tt class="docutils literal"><span class="pre">--system=linux-x86_64</span></tt> to the above
 command-line for x86_64 Linux host.</p>

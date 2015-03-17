@@ -146,6 +146,13 @@ std::string wCharToUtf8(const std::wstring& wsrc)
   }
 }
 
+std::string toForwardSlash(const std::string &src) {
+  auto dst = src;
+  std::transform(std::begin(dst), std::end(dst), std::begin(dst),
+                 [](char c) { return c == '\\' ? '/' : c; });
+  return dst;
+}
+
 #endif // __MINGW32__
 
 namespace util {
@@ -1288,34 +1295,46 @@ void setGlobalSignalHandler(int sig, sigset_t* mask, signal_handler_t handler,
 #endif // HAVE_SIGACTION
 }
 
+#ifndef __MINGW32__
 std::string getHomeDir()
 {
   const char* p = getenv("HOME");
   if (p) {
     return p;
   }
-#ifdef __MINGW32__
-  p = getenv("USERPROFILE");
-  if (p) {
-    return p;
-  }
-  p = getenv("HOMEDRIVE");
-  if (p) {
-    std::string homeDir = p;
-    p = getenv("HOMEPATH");
-    if (p) {
-      homeDir += p;
-      return homeDir;
-    }
-  }
-#elif HAVE_PWD_H
-  passwd* pw = getpwuid(geteuid());
-  if(pw && pw->pw_dir) {
+#ifdef HAVE_PWD_H
+  auto pw = getpwuid(geteuid());
+  if (pw && pw->pw_dir) {
     return pw->pw_dir;
   }
 #endif // HAVE_PWD_H
   return A2STR::NIL;
 }
+
+#else // __MINGW32__
+
+std::string getHomeDir()
+{
+  auto p = _wgetenv(L"HOME");
+  if (p) {
+    return toForwardSlash(wCharToUtf8(p));
+  }
+  p = _wgetenv(L"USERPROFILE");
+  if (p) {
+    return toForwardSlash(wCharToUtf8(p));
+  }
+  p = _wgetenv(L"HOMEDRIVE");
+  if (p) {
+    std::wstring homeDir = p;
+    p = _wgetenv(L"HOMEPATH");
+    if (p) {
+      homeDir += p;
+      return toForwardSlash(wCharToUtf8(homeDir));
+    }
+  }
+  return A2STR::NIL;
+}
+#endif // __MINGW32__
 
 int64_t getRealSize(const std::string& sizeWithUnit)
 {
@@ -1545,45 +1564,10 @@ std::vector<std::pair<size_t, std::string> > createIndexPaths(std::istream& i)
   return indexPaths;
 }
 
-namespace {
-void generateRandomDataRandom(unsigned char* data, size_t length)
-{
-  const auto& rd = SimpleRandomizer::getInstance();
-  rd->getRandomBytes(data, length);
-}
-} // namespace
-
-#ifndef __MINGW32__
-namespace {
-void generateRandomDataUrandom
-(unsigned char* data, size_t length, std::ifstream& devUrand)
-{
-  devUrand.read(reinterpret_cast<char*>(data), length);
-}
-} // namespace
-#endif
-
 void generateRandomData(unsigned char* data, size_t length)
 {
-#ifdef __MINGW32__
-  generateRandomDataRandom(data, length);
-#else // !__MINGW32__
-  static int method = -1;
-  static std::ifstream devUrand;
-  if(method == 0) {
-    generateRandomDataUrandom(data, length, devUrand);
-  } else if(method == 1) {
-    generateRandomDataRandom(data, length);
-  } else {
-    devUrand.open("/dev/urandom");
-    if(devUrand) {
-      method = 0;
-    } else {
-      method = 1;
-    }
-    generateRandomData(data, length);
-  }
-#endif // !__MINGW32__
+  const auto& rd = SimpleRandomizer::getInstance();
+  return rd->getRandomBytes(data, length);
 }
 
 bool saveAs
@@ -2008,6 +1992,25 @@ bool strless(const char* a, const char* b)
 {
   return strcmp(a, b) < 0;
 }
+
+#ifdef ENABLE_SSL
+TLSVersion toTLSVersion(const std::string& ver)
+{
+  if(ver == A2_V_SSL3) {
+    return TLS_PROTO_SSL3;
+  }
+  if(ver == A2_V_TLS10) {
+    return TLS_PROTO_TLS10;
+  }
+  if(ver == A2_V_TLS11) {
+    return TLS_PROTO_TLS11;
+  }
+  if(ver == A2_V_TLS12) {
+    return TLS_PROTO_TLS12;
+  }
+  return TLS_PROTO_TLS10;
+}
+#endif // ENABLE_SSL
 
 } // namespace util
 

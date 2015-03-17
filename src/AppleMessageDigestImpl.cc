@@ -37,6 +37,8 @@
 
 #include <CommonCrypto/CommonDigest.h>
 
+#include "Adler32MessageDigestImpl.h"
+
 namespace aria2 {
 namespace {
 
@@ -116,7 +118,7 @@ MessageDigestSHA512;
 
 std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
-  return std::unique_ptr<MessageDigestImpl>(new MessageDigestSHA1());
+  return make_unique<MessageDigestSHA1>();
 }
 
 MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
@@ -126,6 +128,7 @@ MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
   { "sha-384", make_hi<MessageDigestSHA384>() },
   { "sha-512", make_hi<MessageDigestSHA512>() },
   { "md5", make_hi<MessageDigestMD5>() },
+  ADLER32_MESSAGE_DIGEST
 };
 
 } // namespace aria2

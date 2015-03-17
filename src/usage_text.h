@@ -981,7 +981,7 @@
     "                              documentation, Wikipedia or any other source,\n" \
     "                              use them as they are.")
 #define TEXT_RLIMIT_NOFILE                                              \
-  _("  --rlimit-nofile=NUM         Set the soft limit of open file descriptors.\n" \
+  _(" --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n" \
     "                              This open will only have effect when:\n" \
     "                                a) The system supports it (posix)\n" \
     "                                b) The limit does not exceed the hard limit.\n" \
@@ -1000,3 +1000,24 @@
     "                              using their metadata. This option pauses these\n" \
     "                              subsequent downloads. This option is effective\n" \
     "                              only when --enable-rpc=true is given.")
+#define TEXT_BT_DETACH_SEED_ONLY                \
+  _(" --bt-detach-seed-only[=true|false]\n"     \
+    "                              Exclude seed only downloads when counting\n" \
+    "                              concurrent active downloads (See -j option).\n" \
+    "                              This means that if -j3 is given and this option\n" \
+    "                              is turned on and 3 downloads are active and one\n" \
+    "                              of those enters seed mode, then it is excluded\n" \
+    "                              from active download count (thus it becomes 2),\n" \
+    "                              and the next download waiting in queue gets\n" \
+    "                              started. But be aware that seeding item is still\n" \
+    "                              recognized as active download in RPC method.")
+#define TEXT_MIN_TLS_VERSION                                            \
+  _(" --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable.")
+#define TEXT_BT_FORCE_ENCRYPTION                                        \
+  _(" --bt-force-encryption[=true|false]\n"                             \
+    "                              Requires BitTorrent message payload encryption\n" \
+    "                              with arc4. This is a shorthand of\n" \
+    "                              --bt-require-crypto --bt-min-crypto-level=arc4.\n" \
+    "                              If true is given, deny legacy BitTorrent\n" \
+    "                              handshake and only use Obfuscation handshake and\n" \
+    "                              always encrypt message payload.")

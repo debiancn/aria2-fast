@@ -85,7 +85,7 @@ https://github.com/tatsuhiro-t/aria2
 
 To get the latest source code, run following command::
 
-    $ git clone git://github.com/tatsuhiro-t/aria2.git
+    $ git clone https://github.com/tatsuhiro-t/aria2.git
 
 This will create aria2 directory in your current directory and source
 files are stored there.
@@ -282,6 +282,10 @@ mingw-w64 (http://mingw-w64.sourceforge.net/) cross-compiler on Debian
 Linux. The MinGW (http://www.mingw.org/) may not be able to build
 aria2.
 
+The easiest way to build Windows binary is use Dockerfile.mingw.  See
+Dockerfile.mingw how to build binary.  If you cannot use Dockerfile,
+then continue to read following paragraphs.
+
 Basically, after compiling and installing depended libraries, you can
 do cross-compile just passing appropriate ``--host`` option and
 specifying ``CPPFLAGS``, ``LDFLAGS`` and ``PKG_CONFIG_LIBDIR``
@@ -294,7 +298,6 @@ We use it to create official Windows build.  This script assumes
 following libraries have been built for cross-compile:
 
 * c-ares
-* openssl
 * expat
 * sqlite3
 * zlib
@@ -357,9 +360,10 @@ environment variable which must fulfill the following conditions:
   For example, to install toolchain under ``$ANDROID_HOME/toolchain``,
   do this::
 
-      $NDK/build/tools/make-standalone-toolchain.sh --platform=android-18 --toolchain=arm-linux-androideabi-4.8 --install-dir=$ANDROID_HOME/toolchain
-
-      $NDK/build/tools/make-standalone-toolchain.sh --install-dir=$ANDROID_HOME/toolchain --toolchain=arm-linux-androideabi-4.8 --llvm-version=3.4
+      $NDK/build/tools/make-standalone-toolchain.sh \
+        --install-dir=$ANDROID_HOME/toolchain \
+        --toolchain=arm-linux-androideabi-4.9 \
+        --platform=android-16
 
   You may need to add ``--system=linux-x86_64`` to the above
   command-line for x86_64 Linux host.
