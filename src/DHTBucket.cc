@@ -179,7 +179,7 @@ bool DHTBucket::splitAllowed() const
   return prefixLength_ < DHT_ID_LENGTH*8-1 && isInRange(localNode_);
 }
 
-std::shared_ptr<DHTBucket> DHTBucket::split()
+std::unique_ptr<DHTBucket> DHTBucket::split()
 {
   assert(splitAllowed());
 
@@ -192,10 +192,9 @@ std::shared_ptr<DHTBucket> DHTBucket::split()
   bitfield::flipBit(min_, DHT_ID_LENGTH, prefixLength_);
 
   ++prefixLength_;
-  std::shared_ptr<DHTBucket> rBucket(new DHTBucket(prefixLength_,
-                                                rMax, rMin, localNode_));
+  auto rBucket = make_unique<DHTBucket>(prefixLength_, rMax, rMin, localNode_);
 
-  std::deque<std::shared_ptr<DHTNode> > lNodes;
+  std::deque<std::shared_ptr<DHTNode>> lNodes;
   for(auto & elem : nodes_) {
     if(rBucket->isInRange(elem)) {
       assert(rBucket->addNode(elem));
@@ -227,7 +226,7 @@ void DHTBucket::getGoodNodes
 
 std::shared_ptr<DHTNode> DHTBucket::getNode(const unsigned char* nodeID, const std::string& ipaddr, uint16_t port) const
 {
-  std::shared_ptr<DHTNode> node(new DHTNode(nodeID));
+  auto node = std::make_shared<DHTNode>(nodeID);
   node->setIPAddress(ipaddr);
   node->setPort(port);
   auto itr =

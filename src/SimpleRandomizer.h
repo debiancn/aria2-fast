@@ -41,29 +41,29 @@
 #include <random>
 
 #ifdef __MINGW32__
-# include <wincrypt.h>
-#endif // __MINGW32__
+#  include <wincrypt.h>
+#endif
 
 namespace aria2 {
 
 class SimpleRandomizer : public Randomizer {
 private:
   static std::unique_ptr<SimpleRandomizer> randomizer_;
-
-#ifdef __MINGW32__
-  HCRYPTPROV cryProvider_;
-#else // !__MINGW32__
-  std::minstd_rand eng_;
-#endif //!__MINGW32__
-
   SimpleRandomizer();
+
+private:
+#ifdef __MINGW32__
+  HCRYPTPROV provider_;
+#else
+  std::random_device dev_;
+#endif // ! __MINGW32__
+
 public:
+  typedef std::random_device::result_type result_type;
 
   static const std::unique_ptr<SimpleRandomizer>& getInstance();
 
   virtual ~SimpleRandomizer();
-
-  void init();
 
   /**
    * Returns random number in [0, to).
@@ -72,7 +72,32 @@ public:
 
   void getRandomBytes(unsigned char *buf, size_t len);
 
-  long int operator()(long int to);
+  long int operator()(long int to)
+  {
+    return getRandomNumber(to);
+  }
+
+  result_type operator()()
+  {
+    result_type rv;
+    getRandomBytes(reinterpret_cast<unsigned char*>(&rv), sizeof(rv));
+    return rv;
+  }
+
+  static constexpr result_type min()
+  {
+    return std::numeric_limits<result_type>::min();
+  }
+
+  static constexpr result_type max()
+  {
+    return std::numeric_limits<result_type>::max();
+  }
+
+  static double entropy()
+  {
+    return 0.0;
+  }
 };
 
 } // namespace aria2

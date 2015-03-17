@@ -584,6 +584,17 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     op->setChangeOptionForReserved(true);
     handlers.push_back(op);
   }
+#ifdef ENABLE_SSL
+  {
+    OptionHandler* op(new ParameterOptionHandler
+                      (PREF_MIN_TLS_VERSION,
+                       TEXT_MIN_TLS_VERSION,
+                       A2_V_TLS10,
+                       { A2_V_SSL3, A2_V_TLS10, A2_V_TLS11, A2_V_TLS12 }));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+#endif // ENABLE_SSL
   {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_NO_CONF,
@@ -1702,6 +1713,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
 #ifdef ENABLE_BITTORRENT
   {
     OptionHandler* op(new BooleanOptionHandler
+                      (PREF_BT_DETACH_SEED_ONLY,
+                       TEXT_BT_DETACH_SEED_ONLY,
+                       A2_V_FALSE,
+                       OptionHandler::OPT_ARG));
+    op->addTag(TAG_BITTORRENT);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new BooleanOptionHandler
                       (PREF_BT_ENABLE_LPD,
                        TEXT_BT_ENABLE_LPD,
                        A2_V_FALSE,
@@ -1731,6 +1751,18 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
                        TEXT_BT_EXTERNAL_IP,
                        NO_DEFAULT_VALUE,
                        "a numeric IP address"));
+    op->addTag(TAG_BITTORRENT);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new BooleanOptionHandler
+                      (PREF_BT_FORCE_ENCRYPTION,
+                       TEXT_BT_FORCE_ENCRYPTION,
+                       A2_V_FALSE,
+                       OptionHandler::OPT_ARG));
     op->addTag(TAG_BITTORRENT);
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);

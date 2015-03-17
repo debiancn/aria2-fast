@@ -105,6 +105,10 @@ extern const std::string V_ARC4;
 extern const std::string V_HTTP;
 extern const std::string V_HTTPS;
 extern const std::string V_FTP;
+extern const std::string A2_V_SSL3;
+extern const std::string A2_V_TLS10;
+extern const std::string A2_V_TLS11;
+extern const std::string A2_V_TLS12;
 
 extern PrefPtr PREF_VERSION;
 extern PrefPtr PREF_HELP;
@@ -304,6 +308,8 @@ extern PrefPtr PREF_DSCP;
 extern PrefPtr PREF_PAUSE_METADATA;
 // values: 1*digit
 extern PrefPtr PREF_RLIMIT_NOFILE;
+// values: SSLv3 | TLSv1 | TLSv1.1 | TLSv1.2
+extern PrefPtr PREF_MIN_TLS_VERSION;
 
 /**
  * FTP related preferences
@@ -360,7 +366,7 @@ extern PrefPtr PREF_HTTP_PROXY;
 extern PrefPtr PREF_HTTPS_PROXY;
 extern PrefPtr PREF_FTP_PROXY;
 extern PrefPtr PREF_ALL_PROXY;
-// values: comma separeted hostname or domain
+// values: comma separated hostname or domain
 extern PrefPtr PREF_NO_PROXY;
 // values: get | tunnel
 extern PrefPtr PREF_PROXY_METHOD;
@@ -478,6 +484,10 @@ extern PrefPtr PREF_BT_TRACKER;
 extern PrefPtr PREF_BT_EXCLUDE_TRACKER;
 // values: true | false
 extern PrefPtr PREF_BT_REMOVE_UNSELECTED_FILE;
+// values: true |false
+extern PrefPtr PREF_BT_DETACH_SEED_ONLY;
+// values: true | false
+extern PrefPtr PREF_BT_FORCE_ENCRYPTION;
 
 /**
  * Metalink related preferences

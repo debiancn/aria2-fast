@@ -124,7 +124,7 @@ RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
   : belongsToGID_(0),
     gid_(gid),
     option_(option),
-    progressInfoFile_(new NullProgressInfoFile()),
+    progressInfoFile_(std::make_shared<NullProgressInfoFile>()),
     uriSelector_(make_unique<InorderURISelector>()),
     requestGroupMan_(nullptr),
 #ifdef ENABLE_BITTORRENT
@@ -149,7 +149,8 @@ RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
     haltRequested_(false),
     forceHaltRequested_(false),
     pauseRequested_(false),
-    inMemoryDownload_(false)
+    inMemoryDownload_(false),
+    seedOnly_(false)
 {
   fileAllocationEnabled_ = option_->get(PREF_FILE_ALLOCATION) != V_NONE;
   if(!option_->getAsBool(PREF_DRY_RUN)) {
@@ -710,7 +711,7 @@ void RequestGroup::loadAndOpenFile
     setProgressInfoFile(progressInfoFile);
   }
   catch(RecoverableException& e) {
-    throw DOWNLOAD_FAILURE_EXCEPTION2(fmt(EX_DOWNLOAD_ABORTED), e);
+    throw DOWNLOAD_FAILURE_EXCEPTION2(EX_DOWNLOAD_ABORTED, e);
   }
 }
 
@@ -1123,7 +1124,7 @@ std::shared_ptr<DownloadResult> RequestGroup::createDownloadResult() const
   A2_LOG_DEBUG(fmt("GID#%s - Creating DownloadResult.",
                    gid_->toHex().c_str()));
   TransferStat st = calculateStat();
-  std::shared_ptr<DownloadResult> res(new DownloadResult());
+  auto res = std::make_shared<DownloadResult>();
   res->gid = gid_;
   res->fileEntries = downloadContext_->getFileEntries();
   res->inMemoryDownload = inMemoryDownload_;
@@ -1263,6 +1264,20 @@ bool RequestGroup::p2pInvolved() const
 #else // !ENABLE_BITTORRENT
   return false;
 #endif // !ENABLE_BITTORRENT
+}
+
+void RequestGroup::enableSeedOnly()
+{
+  if(seedOnly_ || !option_->getAsBool(PREF_BT_DETACH_SEED_ONLY)) {
+    return;
+  }
+
+  if(requestGroupMan_) {
+    seedOnly_ = true;
+
+    requestGroupMan_->decreaseNumActive();
+    requestGroupMan_->requestQueueCheck();
+  }
 }
 
 } // namespace aria2

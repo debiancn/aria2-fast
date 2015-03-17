@@ -417,7 +417,8 @@ if HAVE_ZLIB
 SRCS += \
 	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
 	GZipEncoder.cc GZipEncoder.h\
-	GZipFile.cc GZipFile.h
+	GZipFile.cc GZipFile.h \
+	Adler32MessageDigestImpl.cc Adler32MessageDigestImpl.h
 endif # HAVE_ZLIB
 
 if HAVE_SQLITE3
@@ -685,6 +686,10 @@ endif # HAVE_PORT_ASSOCIATE
 if HAVE_KQUEUE
 SRCS += KqueueEventPoll.cc KqueueEventPoll.h
 endif # HAVE_KQUEUE
+
+if HAVE_GETRANDOM_INTERFACE
+SRCS += getrandom_linux.c getrandom_linux.h
+endif # HAVE_GETRANDOM_INTERFACE
 
 if HAVE_LIBUV
 SRCS += LibuvEventPoll.cc LibuvEventPoll.h

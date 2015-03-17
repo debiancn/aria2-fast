@@ -154,7 +154,7 @@ int UDPTrackerClient::receiveReply
                     transactionId, connectionId));
     UDPTrackerConnection c(UDPT_CST_CONNECTED, connectionId, now);
     connectionIdCache_[std::make_pair(remoteAddr, remotePort)] = c;
-    // Now we have connecion ID, push requests which are waiting for
+    // Now we have connection ID, push requests which are waiting for
     // it.
     std::vector<std::shared_ptr<UDPTrackerRequest> > reqs;
     connectRequests_.erase(std::remove_if
@@ -179,7 +179,7 @@ int UDPTrackerClient::receiveReply
     }
     req->state = UDPT_STA_COMPLETE;
 
-    req->reply.reset(new UDPTrackerReply());
+    req->reply = std::make_shared<UDPTrackerReply>();
     req->reply->action = action;
     req->reply->transactionId = transactionId;
     req->reply->interval = bittorrent::getIntParam(data, 8);
@@ -265,7 +265,7 @@ ssize_t UDPTrackerClient::createRequest
                                               req->remotePort,
                                               now);
     if(!c) {
-      std::shared_ptr<UDPTrackerRequest> creq(new UDPTrackerRequest());
+      auto creq = std::make_shared<UDPTrackerRequest>();
       creq->action = UDPT_ACT_CONNECT;
       creq->remoteAddr = req->remoteAddr;
       creq->remotePort = req->remotePort;
@@ -512,7 +512,7 @@ void UDPTrackerClient::failConnect(const std::string& remoteAddr,
                                    uint16_t remotePort, int error)
 {
   connectionIdCache_.erase(std::make_pair(remoteAddr, remotePort));
-  // Fail all requests which are waiting for connecion ID of the host.
+  // Fail all requests which are waiting for connection ID of the host.
   connectRequests_.erase(std::remove_if(connectRequests_.begin(),
                                         connectRequests_.end(),
                                         FailConnectDelete

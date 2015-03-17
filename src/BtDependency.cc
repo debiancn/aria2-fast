@@ -49,6 +49,7 @@
 #include "DlAbortEx.h"
 #include "fmt.h"
 #include "FileEntry.h"
+#include "SimpleRandomizer.h"
 
 namespace aria2 {
 
@@ -94,7 +95,7 @@ bool BtDependency::resolve()
     std::shared_ptr<RequestGroup> dependee = dependee_;
     // cut reference here
     dependee_.reset();
-    std::shared_ptr<DownloadContext> context(new DownloadContext());
+    auto context = std::make_shared<DownloadContext>();
     try {
       std::shared_ptr<DiskAdaptor> diskAdaptor =
         dependee->getPieceStorage()->getDiskAdaptor();
@@ -117,6 +118,11 @@ bool BtDependency::resolve()
       }
       const std::vector<std::shared_ptr<FileEntry> >& fileEntries =
         context->getFileEntries();
+      for (auto &fe : fileEntries) {
+        auto &uri = fe->getRemainingUris();
+        std::random_shuffle(std::begin(uri), std::end(uri),
+                            *SimpleRandomizer::getInstance());
+      }
       const std::vector<std::shared_ptr<FileEntry> >& dependantFileEntries =
         dependant_->getDownloadContext()->getFileEntries();
       // If dependant's FileEntry::getOriginalName() is empty, we

@@ -189,7 +189,8 @@ std::string DefaultBtAnnounce::getAnnounceUrl() {
     uri += "&trackerid=";
     uri += util::torrentPercentEncode(trackerId_);
   }
-  if(option_->getAsBool(PREF_BT_REQUIRE_CRYPTO)) {
+  if(option_->getAsBool(PREF_BT_FORCE_ENCRYPTION) ||
+     option_->getAsBool(PREF_BT_REQUIRE_CRYPTO)) {
     uri += "&requirecrypto=1";
   } else {
     uri += "&supportcrypto=1";
@@ -210,7 +211,7 @@ std::shared_ptr<UDPTrackerRequest> DefaultBtAnnounce::createUDPTrackerRequest
   NetStat& stat = downloadContext_->getNetStat();
   int64_t left =
     pieceStorage_->getTotalLength()-pieceStorage_->getCompletedLength();
-  std::shared_ptr<UDPTrackerRequest> req(new UDPTrackerRequest());
+  auto req = std::make_shared<UDPTrackerRequest>();
   req->remoteAddr = remoteAddr;
   req->remotePort = remotePort;
   req->action = UDPT_ACT_ANNOUNCE;

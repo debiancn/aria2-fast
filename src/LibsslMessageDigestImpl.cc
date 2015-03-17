@@ -37,6 +37,8 @@
 
 #include <openssl/evp.h>
 
+#include "Adler32MessageDigestImpl.h"
+
 namespace aria2 {
 
 template<const EVP_MD* (*init_fn)()>
@@ -84,7 +86,7 @@ typedef MessageDigestBase<EVP_sha1> MessageDigestSHA1;
 
 std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
-  return std::unique_ptr<MessageDigestImpl>(new MessageDigestSHA1());
+  return make_unique<MessageDigestSHA1>();
 }
 
 MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
@@ -102,6 +104,7 @@ MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
   { "sha-512", make_hi<MessageDigestBase<EVP_sha512> >() },
 #endif
   { "md5", make_hi<MessageDigestMD5>() },
+  ADLER32_MESSAGE_DIGEST
 };
 
 } // namespace aria2

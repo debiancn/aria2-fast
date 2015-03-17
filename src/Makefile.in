@@ -158,7 +158,8 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @HAVE_ZLIB_TRUE@am__append_30 = \
 @HAVE_ZLIB_TRUE@	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
 @HAVE_ZLIB_TRUE@	GZipEncoder.cc GZipEncoder.h\
-@HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h
+@HAVE_ZLIB_TRUE@	GZipFile.cc GZipFile.h \
+@HAVE_ZLIB_TRUE@	Adler32MessageDigestImpl.cc Adler32MessageDigestImpl.h
 
 @HAVE_SQLITE3_TRUE@am__append_31 = \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParser.cc Sqlite3CookieParser.h\
@@ -375,8 +376,9 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @HAVE_POLL_TRUE@am__append_46 = PollEventPoll.cc PollEventPoll.h
 @HAVE_PORT_ASSOCIATE_TRUE@am__append_47 = PortEventPoll.cc PortEventPoll.h
 @HAVE_KQUEUE_TRUE@am__append_48 = KqueueEventPoll.cc KqueueEventPoll.h
-@HAVE_LIBUV_TRUE@am__append_49 = LibuvEventPoll.cc LibuvEventPoll.h
-@ENABLE_LIBARIA2_TRUE@am__append_50 = \
+@HAVE_GETRANDOM_INTERFACE_TRUE@am__append_49 = getrandom_linux.c getrandom_linux.h
+@HAVE_LIBUV_TRUE@am__append_50 = LibuvEventPoll.cc LibuvEventPoll.h
+@ENABLE_LIBARIA2_TRUE@am__append_51 = \
 @ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h\
 @ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
 @ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h
@@ -637,6 +639,7 @@ am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	LibsslTLSSession.h LibsslMessageDigestImpl.cc \
 	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h \
 	GZipEncoder.cc GZipEncoder.h GZipFile.cc GZipFile.h \
+	Adler32MessageDigestImpl.cc Adler32MessageDigestImpl.h \
 	Sqlite3CookieParser.cc Sqlite3CookieParser.h \
 	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h \
 	AsyncNameResolver.cc AsyncNameResolver.h \
@@ -795,8 +798,9 @@ am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	clock_gettime_mingw.cc clock_gettime_mingw.h \
 	clock_gettime_osx.cc clock_gettime_osx.h PollEventPoll.cc \
 	PollEventPoll.h PortEventPoll.cc PortEventPoll.h \
-	KqueueEventPoll.cc KqueueEventPoll.h LibuvEventPoll.cc \
-	LibuvEventPoll.h ApiCallbackDownloadEventListener.cc \
+	KqueueEventPoll.cc KqueueEventPoll.h getrandom_linux.c \
+	getrandom_linux.h LibuvEventPoll.cc LibuvEventPoll.h \
+	ApiCallbackDownloadEventListener.cc \
 	ApiCallbackDownloadEventListener.h aria2api.cc aria2api.h \
 	KeepRunningCommand.cc KeepRunningCommand.h
 am__dirstamp = $(am__leading_dot)dirstamp
@@ -842,7 +846,8 @@ am__objects_7 =
 @HAVE_APPLETLS_FALSE@@HAVE_OPENSSL_TRUE@	LibsslTLSSession.lo
 @HAVE_OPENSSL_TRUE@@USE_OPENSSL_MD_TRUE@am__objects_28 = LibsslMessageDigestImpl.lo
 @HAVE_ZLIB_TRUE@am__objects_29 = GZipDecodingStreamFilter.lo \
-@HAVE_ZLIB_TRUE@	GZipEncoder.lo GZipFile.lo
+@HAVE_ZLIB_TRUE@	GZipEncoder.lo GZipFile.lo \
+@HAVE_ZLIB_TRUE@	Adler32MessageDigestImpl.lo
 @HAVE_SQLITE3_TRUE@am__objects_30 = Sqlite3CookieParser.lo \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.lo
 @ENABLE_ASYNC_DNS_TRUE@am__objects_31 = AsyncNameResolver.lo \
@@ -991,11 +996,12 @@ am__objects_7 =
 @HAVE_POLL_TRUE@am__objects_45 = PollEventPoll.lo
 @HAVE_PORT_ASSOCIATE_TRUE@am__objects_46 = PortEventPoll.lo
 @HAVE_KQUEUE_TRUE@am__objects_47 = KqueueEventPoll.lo
-@HAVE_LIBUV_TRUE@am__objects_48 = LibuvEventPoll.lo
-@ENABLE_LIBARIA2_TRUE@am__objects_49 =  \
+@HAVE_GETRANDOM_INTERFACE_TRUE@am__objects_48 = getrandom_linux.lo
+@HAVE_LIBUV_TRUE@am__objects_49 = LibuvEventPoll.lo
+@ENABLE_LIBARIA2_TRUE@am__objects_50 =  \
 @ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo \
 @ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo
-am__objects_50 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
+am__objects_51 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
 	AbstractDiskWriter.lo AbstractHttpServerResponseCommand.lo \
 	AbstractOptionHandler.lo AbstractProxyRequestCommand.lo \
 	AbstractProxyResponseCommand.lo AbstractSingleDiskAdaptor.lo \
@@ -1088,8 +1094,9 @@ am__objects_50 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
 	$(am__objects_38) $(am__objects_39) $(am__objects_40) \
 	$(am__objects_41) $(am__objects_42) $(am__objects_43) \
 	$(am__objects_44) $(am__objects_45) $(am__objects_46) \
-	$(am__objects_47) $(am__objects_48) $(am__objects_49)
-am_libaria2_la_OBJECTS = $(am__objects_50)
+	$(am__objects_47) $(am__objects_48) $(am__objects_49) \
+	$(am__objects_50)
+am_libaria2_la_OBJECTS = $(am__objects_51)
 libaria2_la_OBJECTS = $(am_libaria2_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -1603,7 +1610,8 @@ SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	$(am__append_39) $(am__append_40) $(am__append_41) \
 	$(am__append_42) $(am__append_43) $(am__append_44) \
 	$(am__append_45) $(am__append_46) $(am__append_47) \
-	$(am__append_48) $(am__append_49) $(am__append_50)
+	$(am__append_48) $(am__append_49) $(am__append_50) \
+	$(am__append_51)
 @ENABLE_LIBARIA2_TRUE@pkgconfigdir = $(libdir)/pkgconfig
 @ENABLE_LIBARIA2_TRUE@pkgconfig_DATA = libaria2.pc
 @ENABLE_LIBARIA2_TRUE@DISTCLEANFILES = $(pkgconfig_DATA)
@@ -1793,6 +1801,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ActivePeerConnectionCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveFileAllocationIterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AdaptiveURISelector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Adler32MessageDigestImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceList.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/AnnounceTier.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ApiCallbackDownloadEventListener.Plo@am__quote@
@@ -2177,6 +2186,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/fmt.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gai_strerror.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getaddrinfo.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getrandom_linux.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gettimeofday.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/help_tags.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/json.Plo@am__quote@
