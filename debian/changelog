@@ -1,3 +1,9 @@
+aria2 (1.18.10-2) unstable; urgency=low
+
+  * Uploaded to unstable.
+
+ -- Kartik Mistry <kartik@debian.org>  Wed, 06 May 2015 10:59:39 +0530
+
 aria2 (1.18.10-1) experimental; urgency=low
 
   * New upstream release.
