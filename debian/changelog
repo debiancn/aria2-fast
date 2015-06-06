@@ -1,3 +1,10 @@
+aria2 (1.19.0-1) unstable; urgency=medium
+
+  * New upstream release:
+    + Fix FTBFS with linux-libc-dev 4.0.2-1 (Closes: #785294)
+
+ -- Kartik Mistry <patrickr@kamino.tario.org>  Sat, 06 Jun 2015 23:37:00 +0200
+
 aria2 (1.18.10-2) unstable; urgency=low
 
   * Uploaded to unstable.
