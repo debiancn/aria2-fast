@@ -5,7 +5,7 @@ aria2 (1.19.0-1) unstable; urgency=medium
   * debian/control:
     + Add libssh2-1-dev for newly supported ssh based features
 
- -- Kartik Mistry <patrickr@kamino.tario.org>  Sat, 06 Jun 2015 23:37:00 +0200
+ -- Patrick Ruckstuhl <patrick@ch.tario.org>  Sat, 06 Jun 2015 23:37:00 +0200
 
 aria2 (1.18.10-2) unstable; urgency=low
 
