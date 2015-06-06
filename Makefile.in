@@ -236,14 +236,12 @@ distuninstallcheck_listfiles = find . -type f -print
 am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
   | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
 distcleancheck_listfiles = find . -type f -print
-A2X = @A2X@
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 ARIA2_STATIC = @ARIA2_STATIC@
-ASCIIDOC = @ASCIIDOC@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -302,6 +300,8 @@ LIBICONV = @LIBICONV@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBSSH2_CFLAGS = @LIBSSH2_CFLAGS@
+LIBSSH2_LIBS = @LIBSSH2_LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -430,6 +430,7 @@ EXTRA_DIST = config.rpath \
 	     android-config android-make \
 	     makerelease-osx.mk osx-package/DS_Store osx-package/etc/paths.d/aria2c osx-package/etc/manpaths.d/aria2 \
 	     Dockerfile.mingw \
+	     Dockerfile.raspberrypi \
 	     examples/libaria2ex.cc examples/libaria2wx.cc
 
 dist_doc_DATA = README README.rst README.html

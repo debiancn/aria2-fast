@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.18.10],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.19.0],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -43,7 +43,7 @@ AC_DEFINE_UNQUOTED([HOST], ["$host"], [Define build-type])
 AC_DEFINE_UNQUOTED([TARGET], ["$target"], [Define target-type])
 
 # Checks for arguments.
-ARIA2_ARG_WITHOUT([libuv])
+ARIA2_ARG_WITH([libuv])
 ARIA2_ARG_WITHOUT([appletls])
 ARIA2_ARG_WITHOUT([wintls])
 ARIA2_ARG_WITHOUT([gnutls])
@@ -58,6 +58,7 @@ ARIA2_ARG_WITHOUT([libcares])
 ARIA2_ARG_WITHOUT([libz])
 ARIA2_ARG_WITH([tcmalloc])
 ARIA2_ARG_WITH([jemalloc])
+ARIA2_ARG_WITHOUT([libssh2])
 
 ARIA2_ARG_DISABLE([ssl])
 ARIA2_ARG_DISABLE([bittorrent])
@@ -105,14 +106,6 @@ if test "x$AR" = "x:"; then
   AC_MSG_FAILURE([ar is not found in the system.])
 fi
 AC_SUBST([AR])
-
-AC_PATH_PROG([A2X], [a2x])
-AC_SUBST([A2X])
-AM_CONDITIONAL([HAVE_A2X], [ test "x$A2X" != "x" ])
-
-AC_PATH_PROG([ASCIIDOC], [asciidoc])
-AC_SUBST([ASCIIDOC])
-AM_CONDITIONAL([HAVE_ASCIIDOC], [ test "x$ASCIIDOC" != "x" ])
 
 AC_PATH_PROGS([SPHINXBUILD], [sphinx-build])
 AC_SUBST([SPHINXBUILD])
@@ -470,6 +463,20 @@ if test "x$have_openssl" != "xyes"; then
   fi
 fi
 
+if test "x$with_libssh2" = "xyes"; then
+  PKG_CHECK_MODULES([LIBSSH2], [libssh2], [have_libssh2=yes], [have_libssh2=no])
+  if test "x$have_libssh2" = "xyes"; then
+    AC_DEFINE([HAVE_LIBSSH2], [1], [Define to 1 if you have libssh2.])
+    LIBS="$LIBSSH2_LIBS $LIBS"
+    CPPFLAGS="$LIBSSH2_CFLAGS $CPPFLAGS"
+  else
+    AC_MSG_WARN([$LIBSSH2_PKG_ERRORS])
+    if test "x$with_libssh2_requested" = "xyes"; then
+      ARIA2_DEP_NOT_MET([libssh2])
+    fi
+  fi
+fi
+
 if test "x$with_libcares" = "xyes"; then
   PKG_CHECK_MODULES([LIBCARES], [libcares >= 1.7.0], [have_libcares=yes],
                     [have_libcares=no])
@@ -612,6 +619,9 @@ AM_CONDITIONAL([HAVE_ZLIB], [test "x$have_zlib" = "xyes"])
 
 # Set conditional for sqlite3
 AM_CONDITIONAL([HAVE_SQLITE3], [test "x$have_sqlite3" = "xyes"])
+
+# Set conditional for libssh2
+AM_CONDITIONAL([HAVE_LIBSSH2], [test "x$have_libssh2" = "xyes"])
 
 AC_SEARCH_LIBS([clock_gettime], [rt])
 
@@ -758,10 +768,12 @@ AC_CHECK_FUNCS([__argz_count \
 
 AC_MSG_CHECKING([for getrandom linux syscall interface])
 AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+#include <sys/syscall.h>
 #include <linux/random.h>
 ]],
 [[
 int x = GRND_NONBLOCK;
+int y = (int)SYS_getrandom;
 ]])],
   [have_getrandom_interface=yes
    AC_DEFINE([HAVE_GETRANDOM_INTERFACE], [1], [Define to 1 if getrandom linux syscall interface is available.])],
@@ -1060,6 +1072,7 @@ echo "LibXML2:        $have_libxml2"
 echo "LibExpat:       $have_libexpat"
 echo "LibCares:       $have_libcares"
 echo "Zlib:           $have_zlib"
+echo "Libssh2:        $have_libssh2"
 echo "Epoll:          $have_epoll"
 echo "Bittorrent:     $enable_bittorrent"
 echo "Metalink:       $enable_metalink"

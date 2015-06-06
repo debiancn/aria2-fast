@@ -55,6 +55,10 @@ class TLSContext;
 class TLSSession;
 #endif // ENABLE_SSL
 
+#ifdef HAVE_LIBSSH2
+class SSHSession;
+#endif // HAVE_LIBSSH2
+
 class SocketCore {
   friend bool operator==(const SocketCore& s1, const SocketCore& s2);
   friend bool operator!=(const SocketCore& s1, const SocketCore& s2);
@@ -69,6 +73,8 @@ private:
   static int ipDscp_;
 
   static std::vector<std::pair<sockaddr_union, socklen_t> > bindAddrs_;
+  static std::vector<std::vector<std::pair<sockaddr_union, socklen_t> > > bindAddrsList_;
+  static std::vector<std::vector<std::pair<sockaddr_union, socklen_t> > >::iterator bindAddrsListIt_;
 
   bool blocking_;
   int secure_;
@@ -92,6 +98,12 @@ private:
    */
   bool tlsHandshake(TLSContext* tlsctx, const std::string& hostname);
 #endif // ENABLE_SSL
+
+#ifdef HAVE_LIBSSH2
+  std::unique_ptr<SSHSession> sshSession_;
+
+  void sshCheckDirection();
+#endif // HAVE_LIBSSH2
 
   void init();
 
@@ -288,6 +300,24 @@ public:
   bool tlsConnect(const std::string& hostname);
 #endif // ENABLE_SSL
 
+#ifdef HAVE_LIBSSH2
+  // Performs SSH handshake
+  bool sshHandshake(const std::string& hashType, const std::string& digest);
+  // Performs SSH authentication using username and password.
+  bool sshAuthPassword(const std::string& user, const std::string& password);
+  // Starts sftp session and open remote file |path|.
+  bool sshSFTPOpen(const std::string& path);
+  // Closes sftp remote file gracefully
+  bool sshSFTPClose();
+  // Gets total length and modified time for remote file currently
+  // opened.  |path| is used for logging.
+  bool sshSFTPStat(int64_t& totalLength, time_t& mtime,
+                   const std::string& path);
+  // Seeks file position to |pos|.
+  void sshSFTPSeek(int64_t pos);
+  bool sshGracefulShutdown();
+#endif // HAVE_LIBSSH2
+
   bool operator==(const SocketCore& s) {
     return sockfd_ == s.sockfd_;
   }
@@ -334,6 +364,7 @@ public:
   // We cannot use interface as an argument because it is a reserved
   // keyword in MSVC.
   static void bindAddress(const std::string& iface);
+  static void bindAllAddress(const std::string& ifaces);
 
   friend void getInterfaceAddress
   (std::vector<std::pair<sockaddr_union, socklen_t> >& ifAddrs,
