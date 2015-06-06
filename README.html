@@ -359,13 +359,13 @@ You must use this program at your own risk.</p>
 <div class="section" id="introduction">
 <h1>Introduction</h1>
 <p>aria2 is a utility for downloading files. The supported protocols are
-HTTP(S), FTP, BitTorrent, and Metalink. aria2 can download a file from
-multiple sources/protocols and tries to utilize your maximum download
-bandwidth. It supports downloading a file from HTTP(S)/FTP and
-BitTorrent at the same time, while the data downloaded from
-HTTP(S)/FTP is uploaded to the BitTorrent swarm. Using Metalink's
-chunk checksums, aria2 automatically validates chunks of data while
-downloading a file like BitTorrent.</p>
+HTTP(S), FTP, SFTP, BitTorrent, and Metalink. aria2 can download a
+file from multiple sources/protocols and tries to utilize your maximum
+download bandwidth. It supports downloading a file from
+HTTP(S)/FTP/SFTP and BitTorrent at the same time, while the data
+downloaded from HTTP(S)/FTP/SFTP is uploaded to the BitTorrent
+swarm. Using Metalink's chunk checksums, aria2 automatically validates
+chunks of data while downloading a file like BitTorrent.</p>
 <p>The project page is located at <a class="reference external" href="http://aria2.sourceforge.net/">http://aria2.sourceforge.net/</a>.</p>
 <p>See <a class="reference external" href="http://aria2.sourceforge.net/manual/en/html/">aria2 Online Manual</a> (<a class="reference external" href="http://aria2.sourceforge.net/manual/ru/html/">Russian translation</a>, <a class="reference external" href="http://aria2.sourceforge.net/manual/pt/html/">Portuguese
 translation</a>) to learn
@@ -376,10 +376,10 @@ how to use aria2.</p>
 <p>Here is a list of features:</p>
 <ul class="simple">
 <li>Command-line interface</li>
-<li>Download files through HTTP(S)/FTP/BitTorrent</li>
+<li>Download files through HTTP(S)/FTP/SFTP/BitTorrent</li>
 <li>Segmented downloading</li>
-<li>Metalink version 4 (RFC 5854) support(HTTP/FTP/BitTorrent)</li>
-<li>Metalink version 3.0 support(HTTP/FTP/BitTorrent)</li>
+<li>Metalink version 4 (RFC 5854) support(HTTP/FTP/SFTP/BitTorrent)</li>
+<li>Metalink version 3.0 support(HTTP/FTP/SFTP/BitTorrent)</li>
 <li>Metalink/HTTP (RFC 6249) support</li>
 <li>HTTP/1.1 implementation</li>
 <li>HTTP Proxy support</li>
@@ -397,7 +397,7 @@ and the Mozilla/Firefox
 <li>Save Cookies in the Mozilla/Firefox (1.x/2.x)/Netscape format.</li>
 <li>Custom HTTP Header support</li>
 <li>Persistent Connections support</li>
-<li>FTP through HTTP Proxy</li>
+<li>FTP/SFTP through HTTP Proxy</li>
 <li>Download/Upload speed throttling</li>
 <li>BitTorrent extensions: Fast extension, DHT, PEX, MSE/PSE,
 Multi-Tracker, UDP tracker</li>
@@ -447,6 +447,9 @@ files are stored there.</p>
 <tbody valign="top">
 <tr><td>HTTPS</td>
 <td>OSX or GnuTLS or OpenSSL or Windows</td>
+</tr>
+<tr><td>SFTP</td>
+<td>libssh2</td>
 </tr>
 <tr><td>BitTorrent</td>
 <td>None. Optional: libnettle+libgmp or libgcrypt
@@ -541,6 +544,7 @@ distribution you use):</p>
 <li>libgnutls-dev    (Required for HTTPS, BitTorrent, Checksum support)</li>
 <li>nettle-dev       (Required for BitTorrent, Checksum support)</li>
 <li>libgmp-dev       (Required for BitTorrent)</li>
+<li>libssh2-1-dev    (Required for SFTP support)</li>
 <li>libc-ares-dev    (Required for async DNS support)</li>
 <li>libxml2-dev      (Required for Metalink support)</li>
 <li>zlib1g-dev       (Required for gzip, deflate decoding support in HTTP)</li>
@@ -563,8 +567,13 @@ libgnutls-dev, nettle-dev, libgmp-dev, libgpg-error-dev and libgcrypt-dev:</p>
 </ul>
 <p>On Fedora you need the following packages: gcc, gcc-c++, kernel-devel,
 libgcrypt-devel, libxml2-devel, openssl-devel, gettext-devel, cppunit</p>
-<p>If you downloaded source code from git repository, you have to run
-following command to generate configure script and other files
+<p>If you downloaded source code from git repository, you have to install
+following packages to get autoconf macros:</p>
+<ul class="simple">
+<li>libxml2-dev</li>
+<li>libcppunit-dev</li>
+</ul>
+<p>And run following command to generate configure script and other files
 necessary to build the program:</p>
 <pre class="literal-block">
 $ autoreconf -i
@@ -647,6 +656,7 @@ following libraries have been built for cross-compile:</p>
 <li>expat</li>
 <li>sqlite3</li>
 <li>zlib</li>
+<li>libssh2</li>
 <li>cppunit</li>
 </ul>
 <p>Some environment variables can be adjusted to change build settings:</p>
@@ -683,6 +693,7 @@ assumes the following libraries have been built for cross-compile:</p>
 <li>c-ares</li>
 <li>openssl</li>
 <li>expat</li>
+<li>zlib</li>
 </ul>
 <p>When building the above libraries, make sure that disable shared
 library and enable only static library. We are going to link those
@@ -783,9 +794,9 @@ selective download completes.</li>
 </div>
 <div class="section" id="metalink">
 <h1>Metalink</h1>
-<p>The current implementation supports HTTP(S)/FTP/BitTorrent.  The other
-P2P protocols are ignored. Both Metalink4 (RFC 5854) and Metalink
-version 3.0 documents are supported.</p>
+<p>The current implementation supports HTTP(S)/FTP/SFTP/BitTorrent.  The
+other P2P protocols are ignored. Both Metalink4 (RFC 5854) and
+Metalink version 3.0 documents are supported.</p>
 <p>For checksum verification, md5, sha-1, sha-224, sha-256, sha-384 and
 sha-512 are supported. If multiple hash algorithms are provided, aria2
 uses stronger one. If whole file checksum verification fails, aria2
@@ -824,9 +835,9 @@ which location you prefer, you can use <tt class="docutils literal"><span class=
 </div>
 <div class="section" id="netrc">
 <h1>netrc</h1>
-<p>netrc support is enabled by default for HTTP(S)/FTP.  To disable netrc
-support, specify -n command-line option.  Your .netrc file should have
-correct permissions(600).</p>
+<p>netrc support is enabled by default for HTTP(S)/FTP/SFTP.  To disable
+netrc support, specify -n command-line option.  Your .netrc file
+should have correct permissions(600).</p>
 </div>
 <div class="section" id="websocket">
 <h1>WebSocket</h1>

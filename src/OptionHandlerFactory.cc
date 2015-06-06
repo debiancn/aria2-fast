@@ -596,6 +596,16 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   }
 #endif // ENABLE_SSL
   {
+    OptionHandler* op(new DefaultOptionHandler
+                      (PREF_MULTIPLE_INTERFACE,
+                       TEXT_MULTIPLE_INTERFACE,
+                       NO_DEFAULT_VALUE,
+                       "interface, IP address, hostname",
+                       OptionHandler::REQ_ARG));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new BooleanOptionHandler
                       (PREF_NO_CONF,
                        TEXT_NO_CONF,
@@ -1497,12 +1507,22 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new ChecksumOptionHandler
+                      (PREF_SSH_HOST_KEY_MD,
+                       TEXT_SSH_HOST_KEY_MD,
+                       {"sha-1", "md5"}));
+    op->addTag(TAG_FTP);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new DefaultOptionHandler
                       (PREF_NETRC_PATH,
-                       NO_DESCRIPTION,
+                       TEXT_NETRC_PATH,
                        util::getHomeDir()+"/.netrc",
                        PATH_TO_FILE));
-    op->hide();
     handlers.push_back(op);
   }
   // Proxy options

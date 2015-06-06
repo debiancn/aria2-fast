@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "February 23, 2015" "1.18.10" "aria2"
+.TH "ARIA2C" "1" "May 24, 2015" "1.19.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -36,14 +36,22 @@ level margin: \\n[rst2man-indent\\n[rst2man-indent-level]]
 .SH DESCRIPTION
 .sp
 aria2 is a utility for downloading files. The supported protocols are
-HTTP(S), FTP, BitTorrent, and Metalink. aria2 can download a file from
-multiple sources/protocols and tries to utilize your maximum download
-bandwidth. It supports downloading a file from HTTP(S)/FTP and
-BitTorrent at the same time, while the data downloaded from
-HTTP(S)/FTP is uploaded to the BitTorrent swarm. Using Metalink
+HTTP(S), FTP, SFTP, BitTorrent, and Metalink. aria2 can download a
+file from multiple sources/protocols and tries to utilize your maximum
+download bandwidth. It supports downloading a file from HTTP(S)/FTP
+/SFTP and BitTorrent at the same time, while the data downloaded from
+HTTP(S)/FTP/SFTP is uploaded to the BitTorrent swarm. Using Metalink
 chunk checksums, aria2 automatically validates chunks of data while
 downloading a file.
 .SH OPTIONS
+.sp
+\fBNOTE:\fP
+.INDENT 0.0
+.INDENT 3.5
+Most FTP related options are applicable to SFTP as well.
+Some options are not effective against SFTP (e.g., \fI\%\-\-ftp\-pasv\fP)
+.UNINDENT
+.UNINDENT
 .SS Basic Options
 .INDENT 0.0
 .TP
@@ -114,7 +122,7 @@ Values: \fB#basic\fP, \fB#advanced\fP, \fB#http\fP, \fB#https\fP, \fB#ftp\fP,
 \fB#checksum\fP, \fB#experimental\fP, \fB#deprecated\fP, \fB#help\fP, \fB#all\fP
 Default: \fB#basic\fP
 .UNINDENT
-.SS HTTP/FTP Options
+.SS HTTP/FTP/SFTP Options
 .INDENT 0.0
 .TP
 .B \-\-all\-proxy=<PROXY>
@@ -226,6 +234,20 @@ using 2 sources(if \fI\%\-\-split\fP >= 2, of course).  If SIZE is 15M,
 since 2*15M > 20MiB, aria2 does not split file and download it using
 1 source.  You can append \fBK\fP or \fBM\fP (1K = 1024, 1M = 1024K).
 Possible Values: \fB1M\fP \-\fB1024M\fP Default: \fB20M\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-netrc\-path=<FILE>
+Specify the path to the netrc file.
+Default: \fB$(HOME)/.netrc\fP
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+Permission of the .netrc file must be 600.  Otherwise, the file
+will be ignored.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -645,7 +667,7 @@ Default: \fBfalse\fP
 Set user agent for HTTP(S) downloads.
 Default: \fBaria2/$VERSION\fP, $VERSION is replaced by package version.
 .UNINDENT
-.SS FTP Specific Options
+.SS FTP/SFTP Specific Options
 .INDENT 0.0
 .TP
 .B \-\-ftp\-user=<USER>
@@ -668,6 +690,13 @@ Default: \fBARIA2USER@\fP
 Use the passive mode in FTP.
 If \fBfalse\fP is given, the active mode will be used.
 Default: \fBtrue\fP
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+This option is ignored for SFTP transfer.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -692,12 +721,29 @@ Set user for \fI\%\-\-ftp\-proxy\fP option.
 .B \-\-ftp\-type=<TYPE>
 Set FTP transfer type. TYPE is either \fBbinary\fP or \fBascii\fP\&.
 Default: \fBbinary\fP
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+This option is ignored for SFTP transfer.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-ftp\-reuse\-connection[=true|false]
 Reuse connection in FTP.
 Default: \fBtrue\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-ssh\-host\-key\-md=<TYPE>=<DIGEST>
+Set checksum for SSH host public key. TYPE is hash type. The
+supported hash type is \fBsha\-1\fP or \fBmd5\fP\&. DIGEST is hex
+digest. For example:
+\fBsha\-1=b030503d4de4539dc7885e6f0f5e256704edf4c3\fP\&.  This option can
+be used to validate server\(aqs public key when SFTP is used. If this
+option is not set, which is default, no validation takes place.
 .UNINDENT
 .SS BitTorrent/Metalink Options
 .INDENT 0.0
@@ -1594,6 +1640,15 @@ Default: \fBTLSv1\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-multiple\-interface=<INTERFACES>
+Comma separated list of interfaces to bind sockets to. Requests will
+be splited among the interfaces to achieve link aggregation. You can
+specify interface name, IP address and hostname. If
+\fI\%\-\-interface\fP is used, this option will be ignored.
+Possible Values: interface, IP address, hostname
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-log\-level=<LEVEL>
 Set log level to output.
 LEVEL is either \fBdebug\fP, \fBinfo\fP, \fBnotice\fP, \fBwarn\fP or \fBerror\fP\&.
@@ -1882,12 +1937,12 @@ treated as a separate download. Both Metalink4 and Metalink version
 3.0 are supported.
 .sp
 You can specify both torrent file with \-T option and URIs. By doing
-this, you can download a file from both torrent swarm and HTTP(S)/FTP
-server at the same time, while the data from HTTP(S)/FTP are uploaded
-to the torrent swarm.  For single file torrents, URI can be a complete
-URI pointing to the resource or if URI ends with /, name in torrent
-file in torrent is added. For multi\-file torrents, name and path are
-added to form a URI for each file.
+this, you can download a file from both torrent swarm and
+HTTP(S)/FTP/SFTP server at the same time, while the data from
+HTTP(S)/FTP/SFTP are uploaded to the torrent swarm.  For single file
+torrents, URI can be a complete URI pointing to the resource or if URI
+ends with /, name in torrent file in torrent is added. For multi\-file
+torrents, name and path are added to form a URI for each file.
 .sp
 \fBNOTE:\fP
 .INDENT 0.0
@@ -1917,15 +1972,14 @@ occurred. Currently following options are available:
 .sp
 aria2 passes 3 arguments to specified command when it is executed.
 These arguments are: GID, the number of files and file path.  For
-HTTP, FTP downloads, usually the number of files is 1.  BitTorrent
-download can contain multiple files.
-If number of files is more than one, file path is first one.  In
-other words, this is the value of path key of first struct whose
-selected key is true in the response of \fI\%aria2.getFiles()\fP
-RPC method.
-If you want to get all file paths, consider to use JSON\-RPC/XML\-RPC.  Please
-note that file path may change during download in HTTP because of
-redirection or Content\-Disposition header.
+HTTP, FTP, and SFTP downloads, usually the number of files is 1.
+BitTorrent download can contain multiple files.  If number of files is
+more than one, file path is first one.  In other words, this is the
+value of path key of first struct whose selected key is true in the
+response of \fI\%aria2.getFiles()\fP RPC method.  If you want to get all
+file paths, consider to use JSON\-RPC/XML\-RPC.  Please note that file
+path may change during download in HTTP because of redirection or
+Content\-Disposition header.
 .sp
 Let\(aqs see an example of how arguments are passed to command:
 .INDENT 0.0
@@ -2050,6 +2104,12 @@ temporary overloading or maintenance.
 .TP
 .B 30
 If aria2 could not parse JSON\-RPC request.
+.TP
+.B 31
+Reserved.  Not used.
+.TP
+.B 32
+If checksum validation failed.
 .UNINDENT
 .sp
 \fBNOTE:\fP
@@ -2146,9 +2206,9 @@ By default, the routing table of IPv4 DHT is saved to the path
 the path \fB$HOME/.aria2/dht6.dat\fP\&.
 .SS Netrc
 .sp
-Netrc support is enabled by default for HTTP(S)/FTP.  To disable netrc
-support, specify \fI\%\-\-no\-netrc\fP option.  Your .netrc file should have correct
-permissions(600).
+Netrc support is enabled by default for HTTP(S)/FTP/SFTP.  To disable
+netrc support, specify \fI\%\-\-no\-netrc\fP option.  Your .netrc
+file should have correct permissions(600).
 .sp
 If machine name starts \fB\&.\fP, aria2 performs domain\-match instead of
 exact match. This is an extension of aria2. For example of domain
@@ -2280,10 +2340,10 @@ of URIs. These optional lines must start with white space(s).
 \fI\%dry\-run\fP
 .IP \(bu 2
 \fI\%enable\-http\-keep\-alive\fP
-.UNINDENT
-.INDENT 2.0
 .IP \(bu 2
 \fI\%enable\-http\-pipelining\fP
+.UNINDENT
+.INDENT 2.0
 .IP \(bu 2
 \fI\%enable\-mmap\fP
 .IP \(bu 2
@@ -2352,10 +2412,10 @@ of URIs. These optional lines must start with white space(s).
 \fI\%max\-file\-not\-found\fP
 .IP \(bu 2
 \fI\%max\-resume\-failure\-tries\fP
-.UNINDENT
-.INDENT 2.0
 .IP \(bu 2
 \fI\%max\-tries\fP
+.UNINDENT
+.INDENT 2.0
 .IP \(bu 2
 \fI\%max\-upload\-limit\fP
 .IP \(bu 2
@@ -2414,6 +2474,8 @@ of URIs. These optional lines must start with white space(s).
 \fI\%select\-file\fP
 .IP \(bu 2
 \fI\%split\fP
+.IP \(bu 2
+\fI\%ssh\-host\-key\-md\fP
 .IP \(bu 2
 \fI\%stream\-piece\-selector\fP
 .IP \(bu 2
@@ -2602,19 +2664,19 @@ For information on the \fIsecret\fP parameter, see \fI\%RPC authorization secret
 .INDENT 0.0
 .TP
 .B aria2.addUri([secret], uris[, options[, position]])
-This method adds a new download. \fIuris\fP is an array of HTTP/FTP/BitTorrent
-URIs (strings) pointing to the same resource.  If you mix URIs pointing to
-different resources, then the download may fail or be corrupted without aria2
-complaining.
-When adding BitTorrent Magnet URIs, \fIuris\fP must have only one element and it
-should be BitTorrent Magnet URI.
-\fIoptions\fP is a struct and its members are pairs of option name and value.
-See \fI\%Options\fP below for more details.
-If \fIposition\fP is given, it must be an integer starting from 0. The new
-download will be inserted at \fIposition\fP in the waiting queue. If
-\fIposition\fP is omitted or \fIposition\fP is larger than the current size of the
-queue, the new download is appended to the end of the queue.
-This method returns the GID of the newly registered download.
+This method adds a new download. \fIuris\fP is an array of
+HTTP/FTP/SFTP/BitTorrent URIs (strings) pointing to the same
+resource.  If you mix URIs pointing to different resources, then the
+download may fail or be corrupted without aria2 complaining.  When
+adding BitTorrent Magnet URIs, \fIuris\fP must have only one element and
+it should be BitTorrent Magnet URI.  \fIoptions\fP is a struct and its
+members are pairs of option name and value.  See \fI\%Options\fP
+below for more details.  If \fIposition\fP is given, it must be an
+integer starting from 0. The new download will be inserted at
+\fIposition\fP in the waiting queue. If \fIposition\fP is omitted or
+\fIposition\fP is larger than the current size of the queue, the new
+download is appended to the end of the queue.  This method returns
+the GID of the newly registered download.
 .sp
 \fBJSON\-RPC Example\fP
 .sp
@@ -3389,9 +3451,9 @@ Upload speed(byte/sec) that this client uploads to the peer.
 .INDENT 0.0
 .TP
 .B aria2.getServers([secret], gid)
-This method returns currently connected HTTP(S)/FTP servers of the download
-denoted by \fIgid\fP (string). The response is an array of structs and contains
-the following keys. Values are strings.
+This method returns currently connected HTTP(S)/FTP/SFTP servers of
+the download denoted by \fIgid\fP (string). The response is an array of
+structs and contains the following keys. Values are strings.
 .INDENT 7.0
 .TP
 .B \fBindex\fP

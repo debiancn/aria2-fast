@@ -165,11 +165,17 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 
-@ENABLE_ASYNC_DNS_TRUE@am__append_32 = \
+@HAVE_LIBSSH2_TRUE@am__append_32 = SSHSession.cc SSHSession.h \
+@HAVE_LIBSSH2_TRUE@	SftpNegotiationCommand.cc SftpNegotiationCommand.h \
+@HAVE_LIBSSH2_TRUE@	SftpNegotiationConnectChain.h \
+@HAVE_LIBSSH2_TRUE@	SftpDownloadCommand.cc SftpDownloadCommand.h \
+@HAVE_LIBSSH2_TRUE@	SftpFinishDownloadCommand.cc SftpFinishDownloadCommand.h
+
+@ENABLE_ASYNC_DNS_TRUE@am__append_33 = \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolver.cc AsyncNameResolver.h\
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.cc AsyncNameResolverMan.h
 
-@ENABLE_BITTORRENT_TRUE@am__append_33 = \
+@ENABLE_BITTORRENT_TRUE@am__append_34 = \
 @ENABLE_BITTORRENT_TRUE@	AbstractBtMessage.cc AbstractBtMessage.h\
 @ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.cc ActivePeerConnectionCommand.h\
 @ENABLE_BITTORRENT_TRUE@	AnnounceList.h AnnounceList.cc\
@@ -347,7 +353,7 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_BITTORRENT_TRUE@	XORCloser.h\
 @ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.cc ZeroBtMessage.h
 
-@ENABLE_METALINK_TRUE@am__append_34 = \
+@ENABLE_METALINK_TRUE@am__append_35 = \
 @ENABLE_METALINK_TRUE@	Metalink2RequestGroup.cc Metalink2RequestGroup.h\
 @ENABLE_METALINK_TRUE@	MetalinkEntry.cc MetalinkEntry.h\
 @ENABLE_METALINK_TRUE@	Metalinker.cc Metalinker.h\
@@ -362,23 +368,23 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_METALINK_TRUE@	MetalinkResource.cc MetalinkResource.h\
 @ENABLE_METALINK_TRUE@	metalink_helper.cc metalink_helper.h
 
-@HAVE_ASCTIME_R_FALSE@am__append_35 = asctime_r.c asctime_r.h
-@HAVE_BASENAME_FALSE@am__append_36 = libgen.c libgen.h
-@HAVE_GETADDRINFO_FALSE@am__append_37 = getaddrinfo.c getaddrinfo.h
-@HAVE_GAI_STRERROR_FALSE@am__append_38 = gai_strerror.c gai_strerror.h
-@HAVE_GETTIMEOFDAY_FALSE@am__append_39 = gettimeofday.c gettimeofday.h
-@HAVE_LOCALTIME_R_FALSE@am__append_40 = localtime_r.c localtime_r.h
-@HAVE_STRPTIME_FALSE@am__append_41 = strptime.c strptime.h
-@HAVE_TIMEGM_FALSE@am__append_42 = timegm.c timegm.h
-@HAVE_DAEMON_FALSE@am__append_43 = daemon.cc daemon.h
-@HAVE_TIMEGETTIME_TRUE@am__append_44 = clock_gettime_mingw.cc clock_gettime_mingw.h
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_45 = clock_gettime_osx.cc clock_gettime_osx.h
-@HAVE_POLL_TRUE@am__append_46 = PollEventPoll.cc PollEventPoll.h
-@HAVE_PORT_ASSOCIATE_TRUE@am__append_47 = PortEventPoll.cc PortEventPoll.h
-@HAVE_KQUEUE_TRUE@am__append_48 = KqueueEventPoll.cc KqueueEventPoll.h
-@HAVE_GETRANDOM_INTERFACE_TRUE@am__append_49 = getrandom_linux.c getrandom_linux.h
-@HAVE_LIBUV_TRUE@am__append_50 = LibuvEventPoll.cc LibuvEventPoll.h
-@ENABLE_LIBARIA2_TRUE@am__append_51 = \
+@HAVE_ASCTIME_R_FALSE@am__append_36 = asctime_r.c asctime_r.h
+@HAVE_BASENAME_FALSE@am__append_37 = libgen.c libgen.h
+@HAVE_GETADDRINFO_FALSE@am__append_38 = getaddrinfo.c getaddrinfo.h
+@HAVE_GAI_STRERROR_FALSE@am__append_39 = gai_strerror.c gai_strerror.h
+@HAVE_GETTIMEOFDAY_FALSE@am__append_40 = gettimeofday.c gettimeofday.h
+@HAVE_LOCALTIME_R_FALSE@am__append_41 = localtime_r.c localtime_r.h
+@HAVE_STRPTIME_FALSE@am__append_42 = strptime.c strptime.h
+@HAVE_TIMEGM_FALSE@am__append_43 = timegm.c timegm.h
+@HAVE_DAEMON_FALSE@am__append_44 = daemon.cc daemon.h
+@HAVE_TIMEGETTIME_TRUE@am__append_45 = clock_gettime_mingw.cc clock_gettime_mingw.h
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__append_46 = clock_gettime_osx.cc clock_gettime_osx.h
+@HAVE_POLL_TRUE@am__append_47 = PollEventPoll.cc PollEventPoll.h
+@HAVE_PORT_ASSOCIATE_TRUE@am__append_48 = PortEventPoll.cc PortEventPoll.h
+@HAVE_KQUEUE_TRUE@am__append_49 = KqueueEventPoll.cc KqueueEventPoll.h
+@HAVE_GETRANDOM_INTERFACE_TRUE@am__append_50 = getrandom_linux.c getrandom_linux.h
+@HAVE_LIBUV_TRUE@am__append_51 = LibuvEventPoll.cc LibuvEventPoll.h
+@ENABLE_LIBARIA2_TRUE@am__append_52 = \
 @ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.cc ApiCallbackDownloadEventListener.h\
 @ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
 @ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h
@@ -642,6 +648,10 @@ am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	Adler32MessageDigestImpl.cc Adler32MessageDigestImpl.h \
 	Sqlite3CookieParser.cc Sqlite3CookieParser.h \
 	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h \
+	SSHSession.cc SSHSession.h SftpNegotiationCommand.cc \
+	SftpNegotiationCommand.h SftpNegotiationConnectChain.h \
+	SftpDownloadCommand.cc SftpDownloadCommand.h \
+	SftpFinishDownloadCommand.cc SftpFinishDownloadCommand.h \
 	AsyncNameResolver.cc AsyncNameResolver.h \
 	AsyncNameResolverMan.cc AsyncNameResolverMan.h \
 	AbstractBtMessage.cc AbstractBtMessage.h \
@@ -850,9 +860,13 @@ am__objects_7 =
 @HAVE_ZLIB_TRUE@	Adler32MessageDigestImpl.lo
 @HAVE_SQLITE3_TRUE@am__objects_30 = Sqlite3CookieParser.lo \
 @HAVE_SQLITE3_TRUE@	Sqlite3CookieParserImpl.lo
-@ENABLE_ASYNC_DNS_TRUE@am__objects_31 = AsyncNameResolver.lo \
+@HAVE_LIBSSH2_TRUE@am__objects_31 = SSHSession.lo \
+@HAVE_LIBSSH2_TRUE@	SftpNegotiationCommand.lo \
+@HAVE_LIBSSH2_TRUE@	SftpDownloadCommand.lo \
+@HAVE_LIBSSH2_TRUE@	SftpFinishDownloadCommand.lo
+@ENABLE_ASYNC_DNS_TRUE@am__objects_32 = AsyncNameResolver.lo \
 @ENABLE_ASYNC_DNS_TRUE@	AsyncNameResolverMan.lo
-@ENABLE_BITTORRENT_TRUE@am__objects_32 = AbstractBtMessage.lo \
+@ENABLE_BITTORRENT_TRUE@am__objects_33 = AbstractBtMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	ActivePeerConnectionCommand.lo \
 @ENABLE_BITTORRENT_TRUE@	AnnounceList.lo AnnounceTier.lo \
 @ENABLE_BITTORRENT_TRUE@	bencode2.lo BencodeParser.lo \
@@ -971,7 +985,7 @@ am__objects_7 =
 @ENABLE_BITTORRENT_TRUE@	UTMetadataRequestTracker.lo \
 @ENABLE_BITTORRENT_TRUE@	UTPexExtensionMessage.lo \
 @ENABLE_BITTORRENT_TRUE@	ZeroBtMessage.lo
-@ENABLE_METALINK_TRUE@am__objects_33 = Metalink2RequestGroup.lo \
+@ENABLE_METALINK_TRUE@am__objects_34 = Metalink2RequestGroup.lo \
 @ENABLE_METALINK_TRUE@	MetalinkEntry.lo Metalinker.lo \
 @ENABLE_METALINK_TRUE@	MetalinkMetaurl.lo \
 @ENABLE_METALINK_TRUE@	MetalinkParserController.lo \
@@ -982,26 +996,26 @@ am__objects_7 =
 @ENABLE_METALINK_TRUE@	MetalinkParserStateV4Impl.lo \
 @ENABLE_METALINK_TRUE@	MetalinkPostDownloadHandler.lo \
 @ENABLE_METALINK_TRUE@	MetalinkResource.lo metalink_helper.lo
-@HAVE_ASCTIME_R_FALSE@am__objects_34 = asctime_r.lo
-@HAVE_BASENAME_FALSE@am__objects_35 = libgen.lo
-@HAVE_GETADDRINFO_FALSE@am__objects_36 = getaddrinfo.lo
-@HAVE_GAI_STRERROR_FALSE@am__objects_37 = gai_strerror.lo
-@HAVE_GETTIMEOFDAY_FALSE@am__objects_38 = gettimeofday.lo
-@HAVE_LOCALTIME_R_FALSE@am__objects_39 = localtime_r.lo
-@HAVE_STRPTIME_FALSE@am__objects_40 = strptime.lo
-@HAVE_TIMEGM_FALSE@am__objects_41 = timegm.lo
-@HAVE_DAEMON_FALSE@am__objects_42 = daemon.lo
-@HAVE_TIMEGETTIME_TRUE@am__objects_43 = clock_gettime_mingw.lo
-@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_44 = clock_gettime_osx.lo
-@HAVE_POLL_TRUE@am__objects_45 = PollEventPoll.lo
-@HAVE_PORT_ASSOCIATE_TRUE@am__objects_46 = PortEventPoll.lo
-@HAVE_KQUEUE_TRUE@am__objects_47 = KqueueEventPoll.lo
-@HAVE_GETRANDOM_INTERFACE_TRUE@am__objects_48 = getrandom_linux.lo
-@HAVE_LIBUV_TRUE@am__objects_49 = LibuvEventPoll.lo
-@ENABLE_LIBARIA2_TRUE@am__objects_50 =  \
+@HAVE_ASCTIME_R_FALSE@am__objects_35 = asctime_r.lo
+@HAVE_BASENAME_FALSE@am__objects_36 = libgen.lo
+@HAVE_GETADDRINFO_FALSE@am__objects_37 = getaddrinfo.lo
+@HAVE_GAI_STRERROR_FALSE@am__objects_38 = gai_strerror.lo
+@HAVE_GETTIMEOFDAY_FALSE@am__objects_39 = gettimeofday.lo
+@HAVE_LOCALTIME_R_FALSE@am__objects_40 = localtime_r.lo
+@HAVE_STRPTIME_FALSE@am__objects_41 = strptime.lo
+@HAVE_TIMEGM_FALSE@am__objects_42 = timegm.lo
+@HAVE_DAEMON_FALSE@am__objects_43 = daemon.lo
+@HAVE_TIMEGETTIME_TRUE@am__objects_44 = clock_gettime_mingw.lo
+@HAVE_MACH_ABSOLUTE_TIME_TRUE@am__objects_45 = clock_gettime_osx.lo
+@HAVE_POLL_TRUE@am__objects_46 = PollEventPoll.lo
+@HAVE_PORT_ASSOCIATE_TRUE@am__objects_47 = PortEventPoll.lo
+@HAVE_KQUEUE_TRUE@am__objects_48 = KqueueEventPoll.lo
+@HAVE_GETRANDOM_INTERFACE_TRUE@am__objects_49 = getrandom_linux.lo
+@HAVE_LIBUV_TRUE@am__objects_50 = LibuvEventPoll.lo
+@ENABLE_LIBARIA2_TRUE@am__objects_51 =  \
 @ENABLE_LIBARIA2_TRUE@	ApiCallbackDownloadEventListener.lo \
 @ENABLE_LIBARIA2_TRUE@	aria2api.lo KeepRunningCommand.lo
-am__objects_51 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
+am__objects_52 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
 	AbstractDiskWriter.lo AbstractHttpServerResponseCommand.lo \
 	AbstractOptionHandler.lo AbstractProxyRequestCommand.lo \
 	AbstractProxyResponseCommand.lo AbstractSingleDiskAdaptor.lo \
@@ -1095,8 +1109,8 @@ am__objects_51 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
 	$(am__objects_41) $(am__objects_42) $(am__objects_43) \
 	$(am__objects_44) $(am__objects_45) $(am__objects_46) \
 	$(am__objects_47) $(am__objects_48) $(am__objects_49) \
-	$(am__objects_50)
-am_libaria2_la_OBJECTS = $(am__objects_51)
+	$(am__objects_50) $(am__objects_51)
+am_libaria2_la_OBJECTS = $(am__objects_52)
 libaria2_la_OBJECTS = $(am_libaria2_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -1241,14 +1255,12 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-A2X = @A2X@
 ACLOCAL = @ACLOCAL@
 ALLOCA = @ALLOCA@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
 AR = @AR@
 ARIA2_STATIC = @ARIA2_STATIC@
-ASCIIDOC = @ASCIIDOC@
 AUTOCONF = @AUTOCONF@
 AUTOHEADER = @AUTOHEADER@
 AUTOMAKE = @AUTOMAKE@
@@ -1307,6 +1319,8 @@ LIBICONV = @LIBICONV@
 LIBINTL = @LIBINTL@
 LIBOBJS = @LIBOBJS@
 LIBS = @LIBS@
+LIBSSH2_CFLAGS = @LIBSSH2_CFLAGS@
+LIBSSH2_LIBS = @LIBSSH2_LIBS@
 LIBTOOL = @LIBTOOL@
 LIPO = @LIPO@
 LN_S = @LN_S@
@@ -1611,7 +1625,7 @@ SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	$(am__append_42) $(am__append_43) $(am__append_44) \
 	$(am__append_45) $(am__append_46) $(am__append_47) \
 	$(am__append_48) $(am__append_49) $(am__append_50) \
-	$(am__append_51)
+	$(am__append_51) $(am__append_52)
 @ENABLE_LIBARIA2_TRUE@pkgconfigdir = $(libdir)/pkgconfig
 @ENABLE_LIBARIA2_TRUE@pkgconfig_DATA = libaria2.pc
 @ENABLE_LIBARIA2_TRUE@DISTCLEANFILES = $(pkgconfig_DATA)
@@ -2101,6 +2115,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcMethodImpl.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcRequest.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RpcResponse.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SSHSession.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SaveSessionCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SeedCheckCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SegmentMan.Plo@am__quote@
@@ -2108,6 +2123,9 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStat.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ServerStatMan.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SessionSerializer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SftpDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SftpFinishDownloadCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SftpNegotiationCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ShareRatioSeedCriteria.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Signature.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SimpleBtMessage.Plo@am__quote@
