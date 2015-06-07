@@ -5,7 +5,7 @@ Maintainer: Patrick Ruckstuhl <patrick@ch.tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
 Build-Depends: autotools-dev,
                debhelper (>= 7),
-               dpkg-dev (>= 1.16.1~),
+               dpkg-dev (>= 1.17.11~),
                libc-ares-dev,
                libgcrypt11-dev (>= 1.5.0-3) | libgcrypt-dev,
                libgnutls28-dev,
@@ -18,7 +18,6 @@ Standards-Version: 3.9.6
 Homepage: http://aria2.sourceforge.net/
 Vcs-Git: git://anonscm.debian.org/collab-maint/aria2.git
 Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/aria2.git;a=summary
-XS-Testsuite: autopkgtest
 
 Package: aria2
 Architecture: any
