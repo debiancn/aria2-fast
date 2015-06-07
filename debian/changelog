@@ -1,11 +1,12 @@
 aria2 (1.19.0-1) unstable; urgency=medium
 
+  [ Patrick Ruckstuhl ]
   * New upstream release:
     + Fix FTBFS with linux-libc-dev 4.0.2-1 (Closes: #785294)
   * debian/control:
     + Add libssh2-1-dev for newly supported ssh based features
 
- -- Patrick Ruckstuhl <patrick@ch.tario.org>  Sat, 06 Jun 2015 23:37:00 +0200
+ -- Kartik Mistry <kartik@debian.org>  Sun, 07 Jun 2015 16:54:57 +0530
 
 aria2 (1.18.10-2) unstable; urgency=low
 
