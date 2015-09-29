@@ -1,3 +1,11 @@
+aria2 (1.19.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/watch:
+    + Updated for new upstream location.
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 29 Sep 2015 09:19:21 +0530
+
 aria2 (1.19.0-1) unstable; urgency=medium
 
   [ Patrick Ruckstuhl ]
