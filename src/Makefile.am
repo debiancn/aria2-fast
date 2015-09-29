@@ -675,14 +675,6 @@ if !HAVE_DAEMON
 SRCS += daemon.cc daemon.h
 endif # !HAVE_DAEMON
 
-if HAVE_TIMEGETTIME
-SRCS += clock_gettime_mingw.cc clock_gettime_mingw.h
-endif # HAVE_TIMEGETTIME
-
-if HAVE_MACH_ABSOLUTE_TIME
-SRCS += clock_gettime_osx.cc clock_gettime_osx.h
-endif # HAVE_MACH_ABSOLUTE_TIME
-
 if HAVE_POLL
 SRCS += PollEventPoll.cc PollEventPoll.h
 endif # HAVE_POLL
@@ -721,9 +713,9 @@ endif # !ENABLE_LIBARIA2
 
 libaria2_la_SOURCES = $(SRCS)
 
-libaria2_la_LIBADD = @WSLAY_LIBS@
+libaria2_la_LIBADD = @WSLAY_LIBS@ @LTLIBINTL@
 
-LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
+LDADD = libaria2.la @ALLOCA@ #-lprofiler
 #aria2c_LDFLAGS = -pg
 AM_CPPFLAGS =  -Wall\
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
