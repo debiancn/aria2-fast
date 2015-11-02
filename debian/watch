@@ -1,3 +1,2 @@
 version=3
-opts="filenamemangle=s/(?:.*?)?v?(\d[\d.]*)\.tar\.gz/aria2-$1.tar.gz/" \
-  https://github.com/tatsuhiro-t/aria2/tags (?:.*?/)?v?(\d[\d.]*)\.tar\.gz
+https://github.com/tatsuhiro-t/aria2/releases .*/aria2-(\d\S*)\.tar\.gz
