@@ -1,7 +1,7 @@
 .\" -*- mode: troff; coding: utf-8 -*-
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "24 May 2015" "1.19.0" "aria2"
+.TH "ARIA2C" "1" "04 October 2015" "1.19.2" "aria2"
 .SH NAME
 aria2c \- сверхбыстрая утилита загрузки
 .
@@ -73,7 +73,7 @@ stdin (стандартный поток ввода).
 Входной файл может использовать gzip\-сжатие.
 Смотрите подраздел \fI\%Входной файл\fP для детальных пояснений.
 Также смотрите параметр \fI\%\-\-deferred\-input\fP\&.
-Также смотрите параметр \fI\-\-save\-session\-file\fP\&.
+Также смотрите параметр \fB\-\-save\-session\-file\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1019,14 +1019,16 @@ BitTorrent\-трекеров. На эти URI не действует парам
 .INDENT 0.0
 .TP
 .B \-\-dht\-file\-path=<PATH>
-Заменять файл таблицы маршрутизации IPv4 DHT на PATH.
-По умолчанию: \fB$HOME/.aria2/dht.dat\fP
+Сменить путь к файлу таблицы маршрутизации IPv4 DHT на PATH.
+По умолчанию: \fB$HOME/.aria2/dht.dat\fP если существует,
+иначе \fB$XDG_CACHE_HOME/aria2/dht.dat\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-dht\-file\-path6=<PATH>
-Заменять файл таблицы маршрутизации IPv6 DHT на PATH.
-По умолчанию: \fB$HOME/.aria2/dht.dat\fP
+Сменить путь к файлу таблицы маршрутизации IPv6 DHT на PATH.
+По умолчанию: \fB$HOME/.aria2/dht6.dat\fP если существует,
+иначе \fB$XDG_CACHE_HOME/aria2/dht6.dat\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1494,7 +1496,8 @@ URI, если \fI\%\-\-out\fP не указан. Для перезаписи
 .TP
 .B \-\-conf\-path=<PATH>
 Сменить путь к файлу конфигурации на PATH.
-По умолчанию: \fB$HOME/.aria2/aria2.conf\fP
+По умолчанию: \fB$HOME/.aria2/aria2.conf\fP если существует,
+иначе \fB$XDG_CACHE_HOME/aria2/aria2.conf\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2272,9 +2275,10 @@ https\-proxy в конфигурационном файле. Параметр
 .SH ФАЙЛЫ
 .SS aria2.conf
 .sp
-По умолчанию, aria2 анализирует \fB$HOME/.aria2/aria2.conf\fP как
-конфигурационный файл. Вы можете указать путь к конфигурационному файлу в
-параметре \fI\%\-\-conf\-path\fP\&. Если вы не хотите использовать
+По умолчанию, aria2 проверяет наличие \fB$HOME/.aria2/aria2.conf\fP по
+устаревшему пути, иначе анализируется \fB$XDG_CONFIG_HOME/aria2/aria2.conf\fP
+как конфигурационный файл. Вы можете указать путь к конфигурационному файлу
+в параметре \fI\%\-\-conf\-path\fP\&. Если вы не хотите использовать
 конфигурационный файл, используйте параметр \fI\%\-\-no\-conf\fP\&.
 .sp
 Конфигурационный файл \- это текстовый файл, содержащий один параметр в
@@ -2310,9 +2314,11 @@ ftp\-pasv=true
 .UNINDENT
 .SS dht.dat
 .sp
-By default, the routing table of IPv4 DHT is saved to the path
-\fB$HOME/.aria2/dht.dat\fP and the routing table of IPv6 DHT is saved to the
-path \fB$HOME/.aria2/dht6.dat\fP\&.
+Если устаревшие пути к файлам \fB$HOME/.aria2/dht.dat\fP и
+\fB$HOME/.aria2/dht6.dat\fP указывают на несуществующие файлы, то таблица
+маршрутизации IPv4 DHT сохраняется в \fB$XDG_CACHE_HOME/aria2/dht.dat\fP, а
+таблица маршрутизации IPv6 DHT  сохраняется в
+\fB$XDG_CACHE_HOME/aria2/dht6.dat\fP\&.
 .SS Netrc
 .sp
 Поддержка Netrc включена по умолчанию для HTTP(S)/FTP/SFTP. Для отключения

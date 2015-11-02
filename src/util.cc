@@ -53,6 +53,7 @@
 #  include <pwd.h>
 #endif // HAVE_PWD_H
 
+#include <array>
 #include <cerrno>
 #include <cassert>
 #include <cstring>
@@ -1132,11 +1133,11 @@ ssize_t parse_content_disposition(char *dest, size_t destlen,
 
 std::string getContentDispositionFilename(const std::string& header)
 {
-  char cdval[1024];
-  size_t cdvallen = sizeof(cdval);
+  std::array<char, 1_k> cdval;
+  size_t cdvallen = cdval.size();
   const char* charset;
   size_t charsetlen;
-  ssize_t rv = parse_content_disposition(cdval, cdvallen,
+  ssize_t rv = parse_content_disposition(cdval.data(), cdvallen,
                                          &charset, &charsetlen,
                                          header.c_str(), header.size());
   if(rv == -1) {
@@ -1145,9 +1146,9 @@ std::string getContentDispositionFilename(const std::string& header)
 
   std::string res;
   if(!charset || strieq(charset, charset+charsetlen, "iso-8859-1")) {
-    res = iso8859p1ToUtf8(cdval, rv);
+    res = iso8859p1ToUtf8(cdval.data(), rv);
   } else {
-    res.assign(cdval, rv);
+    res.assign(cdval.data(), rv);
   }
   if(!detectDirTraversal(res) &&
       res.find_first_of("/\\") == std::string::npos) {
@@ -1336,6 +1337,37 @@ std::string getHomeDir()
 }
 #endif // __MINGW32__
 
+std::string getXDGDir(const std::string& environmentVariable,
+                      const std::string& fallbackDirectory)
+{
+  std::string filename;
+  const char* p = getenv(environmentVariable.c_str());
+  if (p && p[0] == '/') {
+    filename = p;
+  } else {
+    filename = fallbackDirectory;
+  }
+  return filename;
+}
+
+std::string getConfigFile() {
+  std::string filename = getHomeDir() + "/.aria2/aria2.conf";
+  if (!File(filename).exists()) {
+      filename = getXDGDir("XDG_CONFIG_HOME", getHomeDir()+"/.config") +
+                 "/aria2/aria2.conf";
+  }
+  return filename;
+}
+
+std::string getDHTFile(bool ipv6) {
+  std::string filename = getHomeDir() + (ipv6 ? "/.aria2/dht6.dat" : "/.aria2/dht.dat");
+  if (!File(filename).exists()) {
+  filename = getXDGDir("XDG_CACHE_HOME", getHomeDir()+"/.cache") +
+             (ipv6 ? "/aria2/dht6.dat" : "/aria2/dht.dat");
+  }
+  return filename;
+}
+
 int64_t getRealSize(const std::string& sizeWithUnit)
 {
   std::string::size_type p = sizeWithUnit.find_first_of("KMkm");
@@ -1347,11 +1379,11 @@ int64_t getRealSize(const std::string& sizeWithUnit)
     switch(sizeWithUnit[p]) {
     case 'K':
     case 'k':
-      mult = 1024;
+      mult = 1_k;
       break;
     case 'M':
     case 'm':
-      mult = 1024*1024;
+      mult = 1_m;
       break;
     }
     size.assign(sizeWithUnit.begin(), sizeWithUnit.begin()+p);
@@ -1374,8 +1406,9 @@ std::string abbrevSize(int64_t size)
   int64_t t = size;
   size_t uidx = 0;
   int r = 0;
-  while(t >= 1024 && uidx+1 < sizeof(UNITS)/sizeof(UNITS[0])) {
-    lldiv_t d = lldiv(t, 1024);
+  while(t >= static_cast<int64_t>(1_k) &&
+        uidx + 1 < sizeof(UNITS) / sizeof(UNITS[0])) {
+    lldiv_t d = lldiv(t, 1_k);
     t = d.quot;
     r = d.rem;
     ++uidx;
@@ -1389,7 +1422,7 @@ std::string abbrevSize(int64_t size)
   res += itos(t, true);
   if(t < 10 && uidx > 0) {
     res += ".";
-    res += itos(r*10/1024);
+    res += itos(r * 10 / 1_k);
   }
   res += UNITS[uidx];
   return res;

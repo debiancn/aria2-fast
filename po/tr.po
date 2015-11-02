@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2015-05-24 18:52+0900\n"
+"POT-Creation-Date: 2015-10-04 18:03+0900\n"
 "PO-Revision-Date: 2010-08-29 22:11+0000\n"
 "Last-Translator: alquirel <Unknown>\n"
 "Language-Team: Turkish <tr@li.org>\n"
@@ -15,16 +15,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2015-05-24 09:48+0000\n"
-"X-Generator: Launchpad (build 17514)\n"
+"X-Launchpad-Export-Date: 2015-10-04 08:40+0000\n"
+"X-Generator: Launchpad (build 17783)\n"
 
-#: src/DownloadEngine.cc:243
+#: src/DownloadEngine.cc:248
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Kapanış işlemleri başlıyor... Acil kapanış için Ctrl-C'ye tekrar basın."
 
-#: src/DownloadEngine.cc:253
+#: src/DownloadEngine.cc:258
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Acil kapanış başlıyor..."
 
@@ -40,47 +40,47 @@ msgstr ""
 "Bir hatayla karşılaşırsanız log dosyasına bakın. Detaylar için yardım ve man "
 "sayfalarındaki '-l' seçeneğine bakın."
 
-#: src/MultiUrlRequestInfo.cc:339
+#: src/MultiUrlRequestInfo.cc:335
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:342
+#: src/MultiUrlRequestInfo.cc:338
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:343
+#: src/RequestGroupMan.cc:351
 #, c-format
 msgid "Download GID#%s paused"
 msgstr ""
 
-#: src/RequestGroupMan.cc:391
+#: src/RequestGroupMan.cc:399
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr ""
 
-#: src/RequestGroupMan.cc:634
+#: src/RequestGroupMan.cc:642
 msgid "Download Results:"
 msgstr "İndirme Sonuçları:"
 
-#: src/RequestGroupMan.cc:681
+#: src/RequestGroupMan.cc:689
 msgid "Status Legend:"
 msgstr "Durum Kısaltmaları:"
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:691
 msgid "(OK):download completed."
 msgstr ""
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:694
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:689
+#: src/RequestGroupMan.cc:697
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:692
+#: src/RequestGroupMan.cc:700
 msgid "(RM):download removed."
 msgstr ""
 
@@ -2178,19 +2178,19 @@ msgstr ""
 msgid "Errors occurred while binding port.\n"
 msgstr "Port bağlanırken hata oldu.\n"
 
-#: src/AbstractCommand.cc:498
+#: src/AbstractCommand.cc:499
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:228
+#: src/AdaptiveURISelector.cc:232
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
 "max:%d)"
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:235
+#: src/AdaptiveURISelector.cc:239
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
@@ -2202,7 +2202,7 @@ msgstr ""
 msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:84
+#: src/DHTConnectionImpl.cc:83
 #, c-format
 msgid "IPv%d DHT: listening on UDP port %u"
 msgstr ""
@@ -2212,7 +2212,7 @@ msgstr ""
 msgid "IPv%d RPC: listening on TCP port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:82
+#: src/PeerListenCommand.cc:81
 #, c-format
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr ""

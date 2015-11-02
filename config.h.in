@@ -73,7 +73,7 @@
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
-/* Define to 1 if you have the `asctime_r' function. */
+/* Define to 1 if you have the `asctime_r' function or macro. */
 #undef HAVE_ASCTIME_R
 
 /* Define to 1 if you have the `atexit' function. */
@@ -89,9 +89,6 @@
 /* Define to 1 if you have the MacOS X function CFPreferencesCopyAppValue in
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
-
-/* Define to 1 if you have the `clock_gettime' function. */
-#undef HAVE_CLOCK_GETTIME
 
 /* define if the compiler supports basic C++11 syntax */
 #undef HAVE_CXX11
@@ -245,11 +242,8 @@
 /* Define to 1 if you have the <locale.h> header file. */
 #undef HAVE_LOCALE_H
 
-/* Define to 1 if you have the `localtime_r' function. */
+/* Define to 1 if you have the `localtime_r' function or macro. */
 #undef HAVE_LOCALTIME_R
-
-/* Define to 1 if you have the `mach_absolute_time' function. */
-#undef HAVE_MACH_ABSOLUTE_TIME
 
 /* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H

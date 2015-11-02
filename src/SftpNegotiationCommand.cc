@@ -168,7 +168,7 @@ bool SftpNegotiationCommand::executeInternal() {
         (getCuid(), getRequest(), getFileEntry(), getRequestGroup(),
          getDownloadEngine(), getSocket(), std::move(authConfig_));
       command->setStartupIdleTime
-        (getOption()->getAsInt(PREF_STARTUP_IDLE_TIME));
+        (std::chrono::seconds(getOption()->getAsInt(PREF_STARTUP_IDLE_TIME)));
       command->setLowestDownloadSpeedLimit
         (getOption()->getAsInt(PREF_LOWEST_SPEED_LIMIT));
       command->setStatus(Command::STATUS_ONESHOT_REALTIME);
@@ -299,12 +299,12 @@ void SftpNegotiationCommand::onFileSizeDetermined(int64_t totalLength)
       poolConnection();
       return;
     }
-    checkIntegrityEntry->pushNextCommand(std::unique_ptr<Command>(this));
     // We have to make sure that command that has Request object must
     // have segment after PieceStorage is initialized. See
     // AbstractCommand::execute()
     getSegmentMan()->getSegmentWithIndex(getCuid(), 0);
 
+    checkIntegrityEntry->pushNextCommand(std::unique_ptr<Command>(this));
     prepareForNextAction(std::move(checkIntegrityEntry));
 
     disableReadCheckSocket();

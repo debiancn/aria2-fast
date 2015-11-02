@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "May 24, 2015" "1.19.0" "aria2"
+.TH "ARIA2C" "1" "October 04, 2015" "1.19.2" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -71,7 +71,7 @@ Input files can use gzip compression.
 When \fBFILE\fP is specified as \fB\-\fP, aria2 will read the input from \fBstdin\fP\&.
 See the \fI\%Input File\fP subsection for details.
 See also the \fI\%\-\-deferred\-input\fP option.
-See also the \fI\-\-save\-session\-file\fP option.
+See also the \fB\-\-save\-session\-file\fP option.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -972,13 +972,15 @@ Set host and port as an entry point to IPv6 DHT network.
 .TP
 .B \-\-dht\-file\-path=<PATH>
 Change the IPv4 DHT routing table file to PATH.
-Default: \fB$HOME/.aria2/dht.dat\fP
+Default: \fB$HOME/.aria2/dht.dat\fP if present, otherwise
+\fB$XDG_CACHE_HOME/aria2/dht.dat\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
 .B \-\-dht\-file\-path6=<PATH>
 Change the IPv6 DHT routing table file to PATH.
-Default: \fB$HOME/.aria2/dht6.dat\fP
+Default: \fB$HOME/.aria2/dht6.dat\fP if present, otherwise
+\fB$XDG_CACHE_HOME/aria2/dht6.dat\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1419,7 +1421,8 @@ Default: \fBfalse\fP
 .TP
 .B \-\-conf\-path=<PATH>
 Change the configuration file path to PATH.
-Default: \fB$HOME/.aria2/aria2.conf\fP
+Default: \fB$HOME/.aria2/aria2.conf\fP if present, otherwise
+\fB$XDG_CONFIG_HOME/aria2/aria2.conf\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2164,10 +2167,12 @@ with or without a subnet mask where no proxy should be used.  Overrides the
 .SH FILES
 .SS aria2.conf
 .sp
-By default, aria2 parses \fB$HOME/.aria2/aria2.conf\fP as a
-configuration file. You can specify the path to configuration file
-using \fI\%\-\-conf\-path\fP option.  If you don\(aqt want to use the
-configuration file, use \fI\%\-\-no\-conf\fP option.
+By default, aria2 checks whether the legacy path
+\fB$HOME/.aria2/aria2.conf\fP is present, otherwise it parses
+\fB$XDG_CONFIG_HOME/aria2/aria2.conf\fP as its configuration file.  You
+can specify the path to configuration file using \fI\%\-\-conf\-path\fP
+option.  If you don\(aqt want to use the configuration file, use
+\fI\%\-\-no\-conf\fP option.
 .sp
 The configuration file is a text file and has 1 option per each
 line. In each line, you can specify name\-value pair in the format:
@@ -2201,9 +2206,11 @@ that other user cannot see the contents of the file.
 .UNINDENT
 .SS dht.dat
 .sp
-By default, the routing table of IPv4 DHT is saved to the path
-\fB$HOME/.aria2/dht.dat\fP and the routing table of IPv6 DHT is saved to
-the path \fB$HOME/.aria2/dht6.dat\fP\&.
+Unless the legacy file paths \fB$HOME/.aria2/dht.dat\fP and
+\fB$HOME/.aria2/dht6.dat\fP are pointing to existing files, the routing
+table of IPv4 DHT is saved to the path
+\fB$XDG_CACHE_HOME/aria2/dht.dat\fP and the routing table of IPv6 DHT is
+saved to the path \fB$XDG_CACHE_HOME/aria2/dht6.dat\fP\&.
 .SS Netrc
 .sp
 Netrc support is enabled by default for HTTP(S)/FTP/SFTP.  To disable
@@ -5315,7 +5322,7 @@ Metalink Homepage: \fI\%http://www.metalinker.org/\fP
 The Metalink Download Description Format: \fI\%RFC 5854\fP
 .SH COPYRIGHT
 .sp
-Copyright (C) 2006, 2014 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2015 Tatsuhiro Tsujikawa
 .sp
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

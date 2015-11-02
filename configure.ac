@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 #
 AC_PREREQ([2.67])
-AC_INIT([aria2],[1.19.0],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
+AC_INIT([aria2],[1.19.2],[https://github.com/tatsuhiro-t/aria2/issues],[aria2],[http://aria2.sourceforge.net/])
 
 AC_CANONICAL_HOST
 AC_CANONICAL_TARGET
@@ -29,9 +29,10 @@ case "$host" in
   *mingw*)
     win_build=yes
     LIBS="$LIBS -lws2_32 -lwsock32 -lgdi32 -lwinmm -liphlpapi -lpsapi"
-    # C++ headers defines __USE_MINGW_ANSI_STDIO to 1 unconditionally.
-    # We have to use it as well nonetheless.
-    CPPFLAGS="-D__USE_MINGW_ANSI_STDIO=1 $CPPFLAGS"
+    # Define _POSIX_C_SOURCE to 1. This makes {asc,local}time_r available
+    # from <time.h> even without (un)helpful interference from <pthread.h>,
+    # and also defines __USE_MINGW_ANSI_STDIO.
+    CPPFLAGS="-D_POSIX_C_SOURCE=1 $CPPFLAGS"
     # Build with ASLR (dynamicbase) and NX compatiblity (nxcompat)
     # Enable pie once upstream/binutils gets fixed to produce correct binaries with it.
     LDFLAGS="$LDFLAGS -Wl,--dynamicbase -Wl,--nxcompat"
@@ -123,6 +124,16 @@ PKG_PROG_PKG_CONFIG([0.20])
 
 # Check C++ compiler supports C++0x/C++11 feature
 AX_CXX_COMPILE_STDCXX_11([noext], [mandatory])
+
+# Check C++ compiler actually supports nullptr
+AC_MSG_CHECKING([whether the c++ compiler supports nullptr])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+]],
+[[
+int *a = nullptr;
+]])],
+[],
+[AC_MSG_FAILURE([C++ compiler does not understand nullptr, perhaps C++ compiler is too old.  Try again with new one (gcc >= 4.8.3 or clang >= 3.4)])])
 
 # i686-w64-mingw32-g++ 4.6 does not support override keyword. For
 # those compilers, define CXX11_OVERRIDE to empty string. Otherwise
@@ -851,10 +862,32 @@ AM_CONDITIONAL([HAVE_SOME_FALLOCATE],
   [test "x$have_posix_fallocate" = "xyes" || test "x$have_fallocate" = "xyes" \
   || test "x$have_osx" = "xyes" || test "x$win_build" = "xyes"])
 
+AC_MSG_CHECKING([for asctime_r])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    #include <time.h>
+  ]], [[
+    struct tm r; char *c;
+    asctime_r(&r, c);
+  ]])],
+  [AM_CONDITIONAL([HAVE_ASCTIME_R], true)
+   AC_MSG_RESULT([yes])
+   AC_DEFINE([HAVE_ASCTIME_R], [1], [Define to 1 if you have the `asctime_r' function or macro.])],
+  [AC_MSG_RESULT([no])
+   AM_CONDITIONAL([HAVE_ASCTIME_R], false)])
 
-AC_CHECK_FUNCS([asctime_r],
-	[AM_CONDITIONAL([HAVE_ASCTIME_R], true)],
-	[AM_CONDITIONAL([HAVE_ASCTIME_R], false)])
+AC_MSG_CHECKING([for localtime_r])
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
+    #include <time.h>
+  ]], [[
+    time_t t; struct tm r;
+    localtime_r(&t, &r);
+  ]])],
+  [AM_CONDITIONAL([HAVE_LOCALTIME_R], true)
+   AC_MSG_RESULT([yes])
+   AC_DEFINE([HAVE_LOCALTIME_R], [1], [Define to 1 if you have the `localtime_r' function or macro.])],
+  [AC_MSG_RESULT([no])
+   AM_CONDITIONAL([HAVE_LOCALTIME_R], false)])
+
 AC_CHECK_FUNCS([basename],
 	[AM_CONDITIONAL([HAVE_BASENAME], true)],
 	[AM_CONDITIONAL([HAVE_BASENAME], false)])
@@ -867,9 +900,6 @@ AC_CHECK_FUNCS([getaddrinfo],
 AC_CHECK_FUNCS([gettimeofday],
 	[AM_CONDITIONAL([HAVE_GETTIMEOFDAY], true)],
 	[AM_CONDITIONAL([HAVE_GETTIMEOFDAY], false)])
-AC_CHECK_FUNCS([localtime_r],
-	[AM_CONDITIONAL([HAVE_LOCALTIME_R], true)],
-	[AM_CONDITIONAL([HAVE_LOCALTIME_R], false)])
 AC_CHECK_FUNCS([strptime],
 	[AM_CONDITIONAL([HAVE_STRPTIME], true)],
 	[AM_CONDITIONAL([HAVE_STRPTIME], false)])
@@ -878,14 +908,6 @@ AC_CHECK_FUNCS([timegm],
 	[AM_CONDITIONAL([HAVE_TIMEGM], false)])
 AC_CHECK_FUNCS([daemon], [have_daemon=yes])
 AM_CONDITIONAL([HAVE_DAEMON], [test "x$have_daemon" = "xyes"])
-
-AC_CHECK_FUNCS([clock_gettime], [have_clock_gettime=yes])
-
-if test "x$have_clock_gettime" != "xyes"; then
-   AC_CHECK_FUNCS([mach_absolute_time], [have_mach_absolute_time=yes])
-fi
-AM_CONDITIONAL([HAVE_MACH_ABSOLUTE_TIME],
-		[test "x$have_mach_absolute_time" = "xyes"])
 
 AC_CHECK_FUNCS([poll], [have_poll=yes])
 AM_CONDITIONAL([HAVE_POLL], [test "x$have_poll" = "xyes"])
@@ -897,11 +919,9 @@ case "$host" in
     AM_CONDITIONAL([HAVE_GETADDRINFO], true)
     dnl defined in ws2tcpip.h, but missing in C:\mingw\lib\libws2_32.a
     AM_CONDITIONAL([HAVE_GAI_STRERROR], false)
-    AM_CONDITIONAL([HAVE_TIMEGETTIME], [test "x$have_clock_gettime" != "xyes"])
     ;;
   *)
     AM_CONDITIONAL([MINGW_BUILD], false)
-    AM_CONDITIONAL([HAVE_TIMEGETTIME], false)
     ;;
 esac
 

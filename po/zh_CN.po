@@ -7,29 +7,29 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2015-05-24 18:52+0900\n"
-"PO-Revision-Date: 2014-03-23 08:28+0000\n"
-"Last-Translator: lj2chl <lj2cl@msn.com>\n"
+"POT-Creation-Date: 2015-10-04 18:03+0900\n"
+"PO-Revision-Date: 2015-09-19 03:43+0000\n"
+"Last-Translator: aerowolf <aerowolf@tom.com>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2015-05-24 09:48+0000\n"
-"X-Generator: Launchpad (build 17514)\n"
+"X-Launchpad-Export-Date: 2015-10-04 08:40+0000\n"
+"X-Generator: Launchpad (build 17783)\n"
 
-#: src/DownloadEngine.cc:243
+#: src/DownloadEngine.cc:248
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
-msgstr "正在关闭程序... 紧急关闭请再按Ctrl-C"
+msgstr "正在关闭程序，再按Ctrl-C可立即关闭"
 
-#: src/DownloadEngine.cc:253
+#: src/DownloadEngine.cc:258
 msgid "Emergency shutdown sequence commencing..."
-msgstr "紧急关闭程序..."
+msgstr "正在立即关闭……"
 
 #: src/MultiUrlRequestInfo.cc:171
 msgid "aria2 will resume download if the transfer is restarted."
-msgstr "重新启动aria2，自动继续下载文件"
+msgstr "传输重启之后，aria2将续传"
 
 #: src/MultiUrlRequestInfo.cc:172
 msgid ""
@@ -39,47 +39,47 @@ msgstr ""
 "如果发生任何错误，请参阅日志文件。要了解详细信息，请在help/man页面中参阅'-"
 "l'选项。"
 
-#: src/MultiUrlRequestInfo.cc:339
+#: src/MultiUrlRequestInfo.cc:335
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "当前会话已成功保存到 '%s' ,下次Aria2启动时将继续保存的会话。"
 
-#: src/MultiUrlRequestInfo.cc:342
+#: src/MultiUrlRequestInfo.cc:338
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "保存到 '%s' 失败。"
 
-#: src/RequestGroupMan.cc:343
+#: src/RequestGroupMan.cc:351
 #, c-format
 msgid "Download GID#%s paused"
 msgstr "GID为%s的下载项已暂停"
 
-#: src/RequestGroupMan.cc:391
+#: src/RequestGroupMan.cc:399
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr "GID为%s的下载项并未全部完成: %s"
 
-#: src/RequestGroupMan.cc:634
+#: src/RequestGroupMan.cc:642
 msgid "Download Results:"
 msgstr "下载结果："
 
-#: src/RequestGroupMan.cc:681
+#: src/RequestGroupMan.cc:689
 msgid "Status Legend:"
 msgstr "状态标识："
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:691
 msgid "(OK):download completed."
 msgstr "(OK)：完成下载。"
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:694
 msgid "(ERR):error occurred."
 msgstr "(ERR)：发生错误。"
 
-#: src/RequestGroupMan.cc:689
+#: src/RequestGroupMan.cc:697
 msgid "(INPR):download in-progress."
 msgstr "(INPR)：下载中断。"
 
-#: src/RequestGroupMan.cc:692
+#: src/RequestGroupMan.cc:700
 msgid "(RM):download removed."
 msgstr "(RM)：已删除下载。"
 
@@ -2365,19 +2365,19 @@ msgstr ""
 msgid "Errors occurred while binding port.\n"
 msgstr "绑定端口时发生错误。\n"
 
-#: src/AbstractCommand.cc:498
+#: src/AbstractCommand.cc:499
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:228
+#: src/AdaptiveURISelector.cc:232
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
 "max:%d)"
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:235
+#: src/AdaptiveURISelector.cc:239
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
@@ -2389,7 +2389,7 @@ msgstr ""
 msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:84
+#: src/DHTConnectionImpl.cc:83
 #, c-format
 msgid "IPv%d DHT: listening on UDP port %u"
 msgstr ""
@@ -2399,7 +2399,7 @@ msgstr ""
 msgid "IPv%d RPC: listening on TCP port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:82
+#: src/PeerListenCommand.cc:81
 #, c-format
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr ""

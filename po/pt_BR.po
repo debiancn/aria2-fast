@@ -7,26 +7,26 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2015-05-24 18:52+0900\n"
-"PO-Revision-Date: 2014-07-20 22:32+0000\n"
+"POT-Creation-Date: 2015-10-04 18:03+0900\n"
+"PO-Revision-Date: 2015-09-20 19:23+0000\n"
 "Last-Translator: gsavix <gsavix@gmail.com>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2015-05-24 09:48+0000\n"
-"X-Generator: Launchpad (build 17514)\n"
+"X-Launchpad-Export-Date: 2015-10-04 08:40+0000\n"
+"X-Generator: Launchpad (build 17783)\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: src/DownloadEngine.cc:243
+#: src/DownloadEngine.cc:248
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Sequência de encerramento iniciada... digite Ctrl-C novamente para encerrar "
 "imediatamente."
 
-#: src/DownloadEngine.cc:253
+#: src/DownloadEngine.cc:258
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Sequência de encerramento de emergência iniciada..."
 
@@ -42,47 +42,47 @@ msgstr ""
 "Caso tenha havido algum erro, veja o arquivo de log. Veja a opção '-l' na "
 "ajuda/página de manual para detalhes."
 
-#: src/MultiUrlRequestInfo.cc:339
+#: src/MultiUrlRequestInfo.cc:335
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "Sessão serializada com sucesso para '%s'."
 
-#: src/MultiUrlRequestInfo.cc:342
+#: src/MultiUrlRequestInfo.cc:338
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "Falha na serialização da sessão para '%s'."
 
-#: src/RequestGroupMan.cc:343
+#: src/RequestGroupMan.cc:351
 #, c-format
 msgid "Download GID#%s paused"
 msgstr "Download GID#%s parado"
 
-#: src/RequestGroupMan.cc:391
+#: src/RequestGroupMan.cc:399
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr "Download GID#%s não completado: %s"
 
-#: src/RequestGroupMan.cc:634
+#: src/RequestGroupMan.cc:642
 msgid "Download Results:"
 msgstr "Resultados do Download:"
 
-#: src/RequestGroupMan.cc:681
+#: src/RequestGroupMan.cc:689
 msgid "Status Legend:"
 msgstr "Legenda de estados:"
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:691
 msgid "(OK):download completed."
 msgstr "(OK):download completo."
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:694
 msgid "(ERR):error occurred."
 msgstr "(ERR):ocorreu um erro."
 
-#: src/RequestGroupMan.cc:689
+#: src/RequestGroupMan.cc:697
 msgid "(INPR):download in-progress."
 msgstr "(INPR):download em progresso."
 
-#: src/RequestGroupMan.cc:692
+#: src/RequestGroupMan.cc:700
 msgid "(RM):download removed."
 msgstr "(RM):download removido."
 
@@ -668,7 +668,7 @@ msgstr " -n, --no-netrc[=true|false]  Desabilita suporte a netrc."
 
 #: src/usage_text.h:229
 msgid " --netrc-path=FILE            Specify the path to the netrc file."
-msgstr ""
+msgstr " --netrc-path=ARQUIVO especificar o caminho do arquivo netrc."
 
 #: src/usage_text.h:231
 msgid ""
@@ -1847,6 +1847,15 @@ msgid ""
 "                              If --interface is used, this option will be\n"
 "                              ignored."
 msgstr ""
+" --multiple-interface=INTERFACES Lista separada por vírgulas de quais "
+"interfaces\n"
+"                              os sockets pertencem. Requisições serão "
+"fragmentadas pela quantidade\n"
+"                              de interfaces obtidas pelo link. Pode ser "
+"especificado o nome do interface,\n"
+"                              specify, endereço ip e nome do host.\n"
+"                              Se usar opção --interface essa opção será "
+"ignorada."
 
 #: src/usage_text.h:612
 msgid " --disable-ipv6[=true|false]  Disable IPv6."
@@ -3027,6 +3036,15 @@ msgid ""
 "ulimit,\n"
 "                              except that it will never decrease the limit."
 msgstr ""
+" --rlimit-nofile=NÚMERO Configura o limite leve de descritores de arquivos "
+"abertos.\n"
+"                              Essa abertura terá efeito quando:\n"
+"                                a) O sistema possui essa função (posix)\n"
+"                                b) O limite não excede o limite hard.\n"
+"                                c) O limite especificado é maior que o\n"
+"                                   limite soft atualmente em uso.\n"
+"                              Equivalente a configurar nofile via ulimit,\n"
+"                              except that it will never decrease the limit."
 
 #: src/usage_text.h:1002
 msgid ""
@@ -3076,11 +3094,26 @@ msgid ""
 "still\n"
 "                              recognized as active download in RPC method."
 msgstr ""
+" --bt-detach-seed-only[=true|false]\n"
+"                              Exclui seed nos downloads quando a contagem\n"
+"                              dos downloads ativos exceder (Ver opção -j).\n"
+"                              Isso significa que se -j3 é fornecido e essa "
+"opção\n"
+"                              for ativada e já houver 3 downloads ativos e\n"
+"                              algum desses entrar no modo seed, então ele\n"
+"                              será excluido da contagem download ativos (os "
+"quais tornam-se  2),\n"
+"                              e o proximo download aguarda em fila até ser\n"
+"                              ativado.  Mas saiba que item seed permanece "
+"reconhecido como \n"
+"                              ativo no método RPC."
 
 #: src/usage_text.h:1024
 msgid ""
 " --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
 msgstr ""
+" --min-tls-version=VERSÃO    Especificar versão mínima SSL/TLS para "
+"habilitar."
 
 #: src/usage_text.h:1026
 msgid ""
@@ -3095,6 +3128,17 @@ msgid ""
 "and\n"
 "                              always encrypt message payload."
 msgstr ""
+" --bt-force-encryption[=true|false]\n"
+"                              Requer mensagem BitTorrent carga com "
+"criptografia\n"
+"                              usando arc4. Isso é uma abreviatura de\n"
+"                              --bt-require-crypto --bt-min-crypto-"
+"level=arc4.\n"
+"                              Se verdadeiro é informado, impede handshake "
+"de \n"
+"                              BitTorrent Legado e usa handshake Obfuscation "
+"e sempre\n"
+"                              criptografa mensagem de payload."
 
 #: src/usage_text.h:1034
 msgid ""
@@ -3111,6 +3155,18 @@ msgid ""
 "takes\n"
 "                              place."
 msgstr ""
+" --ssh-host-key-md=TYPE=DIGEST\n"
+"                              Config checksum para chave publica SSH. TYPE "
+"é\n"
+"                              o tipo de hash. O tipo de hash suportado é "
+"sha-1 ou\n"
+"                              md5. DIGEST é em hex. Por exemplo:\n"
+"                              sha-1=b030503d4de4539dc7885e6f0f5e256704edf4c3\n"
+"                              Essa opção pode ser usada para validar chaves "
+"do\n"
+"                              servidor,  quando o SFTP é usado. Se ssa opção "
+"não é\n"
+"                              usada, então o padrão é não validar nada."
 
 #: src/version_usage.cc:54
 msgid " version "
@@ -3335,13 +3391,13 @@ msgstr "Opção desconhecida '%s'"
 msgid "Errors occurred while binding port.\n"
 msgstr "Erros ocorreram enquanto fazia bind na porta.\n"
 
-#: src/AbstractCommand.cc:498
+#: src/AbstractCommand.cc:499
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr ""
 "CUID#%<PRId64> - Falhou em retomar o download. Reiniciando download do 0."
 
-#: src/AdaptiveURISelector.cc:228
+#: src/AdaptiveURISelector.cc:232
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
@@ -3350,7 +3406,7 @@ msgstr ""
 "Rebaixando o limite da velocidade mínima pois a velocidade máxima está "
 "próxima (nova:%d antes:%d max:%d)"
 
-#: src/AdaptiveURISelector.cc:235
+#: src/AdaptiveURISelector.cc:239
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
@@ -3364,7 +3420,7 @@ msgstr ""
 msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 msgstr "GID#%s Pausa o download torrent por causa da opção --bt-stop-timeout"
 
-#: src/DHTConnectionImpl.cc:84
+#: src/DHTConnectionImpl.cc:83
 #, c-format
 msgid "IPv%d DHT: listening on UDP port %u"
 msgstr "IPv%d DHT: escutando na porta UDP %u"
@@ -3374,7 +3430,7 @@ msgstr "IPv%d DHT: escutando na porta UDP %u"
 msgid "IPv%d RPC: listening on TCP port %u"
 msgstr "IPv%d RPC: ouvindo na porta TCP %u"
 
-#: src/PeerListenCommand.cc:82
+#: src/PeerListenCommand.cc:81
 #, c-format
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr "IPv%d BitTorrent: ouvindo na porta TCP %u"
@@ -3738,6 +3794,8 @@ msgid ""
 "integrity and confidentiality of the connection might be compromised.\n"
 "Peer: %s"
 msgstr ""
+"aria2c precisa conectar ao outro lado usando protocolo TLS desconhecido. A "
+"integridade e a confidencialidade da conexão pode ser comprometida. Peer %s"
 
 #: src/message.h:191
 #, c-format
@@ -3747,6 +3805,9 @@ msgid ""
 "compromised.\n"
 "Protocol: %s, Peer: %s"
 msgstr ""
+"aria2c conectou com o outro lado usando protocolo TLS antigo e vulnerável. A "
+"integridade e confidencialidade da conexão pode estar comprometida.\n"
+"Protocolo: %s, Peer: %s"
 
 #: src/message.h:194
 #, c-format

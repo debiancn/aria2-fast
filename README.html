@@ -694,6 +694,7 @@ assumes the following libraries have been built for cross-compile:</p>
 <li>openssl</li>
 <li>expat</li>
 <li>zlib</li>
+<li>libssh2</li>
 </ul>
 <p>When building the above libraries, make sure that disable shared
 library and enable only static library. We are going to link those
@@ -764,9 +765,11 @@ The number of files to open simultaneously can be controlled by
 <div class="section" id="dht">
 <h2>DHT</h2>
 <p>aria2 supports mainline compatible DHT. By default, the routing table
-for IPv4 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht.dat</span></tt> and the routing
-table for IPv6 DHT is saved to <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht6.dat</span></tt>. aria2 uses
-same port number to listen on for both IPv4 and IPv6 DHT.</p>
+for IPv4 DHT is saved to <tt class="docutils literal">$XDG_CACHE_HOME/aria2/dht.dat</tt> and the
+routing table for IPv6 DHT is saved to
+<tt class="docutils literal">$XDG_CACHE_HOME/aria2/dht6.dat</tt> unless files exist at
+<tt class="docutils literal"><span class="pre">$HOME/.aria2/dht.dat</span></tt> or <tt class="docutils literal"><span class="pre">$HOME/.aria2/dht6.dat</span></tt>. aria2 uses same
+port number to listen on for both IPv4 and IPv6 DHT.</p>
 </div>
 <div class="section" id="udp-tracker">
 <h2>UDP tracker</h2>

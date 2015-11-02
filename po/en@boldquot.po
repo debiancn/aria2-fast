@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: aria2 1.19.0\n"
+"Project-Id-Version: aria2 1.19.2\n"
 "Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2015-05-24 18:52+0900\n"
-"PO-Revision-Date: 2015-05-24 18:52+0900\n"
+"POT-Creation-Date: 2015-10-04 18:03+0900\n"
+"PO-Revision-Date: 2015-10-04 18:03+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -42,13 +42,13 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: src/DownloadEngine.cc:243
+#: src/DownloadEngine.cc:248
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 
-#: src/DownloadEngine.cc:253
+#: src/DownloadEngine.cc:258
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Emergency shutdown sequence commencing..."
 
@@ -64,47 +64,47 @@ msgstr ""
 "If there are any errors, then see the log file. See ‘[1m-l[0m’ option in "
 "help/man page for details."
 
-#: src/MultiUrlRequestInfo.cc:339
+#: src/MultiUrlRequestInfo.cc:335
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr "Serialized session to ‘[1m%s[0m’ successfully."
 
-#: src/MultiUrlRequestInfo.cc:342
+#: src/MultiUrlRequestInfo.cc:338
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr "Failed to serialize session to '%s'."
 
-#: src/RequestGroupMan.cc:343
+#: src/RequestGroupMan.cc:351
 #, c-format
 msgid "Download GID#%s paused"
 msgstr "Download GID#%s paused"
 
-#: src/RequestGroupMan.cc:391
+#: src/RequestGroupMan.cc:399
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr "Download GID#%s not complete: %s"
 
-#: src/RequestGroupMan.cc:634
+#: src/RequestGroupMan.cc:642
 msgid "Download Results:"
 msgstr "Download Results:"
 
-#: src/RequestGroupMan.cc:681
+#: src/RequestGroupMan.cc:689
 msgid "Status Legend:"
 msgstr "Status Legend:"
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:691
 msgid "(OK):download completed."
 msgstr "(OK):download completed."
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:694
 msgid "(ERR):error occurred."
 msgstr "(ERR):error occurred."
 
-#: src/RequestGroupMan.cc:689
+#: src/RequestGroupMan.cc:697
 msgid "(INPR):download in-progress."
 msgstr "(INPR):download in-progress."
 
-#: src/RequestGroupMan.cc:692
+#: src/RequestGroupMan.cc:700
 msgid "(RM):download removed."
 msgstr "(RM):download removed."
 
@@ -3274,12 +3274,12 @@ msgstr "Unknown option ‘[1m%s[0m’"
 msgid "Errors occurred while binding port.\n"
 msgstr "Errors occurred while binding port.\n"
 
-#: src/AbstractCommand.cc:498
+#: src/AbstractCommand.cc:499
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 
-#: src/AdaptiveURISelector.cc:228
+#: src/AdaptiveURISelector.cc:232
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
@@ -3288,7 +3288,7 @@ msgstr ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
 "max:%d)"
 
-#: src/AdaptiveURISelector.cc:235
+#: src/AdaptiveURISelector.cc:239
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
@@ -3302,7 +3302,7 @@ msgstr ""
 msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 msgstr "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 
-#: src/DHTConnectionImpl.cc:84
+#: src/DHTConnectionImpl.cc:83
 #, c-format
 msgid "IPv%d DHT: listening on UDP port %u"
 msgstr "IPv%d DHT: listening on UDP port %u"
@@ -3312,7 +3312,7 @@ msgstr "IPv%d DHT: listening on UDP port %u"
 msgid "IPv%d RPC: listening on TCP port %u"
 msgstr "IPv%d RPC: listening on TCP port %u"
 
-#: src/PeerListenCommand.cc:82
+#: src/PeerListenCommand.cc:81
 #, c-format
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr "IPv%d BitTorrent: listening on TCP port %u"
