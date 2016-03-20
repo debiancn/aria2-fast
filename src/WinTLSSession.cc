@@ -60,8 +60,7 @@
 namespace {
 using namespace aria2;
 
-struct WinSecPkgContext_CipherInfo
-{
+struct WinSecPkgContext_CipherInfo {
   DWORD dwVersion;
   DWORD dwProtocol;
   DWORD dwCipherSuite;
@@ -87,8 +86,7 @@ static const ULONG kReqAFlags =
     ASC_REQ_SEQUENCE_DETECT | ASC_REQ_REPLAY_DETECT | ASC_REQ_CONFIDENTIALITY |
     ASC_REQ_EXTENDED_ERROR | ASC_REQ_ALLOCATE_MEMORY | ASC_REQ_STREAM;
 
-class TLSBuffer : public ::SecBuffer
-{
+class TLSBuffer : public ::SecBuffer {
 public:
   explicit TLSBuffer(ULONG type, ULONG size, void* data)
   {
@@ -98,8 +96,7 @@ public:
   }
 };
 
-class TLSBufferDesc : public ::SecBufferDesc
-{
+class TLSBufferDesc : public ::SecBufferDesc {
 public:
   explicit TLSBufferDesc(SecBuffer* arr, ULONG buffers)
   {
@@ -119,6 +116,17 @@ inline static std::string getCipherSuite(CtxtHandle* handle)
   return "Unknown";
 }
 
+inline static uint32_t getProtocolVersion(CtxtHandle* handle)
+{
+  WinSecPkgContext_CipherInfo info = {SECPKGCONTEXT_CIPHERINFO_V1};
+  if (QueryContextAttributes(handle, SECPKG_ATTR_CIPHER_INFO, &info) ==
+      SEC_E_OK) {
+    return info.dwProtocol;
+  }
+  // XXX Assume the best?!
+  return std::numeric_limits<uint32_t>::max();
+}
+
 } // namespace
 
 namespace aria2 {
@@ -129,12 +137,12 @@ TLSSession* TLSSession::make(TLSContext* ctx)
 }
 
 WinTLSSession::WinTLSSession(WinTLSContext* ctx)
-  : sockfd_(0),
-    side_(ctx->getSide()),
-    cred_(ctx->getCredHandle()),
-    writeBuffered_(0),
-    state_(st_constructed),
-    status_(SEC_E_OK)
+    : sockfd_(0),
+      side_(ctx->getSide()),
+      cred_(ctx->getCredHandle()),
+      writeBuffered_(0),
+      state_(st_constructed),
+      status_(SEC_E_OK)
 {
   memset(&handle_, 0, sizeof(handle_));
 }
@@ -194,32 +202,16 @@ int WinTLSSession::closeConnection()
     TLSBufferDesc desc(&ctx, 1);
     ULONG flags = 0;
     if (side_ == TLS_CLIENT) {
-      SEC_CHAR* host = hostname_.empty() ?
-                           nullptr :
-                           const_cast<SEC_CHAR*>(hostname_.c_str());
-      status_ = ::InitializeSecurityContext(cred_,
-                                            &handle_,
-                                            host,
-                                            kReqFlags,
-                                            0,
-                                            0,
-                                            nullptr,
-                                            0,
-                                            &handle_,
-                                            &desc,
-                                            &flags,
-                                            nullptr);
+      SEC_CHAR* host = hostname_.empty()
+                           ? nullptr
+                           : const_cast<SEC_CHAR*>(hostname_.c_str());
+      status_ = ::InitializeSecurityContext(cred_, &handle_, host, kReqFlags, 0,
+                                            0, nullptr, 0, &handle_, &desc,
+                                            &flags, nullptr);
     }
     else {
-      status_ = ::AcceptSecurityContext(cred_,
-                                        &handle_,
-                                        nullptr,
-                                        kReqAFlags,
-                                        0,
-                                        &handle_,
-                                        &desc,
-                                        &flags,
-                                        nullptr);
+      status_ = ::AcceptSecurityContext(cred_, &handle_, nullptr, kReqAFlags, 0,
+                                        &handle_, &desc, &flags, nullptr);
     }
     if (status_ == SEC_E_OK || status_ == SEC_I_CONTEXT_EXPIRED) {
       size_t len = ctx.cbBuffer;
@@ -239,7 +231,10 @@ int WinTLSSession::closeConnection()
   // Send remaining data.
   while (writeBuf_.size()) {
     int rv = writeData(nullptr, 0);
-    if (rv == TLS_ERR_WOULDBLOCK) {
+    if (rv == 0) {
+      break;
+    }
+    if (rv < 0) {
       return rv;
     }
   }
@@ -272,7 +267,8 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
       state_ == st_handshake_read) {
     // Renegotiating
     std::string hn, err;
-    auto connect = tlsConnect(hn, err);
+    TLSVersion ver;
+    auto connect = tlsConnect(hn, ver, err);
     if (connect != TLS_ERR_OK) {
       return connect;
     }
@@ -285,8 +281,7 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
   }
 
   A2_LOG_DEBUG(fmt("WinTLS: Write request: %" PRIu64 " buffered: %" PRIu64,
-                   (uint64_t)len,
-                   (uint64_t)writeBuf_.size()));
+                   (uint64_t)len, (uint64_t)writeBuf_.size()));
 
   // Write remaining buffered data, if any.
   size_t written = 0;
@@ -316,8 +311,8 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
 
   if (!streamSizes_) {
     streamSizes_.reset(new SecPkgContext_StreamSizes());
-    status_ = ::QueryContextAttributes(
-        &handle_, SECPKG_ATTR_STREAM_SIZES, streamSizes_.get());
+    status_ = ::QueryContextAttributes(&handle_, SECPKG_ATTR_STREAM_SIZES,
+                                       streamSizes_.get());
     if (status_ != SEC_E_OK || !streamSizes_->cbMaximumMessage) {
       state_ = st_error;
       return TLS_ERR_ERROR;
@@ -357,10 +352,9 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
     auto buf = make_unique<char[]>(dl);
     TLSBuffer buffers[] = {
         TLSBuffer(SECBUFFER_STREAM_HEADER, streamSizes_->cbHeader, buf.get()),
-        TLSBuffer(
-            SECBUFFER_DATA, writeBuffered_, buf.get() + streamSizes_->cbHeader),
-        TLSBuffer(SECBUFFER_STREAM_TRAILER,
-                  streamSizes_->cbTrailer,
+        TLSBuffer(SECBUFFER_DATA, writeBuffered_,
+                  buf.get() + streamSizes_->cbHeader),
+        TLSBuffer(SECBUFFER_STREAM_TRAILER, streamSizes_->cbTrailer,
                   buf.get() + streamSizes_->cbHeader + writeBuffered_),
         TLSBuffer(SECBUFFER_EMPTY, 0, nullptr),
     };
@@ -383,7 +377,7 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
     }
     dl += buffers[1].cbBuffer;
     if (dl < streamSizes_->cbHeader + writeBuffered_) {
-      // Move tailer.
+      // Move trailer.
       memmove(buf.get() + dl, buffers[2].pvBuffer, buffers[2].cbBuffer);
     }
     dl += buffers[2].cbBuffer;
@@ -425,8 +419,7 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
   }
 
   A2_LOG_DEBUG(fmt("WinTLS: Write result: %" PRIu64 " buffered: %" PRIu64,
-                   (uint64_t)len,
-                   (uint64_t)writeBuf_.size()));
+                   (uint64_t)len, (uint64_t)writeBuf_.size()));
   if (!len) {
     return TLS_ERR_WOULDBLOCK;
   }
@@ -436,8 +429,7 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
 ssize_t WinTLSSession::readData(void* data, size_t len)
 {
   A2_LOG_DEBUG(fmt("WinTLS: Read request: %" PRIu64 " buffered: %" PRIu64,
-                   (uint64_t)len,
-                   (uint64_t)readBuf_.size()));
+                   (uint64_t)len, (uint64_t)readBuf_.size()));
   if (len == 0) {
     return 0;
   }
@@ -468,7 +460,8 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
       state_ == st_handshake_read) {
     // Renegotiating
     std::string hn, err;
-    auto connect = tlsConnect(hn, err);
+    TLSVersion ver;
+    auto connect = tlsConnect(hn, ver, err);
     if (connect != TLS_ERR_OK) {
       return connect;
     }
@@ -481,7 +474,7 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
   }
 
   // Read as many bytes as available from the connection, up to len + 4k.
-  readBuf_.resize(len + 4096);
+  readBuf_.resize(len + 4_k);
   while (readBuf_.free()) {
     ssize_t read = ::recv(sockfd_, readBuf_.end(), readBuf_.free(), 0);
     errno = ::WSAGetLastError();
@@ -548,7 +541,8 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
       state_ = st_initialized;
       A2_LOG_INFO("WinTLS: Renegotiate");
       std::string hn, err;
-      auto connect = tlsConnect(hn, err);
+      TLSVersion ver;
+      auto connect = tlsConnect(hn, ver, err);
       if (connect == TLS_ERR_WOULDBLOCK) {
         break;
       }
@@ -578,7 +572,7 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
   return len;
 }
 
-int WinTLSSession::tlsConnect(const std::string& hostname,
+int WinTLSSession::tlsConnect(const std::string& hostname, TLSVersion& version,
                               std::string& handshakeErr)
 {
   // Handshaking will require sending multiple read/write exchanges until the
@@ -612,17 +606,8 @@ restart:
     TLSBufferDesc desc(&buf, 1);
     SEC_CHAR* host =
         hostname_.empty() ? nullptr : const_cast<SEC_CHAR*>(hostname_.c_str());
-    status_ = ::InitializeSecurityContext(cred_,
-                                          nullptr,
-                                          host,
-                                          kReqFlags,
-                                          0,
-                                          0,
-                                          nullptr,
-                                          0,
-                                          &handle_,
-                                          &desc,
-                                          &flags,
+    status_ = ::InitializeSecurityContext(cred_, nullptr, host, kReqFlags, 0, 0,
+                                          nullptr, 0, &handle_, &desc, &flags,
                                           nullptr);
     if (status_ != SEC_I_CONTINUE_NEEDED) {
       // Has to be SEC_I_CONTINUE_NEEDED, as we did not actually send data
@@ -682,7 +667,7 @@ restart:
     // Read as many bytes as possible, up to 4k new bytes.
     // We do not know how many bytes will arrive from the server at this
     // point.
-    readBuf_.resize(readBuf_.size() + 4096);
+    readBuf_.resize(readBuf_.size() + 4_k);
     while (readBuf_.free()) {
       ssize_t read = ::recv(sockfd_, readBuf_.end(), readBuf_.free(), 0);
       errno = ::WSAGetLastError();
@@ -723,38 +708,23 @@ restart:
     };
     TLSBufferDesc indesc(inbufs, 2);
     TLSBuffer outbufs[] = {
-      TLSBuffer(SECBUFFER_TOKEN, 0, nullptr),
-      TLSBuffer(SECBUFFER_ALERT, 0, nullptr),
+        TLSBuffer(SECBUFFER_TOKEN, 0, nullptr),
+        TLSBuffer(SECBUFFER_ALERT, 0, nullptr),
     };
     TLSBufferDesc outdesc(outbufs, 2);
     if (side_ == TLS_CLIENT) {
-      SEC_CHAR* host = hostname_.empty() ?
-                           nullptr :
-                           const_cast<SEC_CHAR*>(hostname_.c_str());
-      status_ = ::InitializeSecurityContext(cred_,
-                                            &handle_,
-                                            host,
-                                            kReqFlags,
-                                            0,
-                                            0,
-                                            &indesc,
-                                            0,
-                                            nullptr,
-                                            &outdesc,
-                                            &flags,
-                                            nullptr);
+      SEC_CHAR* host = hostname_.empty()
+                           ? nullptr
+                           : const_cast<SEC_CHAR*>(hostname_.c_str());
+      status_ = ::InitializeSecurityContext(cred_, &handle_, host, kReqFlags, 0,
+                                            0, &indesc, 0, nullptr, &outdesc,
+                                            &flags, nullptr);
     }
     else {
-      status_ =
-          ::AcceptSecurityContext(cred_,
-                                  state_ == st_initialized ? nullptr : &handle_,
-                                  &indesc,
-                                  kReqAFlags,
-                                  0,
-                                  state_ == st_initialized ? &handle_ : nullptr,
-                                  &outdesc,
-                                  &flags,
-                                  nullptr);
+      status_ = ::AcceptSecurityContext(
+          cred_, state_ == st_initialized ? nullptr : &handle_, &indesc,
+          kReqAFlags, 0, state_ == st_initialized ? &handle_ : nullptr,
+          &outdesc, &flags, nullptr);
     }
     if (status_ == SEC_E_INCOMPLETE_MESSAGE) {
       // Not enough raw bytes read yet to decode a full message.
@@ -793,8 +763,7 @@ restart:
       A2_LOG_ERROR(fmt("WinTLS: Channel setup failed. Schannel provider did "
                        "not fulfill requested flags. "
                        "Excepted: %lu Actual: %lu",
-                       kReqFlags,
-                       flags));
+                       kReqFlags, flags));
       status_ = SEC_E_INTERNAL_ERROR;
       state_ = st_error;
       return TLS_ERR_ERROR;
@@ -813,6 +782,23 @@ restart:
     state_ = st_connected;
     A2_LOG_INFO(
         fmt("WinTLS: connected with: %s", getCipherSuite(&handle_).c_str()));
+    switch (getProtocolVersion(&handle_)) {
+    case 0x300:
+      version = TLS_PROTO_SSL3;
+      break;
+    case 0x301:
+      version = TLS_PROTO_TLS10;
+      break;
+    case 0x302:
+      version = TLS_PROTO_TLS11;
+      break;
+    case 0x303:
+      version = TLS_PROTO_TLS12;
+      break;
+    default:
+      version = TLS_PROTO_NONE;
+      break;
+    }
     return TLS_ERR_OK;
   }
 
@@ -821,25 +807,21 @@ restart:
   return TLS_ERR_ERROR;
 }
 
-int WinTLSSession::tlsAccept()
+int WinTLSSession::tlsAccept(TLSVersion& version)
 {
   std::string host, err;
-  return tlsConnect(host, err);
+  return tlsConnect(host, version, err);
 }
 
 std::string WinTLSSession::getLastErrorString()
 {
   std::stringstream ss;
   wchar_t* buf = nullptr;
-  auto rv = FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                               FORMAT_MESSAGE_FROM_SYSTEM |
-                               FORMAT_MESSAGE_IGNORE_INSERTS,
-                           nullptr,
-                           status_,
-                           MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                           (LPWSTR) & buf,
-                           1024,
-                           nullptr);
+  auto rv = FormatMessageW(
+      FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM |
+          FORMAT_MESSAGE_IGNORE_INSERTS,
+      nullptr, status_, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPWSTR)&buf,
+      1024, nullptr);
   if (rv && buf) {
     ss << "Error: " << wCharToUtf8(buf) << "(" << std::hex << status_ << ")";
     LocalFree(buf);
@@ -849,5 +831,7 @@ std::string WinTLSSession::getLastErrorString()
   }
   return ss.str();
 }
+
+size_t WinTLSSession::getRecvBufferedLength() { return decBuf_.size(); }
 
 } // namespace aria2

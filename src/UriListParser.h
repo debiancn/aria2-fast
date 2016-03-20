@@ -49,9 +49,10 @@ namespace aria2 {
 
 class UriListParser {
 private:
-  std::shared_ptr<IOFile> fp_;
+  std::unique_ptr<IOFile> fp_;
 
   std::string line_;
+
 public:
   UriListParser(const std::string& filename);
 

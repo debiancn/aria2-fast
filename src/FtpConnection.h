@@ -44,6 +44,7 @@
 #include "TimeA2.h"
 #include "SocketBuffer.h"
 #include "Command.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
@@ -70,12 +71,13 @@ private:
   std::string baseWorkingDir_;
 
   int getStatus(const std::string& response) const;
-  std::string::size_type findEndOfResponse
-  (int status, const std::string& buf) const;
+  std::string::size_type findEndOfResponse(int status,
+                                           const std::string& buf) const;
   bool bulkReceiveResponse(std::pair<int, std::string>& response);
 
-  //prepare for large banners
-  static const size_t MAX_RECV_BUFFER = 65536;
+  // prepare for large banners
+  static const size_t MAX_RECV_BUFFER = 64_k;
+
 public:
   FtpConnection(cuid_t cuid, const std::shared_ptr<SocketCore>& socket,
                 const std::shared_ptr<Request>& req,
@@ -112,10 +114,7 @@ public:
 
   void setBaseWorkingDir(const std::string& baseWorkingDir);
 
-  const std::string& getBaseWorkingDir() const
-  {
-    return baseWorkingDir_;
-  }
+  const std::string& getBaseWorkingDir() const { return baseWorkingDir_; }
 
   const std::string& getUser() const;
 };

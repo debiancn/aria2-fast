@@ -41,8 +41,7 @@
 
 namespace aria2 {
 
-class AppleTLSSession : public TLSSession
-{
+class AppleTLSSession : public TLSSession {
   enum state_t {
     st_constructed,
     st_initialized,
@@ -58,7 +57,7 @@ public:
   virtual ~AppleTLSSession();
 
   // Initializes SSL/TLS session. The |sockfd| is the underlying
-  // tranport socket. This function returns TLS_ERR_OK if it
+  // transport socket. This function returns TLS_ERR_OK if it
   // succeeds, or TLS_ERR_ERROR.
   virtual int init(sock_t sockfd) CXX11_OVERRIDE;
 
@@ -81,12 +80,12 @@ public:
 
   // Sends |data| with length |len|. This function returns the number
   // of bytes sent if it succeeds, or TLS_ERR_WOULDBLOCK if the
-  // underlying tranport blocks, or TLS_ERR_ERROR.
+  // underlying transport blocks, or TLS_ERR_ERROR.
   virtual ssize_t writeData(const void* data, size_t len) CXX11_OVERRIDE;
 
   // Receives data into |data| with length |len|. This function returns
   // the number of bytes received if it succeeds, or TLS_ERR_WOULDBLOCK
-  // if the underlying tranport blocks, or TLS_ERR_ERROR.
+  // if the underlying transport blocks, or TLS_ERR_ERROR.
   virtual ssize_t readData(void* data, size_t len) CXX11_OVERRIDE;
 
   // Performs client side handshake. The |hostname| is the hostname of
@@ -95,20 +94,22 @@ public:
   // if the underlying transport blocks, or TLS_ERR_ERROR.
   // When returning TLS_ERR_ERROR, provide certificate validation error
   // in |handshakeErr|.
-  virtual int tlsConnect(const std::string& hostname,
+  virtual int tlsConnect(const std::string& hostname, TLSVersion& version,
                          std::string& handshakeErr) CXX11_OVERRIDE;
 
   // Performs server side handshake. This function returns TLS_ERR_OK
   // if it succeeds, or TLS_ERR_WOULDBLOCK if the underlying transport
   // blocks, or TLS_ERR_ERROR.
-  virtual int tlsAccept() CXX11_OVERRIDE;
+  virtual int tlsAccept(TLSVersion& version) CXX11_OVERRIDE;
 
   // Returns last error string
   virtual std::string getLastErrorString() CXX11_OVERRIDE;
 
+  virtual size_t getRecvBufferedLength() CXX11_OVERRIDE { return 0; }
+
 private:
-  static OSStatus
-  SocketWrite(SSLConnectionRef conn, const void* data, size_t* len)
+  static OSStatus SocketWrite(SSLConnectionRef conn, const void* data,
+                              size_t* len)
   {
     return ((AppleTLSSession*)conn)->sockWrite(data, len);
   }

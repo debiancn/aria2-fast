@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
-"Report-Msgid-Bugs-To: http://aria2.sourceforge.net/\n"
-"POT-Creation-Date: 2014-09-12 01:26+0900\n"
+"Report-Msgid-Bugs-To: https://aria2.github.io/\n"
+"POT-Creation-Date: 2016-03-16 00:13+0900\n"
 "PO-Revision-Date: 2011-08-25 19:19+0000\n"
 "Last-Translator: Kostas Milonas <milonas.ko@gmail.com>\n"
 "Language-Team: Greek <el@li.org>\n"
@@ -15,16 +15,16 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2014-09-11 16:24+0000\n"
-"X-Generator: Launchpad (build 17196)\n"
+"X-Launchpad-Export-Date: 2016-03-15 14:52+0000\n"
+"X-Generator: Launchpad (build 17939)\n"
 
-#: src/DownloadEngine.cc:243
+#: src/DownloadEngine.cc:247
 msgid ""
 "Shutdown sequence commencing... Press Ctrl-C again for emergency shutdown."
 msgstr ""
 "Η διαδικασία τερματισμού ξεκινά... Πατήστε Ctrl-C ξανά για άμεσο τερματισμό."
 
-#: src/DownloadEngine.cc:253
+#: src/DownloadEngine.cc:257
 msgid "Emergency shutdown sequence commencing..."
 msgstr "Η διαδικασία άμεσου τερματισμού ξεκινά..."
 
@@ -40,47 +40,47 @@ msgstr ""
 "Αν υπάρχουν σφάλματα, δείτε το αρχείο καταγραφών. Για περαιτέρω "
 "λεπτομέρειες, δείτε την παράμετρο -l στη σελίδα βοήθειας/man."
 
-#: src/MultiUrlRequestInfo.cc:335
+#: src/MultiUrlRequestInfo.cc:341
 #, c-format
 msgid "Serialized session to '%s' successfully."
 msgstr ""
 
-#: src/MultiUrlRequestInfo.cc:338
+#: src/MultiUrlRequestInfo.cc:345
 #, c-format
 msgid "Failed to serialize session to '%s'."
 msgstr ""
 
-#: src/RequestGroupMan.cc:338
+#: src/RequestGroupMan.cc:349
 #, c-format
 msgid "Download GID#%s paused"
 msgstr ""
 
-#: src/RequestGroupMan.cc:386
+#: src/RequestGroupMan.cc:399
 #, c-format
 msgid "Download GID#%s not complete: %s"
 msgstr ""
 
-#: src/RequestGroupMan.cc:628
+#: src/RequestGroupMan.cc:658
 msgid "Download Results:"
 msgstr "Αποτελέσματα λήψης:"
 
-#: src/RequestGroupMan.cc:675
+#: src/RequestGroupMan.cc:707
 msgid "Status Legend:"
 msgstr "Υπόμνημα Κατάστασης:"
 
-#: src/RequestGroupMan.cc:677
+#: src/RequestGroupMan.cc:709
 msgid "(OK):download completed."
 msgstr ""
 
-#: src/RequestGroupMan.cc:680
+#: src/RequestGroupMan.cc:712
 msgid "(ERR):error occurred."
 msgstr ""
 
-#: src/RequestGroupMan.cc:683
+#: src/RequestGroupMan.cc:715
 msgid "(INPR):download in-progress."
 msgstr ""
 
-#: src/RequestGroupMan.cc:686
+#: src/RequestGroupMan.cc:718
 msgid "(RM):download removed."
 msgstr ""
 
@@ -96,19 +96,19 @@ msgstr "                              Ετικέτες: "
 msgid "                              Possible Values: "
 msgstr "                              Πιθανές Τιμές: "
 
-#: src/usage_text.h:37
+#: src/usage_text.h:39
 msgid ""
 " -d, --dir=DIR                The directory to store the downloaded file."
 msgstr " -d, --dir=DIR Ο κατάλογος που θα αποθηκευτεί το αρχείο που ελήφθη."
 
-#: src/usage_text.h:39
+#: src/usage_text.h:41
 msgid ""
 " -o, --out=FILE               The file name of the downloaded file. When \n"
 "                              the -Z option is used, this option will be \n"
 "                              ignored."
 msgstr ""
 
-#: src/usage_text.h:43
+#: src/usage_text.h:45
 msgid ""
 " -l, --log=LOG                The file name of the log file. If '-' is\n"
 "                              specified, log is written to stdout."
@@ -116,7 +116,7 @@ msgstr ""
 " -l, --log=LOG Το όνομα του αρχείου καταγραφής. Εάν ορίσετε το '-',\n"
 "                              η καταγραφή γίνετε στο stdout."
 
-#: src/usage_text.h:46
+#: src/usage_text.h:48
 msgid ""
 " -D, --daemon[=true|false]    Run as daemon. The current working directory "
 "will\n"
@@ -134,7 +134,7 @@ msgstr ""
 "στο\n"
 "                              \"/dev/null\"."
 
-#: src/usage_text.h:51
+#: src/usage_text.h:53
 msgid ""
 " -s, --split=N                Download a file using N connections. If more\n"
 "                              than N URIs are given, first N URIs are used "
@@ -152,7 +152,7 @@ msgid ""
 "                              --min-split-size option."
 msgstr ""
 
-#: src/usage_text.h:61
+#: src/usage_text.h:63
 msgid ""
 " --retry-wait=SEC             Set the seconds to wait between retries. \n"
 "                              With SEC > 0, aria2 will retry download when "
@@ -165,17 +165,17 @@ msgstr ""
 "λήψη όταν ο διακομιστής\n"
 "                              HTTP επιστρέψει απάντηση 503."
 
-#: src/usage_text.h:65
+#: src/usage_text.h:67
 msgid " -t, --timeout=SEC            Set timeout in seconds."
 msgstr " -t, --timeout=SEC            Ορίστε τη λήξη χρόνου σε δευτερόλεπτα."
 
-#: src/usage_text.h:67
+#: src/usage_text.h:69
 msgid " -m, --max-tries=N            Set number of tries. 0 means unlimited."
 msgstr ""
 " -m, --max-tries=N            Ορίστε τον αριθμό των προσπαθειών. Το 0 "
 "σημαίνει απεριόριστες."
 
-#: src/usage_text.h:69
+#: src/usage_text.h:71
 msgid ""
 " --http-proxy=PROXY           Use a proxy server for HTTP. To override a\n"
 "                              previously defined proxy, use \"\".\n"
@@ -183,7 +183,7 @@ msgid ""
 "                              This affects all http downloads."
 msgstr ""
 
-#: src/usage_text.h:74
+#: src/usage_text.h:76
 msgid ""
 " --https-proxy=PROXY          Use a proxy server for HTTPS. To override a \n"
 "                              previously defined proxy, use \"\".\n"
@@ -191,7 +191,7 @@ msgid ""
 "                              This affects all https downloads."
 msgstr ""
 
-#: src/usage_text.h:79
+#: src/usage_text.h:81
 msgid ""
 " --ftp-proxy=PROXY            Use a proxy server for FTP. To override a \n"
 "                              previously defined proxy, use \"\".\n"
@@ -199,7 +199,7 @@ msgid ""
 "                              This affects all ftp downloads."
 msgstr ""
 
-#: src/usage_text.h:84
+#: src/usage_text.h:86
 msgid ""
 " --all-proxy=PROXY            Use a proxy server for all protocols. To "
 "override\n"
@@ -213,22 +213,22 @@ msgid ""
 "                              This affects all downloads."
 msgstr ""
 
-#: src/usage_text.h:92
+#: src/usage_text.h:94
 msgid " --http-user=USER             Set HTTP user. This affects all URLs."
 msgstr " --http-user=USER Ορίστε το χρήστη του HTTP. Επιδρά σε όλα τα URLs."
 
-#: src/usage_text.h:94
+#: src/usage_text.h:96
 msgid " --http-passwd=PASSWD         Set HTTP password. This affects all URLs."
 msgstr ""
 " --http-passwd=PASSWD Ορίστε τον κωδικό του HTTP. Επιδρά σε όλα τα URLs."
 
-#: src/usage_text.h:96
+#: src/usage_text.h:98
 msgid " --proxy-method=METHOD        Set the method to use in proxy request."
 msgstr ""
 " --proxy-method=METHOD     Ορίστε τη μέθοδο αίτησης προς το διακομιστή\n"
 "                              μεσολάβησης."
 
-#: src/usage_text.h:98
+#: src/usage_text.h:100
 msgid ""
 " --referer=REFERER            Set an http referrrer (Referer). This affects\n"
 "                              all http/https downloads. If \"*\" is given,\n"
@@ -238,23 +238,23 @@ msgid ""
 "                              the -P option."
 msgstr ""
 
-#: src/usage_text.h:104
+#: src/usage_text.h:106
 msgid " --ftp-user=USER              Set FTP user. This affects all URLs."
 msgstr ""
 " --ftp-user=USER      Ορίστε το χρήστη του FTP. Αυτή η επιλογή επιδρά σε\n"
 "                              όλα τα URLs."
 
-#: src/usage_text.h:106
+#: src/usage_text.h:108
 msgid " --ftp-passwd=PASSWD          Set FTP password. This affects all URLs."
 msgstr ""
 " --ftp-passwd=PASSWD  Ορίστε τον κωδικό του FTP. Αυτή η επιλογή επιδρά σε\n"
 "                              όλα τα URLs."
 
-#: src/usage_text.h:108
+#: src/usage_text.h:110
 msgid " --ftp-type=TYPE              Set FTP transfer type."
 msgstr " --ftp-type=TYPE          Ορίστε τον τύπο της FTP μεταφοράς."
 
-#: src/usage_text.h:110
+#: src/usage_text.h:112
 msgid ""
 " -p, --ftp-pasv[=true|false]  Use the passive mode in FTP. If false is "
 "given,\n"
@@ -264,7 +264,7 @@ msgstr ""
 "                              Αν δοθεί false, θα χρησιμοποιηθεί η μέθοδος "
 "active."
 
-#: src/usage_text.h:113
+#: src/usage_text.h:115
 msgid ""
 " --lowest-speed-limit=SPEED   Close connection if download speed is lower "
 "than\n"
@@ -285,7 +285,7 @@ msgstr ""
 "                              Αυτή η επιλογή δεν επηρεάζει τη λήψη μέσω "
 "BitTorrent."
 
-#: src/usage_text.h:119
+#: src/usage_text.h:121
 msgid ""
 " --max-overall-download-limit=SPEED Set max overall download speed in bytes/"
 "sec.\n"
@@ -304,7 +304,7 @@ msgstr ""
 "                              χρησιμοποιείστε την επιλογή --max-download-"
 "limit."
 
-#: src/usage_text.h:125
+#: src/usage_text.h:127
 msgid ""
 " --max-download-limit=SPEED   Set max download speed per each download in\n"
 "                              bytes/sec. 0 means unrestricted.\n"
@@ -321,7 +321,7 @@ msgstr ""
 "                              χρησιμοποιείστε την επιλογή --max-overall-"
 "download-limit."
 
-#: src/usage_text.h:131
+#: src/usage_text.h:133
 msgid ""
 " --file-allocation=METHOD     Specify file allocation method.\n"
 "                              'none' doesn't pre-allocate file space. "
@@ -351,7 +351,7 @@ msgid ""
 "                              to a specified length."
 msgstr ""
 
-#: src/usage_text.h:150
+#: src/usage_text.h:152
 msgid ""
 " --no-file-allocation-limit=SIZE No file allocation is made for files whose\n"
 "                              size is smaller than SIZE.\n"
@@ -362,7 +362,7 @@ msgstr ""
 "                              Μπορείτε να προσθέσετε και K ή M(1K = 1024, 1M "
 "= 1024K)."
 
-#: src/usage_text.h:154
+#: src/usage_text.h:156
 msgid ""
 " --enable-direct-io[=true|false] Enable directI/O, which lowers cpu usage "
 "while\n"
@@ -376,7 +376,7 @@ msgstr ""
 "                              αρχείων. Απενεργοποιείστε το αν αντιμετωπίσετε "
 "κάποιο σφάλμα"
 
-#: src/usage_text.h:158
+#: src/usage_text.h:160
 msgid ""
 " --allow-overwrite[=true|false] Restart download from scratch if the\n"
 "                              corresponding control file doesn't exist.  "
@@ -387,7 +387,7 @@ msgstr ""
 "                              δεν υπάρχει το αντίστοιχο αρχείο ελέγχου.\n"
 "                              Ακόμη, δείτε την επιλογή --auto-file-renaming."
 
-#: src/usage_text.h:162
+#: src/usage_text.h:164
 msgid ""
 " --allow-piece-length-change[=true|false] If false is given, aria2 aborts\n"
 "                              download when a piece length is different "
@@ -407,7 +407,7 @@ msgstr ""
 "πρόοδο\n"
 "                              της λήψης."
 
-#: src/usage_text.h:167
+#: src/usage_text.h:169
 msgid ""
 " -Z, --force-sequential[=true|false] Fetch URIs in the command-line "
 "sequentially\n"
@@ -422,7 +422,7 @@ msgstr ""
 "                              τα συνηθισμένα εργαλεία λήψης της γραμμής "
 "εντολών."
 
-#: src/usage_text.h:171
+#: src/usage_text.h:173
 msgid ""
 " --auto-file-renaming[=true|false] Rename file name if the same file "
 "already\n"
@@ -439,7 +439,7 @@ msgstr ""
 "και ένα\n"
 "                              νούμερο(1..9999)."
 
-#: src/usage_text.h:177
+#: src/usage_text.h:179
 msgid ""
 " -P, --parameterized-uri[=true|false] Enable parameterized URI support.\n"
 "                              You can specify set of parts:\n"
@@ -468,19 +468,19 @@ msgstr ""
 "                              όπως στο δεύτερο παράδειγμα, απαιτείται η "
 "επιλογή -Z."
 
-#: src/usage_text.h:188
+#: src/usage_text.h:190
 msgid ""
 " --enable-http-keep-alive[=true|false] Enable HTTP/1.1 persistent connection."
 msgstr ""
 " --enable-http-keep-alive[=true|false] Ενεργοποιήστε τη μόνιμη σύνδεση "
 "HTTP/1.1."
 
-#: src/usage_text.h:190
+#: src/usage_text.h:192
 msgid " --enable-http-pipelining[=true|false] Enable HTTP/1.1 pipelining."
 msgstr ""
 " --enable-http-pipelining[=true|false] Ενεργοποιήστε τη διασωλήνωση HTTP/1.1."
 
-#: src/usage_text.h:192
+#: src/usage_text.h:194
 msgid ""
 " -V, --check-integrity[=true|false] Check file integrity by validating "
 "piece\n"
@@ -505,7 +505,7 @@ msgid ""
 "                              piece hashes are used."
 msgstr ""
 
-#: src/usage_text.h:206
+#: src/usage_text.h:208
 msgid ""
 " --bt-hash-check-seed[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option and file is "
@@ -530,7 +530,7 @@ msgstr ""
 "                              Αυτή η επιλογή λειτουργεί μόνο στις λήψεις "
 "μέσω BitTorrent."
 
-#: src/usage_text.h:214
+#: src/usage_text.h:216
 msgid ""
 " --realtime-chunk-checksum[=true|false]  Validate chunk of data by "
 "calculating\n"
@@ -542,7 +542,7 @@ msgstr ""
 "checksum,\n"
 "                              αν βέβαια παρέχονται τα checksums των τμημάτων."
 
-#: src/usage_text.h:218
+#: src/usage_text.h:220
 msgid ""
 " -c, --continue[=true|false]  Continue downloading a partially downloaded\n"
 "                              file. Use this option to resume a download\n"
@@ -562,16 +562,20 @@ msgstr ""
 "                              αυτή η επιλογή, ισχύει μόνο για τις λήψεις "
 "μέσω http(s)/ftp."
 
-#: src/usage_text.h:225
+#: src/usage_text.h:227
 msgid " -U, --user-agent=USER_AGENT  Set user agent for http(s) downloads."
 msgstr ""
 " -U, --user-agent=USER_AGENT  Ορίστε έναν user agent για λήψεις μέσω http(s)."
 
-#: src/usage_text.h:227
+#: src/usage_text.h:229
 msgid " -n, --no-netrc[=true|false]  Disables netrc support."
 msgstr " -n, --no-netrc[=true|false]  Απενεργοποιείστε την υποστήριξη netrc."
 
-#: src/usage_text.h:229
+#: src/usage_text.h:231
+msgid " --netrc-path=FILE            Specify the path to the netrc file."
+msgstr ""
+
+#: src/usage_text.h:233
 msgid ""
 " -i, --input-file=FILE        Downloads URIs found in FILE. You can specify\n"
 "                              multiple URIs for a single entity: separate\n"
@@ -589,7 +593,7 @@ msgid ""
 "                              for details. See also --deferred-input option."
 msgstr ""
 
-#: src/usage_text.h:239
+#: src/usage_text.h:243
 msgid ""
 " -j, --max-concurrent-downloads=N Set maximum number of parallel downloads "
 "for\n"
@@ -598,7 +602,7 @@ msgid ""
 "                              See also --split option."
 msgstr ""
 
-#: src/usage_text.h:243
+#: src/usage_text.h:247
 msgid ""
 " --load-cookies=FILE          Load Cookies from FILE using the Firefox3 "
 "format\n"
@@ -609,7 +613,7 @@ msgstr ""
 "                              τη μορφή του Firefox3 και του Mozilla/"
 "Firefox(1.x/2.x)/Netscape."
 
-#: src/usage_text.h:246
+#: src/usage_text.h:250
 msgid ""
 " --save-cookies=FILE          Save Cookies to FILE in Mozilla/Firefox(1.x/2."
 "x)/\n"
@@ -627,7 +631,7 @@ msgstr ""
 "συνεδρίας\n"
 "                              και οι τιμές λήξης τους αντιμετωπίζονται ως 0."
 
-#: src/usage_text.h:251
+#: src/usage_text.h:255
 msgid ""
 " -S, --show-files[=true|false] Print file listing of .torrent, .meta4 and\n"
 "                              .metalink file and exit. More detailed\n"
@@ -640,7 +644,7 @@ msgstr ""
 "προβληθούν\n"
 "                              πιο λεπτομερείς πληροφορίες."
 
-#: src/usage_text.h:256
+#: src/usage_text.h:260
 msgid ""
 " --select-file=INDEX...       Set file to download by specifying its index.\n"
 "                              You can find the file index using the\n"
@@ -670,11 +674,11 @@ msgstr ""
 "                              να ποικίλει βάσει του query (δείτε τις "
 "επιλογές --metalink-*)."
 
-#: src/usage_text.h:265
+#: src/usage_text.h:269
 msgid " -T, --torrent-file=TORRENT_FILE  The path to the .torrent file."
 msgstr " -T, --torrent-file=TORRENT_FILE  Η διαδρομή του αρχείου .torrent."
 
-#: src/usage_text.h:267
+#: src/usage_text.h:271
 msgid ""
 " --follow-torrent=true|false|mem If true or mem is specified, when a file\n"
 "                              whose suffix is .torrent or content type is\n"
@@ -691,7 +695,7 @@ msgid ""
 "                              torrent and its contents are not downloaded."
 msgstr ""
 
-#: src/usage_text.h:278
+#: src/usage_text.h:282
 msgid ""
 " --listen-port=PORT...        Set TCP port number for BitTorrent downloads.\n"
 "                              Multiple ports can be specified by using ',',\n"
@@ -711,7 +715,7 @@ msgstr ""
 "                              Τα ',' και '-' μπορούν να χρησιμοποιηθούν "
 "συνδυαστικά."
 
-#: src/usage_text.h:284
+#: src/usage_text.h:288
 msgid ""
 " --max-overall-upload-limit=SPEED Set max overall upload speed in bytes/"
 "sec.\n"
@@ -729,7 +733,7 @@ msgstr ""
 "torrent,\n"
 "                              χρησιμοποιείστε την επιλογή --max-upload-limit."
 
-#: src/usage_text.h:290
+#: src/usage_text.h:294
 msgid ""
 " -u, --max-upload-limit=SPEED Set max upload speed per each torrent in\n"
 "                              bytes/sec. 0 means unrestricted.\n"
@@ -747,7 +751,7 @@ msgstr ""
 "                              χρησιμοποιείστε την επιλογή --max-overall-"
 "upload-limit."
 
-#: src/usage_text.h:296
+#: src/usage_text.h:300
 msgid ""
 " --seed-time=MINUTES          Specify seeding time in minutes. Also see the\n"
 "                              --seed-ratio option."
@@ -755,7 +759,7 @@ msgstr ""
 " --seed-time=MINUTES          Ορίστε το χρόνο διαμοιρασμού σε λεπτά.\n"
 "                              Ακόμη, δείτε την επιλογή --seed-ratio."
 
-#: src/usage_text.h:299
+#: src/usage_text.h:303
 msgid ""
 " --seed-ratio=RATIO           Specify share ratio. Seed completed torrents\n"
 "                              until share ratio reaches RATIO.\n"
@@ -783,7 +787,7 @@ msgstr ""
 "                              ικανοποιηθεί τουλάχιστον μια από τις "
 "προϋποθέσεις."
 
-#: src/usage_text.h:308
+#: src/usage_text.h:312
 msgid ""
 " --peer-id-prefix=PEER_ID_PREFIX Specify the prefix of peer ID. The peer ID "
 "in\n"
@@ -804,13 +808,13 @@ msgstr ""
 "                              τυχαία δεδομένα για να συμπληρωθούν τα 20 "
 "bytes."
 
-#: src/usage_text.h:314
+#: src/usage_text.h:318
 msgid " --enable-peer-exchange[=true|false] Enable Peer Exchange extension."
 msgstr ""
 " --enable-peer-exchange[=true|false] Ενεργοποιείστε την επέκταση Peer "
 "Exchange."
 
-#: src/usage_text.h:316
+#: src/usage_text.h:320
 msgid ""
 " --enable-dht[=true|false]    Enable IPv4 DHT functionality. It also "
 "enables\n"
@@ -819,7 +823,7 @@ msgid ""
 "                              download even if ``true`` is given."
 msgstr ""
 
-#: src/usage_text.h:321
+#: src/usage_text.h:325
 msgid ""
 " --dht-listen-port=PORT...    Set UDP listening port used by DHT(IPv4, "
 "IPv6)\n"
@@ -832,7 +836,7 @@ msgid ""
 "                              ',' and '-' can be used together."
 msgstr ""
 
-#: src/usage_text.h:327
+#: src/usage_text.h:331
 msgid ""
 " --dht-entry-point=HOST:PORT  Set host and port as an entry point to IPv4 "
 "DHT\n"
@@ -841,14 +845,14 @@ msgstr ""
 " --dht-entry-point=HOST:PORT  Ορίστε τον υπολογιστή και τη θύρα ως σημείο\n"
 "                              εισόδου στο IPv4 DHT δίκτυο."
 
-#: src/usage_text.h:330
+#: src/usage_text.h:334
 msgid ""
 " --dht-file-path=PATH         Change the IPv4 DHT routing table file to PATH."
 msgstr ""
 " --dht-file-path=PATH         Αλλάξτε το αρχείο του πίνακα δρομολόγησης\n"
 "                              του IPv4 DHT στο PATH."
 
-#: src/usage_text.h:332
+#: src/usage_text.h:336
 msgid ""
 " --bt-min-crypto-level=plain|arc4 Set minimum level of encryption method.\n"
 "                              If several encryption methods are provided by "
@@ -864,7 +868,7 @@ msgstr ""
 "ικανοποιεί\n"
 "                              το επίπεδο που έχει δοθεί."
 
-#: src/usage_text.h:337
+#: src/usage_text.h:341
 msgid ""
 " --bt-require-crypto[=true|false] If true is given, aria2 doesn't accept "
 "and\n"
@@ -879,7 +883,7 @@ msgstr ""
 "Obfuscation\n"
 "                              handshake."
 
-#: src/usage_text.h:342
+#: src/usage_text.h:346
 msgid ""
 " --bt-request-peer-speed-limit=SPEED If the whole download speed of every\n"
 "                              torrent is lower than SPEED, aria2 "
@@ -903,14 +907,14 @@ msgstr ""
 "                              Μπορείτε να προσθέσετε και K ή M(1K = 1024, 1M "
 "= 1024K)."
 
-#: src/usage_text.h:350
+#: src/usage_text.h:354
 msgid ""
 " --bt-max-open-files=NUM      Specify maximum number of files to open in\n"
 "                              multi-file BitTorrent/Metalink downloads\n"
 "                              globally."
 msgstr ""
 
-#: src/usage_text.h:354
+#: src/usage_text.h:358
 msgid ""
 " --bt-seed-unverified[=true|false] Seed previously downloaded files without\n"
 "                              verifying piece hashes."
@@ -920,7 +924,7 @@ msgstr ""
 "hashes\n"
 "                              των κομματιών."
 
-#: src/usage_text.h:357
+#: src/usage_text.h:361
 msgid ""
 " --bt-max-peers=NUM           Specify the maximum number of peers per "
 "torrent.\n"
@@ -932,7 +936,7 @@ msgstr ""
 "                              Δείτε ακόμη την επιλογή --bt-request-peer-"
 "speed-limit."
 
-#: src/usage_text.h:361
+#: src/usage_text.h:365
 msgid ""
 " -M, --metalink-file=METALINK_FILE The file path to the .meta4 and ."
 "metalink\n"
@@ -944,7 +948,7 @@ msgstr ""
 "stdin\n"
 "                              όταν έχει οριστεί '-'."
 
-#: src/usage_text.h:365
+#: src/usage_text.h:369
 msgid ""
 " -C, --metalink-servers=NUM_SERVERS The number of servers to connect to\n"
 "                              simultaneously. Some Metalinks regulate the\n"
@@ -971,22 +975,22 @@ msgstr ""
 "                              NUM_SERVERS. Ακόμη, δείτε τις ρυθμίσεις -s και "
 "-j."
 
-#: src/usage_text.h:374
+#: src/usage_text.h:378
 msgid " --metalink-version=VERSION   The version of the file to download."
 msgstr " --metalink-version=VERSION   Η έκδοση του αρχείου που θα κατέβει."
 
-#: src/usage_text.h:376
+#: src/usage_text.h:380
 msgid " --metalink-language=LANGUAGE The language of the file to download."
 msgstr " --metalink-version=VERSION   Η γλώσσα του αρχείου που θα κατέβει."
 
-#: src/usage_text.h:378
+#: src/usage_text.h:382
 msgid ""
 " --metalink-os=OS             The operating system of the file to download."
 msgstr ""
 " --metalink-version=VERSION   Το λειτουργικό σύστημα του αρχείου\n"
 "                              που θα κατέβει."
 
-#: src/usage_text.h:380
+#: src/usage_text.h:384
 msgid ""
 " --metalink-location=LOCATION[,...] The location of the preferred server.\n"
 "                              A comma-delimited list of locations is\n"
@@ -998,7 +1002,7 @@ msgstr ""
 "διαχωρισμένη\n"
 "                              με κόμματα."
 
-#: src/usage_text.h:384
+#: src/usage_text.h:388
 msgid ""
 " --metalink-preferred-protocol=PROTO Specify preferred protocol. Specify "
 "'none'\n"
@@ -1008,7 +1012,7 @@ msgstr ""
 "                              Ορίστε το σε 'none' αν δεν έχετε κάποια "
 "ιδιαίτερη προτίμηση."
 
-#: src/usage_text.h:387
+#: src/usage_text.h:391
 msgid ""
 " --follow-metalink=true|false|mem If true or mem is specified, when a file\n"
 "                              whose suffix is .meta4 or .metalink, or "
@@ -1028,7 +1032,7 @@ msgid ""
 "                              downloaded."
 msgstr ""
 
-#: src/usage_text.h:400
+#: src/usage_text.h:404
 msgid ""
 " --metalink-enable-unique-protocol[=true|false] If true is given and "
 "several\n"
@@ -1048,11 +1052,11 @@ msgstr ""
 "να ορίσετε το\n"
 "                              πρωτόκολλο της επιλογής σας."
 
-#: src/usage_text.h:406
+#: src/usage_text.h:410
 msgid " -v, --version                Print the version number and exit."
 msgstr " -v, --version                Εκτύπωση του αριθμού έκδοσης και έξοδος."
 
-#: src/usage_text.h:408
+#: src/usage_text.h:412
 msgid ""
 " -h, --help[=TAG|KEYWORD]     Print usage and exit.\n"
 "                              The help messages are classified with tags. A "
@@ -1077,20 +1081,20 @@ msgstr ""
 "τις επιλογές\n"
 "                              των οποίων το όνομα περιέχει αυτήν τη λέξη."
 
-#: src/usage_text.h:415
+#: src/usage_text.h:419
 msgid " --no-conf[=true|false]       Disable loading aria2.conf file."
 msgstr ""
 " --no-conf[=true|false]       Απενεργοποιείστε τη φόρτωση του αρχείου aria2."
 "conf."
 
-#: src/usage_text.h:417
+#: src/usage_text.h:421
 msgid ""
 " --conf-path=PATH             Change the configuration file path to PATH."
 msgstr ""
 " --conf-path=PATH             Αλλαγή της διαδρομής του αρχείου ρυθμίσεων σε "
 "PATH."
 
-#: src/usage_text.h:419
+#: src/usage_text.h:423
 msgid ""
 " --stop=SEC                   Stop application after SEC seconds has "
 "passed.\n"
@@ -1100,7 +1104,7 @@ msgstr ""
 "δευτερόλεπτα.\n"
 "                              Αν δοθεί 0, αυτή η λειτουργία απενεργοποιείται."
 
-#: src/usage_text.h:422
+#: src/usage_text.h:426
 msgid ""
 " --header=HEADER              Append HEADER to HTTP request header. You can "
 "use\n"
@@ -1120,22 +1124,22 @@ msgstr ""
 "9J1\"\n"
 "                              http://host/file"
 
-#: src/usage_text.h:428
+#: src/usage_text.h:432
 msgid " -q, --quiet[=true|false]     Make aria2 quiet(no console output)."
 msgstr ""
 " -q, --quiet[=true|false]     Σιωπηλή λειτουργία του aria2 (χωρίς έξοδο στην "
 "κονσόλα)."
 
-#: src/usage_text.h:430
+#: src/usage_text.h:434
 msgid " --async-dns[=true|false]     Enable asynchronous DNS."
 msgstr " --async-dns[=true|false]     Ενεργοποιήστε το ασύγχρονο DNS."
 
-#: src/usage_text.h:432
+#: src/usage_text.h:436
 msgid " --ftp-reuse-connection[=true|false] Reuse connection in FTP."
 msgstr ""
 " --ftp-reuse-connection[=true|false] Επαναχρησιμοποίηση της σύνδεσης στο FTP."
 
-#: src/usage_text.h:434
+#: src/usage_text.h:438
 msgid ""
 " --summary-interval=SEC       Set interval to output download progress "
 "summary.\n"
@@ -1146,14 +1150,14 @@ msgstr ""
 "σε 0,\n"
 "                              δε γίνεται εκτύπωση."
 
-#: src/usage_text.h:437
+#: src/usage_text.h:441
 msgid ""
 " --log-level=LEVEL            Set log level to output to file specified "
 "using\n"
 "                             --log option."
 msgstr ""
 
-#: src/usage_text.h:440
+#: src/usage_text.h:444
 msgid ""
 " -R, --remote-time[=true|false] Retrieve timestamp of the remote file from "
 "the\n"
@@ -1166,7 +1170,7 @@ msgstr ""
 "αν είναι\n"
 "                              διαθέσιμη την εφαρμόζει στο τοπικό αρχείο."
 
-#: src/usage_text.h:444
+#: src/usage_text.h:448
 msgid ""
 " --connect-timeout=SEC        Set the connect timeout in seconds to "
 "establish\n"
@@ -1184,7 +1188,7 @@ msgstr ""
 "                              και στη θέση της χρησιμοποιείται η επιλογή --"
 "timeout."
 
-#: src/usage_text.h:449
+#: src/usage_text.h:453
 msgid ""
 " --max-file-not-found=NUM     If aria2 receives `file not found' status from "
 "the\n"
@@ -1194,20 +1198,13 @@ msgid ""
 "fail.\n"
 "                              Specify 0 to disable this option.\n"
 "                              This options is effective only when using\n"
-"                              HTTP/FTP servers."
+"                              HTTP/FTP servers. The number of retry attempt "
+"is\n"
+"                              counted toward --max-tries, so it should be\n"
+"                              configured too."
 msgstr ""
-" --max-file-not-found=NUM     Αν το aria2 λάβει NUM φορές μια κατάσταση\n"
-"                              `το αρχείο δε βρέθηκε' από απομακρυσμένους "
-"διακομιστές\n"
-"                              HTTP/FTP χωρίς να λάβει ούτε ένα byte, τότε "
-"εξαναγκάζει\n"
-"                              τη λήψη να αποτύχει. Ορίστε σε 0 για να "
-"απενεργοποιήσετε.\n"
-"                              αυτήν την επιλογή. Αυτή η επιλογή λειτουργεί "
-"μόνο όταν\n"
-"                              χρησιμοποιούνται διακομιστές HTTP/FTP."
 
-#: src/usage_text.h:456
+#: src/usage_text.h:462
 msgid ""
 " --uri-selector=SELECTOR      Specify URI selection algorithm.\n"
 "                              If 'inorder' is given, URI is tried in the "
@@ -1272,7 +1269,7 @@ msgstr ""
 "χρησιμοποιεί\n"
 "                              ένα προφίλ απόδοσης των διακομιστών."
 
-#: src/usage_text.h:475
+#: src/usage_text.h:481
 msgid ""
 " --server-stat-of=FILE        Specify the filename to which performance "
 "profile\n"
@@ -1288,7 +1285,7 @@ msgstr ""
 "επιλογή\n"
 "                              --server-stat-if."
 
-#: src/usage_text.h:479
+#: src/usage_text.h:485
 msgid ""
 " --server-stat-if=FILE        Specify the filename to load performance "
 "profile\n"
@@ -1305,7 +1302,7 @@ msgstr ""
 "                              URI όπως ο 'feedback'. Δείτε ακόμη την επιλογή "
 "--uri-selector."
 
-#: src/usage_text.h:484
+#: src/usage_text.h:490
 msgid ""
 " --server-stat-timeout=SEC    Specifies timeout in seconds to invalidate\n"
 "                              performance profile of the servers since the "
@@ -1318,7 +1315,7 @@ msgstr ""
 "                              το οποίο θα καταστήσει άκυρο το προφίλ "
 "επιδόσεων τους."
 
-#: src/usage_text.h:488
+#: src/usage_text.h:494
 msgid ""
 " --auto-save-interval=SEC     Save a control file(*.aria2) every SEC "
 "seconds.\n"
@@ -1335,7 +1332,7 @@ msgstr ""
 "                              Το aria2 αποθηκεύει ένα αρχείο ελέγχου όταν\n"
 "                              σταματάει, ανεξάρτητα από την τιμή."
 
-#: src/usage_text.h:493
+#: src/usage_text.h:499
 msgid ""
 " --certificate=FILE           Use the client certificate in FILE.\n"
 "                              The certificate must be in PEM format.\n"
@@ -1352,7 +1349,7 @@ msgstr ""
 "το\n"
 "                              ιδιωτικό κλειδί."
 
-#: src/usage_text.h:498
+#: src/usage_text.h:504
 msgid ""
 " --private-key=FILE           Use the private key in FILE.\n"
 "                              The private key must be decrypted and in PEM\n"
@@ -1365,7 +1362,7 @@ msgstr ""
 "                              και στη μορφή PEM. Δείτε ακόμη την επιλογή --"
 "certificate."
 
-#: src/usage_text.h:502
+#: src/usage_text.h:508
 msgid ""
 " --ca-certificate=FILE        Use the certificate authorities in FILE to "
 "verify\n"
@@ -1386,7 +1383,7 @@ msgstr ""
 "για\n"
 "                              να ενεργοποιήσετε την πιστοποίηση."
 
-#: src/usage_text.h:508
+#: src/usage_text.h:514
 msgid ""
 " --check-certificate[=true|false] Verify the peer using certificates "
 "specified\n"
@@ -1397,7 +1394,7 @@ msgstr ""
 "οριστεί\n"
 "                              στην επιλογή --ca-certificate."
 
-#: src/usage_text.h:511
+#: src/usage_text.h:517
 msgid ""
 " --no-proxy=DOMAINS           Specify comma separated hostnames, domains or\n"
 "                              network address with or without CIDR block "
@@ -1411,7 +1408,7 @@ msgstr ""
 "χρησιμοποιηθεί.\n"
 "                              ο διακομιστής μεσολάβησης."
 
-#: src/usage_text.h:515
+#: src/usage_text.h:521
 msgid ""
 " --use-head[=true|false]      Use HEAD method for the first request to the "
 "HTTP\n"
@@ -1421,11 +1418,11 @@ msgstr ""
 "αίτηση\n"
 "                              στο διακομιστή HTTP."
 
-#: src/usage_text.h:518
+#: src/usage_text.h:524
 msgid " --event-poll=POLL            Specify the method for polling events."
 msgstr " --event-poll=POLL            Καθορίστε τη μέθοδο ελέγχου συμβάντων."
 
-#: src/usage_text.h:520
+#: src/usage_text.h:526
 msgid ""
 " --bt-external-ip=IPADDRESS   Specify the external IP address to report to "
 "a\n"
@@ -1441,7 +1438,7 @@ msgstr ""
 "'external' (εξωτερική),\n"
 "                              μπορεί να δεχτεί κάθε είδους διεύθυνση IP."
 
-#: src/usage_text.h:525
+#: src/usage_text.h:531
 msgid ""
 " --http-auth-challenge[=true|false] Send HTTP authorization header only when "
 "it\n"
@@ -1468,7 +1465,7 @@ msgstr ""
 "                              στέλνεται πάντα στο διακομιστή ανεξάρτητα από "
 "αυτήν τη ρύθμιση."
 
-#: src/usage_text.h:533
+#: src/usage_text.h:539
 msgid ""
 " -O, --index-out=INDEX=PATH   Set file path for file with index=INDEX. You "
 "can\n"
@@ -1491,7 +1488,7 @@ msgstr ""
 "                              Μπορείτε να χρησιμοποιήσετε αυτήν την επιλογή "
 "πολλές φορές."
 
-#: src/usage_text.h:539
+#: src/usage_text.h:545
 msgid ""
 " --dry-run[=true|false]       If true is given, aria2 just checks whether "
 "the\n"
@@ -1510,7 +1507,7 @@ msgstr ""
 "                              Οι λήψεις μέσω BitTorrent ακυρώνονται αν δοθεί "
 "true."
 
-#: src/usage_text.h:545
+#: src/usage_text.h:551
 msgid ""
 " --bt-tracker-interval=SEC    Set the interval in seconds between tracker\n"
 "                              requests. This completely overrides interval "
@@ -1538,7 +1535,7 @@ msgstr ""
 "και\n"
 "                              της προόδου της λήψης."
 
-#: src/usage_text.h:553
+#: src/usage_text.h:559
 msgid ""
 " --on-download-complete=COMMAND Set the command to be executed after "
 "download\n"
@@ -1555,7 +1552,7 @@ msgstr ""
 "την επιλογή\n"
 "                              --on-download-stop."
 
-#: src/usage_text.h:559
+#: src/usage_text.h:565
 msgid ""
 " --on-download-start=COMMAND  Set the command to be executed after download\n"
 "                              got started. aria2 passes 3 arguments to "
@@ -1572,7 +1569,7 @@ msgstr ""
 "                              Για περισσότερες πληροφορίες, δείτε στη σελίδα "
 "man το Event Hook."
 
-#: src/usage_text.h:564
+#: src/usage_text.h:570
 msgid ""
 " --on-download-pause=COMMAND  Set the command to be executed after download\n"
 "                              was paused.\n"
@@ -1584,7 +1581,7 @@ msgstr ""
 "download-start για\n"
 "                              τις απαιτήσεις του COMMAND."
 
-#: src/usage_text.h:569
+#: src/usage_text.h:575
 msgid ""
 " --on-download-error=COMMAND  Set the command to be executed after download\n"
 "                              aborted due to error.\n"
@@ -1599,7 +1596,7 @@ msgstr ""
 "COMMAND.\n"
 "                              Δείτε ακόμη την επιλογή --on-download-stop."
 
-#: src/usage_text.h:575
+#: src/usage_text.h:581
 msgid ""
 " --on-download-stop=COMMAND   Set the command to be executed after download\n"
 "                              stopped. You can override the command to be\n"
@@ -1624,7 +1621,7 @@ msgstr ""
 "                              απαιτήσεις του COMMAND δείτε την επιλογή --on-"
 "download-start."
 
-#: src/usage_text.h:584
+#: src/usage_text.h:590
 msgid ""
 " --bt-stop-timeout=SEC        Stop BitTorrent download if download speed is "
 "0 in\n"
@@ -1637,7 +1634,7 @@ msgstr ""
 "επιλογή είναι\n"
 "                              απενεργοποιημένη."
 
-#: src/usage_text.h:588
+#: src/usage_text.h:594
 msgid ""
 " --bt-prioritize-piece=head[=SIZE],tail[=SIZE] Try to download first and "
 "last\n"
@@ -1683,7 +1680,7 @@ msgstr ""
 "τιμή\n"
 "                              του SIZE, χρησιμοποιείται το SIZE=1M."
 
-#: src/usage_text.h:600
+#: src/usage_text.h:606
 msgid ""
 " --interface=INTERFACE        Bind sockets to given interface. You can "
 "specify\n"
@@ -1693,11 +1690,24 @@ msgstr ""
 "                              Μπορείτε να ορίσετε το όνομα της διεπαφής,\n"
 "                              τη διεύθυνση IP και το όνομα υπολογιστή."
 
-#: src/usage_text.h:603
+#: src/usage_text.h:609
+msgid ""
+" --multiple-interface=INTERFACES Comma separated list of interfaces to bind\n"
+"                              sockets to. Requests will be splited among "
+"the\n"
+"                              interfaces to achieve link aggregation. You "
+"can\n"
+"                              specify interface name, IP address and "
+"hostname.\n"
+"                              If --interface is used, this option will be\n"
+"                              ignored."
+msgstr ""
+
+#: src/usage_text.h:616
 msgid " --disable-ipv6[=true|false]  Disable IPv6."
 msgstr " --disable-ipv6[=true|false]  Απενεργοποίηση του IPv6."
 
-#: src/usage_text.h:605
+#: src/usage_text.h:618
 msgid ""
 " --bt-save-metadata[=true|false] Save metadata as .torrent file. This option "
 "has\n"
@@ -1729,7 +1739,7 @@ msgstr ""
 "αποθηκεύονται.\n"
 "                              Δείτε ακόμη την επιλογή --bt-metadata-only."
 
-#: src/usage_text.h:613
+#: src/usage_text.h:626
 msgid ""
 " --http-no-cache[=true|false] Send Cache-Control: no-cache and Pragma: no-"
 "cache\n"
@@ -1752,7 +1762,7 @@ msgstr ""
 "χρησιμοποιώντας\n"
 "                              την επιλογή --header."
 
-#: src/usage_text.h:619
+#: src/usage_text.h:632
 msgid ""
 " --bt-metadata-only[=true|false] Download metadata only. The file(s) "
 "described\n"
@@ -1767,7 +1777,7 @@ msgstr ""
 "                              όταν χρησιμοποιούνται BitTorrent Magnet URIs.\n"
 "                              Δείτε ακόμη την επιλογή --bt-save-metadata."
 
-#: src/usage_text.h:624
+#: src/usage_text.h:637
 msgid ""
 " --human-readable[=true|false] Print sizes and speed in human readable "
 "format\n"
@@ -1778,11 +1788,11 @@ msgstr ""
 "3.4Mi),\n"
 "                              στην έξοδο της κονσόλας."
 
-#: src/usage_text.h:627
+#: src/usage_text.h:640
 msgid " --bt-enable-lpd[=true|false] Enable Local Peer Discovery."
 msgstr " --bt-enable-lpd[=true|false] Ενεργοποιείστε το Local Peer Discovery."
 
-#: src/usage_text.h:629
+#: src/usage_text.h:642
 msgid ""
 " --bt-lpd-interface=INTERFACE Use given interface for Local Peer Discovery. "
 "If\n"
@@ -1798,7 +1808,7 @@ msgstr ""
 "Μπορείτε\n"
 "                              να καθορίσετε όνομα διεπαφής και διεύθυνση IP."
 
-#: src/usage_text.h:634
+#: src/usage_text.h:647
 msgid ""
 " --reuse-uri[=true|false]     Reuse already used URIs if no unused URIs are\n"
 "                              left."
@@ -1807,39 +1817,39 @@ msgstr ""
 "URIs\n"
 "                              αν δεν έχουν μείνει μη χρησιμοποιημένα."
 
-#: src/usage_text.h:637
+#: src/usage_text.h:650
 msgid " --all-proxy-user=USER        Set user for --all-proxy."
 msgstr ""
 
-#: src/usage_text.h:639
+#: src/usage_text.h:652
 msgid " --all-proxy-passwd=PASSWD    Set password for --all-proxy."
 msgstr ""
 
-#: src/usage_text.h:641
+#: src/usage_text.h:654
 msgid " --http-proxy-user=USER       Set user for --http-proxy."
 msgstr ""
 
-#: src/usage_text.h:643
+#: src/usage_text.h:656
 msgid " --http-proxy-passwd=PASSWD   Set password for --http-proxy."
 msgstr ""
 
-#: src/usage_text.h:645
+#: src/usage_text.h:658
 msgid " --https-proxy-user=USER      Set user for --https-proxy."
 msgstr ""
 
-#: src/usage_text.h:647
+#: src/usage_text.h:660
 msgid " --https-proxy-passwd=PASSWD  Set password for --https-proxy."
 msgstr ""
 
-#: src/usage_text.h:649
+#: src/usage_text.h:662
 msgid " --ftp-proxy-user=USER        Set user for --ftp-proxy."
 msgstr ""
 
-#: src/usage_text.h:651
+#: src/usage_text.h:664
 msgid " --ftp-proxy-passwd=PASSWD    Set password for --ftp-proxy."
 msgstr ""
 
-#: src/usage_text.h:653
+#: src/usage_text.h:666
 msgid ""
 " --remove-control-file[=true|false] Remove control file before download. "
 "Using\n"
@@ -1858,7 +1868,7 @@ msgstr ""
 "μεσολάβησης\n"
 "                              που απενεργοποιεί τη συνέχιση λήψης."
 
-#: src/usage_text.h:658
+#: src/usage_text.h:671
 msgid ""
 " --always-resume[=true|false] Always resume download. If true is given, "
 "aria2\n"
@@ -1891,7 +1901,7 @@ msgstr ""
 "                              την αρχή. Δείτε ακόμη την επιλογή --max-resume-"
 "failure-tries."
 
-#: src/usage_text.h:668
+#: src/usage_text.h:681
 msgid ""
 " --max-resume-failure-tries=N When used with --always-resume=false, aria2\n"
 "                              downloads file from scratch when aria2 detects "
@@ -1915,11 +1925,11 @@ msgstr ""
 "συνέχιση της\n"
 "                              λήψης. Δείτε ακόμη την επιλογή --always-resume."
 
-#: src/usage_text.h:675
+#: src/usage_text.h:688
 msgid " --bt-tracker-timeout=SEC     Set timeout in seconds."
 msgstr " --bt-tracker-timeout=SEC     Ορίστε το χρονικό όριο σε δευτερόλεπτα."
 
-#: src/usage_text.h:677
+#: src/usage_text.h:690
 msgid ""
 " --bt-tracker-connect-timeout=SEC Set the connect timeout in seconds to\n"
 "                              establish connection to tracker. After the\n"
@@ -1937,11 +1947,11 @@ msgstr ""
 "στη θέση της\n"
 "                              χρησιμοποιείται η επιλογή --bt-tracker-timeout."
 
-#: src/usage_text.h:683
+#: src/usage_text.h:696
 msgid " --dht-message-timeout=SEC    Set timeout in seconds."
 msgstr " --dht-message-timeout=SEC    Ορίστε το χρονικό όριο σε δευτερόλεπτα."
 
-#: src/usage_text.h:685
+#: src/usage_text.h:698
 msgid ""
 " --http-accept-gzip[=true|false] Send 'Accept: deflate, gzip' request "
 "header\n"
@@ -1957,7 +1967,7 @@ msgstr ""
 "                              'Content-Encoding: gzip' ή 'Content-Encoding: "
 "deflate'."
 
-#: src/usage_text.h:690
+#: src/usage_text.h:703
 msgid ""
 " --save-session=FILE          Save error/unfinished downloads to FILE on "
 "exit.\n"
@@ -1994,7 +2004,7 @@ msgstr ""
 "μεθόδους\n"
 "                              aria2.remove και aria2.forceRemove."
 
-#: src/usage_text.h:699
+#: src/usage_text.h:712
 msgid ""
 " -x, --max-connection-per-server=NUM The maximum number of connections to "
 "one\n"
@@ -2003,7 +2013,7 @@ msgstr ""
 " -x, --max-connection-per-server=NUM Ο μέγιστος αριθμός συνδέσεων σε ένα\n"
 "                              διακομιστή για κάθε λήψη."
 
-#: src/usage_text.h:702
+#: src/usage_text.h:715
 msgid ""
 " -k, --min-split-size=SIZE    aria2 does not split less than 2*SIZE byte "
 "range.\n"
@@ -2036,7 +2046,7 @@ msgstr ""
 "                              1 πηγή. Μπορείτε να προσθέσετε και K ή M\n"
 "                              (1K = 1024, 1M = 1024K)."
 
-#: src/usage_text.h:711
+#: src/usage_text.h:724
 msgid ""
 " --conditional-get[=true|false] Download file only when the local file is "
 "older\n"
@@ -2053,7 +2063,7 @@ msgstr ""
 "                              Για περισσότερες πληροφορίες, δείτε τη σελίδα "
 "man."
 
-#: src/usage_text.h:715
+#: src/usage_text.h:728
 msgid ""
 " --on-bt-download-complete=COMMAND For BitTorrent, a command specified in\n"
 "                              --on-download-complete is called after "
@@ -2080,7 +2090,7 @@ msgstr ""
 "δείτε την επιλογή\n"
 "                              --on-download-start."
 
-#: src/usage_text.h:723
+#: src/usage_text.h:736
 msgid ""
 " --enable-async-dns6[=true|false] Enable IPv6 name resolution in "
 "asynchronous\n"
@@ -2094,7 +2104,7 @@ msgstr ""
 "θα αγνοηθεί\n"
 "                              όταν --async-dns=false."
 
-#: src/usage_text.h:727
+#: src/usage_text.h:740
 msgid ""
 " --enable-dht6[=true|false]   Enable IPv6 DHT functionality.\n"
 "                              Use --dht-listen-port option to specify port\n"
@@ -2108,7 +2118,7 @@ msgstr ""
 "                              οποία θα κάνει την ακρόαση. Δείτε ακόμη την\n"
 "                              επιλογή --dht-listen-addr6."
 
-#: src/usage_text.h:732
+#: src/usage_text.h:745
 msgid ""
 " --dht-listen-addr6=ADDR      Specify address to bind socket for IPv6 DHT. \n"
 "                              It should be a global unicast IPv6 address of "
@@ -2120,7 +2130,7 @@ msgstr ""
 "παγκόσμια\n"
 "                              unicast IPv6 διεύθυνση του υπολογιστή."
 
-#: src/usage_text.h:736
+#: src/usage_text.h:749
 msgid ""
 " --dht-entry-point6=HOST:PORT Set host and port as an entry point to IPv6 "
 "DHT\n"
@@ -2130,14 +2140,14 @@ msgstr ""
 "εισόδου\n"
 "                              στο IPv6 DHT δίκτυο."
 
-#: src/usage_text.h:739
+#: src/usage_text.h:752
 msgid ""
 " --dht-file-path6=PATH        Change the IPv6 DHT routing table file to PATH."
 msgstr ""
 " --dht-file-path6=PATH        Αλλάξτε το αρχείο του πίνακα δρομολόγησης του\n"
 "                              IPv6 DHT στο PATH."
 
-#: src/usage_text.h:741
+#: src/usage_text.h:754
 msgid ""
 " --bt-tracker=URI[,...]       Comma separated list of additional BitTorrent\n"
 "                              tracker's announce URI. These URIs are not\n"
@@ -2157,7 +2167,7 @@ msgstr ""
 "της\n"
 "                              επιλογής --bt-exclude-tracker."
 
-#: src/usage_text.h:747
+#: src/usage_text.h:760
 msgid ""
 " --bt-exclude-tracker=URI[,...] Comma separated list of BitTorrent "
 "tracker's\n"
@@ -2183,7 +2193,7 @@ msgstr ""
 "                              σε εισαγωγικά. Δείτε ακόμη την επιλογή --bt-"
 "tracker."
 
-#: src/usage_text.h:754
+#: src/usage_text.h:767
 msgid ""
 " --max-download-result=NUM    Set maximum number of download result kept in\n"
 "                              memory. The download results are completed/"
@@ -2227,7 +2237,7 @@ msgstr ""
 "                              τιμή σε 0 σημαίνει ότι δε θα τηρούνται "
 "αποτελέσματα λήψης."
 
-#: src/usage_text.h:766
+#: src/usage_text.h:779
 msgid ""
 " --async-dns-server=IPADDRESS[,...] Comma separated list of DNS server "
 "address\n"
@@ -2267,7 +2277,7 @@ msgstr ""
 "έχει τα δικαιώματα\n"
 "                              να το δημιουργήσει."
 
-#: src/usage_text.h:777
+#: src/usage_text.h:790
 msgid ""
 " --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"
 "                              It is strongly recommended to set secret\n"
@@ -2276,7 +2286,7 @@ msgid ""
 "                              See also --rpc-listen-port option."
 msgstr ""
 
-#: src/usage_text.h:782
+#: src/usage_text.h:795
 msgid ""
 " --rpc-max-request-size=SIZE  Set max size of JSON-RPC/XML-RPC request. If "
 "aria2\n"
@@ -2289,7 +2299,7 @@ msgstr ""
 "αίτηση\n"
 "                              μεγαλύτερο από SIZE bytes, κλείνει τη σύνδεση."
 
-#: src/usage_text.h:786
+#: src/usage_text.h:799
 msgid ""
 " --rpc-user=USER              Set JSON-RPC/XML-RPC user. This option will "
 "be\n"
@@ -2297,7 +2307,7 @@ msgid ""
 "                              --rpc-secret option as soon as possible."
 msgstr ""
 
-#: src/usage_text.h:790
+#: src/usage_text.h:803
 msgid ""
 " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password. This option "
 "will\n"
@@ -2306,7 +2316,7 @@ msgid ""
 "                              --rpc-secret option as soon as possible."
 msgstr ""
 
-#: src/usage_text.h:794
+#: src/usage_text.h:807
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -2320,7 +2330,7 @@ msgstr ""
 "ακούτε μόνο στην\n"
 "                              τοπική διεπαφή loopback."
 
-#: src/usage_text.h:798
+#: src/usage_text.h:811
 msgid ""
 " --rpc-listen-port=PORT       Specify a port number for JSON-RPC/XML-RPC "
 "server\n"
@@ -2330,11 +2340,11 @@ msgstr ""
 "διακομιστή\n"
 "                              JSON-RPC/XML-RPC."
 
-#: src/usage_text.h:801
+#: src/usage_text.h:814
 msgid " --show-console-readout[=true|false] Show console readout."
 msgstr " --show-console-readout[=true|false] Εμφάνιση της εξόδου στην κονσόλα."
 
-#: src/usage_text.h:803
+#: src/usage_text.h:816
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -2352,7 +2362,7 @@ msgstr ""
 "τελειώνει\n"
 "                              με '/'."
 
-#: src/usage_text.h:808
+#: src/usage_text.h:821
 msgid ""
 " --stream-piece-selector=SELECTOR Specify piece selection algorithm\n"
 "                              used in HTTP/FTP download. Piece means fixed\n"
@@ -2390,7 +2400,7 @@ msgid ""
 "                              useful to view movie while downloading it."
 msgstr ""
 
-#: src/usage_text.h:835
+#: src/usage_text.h:848
 msgid ""
 " --truncate-console-readout[=true|false] Truncate console readout to fit in\n"
 "                              a single line."
@@ -2398,7 +2408,7 @@ msgstr ""
 " --truncate-console-readout[=true|false] Περιορισμός της εξόδου στην\n"
 "                              κονσόλα ώστε να χωράει σε μια γραμμή."
 
-#: src/usage_text.h:838
+#: src/usage_text.h:851
 msgid ""
 " --pause[=true|false]         Pause download after added. This option is\n"
 "                              effective only when --enable-rpc=true is given."
@@ -2408,7 +2418,7 @@ msgstr ""
 "μόνο\n"
 "                              όταν δοθεί --enable-rpc=true."
 
-#: src/usage_text.h:841
+#: src/usage_text.h:854
 msgid ""
 " --rpc-allow-origin-all[=true|false] Add Access-Control-Allow-Origin header\n"
 "                              field with value '*' to the RPC response."
@@ -2417,7 +2427,7 @@ msgstr ""
 "                              κεφαλίδας Access-Control-Allow-Origin με τιμή "
 "'*'."
 
-#: src/usage_text.h:844
+#: src/usage_text.h:857
 msgid ""
 " --download-result=OPT        This option changes the way \"Download Results"
 "\"\n"
@@ -2437,7 +2447,7 @@ msgid ""
 "                              each row."
 msgstr ""
 
-#: src/usage_text.h:856
+#: src/usage_text.h:869
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
@@ -2445,7 +2455,7 @@ msgid ""
 "                              or not download is complete."
 msgstr ""
 
-#: src/usage_text.h:860
+#: src/usage_text.h:873
 msgid ""
 " --checksum=TYPE=DIGEST       Set checksum. TYPE is hash type. The "
 "supported\n"
@@ -2458,7 +2468,7 @@ msgid ""
 "                              downloads."
 msgstr ""
 
-#: src/usage_text.h:869
+#: src/usage_text.h:882
 msgid ""
 " --piece-length=LENGTH        Set a piece length for HTTP/FTP downloads. "
 "This\n"
@@ -2470,7 +2480,7 @@ msgid ""
 "                              contains piece hashes."
 msgstr ""
 
-#: src/usage_text.h:876
+#: src/usage_text.h:889
 msgid ""
 " --stop-with-process=PID      Stop application when process PID is not "
 "running.\n"
@@ -2485,7 +2495,7 @@ msgid ""
 "                              itself."
 msgstr ""
 
-#: src/usage_text.h:883
+#: src/usage_text.h:896
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -2499,7 +2509,7 @@ msgid ""
 "                              options at startup."
 msgstr ""
 
-#: src/usage_text.h:891
+#: src/usage_text.h:904
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -2510,11 +2520,11 @@ msgid ""
 "                              your disk."
 msgstr ""
 
-#: src/usage_text.h:899
+#: src/usage_text.h:912
 msgid " --enable-mmap[=true|false]   Map files into memory."
 msgstr ""
 
-#: src/usage_text.h:901
+#: src/usage_text.h:914
 msgid ""
 " --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
 "                              The certificate must be in PEM format.\n"
@@ -2524,7 +2534,7 @@ msgid ""
 "                              encryption."
 msgstr ""
 
-#: src/usage_text.h:907
+#: src/usage_text.h:920
 msgid ""
 " --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
 "                              The private key must be decrypted and in PEM\n"
@@ -2532,7 +2542,7 @@ msgid ""
 "                              encryption. See also --rpc-certificate option."
 msgstr ""
 
-#: src/usage_text.h:912
+#: src/usage_text.h:925
 msgid ""
 " --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
 "                              The RPC clients must use https scheme to "
@@ -2543,7 +2553,7 @@ msgid ""
 "                              server certificate and private key."
 msgstr ""
 
-#: src/usage_text.h:919
+#: src/usage_text.h:932
 msgid ""
 " --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
 "                              metalink metadata in the directory specified\n"
@@ -2557,7 +2567,7 @@ msgid ""
 "                              --save-session option."
 msgstr ""
 
-#: src/usage_text.h:930
+#: src/usage_text.h:943
 msgid ""
 " --force-save[=true|false]    Save download with --save-session option even\n"
 "                              if the download is completed or removed. This\n"
@@ -2567,7 +2577,7 @@ msgid ""
 "                              completed state."
 msgstr ""
 
-#: src/usage_text.h:937
+#: src/usage_text.h:950
 msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
@@ -2588,7 +2598,7 @@ msgid ""
 "                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
 msgstr ""
 
-#: src/usage_text.h:950
+#: src/usage_text.h:963
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -2607,11 +2617,11 @@ msgid ""
 "                              by aria2."
 msgstr ""
 
-#: src/usage_text.h:962
+#: src/usage_text.h:975
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr ""
 
-#: src/usage_text.h:964
+#: src/usage_text.h:977
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
@@ -2620,15 +2630,15 @@ msgid ""
 "                              when aria2 exits."
 msgstr ""
 
-#: src/usage_text.h:969
+#: src/usage_text.h:982
 msgid " --enable-color[=true|false]  Enable color output for a terminal."
 msgstr ""
 
-#: src/usage_text.h:971
+#: src/usage_text.h:984
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
 msgstr ""
 
-#: src/usage_text.h:973
+#: src/usage_text.h:986
 msgid ""
 " --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
 "                              BitTorrent traffic for QoS. This parameter "
@@ -2646,9 +2656,9 @@ msgid ""
 "                              use them as they are."
 msgstr ""
 
-#: src/usage_text.h:984
+#: src/usage_text.h:997
 msgid ""
-"  --rlimit-nofile=NUM         Set the soft limit of open file descriptors.\n"
+" --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
 "                                a) The system supports it (posix)\n"
 "                                b) The limit does not exceed the hard "
@@ -2660,7 +2670,7 @@ msgid ""
 "                              except that it will never decrease the limit."
 msgstr ""
 
-#: src/usage_text.h:993
+#: src/usage_text.h:1006
 msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
@@ -2678,11 +2688,105 @@ msgid ""
 "                              only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/version_usage.cc:54
+#: src/usage_text.h:1017
+msgid ""
+" --bt-detach-seed-only[=true|false]\n"
+"                              Exclude seed only downloads when counting\n"
+"                              concurrent active downloads (See -j option).\n"
+"                              This means that if -j3 is given and this "
+"option\n"
+"                              is turned on and 3 downloads are active and "
+"one\n"
+"                              of those enters seed mode, then it is "
+"excluded\n"
+"                              from active download count (thus it becomes "
+"2),\n"
+"                              and the next download waiting in queue gets\n"
+"                              started. But be aware that seeding item is "
+"still\n"
+"                              recognized as active download in RPC method."
+msgstr ""
+
+#: src/usage_text.h:1028
+msgid ""
+" --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
+msgstr ""
+
+#: src/usage_text.h:1030
+msgid ""
+" --bt-force-encryption[=true|false]\n"
+"                              Requires BitTorrent message payload "
+"encryption\n"
+"                              with arc4. This is a shorthand of\n"
+"                              --bt-require-crypto --bt-min-crypto-"
+"level=arc4.\n"
+"                              If true is given, deny legacy BitTorrent\n"
+"                              handshake and only use Obfuscation handshake "
+"and\n"
+"                              always encrypt message payload."
+msgstr ""
+
+#: src/usage_text.h:1038
+msgid ""
+" --ssh-host-key-md=TYPE=DIGEST\n"
+"                              Set checksum for SSH host public key. TYPE is\n"
+"                              hash type. The supported hash type is sha-1 "
+"or\n"
+"                              md5. DIGEST is hex digest. For example:\n"
+"                              sha-1=b030503d4de4539dc7885e6f0f5e256704edf4c3\n"
+"                              This option can be used to validate server's\n"
+"                              public key when SFTP is used. If this option "
+"is\n"
+"                              not set, which is default, no validation "
+"takes\n"
+"                              place."
+msgstr ""
+
+#: src/usage_text.h:1048
+msgid ""
+" --socket-recv-buffer-size=SIZE\n"
+"                              Set the maximum socket receive buffer in "
+"bytes.\n"
+"                              Specifing 0 will disable this option. This "
+"value\n"
+"                              will be set to socket file descriptor using\n"
+"                              SO_RCVBUF socket option with setsockopt() call."
+msgstr ""
+
+#: src/usage_text.h:1054
+msgid ""
+" --bt-enable-hook-after-hash-check[=true|false] Allow hook command "
+"invocation\n"
+"                              after hash check (see -V option) in "
+"BitTorrent\n"
+"                              download. By default, when hash check "
+"succeeds,\n"
+"                              the command given by --on-bt-download-"
+"complete\n"
+"                              is executed. To disable this action, give "
+"false\n"
+"                              to this option."
+msgstr ""
+
+#: src/usage_text.h:1061
+msgid ""
+" --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n"
+"                              --enable-mmap option). The file size is\n"
+"                              determined by the sum of all files contained "
+"in\n"
+"                              one download. For example, if a download\n"
+"                              contains 5 files, then file size is the total\n"
+"                              size of those files. If file size is strictly\n"
+"                              greater than the size specified in this "
+"option,\n"
+"                              mmap will be disabled."
+msgstr ""
+
+#: src/version_usage.cc:56
 msgid " version "
 msgstr " έκδοση "
 
-#: src/version_usage.cc:58
+#: src/version_usage.cc:60
 msgid ""
 "This program is free software; you can redistribute it and/or modify\n"
 "it under the terms of the GNU General Public License as published by\n"
@@ -2695,15 +2799,15 @@ msgid ""
 "GNU General Public License for more details.\n"
 msgstr ""
 
-#: src/version_usage.cc:68
+#: src/version_usage.cc:71
 msgid "** Configuration **"
 msgstr ""
 
-#: src/version_usage.cc:69
+#: src/version_usage.cc:71
 msgid "Enabled Features"
 msgstr ""
 
-#: src/version_usage.cc:71
+#: src/version_usage.cc:72
 msgid "Hash Algorithms"
 msgstr ""
 
@@ -2711,66 +2815,66 @@ msgstr ""
 msgid "Libraries"
 msgstr ""
 
-#: src/version_usage.cc:75
+#: src/version_usage.cc:74
 msgid "Compiler"
 msgstr ""
 
-#: src/version_usage.cc:77
+#: src/version_usage.cc:75
 msgid "System"
 msgstr ""
 
-#: src/version_usage.cc:80
+#: src/version_usage.cc:77
 #, c-format
 msgid "Report bugs to %s"
 msgstr "Αναφορά σφαλμάτων στο %s"
 
-#: src/version_usage.cc:81
+#: src/version_usage.cc:78
 msgid "Visit"
 msgstr ""
 
-#: src/version_usage.cc:88
+#: src/version_usage.cc:84
 #, c-format
 msgid ""
 "Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
 msgstr ""
 "Χρήση: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
 
-#: src/version_usage.cc:93
+#: src/version_usage.cc:89
 #, c-format
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:98
 #, c-format
 msgid "Printing all options."
 msgstr "Εκτύπωση όλων των επιλογών."
 
-#: src/version_usage.cc:103
+#: src/version_usage.cc:101
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "Εκτύπωση των επιλογών που έχουν ετικέτα '%s'."
 
-#: src/version_usage.cc:106
+#: src/version_usage.cc:103
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:109 src/version_usage.cc:123
+#: src/version_usage.cc:106 src/version_usage.cc:122
 #, c-format
 msgid "Options:"
 msgstr "Επιλογές:"
 
-#: src/version_usage.cc:120
+#: src/version_usage.cc:119
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "Εκτύπωση των επιλογών που το όνομά τους περιέχει '%s'."
 
-#: src/version_usage.cc:131
+#: src/version_usage.cc:133
 #, c-format
 msgid "No option matching with '%s'."
 msgstr "Δεν υπάρχει επιλογή που να ταιριάζει με το '%s'"
 
-#: src/version_usage.cc:139
+#: src/version_usage.cc:141
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2781,7 +2885,7 @@ msgstr ""
 " την επιλογή -Z, όλα τα URIs πρέπει να δείχνουν στο ίδιο αρχείο αλλιώς\n"
 " η λήψη θα αποτύχει."
 
-#: src/version_usage.cc:142
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2793,7 +2897,7 @@ msgstr ""
 " τοπικό δίσκο. Παρακαλούμε σημειώστε ότι αντιμετωπίζονται πάντα ως\n"
 " ξεχωριστές λήψεις."
 
-#: src/version_usage.cc:146
+#: src/version_usage.cc:151
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2817,7 +2921,7 @@ msgstr ""
 " το 'name' και το 'path' του torrent προστίθενται ώστε να δημιουργηθεί\n"
 " ένα URI για κάθε αρχείο."
 
-#: src/version_usage.cc:153
+#: src/version_usage.cc:163
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
@@ -2827,7 +2931,7 @@ msgstr ""
 "αν περιέχει \"&\" ή άλλους χαρακτήρες που έχουν ιδιαίτερη σημασία για το "
 "κέλυφος."
 
-#: src/version_usage.cc:156
+#: src/version_usage.cc:169
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2840,32 +2944,32 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:163
+#: src/version_usage.cc:178
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Για περισσότερες πληροφορίες ανατρέξτε στη σελίδα man."
 
-#: src/option_processing.cc:87
+#: src/option_processing.cc:86
 #, c-format
 msgid "Caught Error while parsing environment variable '%s'"
 msgstr ""
 
-#: src/option_processing.cc:169
+#: src/option_processing.cc:164
 #, c-format
 msgid "Did you mean:"
 msgstr ""
 
-#: src/option_processing.cc:242 src/option_processing.cc:251
+#: src/option_processing.cc:239 src/option_processing.cc:249
 #, c-format
 msgid "Parse error in %s"
 msgstr ""
 
-#: src/option_processing.cc:246 src/option_processing.cc:287
+#: src/option_processing.cc:243 src/option_processing.cc:287
 #, c-format
 msgid "Usage:"
 msgstr ""
 
-#: src/option_processing.cc:256
+#: src/option_processing.cc:255
 #, c-format
 msgid "Configuration file %s is not found."
 msgstr ""
@@ -2880,23 +2984,23 @@ msgstr ""
 msgid "Unknown option '%s'"
 msgstr ""
 
-#: src/BtSetup.cc:210
+#: src/BtSetup.cc:211
 msgid "Errors occurred while binding port.\n"
 msgstr "Συνέβησαν σφάλματα κατά τη δέσμευση της θύρας.\n"
 
-#: src/AbstractCommand.cc:498
+#: src/AbstractCommand.cc:494
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:228
+#: src/AdaptiveURISelector.cc:232
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
 "max:%d)"
 msgstr ""
 
-#: src/AdaptiveURISelector.cc:235
+#: src/AdaptiveURISelector.cc:238
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
@@ -2908,28 +3012,28 @@ msgstr ""
 msgid "GID#%s Stop downloading torrent due to --bt-stop-timeout option."
 msgstr ""
 
-#: src/DHTConnectionImpl.cc:84
+#: src/DHTConnectionImpl.cc:82
 #, c-format
 msgid "IPv%d DHT: listening on UDP port %u"
 msgstr ""
 
-#: src/HttpListenCommand.cc:111
+#: src/HttpListenCommand.cc:108
 #, c-format
 msgid "IPv%d RPC: listening on TCP port %u"
 msgstr ""
 
-#: src/PeerListenCommand.cc:82
+#: src/PeerListenCommand.cc:79
 #, c-format
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr ""
 
-#: src/RequestGroup.cc:377
+#: src/RequestGroup.cc:386
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 msgstr ""
 
-#: src/RequestGroup.cc:647
+#: src/RequestGroup.cc:653
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr ""
@@ -2940,54 +3044,54 @@ msgid ""
 "allocation option in man page for more details."
 msgstr ""
 
-#: src/message.h:57
+#: src/message.h:59
 #, c-format
 msgid "GID#%s - Download has already completed: %s"
 msgstr ""
 
-#: src/message.h:106
+#: src/message.h:108
 #, c-format
 msgid "Unrecognized URI or unsupported protocol: %s"
 msgstr "Μη αναγνωρίσιμο URI ή μη υποστηριζόμενο πρωτόκολλο: %s"
 
-#: src/message.h:107
+#: src/message.h:109
 #, c-format
 msgid "Tracker returned warning message: %s"
 msgstr "Ο tracker επέστρεψε ένα προειδοποιητικό μήνυμα: %s"
 
-#: src/message.h:108
+#: src/message.h:110
 #, c-format
 msgid "The segment file %s exists."
 msgstr "Το αρχείο τμήματος %s υπάρχει ήδη."
 
-#: src/message.h:109
+#: src/message.h:111
 #, c-format
 msgid "The segment file %s does not exist."
 msgstr "Το αρχείο τμήματος %s δεν υπάρχει."
 
-#: src/message.h:110
+#: src/message.h:112
 #, c-format
 msgid "Saving the segment file %s"
 msgstr "Γίνεται αποθήκευση του αρχείου τμήματος %s."
 
-#: src/message.h:111
+#: src/message.h:113
 msgid "The segment file was saved successfully."
 msgstr "Το αρχείο τμήματος αποθηκεύτηκε επιτυχώς."
 
-#: src/message.h:112
+#: src/message.h:114
 #, c-format
 msgid "Loading the segment file %s."
 msgstr "Γίνεται φόρτωση του αρχείου τμήματος %s."
 
-#: src/message.h:113
+#: src/message.h:115
 msgid "The segment file was loaded successfully."
 msgstr "Το αρχείο τμήματος φορτώθηκε επιτυχώς."
 
-#: src/message.h:114
+#: src/message.h:116
 msgid "No URI to download. Download aborted."
 msgstr "Δεν υπάρχει URI για λήψη. Η λήψη ματαιώθηκε."
 
-#: src/message.h:115
+#: src/message.h:117
 #, c-format
 msgid ""
 "File %s exists, but a control file(*.aria2) does not exist. Download was "
@@ -3000,92 +3104,92 @@ msgstr ""
 "για τη λήψη του αρχείου από την αρχή, τότε διαγράψτε το ή προσθέστε την "
 "επιλογή--allow-overwrite=true και επανεκκινήστε το aria2."
 
-#: src/message.h:116
+#: src/message.h:118
 #, c-format
 msgid "Allocating file %s, %s bytes"
 msgstr "Γίνεται δέσμευση του αρχείου %s, %s bytes"
 
-#: src/message.h:117
+#: src/message.h:119
 msgid "File not found"
 msgstr "Δε βρέθηκε το αρχείο"
 
-#: src/message.h:118
+#: src/message.h:120
 msgid "Not a directory"
 msgstr "Δεν είναι κατάλογος"
 
-#: src/message.h:119
+#: src/message.h:121
 #, c-format
 msgid "Insufficient checksums. checksumLength=%d, numChecksum=%d"
 msgstr "Ανεπαρκή checksums. checksumLength=%d, numChecksum=%d"
 
-#: src/message.h:120
+#: src/message.h:122
 #, c-format
 msgid "Writing file %s"
 msgstr "Γίνεται εγγραφή του αρχείου %s"
 
-#: src/message.h:121
+#: src/message.h:123
 msgid "No peer list received."
 msgstr "Δεν έγινε λήψη λίστας χρηστών"
 
-#: src/message.h:122
+#: src/message.h:124
 #, c-format
 msgid "Adding peer %s:%d"
 msgstr "Γίνεται προσθήκη του χρήστη %s:%d"
 
-#: src/message.h:123
+#: src/message.h:125
 #, c-format
 msgid "Deleting used piece index=%d, fillRate(%%)=%d<=%d"
 msgstr ""
 "Γίνεται διαγραφή του χρησιμοποιημένου κομματιού. index=%d, fillRate(%%)=%d<="
 "%d"
 
-#: src/message.h:124
+#: src/message.h:126
 msgid "Download of selected files was complete."
 msgstr "Η λήψη των επιλεγμένων αρχείων ολοκληρώθηκε."
 
-#: src/message.h:125
+#: src/message.h:127
 msgid "The download was complete."
 msgstr "Η λήψη ολοκληρώθηκε."
 
-#: src/message.h:126
+#: src/message.h:128
 #, c-format
 msgid "Removed %lu have entries."
 msgstr "Τα %lu που αφαιρέθηκαν περιέχουν εγγραφές."
 
-#: src/message.h:127
+#: src/message.h:129
 #, c-format
 msgid "Validating file %s"
 msgstr "Γίνεται επαλήθευση του αρχείου %s"
 
-#: src/message.h:131
+#: src/message.h:133
 #, c-format
 msgid "Metalink: Queueing %s for download."
 msgstr "Metalink: Τοποθέτηση του %s στην ουρά για λήψη."
 
-#: src/message.h:132
+#: src/message.h:134
 #, c-format
 msgid "Download complete: %s"
 msgstr "Η λήψη ολοκληρώθηκε: %s"
 
-#: src/message.h:133
+#: src/message.h:135
 msgid "Seeding is over."
 msgstr "Ο διαμοιρασμός ολοκληρώθηκε."
 
-#: src/message.h:134
+#: src/message.h:136
 msgid "No chunk to verify."
 msgstr "Δεν υπάρχει τμήμα για επαλήθευση."
 
-#: src/message.h:135
+#: src/message.h:137
 #, c-format
 msgid "Good chunk checksum. hash=%s"
 msgstr "Σωστό checksum τμήματος. hash=%s"
 
-#: src/message.h:136
+#: src/message.h:138
 #, c-format
 msgid "Failed to load cookies from %s"
 msgstr "Αποτυχία φόρτωσης των cookies από το %s"
 
-#: src/message.h:137
+#: src/message.h:139
 #, c-format
 msgid ""
 ".netrc file %s does not have correct permissions. It should be 600. netrc "
@@ -3094,59 +3198,59 @@ msgstr ""
 "Το αρχείο .netrc %s δεν έχει τα σωστά δικαιώματα. Θα έπρεπε να είναι 600. Η "
 "υποστήριξη για το netrc απενεργοποιήθηκε."
 
-#: src/message.h:138
+#: src/message.h:140
 msgid "Logging started."
 msgstr "Η καταγραφή εκκινήθηκε."
 
-#: src/message.h:139
+#: src/message.h:141
 msgid "Specify at least one URL."
 msgstr "Ορίστε τουλάχιστον ένα URL."
 
-#: src/message.h:140
+#: src/message.h:142
 msgid "daemon failed."
 msgstr "Ο δαίμονας απέτυχε."
 
-#: src/message.h:141
+#: src/message.h:143
 #, c-format
 msgid "Verification finished successfully. file=%s"
 msgstr "Η επαλήθευση ολοκληρώθηκε επιτυχώς. file=%s"
 
-#: src/message.h:142
+#: src/message.h:144
 #, c-format
 msgid "Checksum error detected. file=%s"
 msgstr "Εντοπίστηκε σφάλμα checksum, file=%s"
 
-#: src/message.h:143
+#: src/message.h:145
 #, c-format
 msgid "Incomplete range specified. %s"
 msgstr "Προσδιορίστηκε μη ολοκληρωμένο εύρος. %s"
 
-#: src/message.h:144
+#: src/message.h:146
 #, c-format
 msgid "Failed to convert string into value: %s"
 msgstr "Αποτυχία μετατροπής αλφαριθμητικού σε τιμή: %s"
 
-#: src/message.h:145
+#: src/message.h:147
 msgid "Resource not found"
 msgstr "Δε βρέθηκε ο πόρος"
 
-#: src/message.h:146
+#: src/message.h:148
 #, c-format
 msgid "File already exists. Renamed to %s."
 msgstr "Το αρχείο υπάρχει ήδη. Έγινε μετονομασία σε %s."
 
-#: src/message.h:147
+#: src/message.h:149
 msgid "Cannot parse metalink XML file. XML may be malformed."
 msgstr ""
 "Δεν ήταν δυνατή η ανάλυση του αρχείου metalink. Το XML μπορεί να είναι "
 "λανθασμένο."
 
-#: src/message.h:148
+#: src/message.h:150
 #, c-format
 msgid "Too small payload size for %s, size=%lu."
 msgstr "Πολύ μικρό μέγεθος φόρτου για το %s, size=%lu."
 
-#: src/message.h:149
+#: src/message.h:151
 #, c-format
 msgid ""
 "Removed the defunct control file %s because the download file %s doesn't "
@@ -3155,35 +3259,35 @@ msgstr ""
 "Έγινε αφαίρεση του παλιού αρχείου ελέγχου %s γιατί το αρχείο λήψης %s δεν "
 "υπάρχει."
 
-#: src/message.h:150
+#: src/message.h:152
 #, c-format
 msgid "Your share ratio was %.1f, uploaded/downloaded=%sB/%sB"
 msgstr "Ο λόγος του διαμοιρασμού σας ήταν %.1f, απεστάλησαν/ελήφθησαν=%sB/%sB"
 
-#: src/message.h:151
+#: src/message.h:153
 #, c-format
 msgid "Missing %s in torrent metainfo."
 msgstr "Απουσία του %s στα metainfo του torrent."
 
-#: src/message.h:152
+#: src/message.h:154
 #, c-format
 msgid "%s does not allow negative integer %<PRId64>"
 msgstr ""
 
-#: src/message.h:153
+#: src/message.h:155
 msgid "Tracker returned null data."
 msgstr "Ο tracker επέστρεψε κενά δεδομένα."
 
-#: src/message.h:154
+#: src/message.h:156
 msgid "Windows socket library initialization failed"
 msgstr "Αποτυχία αρχικοποίησης της βιβλιοθήκης socket των windows"
 
-#: src/message.h:155
+#: src/message.h:157
 #, c-format
 msgid "%ld second(s) has passed. Stopping application."
 msgstr "Έχουν/ει περάσει %ld δευτερόλεπτα/ο. Γίνεται διακοπή της εφαρμογής."
 
-#: src/message.h:156
+#: src/message.h:158
 #, c-format
 msgid ""
 "Saved signature as %s. Please note that aria2 doesn't verify signatures."
@@ -3191,63 +3295,63 @@ msgstr ""
 "Η υπογραφή αποθηκεύτηκε σαν %s. Παρακαλούμε έχετε υπόψιν σας ότι το aria2 "
 "δεν επαληθεύει τις υπογραφές."
 
-#: src/message.h:158
+#: src/message.h:160
 #, c-format
 msgid "Saving signature as %s failed. Maybe file already exists."
 msgstr ""
 "Η αποθήκευση της υπογραφής ως %s απέτυχε. Πιθανόν να υπάρχει ήδη το αρχείο."
 
-#: src/message.h:161
+#: src/message.h:163
 #, c-format
 msgid "Failed to open ServerStat file %s for read."
 msgstr "Αποτυχία ανοίγματος του αρχείου ServerStat %s για ανάγνωση."
 
-#: src/message.h:162
+#: src/message.h:164
 #, c-format
 msgid "ServerStat file %s loaded successfully."
 msgstr "Το αρχείο ServerStat %s φορτώθηκε επιτυχώς."
 
-#: src/message.h:163
+#: src/message.h:165
 #, c-format
 msgid "Failed to read ServerStat from %s."
 msgstr "Αποτυχία ανάγνωσης του ServerStat από %s."
 
-#: src/message.h:166
+#: src/message.h:168
 #, c-format
 msgid "Failed to open ServerStat file %s for write."
 msgstr "Αποτυχία ανοίγματος του αρχείου ServerStat %s για εγγραφή."
 
-#: src/message.h:167
+#: src/message.h:169
 #, c-format
 msgid "ServerStat file %s saved successfully."
 msgstr "Το αρχείο ServerStat %s αποθηκεύτηκε επιτυχώς."
 
-#: src/message.h:168
+#: src/message.h:170
 #, c-format
 msgid "Failed to write ServerStat to %s."
 msgstr "Αποτυχία εγγραφής του ServerStat στο %s."
 
-#: src/message.h:171
+#: src/message.h:173
 #, c-format
 msgid "Failed to establish connection, cause: %s"
 msgstr "Αποτυχία δημιουργίας σύνδεσης, λόγω: %s"
 
-#: src/message.h:172
+#: src/message.h:174
 #, c-format
 msgid "Network problem has occurred. cause:%s"
 msgstr "Συνέβη κάποιο σφάλμα δικτύου, λόγω:%s"
 
-#: src/message.h:174
+#: src/message.h:176
 #, c-format
 msgid "Failed to load trusted CA certificates from system. Cause: %s"
 msgstr ""
 
-#: src/message.h:176
+#: src/message.h:178
 #, c-format
 msgid "Failed to load trusted CA certificates from %s. Cause: %s"
 msgstr "Αποτυχία φόρτωσης έμπιστων πιστοποιητικών CA από το %s. Λόγος: %s"
 
-#: src/message.h:178
+#: src/message.h:180
 #, c-format
 msgid ""
 "Certificate verification failed. Cause: %s See --ca-certificate and --check-"
@@ -3256,19 +3360,19 @@ msgstr ""
 "Αποτυχία επαλήθευσης του πιστοποιητικού. Λόγος: %s. Δείτε τις επιλογές --ca-"
 "certificate και --check-certificate."
 
-#: src/message.h:180
+#: src/message.h:182
 msgid "No certificate found."
 msgstr "Δε βρέθηκε πιστοποιητικό."
 
-#: src/message.h:181
+#: src/message.h:183
 msgid "Hostname not match."
 msgstr "Το όνομα υπολογιστή δεν ταιριάζει."
 
-#: src/message.h:182
+#: src/message.h:184
 msgid "No files to download."
 msgstr "Δεν υπάρχουν αρχεία για λήψη."
 
-#: src/message.h:184
+#: src/message.h:186
 msgid ""
 "You may encounter the certificate verification error with HTTPS server. See "
 "--ca-certificate and --check-certificate option."
@@ -3276,95 +3380,112 @@ msgstr ""
 "Ίσως αντιμετωπίσετε ένα σφάλμα επαλήθευσης πιστοποιητικού με το διακομιστή "
 "HTTPS. Δείτε τις επιλογές --ca-certificate και --check-certificate."
 
-#: src/message.h:186
+#: src/message.h:189
+#, c-format
+msgid ""
+"aria2c had to connect to the other side using an unknown TLS protocol. The "
+"integrity and confidentiality of the connection might be compromised.\n"
+"Peer: %s"
+msgstr ""
+
+#: src/message.h:193
+#, c-format
+msgid ""
+"aria2c had to connect to the other side using an old and vulnerable TLS "
+"protocol. The integrity and confidentiality of the connection might be "
+"compromised.\n"
+"Protocol: %s, Peer: %s"
+msgstr ""
+
+#: src/message.h:196
 #, c-format
 msgid "Printing the contents of file '%s'..."
 msgstr "Γίνεται εκτύπωση των περιεχομένων του αρχείου '%s'..."
 
-#: src/message.h:187
+#: src/message.h:197
 msgid "This file is neither Torrent nor Metalink file. Skipping."
 msgstr ""
 "Το αρχείο δεν είναι ούτε αρχείο Torrent ούτε Metalink. Γίνεται παράληψη."
 
-#: src/message.h:192
+#: src/message.h:202
 #, c-format
 msgid "Is '%s' a file?"
 msgstr "Είναι αρχείο το '%s';"
 
-#: src/message.h:193
+#: src/message.h:203
 #, c-format
 msgid "Failed to find given interface %s, cause: %s"
 msgstr "Αποτυχία εύρεσης της διεπαφής %s που δόθηκε, λόγω: %s."
 
-#: src/message.h:195
+#: src/message.h:205
 #, c-format
 msgid "Saved metadata as %s."
 msgstr "Τα metadata αποθηκεύτηκαν ως %s."
 
-#: src/message.h:196
+#: src/message.h:206
 #, c-format
 msgid "Saving metadata as %s failed. Maybe file already exists."
 msgstr ""
 "Αποτυχία αποθήκευσης των metadata ως %s. Πιθανώς το αρχείο να υπάρχει ήδη."
 
-#: src/message.h:198
+#: src/message.h:208
 #, c-format
 msgid "Detected directory traversal directive in %s"
 msgstr "Εντοπίστηκε οδηγία directory traversal στο %s"
 
-#: src/message.h:201
+#: src/message.h:211
 #, c-format
 msgid "GID#%s - Removing unselected file."
 msgstr ""
 
-#: src/message.h:202
+#: src/message.h:212
 #, c-format
 msgid "File %s removed."
 msgstr ""
 
-#: src/message.h:203
+#: src/message.h:213
 #, c-format
 msgid "File %s could not be removed."
 msgstr ""
 
-#: src/message.h:205
+#: src/message.h:215
 msgid "Timeout."
 msgstr "Υπέρβαση χρονικού ορίου."
 
-#: src/message.h:206
+#: src/message.h:216
 msgid "Invalid chunk size."
 msgstr "Μη έγκυρο μέγεθος τμήματος."
 
-#: src/message.h:207
+#: src/message.h:217
 #, c-format
 msgid "Too large chunk. size=%d"
 msgstr "Πολύ μεγάλο τμήμα. μέγεθος=%d"
 
-#: src/message.h:208
+#: src/message.h:218
 msgid "Invalid header."
 msgstr "Μη έγκυρη κεφαλίδα."
 
-#: src/message.h:209
+#: src/message.h:219
 msgid "Invalid response."
 msgstr "Μη έγκυρη απάντηση."
 
-#: src/message.h:210
+#: src/message.h:220
 msgid "No header found."
 msgstr "Δε βρέθηκε κεφαλίδα."
 
-#: src/message.h:211
+#: src/message.h:221
 msgid "No status header."
 msgstr "Δεν υπάρχει κεφαλίδα κατάστασης."
 
-#: src/message.h:212
+#: src/message.h:222
 msgid "Proxy connection failed."
 msgstr "Αποτυχία σύνδεσης με το διακομιστή μεσολάβησης."
 
-#: src/message.h:213
+#: src/message.h:223
 msgid "Connection failed."
 msgstr "Αποτυχία σύνδεσης."
 
-#: src/message.h:214
+#: src/message.h:224
 #, c-format
 msgid ""
 "The requested filename and the previously registered one are not same. "
@@ -3373,219 +3494,219 @@ msgstr ""
 "Το όνομα αρχείου που ζητήθηκε και εκείνο που δηλώθηκε προηγουμένως, δεν "
 "είναι τα ίδια. Αναμενόμενο:%s Πραγματικό:%s"
 
-#: src/message.h:215
+#: src/message.h:225
 #, c-format
 msgid "The response status is not successful. status=%d"
 msgstr "Η κατάσταση της απάντησης δεν είναι επιτυχής. status=%d"
 
-#: src/message.h:217
+#: src/message.h:227
 #, c-format
 msgid "Transfer encoding %s is not supported."
 msgstr "Η κωδικοποίηση μεταφοράς %s δεν υποστηρίζεται."
 
-#: src/message.h:218
+#: src/message.h:228
 #, c-format
 msgid "SSL initialization failed: %s"
 msgstr "Η αρχικοποίηση του SSL απέτυχε: %s"
 
-#: src/message.h:219
+#: src/message.h:229
 msgid "SSL I/O error"
 msgstr "Σφάλμα SSL I/O"
 
-#: src/message.h:220
+#: src/message.h:230
 msgid "SSL protocol error"
 msgstr "Σφάλμα πρωτοκόλλου SSL"
 
-#: src/message.h:221
+#: src/message.h:231
 #, c-format
 msgid "SSL unknown error %d"
 msgstr "Άγνωστο σφάλμα του SSL %d"
 
-#: src/message.h:222
+#: src/message.h:232
 #, c-format
 msgid "SSL initialization failed: OpenSSL connect error %d"
 msgstr "Η αρχικοποίηση του SSL απέτυχε: Σφάλμα σύνδεσης του OpenSSL %d"
 
-#: src/message.h:224
+#: src/message.h:234
 msgid "Authorization failed."
 msgstr "Αποτυχία εξουσιοδότησης."
 
-#: src/message.h:225
+#: src/message.h:235
 msgid "Got EOF from the server."
 msgstr "Έγινε λήψη EOF από το διακομιστή."
 
-#: src/message.h:226
+#: src/message.h:236
 msgid "Got EOF from peer."
 msgstr "Έγινε λήψη EOF από το χρήστη."
 
-#: src/message.h:227
+#: src/message.h:237
 msgid "Malformed meta info."
 msgstr "Λανθασμένες metainfo."
 
-#: src/message.h:229
+#: src/message.h:239
 #, c-format
 msgid "Failed to open the file %s, cause: %s"
 msgstr "Αποτυχία ανοίγματος του αρχείου %s, λόγω: %s"
 
-#: src/message.h:230
+#: src/message.h:240
 #, c-format
 msgid "Failed to write into the file %s, cause: %s"
 msgstr "Αποτυχία εγγραφής στο αρχείο %s, λόγω: %s"
 
-#: src/message.h:231
+#: src/message.h:241
 #, c-format
 msgid "Failed to read from the file %s, cause: %s"
 msgstr "Αποτυχία ανάγνωσης του αρχείου %s, λόγω: %s"
 
-#: src/message.h:232
+#: src/message.h:242
 msgid "Failed to read data from disk."
 msgstr "Αποτυχία ανάγνωσης δεδομένων από το δίσκο."
 
-#: src/message.h:233
+#: src/message.h:243
 #, c-format
 msgid "Failed to calculate SHA1 digest of or a part of the file %s, cause: %s"
 msgstr ""
 "Αποτυχία υπολογισμού του αλγορίθμου SHA1 για το αρχείο %s ή ενός μέρους του, "
 "λόγω: %s"
 
-#: src/message.h:234
+#: src/message.h:244
 #, c-format
 msgid "Failed to seek the file %s, cause: %s"
 msgstr "Αποτυχία αναζήτησης του αρχείου %s, λόγω: %s"
 
-#: src/message.h:236
+#: src/message.h:246
 #, c-format
 msgid "%s is not a directory."
 msgstr "Το %s δεν είναι κατάλογος."
 
-#: src/message.h:237
+#: src/message.h:247
 #, c-format
 msgid "Failed to make the directory %s, cause: %s"
 msgstr "Αποτυχία δημιουργίας του καταλόγου %s, λόγω: %s"
 
-#: src/message.h:241
+#: src/message.h:251
 #, c-format
 msgid "Failed to open a socket, cause: %s"
 msgstr "Αποτυχία ανοίγματος ενός socket, λόγω: %s"
 
-#: src/message.h:242
+#: src/message.h:252
 #, c-format
 msgid "Failed to set a socket option, cause: %s"
 msgstr "Αποτυχία ορισμού μιας επιλογής του socket, λόγω: %s"
 
-#: src/message.h:243
+#: src/message.h:253
 #, c-format
 msgid "Failed to set a socket as blocking, cause: %s"
 msgstr "Αποτυχία ρύθμισης ενός socket ως κλειστό, λόγω: %s"
 
-#: src/message.h:244
+#: src/message.h:254
 #, c-format
 msgid "Failed to set a socket as non-blocking, cause: %s"
 msgstr "Αποτυχία ρύθμισης ενός socket ως ανοιχτό, λόγω: %s"
 
-#: src/message.h:245
+#: src/message.h:255
 #, c-format
 msgid "Failed to bind a socket, cause: %s"
 msgstr "Αποτυχία δέσμευσης ενός socket, λόγω: %s"
 
-#: src/message.h:246
+#: src/message.h:256
 #, c-format
 msgid "Failed to listen to a socket, cause: %s"
 msgstr "Αποτυχία ακρόασης σε ένα socket, λόγω: %s"
 
-#: src/message.h:247
+#: src/message.h:257
 #, c-format
 msgid "Failed to accept a peer connection, cause: %s"
 msgstr "Αποτυχία αποδοχής μιας σύνδεσης χρήστη, λόγω: %s"
 
-#: src/message.h:248
+#: src/message.h:258
 #, c-format
 msgid "Failed to get the name of socket, cause: %s"
 msgstr "Αποτυχία λήψης του ονόματος του socket, λόγω: %s"
 
-#: src/message.h:249
+#: src/message.h:259
 #, c-format
 msgid "Failed to get the name of connected peer, cause: %s"
 msgstr "Αποτυχία λήψης του ονόματος του συνδεδεμένου χρήστη, λόγω: %s"
 
-#: src/message.h:250
+#: src/message.h:260
 #, c-format
 msgid "Failed to resolve the hostname %s, cause: %s"
 msgstr "Αποτυχία επίλυσης του ονόματος υπολογιστή %s, λόγω: %s"
 
-#: src/message.h:251
+#: src/message.h:261
 #, c-format
 msgid "Failed to connect to the host %s, cause: %s"
 msgstr "Αποτυχία σύνδεσης στον υπολογιστή %s, λόγω: %s"
 
-#: src/message.h:252
+#: src/message.h:262
 #, c-format
 msgid "Failed to check whether the socket is writable, cause: %s"
 msgstr "Αποτυχία ελέγχου αν το socket είναι εγγράψιμο, λόγω: %s"
 
-#: src/message.h:253
+#: src/message.h:263
 #, c-format
 msgid "Failed to check whether the socket is readable, cause: %s"
 msgstr "Αποτυχία ελέγχου αν το socket είναι αναγνώσιμο, λόγω: %s"
 
-#: src/message.h:254
+#: src/message.h:264
 #, c-format
 msgid "Failed to send data, cause: %s"
 msgstr "Αποτυχία αποστολής δεδομένων, λόγω: %s"
 
-#: src/message.h:255
+#: src/message.h:265
 #, c-format
 msgid "Failed to receive data, cause: %s"
 msgstr "Αποτυχία λήψης δεδομένων, λόγω: %s"
 
-#: src/message.h:256
+#: src/message.h:266
 #, c-format
 msgid "Failed to peek data, cause: %s"
 msgstr "Αποτυχία εύρεσης δεδομένων, λόγω: %s"
 
-#: src/message.h:257
+#: src/message.h:267
 #, c-format
 msgid "Unknown socket error %d (0x%x)"
 msgstr "Άγνωστο σφάλμα του socket %d (0x%x)"
 
-#: src/message.h:258
+#: src/message.h:268
 #, c-format
 msgid "File %s exists, but %s does not exist."
 msgstr "Το αρχείο %s υπάρχει, αλλά το %s δεν υπάρχει."
 
-#: src/message.h:260
+#: src/message.h:270
 #, c-format
 msgid "Invalid payload size for %s, size=%lu. It should be %lu."
 msgstr "Μη έγκυρο μέγεθος φόρτου για το %s, size=%lu. Θα έπρεπε να είναι %lu."
 
-#: src/message.h:261
+#: src/message.h:271
 #, c-format
 msgid "Invalid ID=%d for %s. It should be %d."
 msgstr "Μη έγκυρο ID=%d για το %s. Θα έπρεπε να είναι %d."
 
-#: src/message.h:263
+#: src/message.h:273
 msgid "Download aborted."
 msgstr "Η λήψη ματαιώθηκε."
 
-#: src/message.h:264
+#: src/message.h:274
 #, c-format
 msgid "File %s is being downloaded by other command."
 msgstr "Γίνεται λήψη του αρχείου %s από κάποια άλλη εντολή."
 
-#: src/message.h:265
+#: src/message.h:275
 msgid "Insufficient checksums."
 msgstr "Μη επαρκή checksums."
 
-#: src/message.h:266
+#: src/message.h:276
 #, c-format
 msgid "Tracker returned failure reason: %s"
 msgstr "Ο tracker επέστρεψε το λόγο αποτυχίας: %s"
 
-#: src/message.h:267
+#: src/message.h:277
 msgid "Flooding detected."
 msgstr "Εντοπίστηκε υπερχείλιση."
 
-#: src/message.h:269
+#: src/message.h:279
 #, c-format
 msgid ""
 "Drop connection because no request/piece messages were exchanged in a "
@@ -3594,44 +3715,44 @@ msgstr ""
 "Κλείσιμο της σύνδεσης γιατί δεν ανταλλάχτηκαν μηνύματα αιτήσεων/κομματιών "
 "μέσα σε μια συγκεκριμένη περίοδο (%ld δευτερόλεπτα)."
 
-#: src/message.h:271
+#: src/message.h:281
 msgid "The infoHash in torrent file doesn't match to one in .aria2 file."
 msgstr ""
 "Το infoHash στο αρχείο torrent δεν ταιριάζει με κάποιο στο αρχείο .aria2."
 
-#: src/message.h:272
+#: src/message.h:282
 #, c-format
 msgid "No such file entry %s"
 msgstr "Δε βρέθηκε η εγγραφή αρχείου %s"
 
-#: src/message.h:273
+#: src/message.h:283
 #, c-format
 msgid "Too slow Downloading speed: %d <= %d(B/s), host:%s"
 msgstr "Πολύ αργή ταχύτητα λήψης: %d <= %d(B/s), υπολογιστής:%s"
 
-#: src/message.h:274
+#: src/message.h:284
 msgid "No HttpRequestEntry found."
 msgstr "Δε βρέθηκε HttpRequestEntry."
 
-#: src/message.h:275
+#: src/message.h:285
 #, c-format
 msgid "Got %d status, but no location header provided."
 msgstr "Ελήφθη η κατάσταση %d, αλλά δεν παρέχεται η κεφαλίδα τοποθεσίας."
 
-#: src/message.h:277
+#: src/message.h:287
 msgid "No file matched with your preference."
 msgstr "Δε βρέθηκε αρχείο που να ταιριάζει με τις προτιμήσεις σας."
 
-#: src/message.h:278
+#: src/message.h:288
 msgid "Exception caught"
 msgstr "Ελήφθη εξαίρεση"
 
-#: src/message.h:279
+#: src/message.h:289
 #, c-format
 msgid "Max payload length exceeded or invalid. length = %u"
 msgstr "Υπέρβαση του μέγιστου μήκους φόρτου ή μη έγκυρο μήκος = %u"
 
-#: src/message.h:280
+#: src/message.h:290
 #, c-format
 msgid "Invalid file length. Cannot continue download %s: local %s, remote %s"
 msgstr ""

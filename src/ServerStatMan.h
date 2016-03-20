@@ -54,7 +54,7 @@ public:
   ~ServerStatMan();
 
   std::shared_ptr<ServerStat> find(const std::string& hostname,
-                                const std::string& protocol) const;
+                                   const std::string& protocol) const;
 
   bool add(const std::shared_ptr<ServerStat>& serverStat);
 
@@ -62,10 +62,11 @@ public:
 
   bool save(const std::string& filename) const;
 
-  void removeStaleServerStat(time_t timeout);
+  void removeStaleServerStat(const std::chrono::seconds& timeout);
+
 private:
   typedef std::set<std::shared_ptr<ServerStat>,
-                   DerefLess<std::shared_ptr<ServerStat> > > ServerStatSet;
+                   DerefLess<std::shared_ptr<ServerStat>>> ServerStatSet;
   ServerStatSet serverStats_;
 };
 

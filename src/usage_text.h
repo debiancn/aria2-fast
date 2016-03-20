@@ -33,6 +33,8 @@
  */
 /* copyright --> */
 
+// clang-format off
+
 #define TEXT_DIR                                                        \
   _(" -d, --dir=DIR                The directory to store the downloaded file.")
 #define TEXT_OUT                                                        \
@@ -150,7 +152,7 @@
   _(" --no-file-allocation-limit=SIZE No file allocation is made for files whose\n" \
     "                              size is smaller than SIZE.\n"        \
     "                              You can append K or M(1K = 1024, 1M = 1024K).")
-# define TEXT_ENABLE_DIRECT_IO                                          \
+#define TEXT_ENABLE_DIRECT_IO                                          \
   _(" --enable-direct-io[=true|false] Enable directI/O, which lowers cpu usage while\n" \
     "                              allocating files.\n"                 \
     "                              Turn off if you encounter any error")
@@ -225,6 +227,8 @@
   _(" -U, --user-agent=USER_AGENT  Set user agent for http(s) downloads.")
 #define TEXT_NO_NETRC                                           \
   _(" -n, --no-netrc[=true|false]  Disables netrc support.")
+#define TEXT_NETRC_PATH                                           \
+  _(" --netrc-path=FILE            Specify the path to the netrc file.")
 #define TEXT_INPUT_FILE                                                 \
   _(" -i, --input-file=FILE        Downloads URIs found in FILE. You can specify\n" \
     "                              multiple URIs for a single entity: separate\n" \
@@ -451,7 +455,9 @@
     "                              a single byte, then force the download to fail.\n" \
     "                              Specify 0 to disable this option.\n" \
     "                              This options is effective only when using\n" \
-    "                              HTTP/FTP servers.")
+    "                              HTTP/FTP servers. The number of retry attempt is\n" \
+    "                              counted toward --max-tries, so it should be\n" \
+    "                              configured too.")
 #define TEXT_URI_SELECTOR                                               \
   _(" --uri-selector=SELECTOR      Specify URI selection algorithm.\n"  \
     "                              If 'inorder' is given, URI is tried in the order\n" \
@@ -599,6 +605,13 @@
 #define TEXT_INTERFACE                                                  \
   _(" --interface=INTERFACE        Bind sockets to given interface. You can specify\n" \
     "                              interface name, IP address and hostname.")
+#define TEXT_MULTIPLE_INTERFACE                                         \
+  _(" --multiple-interface=INTERFACES Comma separated list of interfaces to bind\n" \
+    "                              sockets to. Requests will be splited among the\n" \
+    "                              interfaces to achieve link aggregation. You can\n" \
+    "                              specify interface name, IP address and hostname.\n" \
+    "                              If --interface is used, this option will be\n" \
+    "                              ignored.")
 #define TEXT_DISABLE_IPV6                               \
   _(" --disable-ipv6[=true|false]  Disable IPv6.")
 #define TEXT_BT_SAVE_METADATA                                           \
@@ -981,7 +994,7 @@
     "                              documentation, Wikipedia or any other source,\n" \
     "                              use them as they are.")
 #define TEXT_RLIMIT_NOFILE                                              \
-  _("  --rlimit-nofile=NUM         Set the soft limit of open file descriptors.\n" \
+  _(" --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n" \
     "                              This open will only have effect when:\n" \
     "                                a) The system supports it (posix)\n" \
     "                                b) The limit does not exceed the hard limit.\n" \
@@ -1000,3 +1013,58 @@
     "                              using their metadata. This option pauses these\n" \
     "                              subsequent downloads. This option is effective\n" \
     "                              only when --enable-rpc=true is given.")
+#define TEXT_BT_DETACH_SEED_ONLY                \
+  _(" --bt-detach-seed-only[=true|false]\n"     \
+    "                              Exclude seed only downloads when counting\n" \
+    "                              concurrent active downloads (See -j option).\n" \
+    "                              This means that if -j3 is given and this option\n" \
+    "                              is turned on and 3 downloads are active and one\n" \
+    "                              of those enters seed mode, then it is excluded\n" \
+    "                              from active download count (thus it becomes 2),\n" \
+    "                              and the next download waiting in queue gets\n" \
+    "                              started. But be aware that seeding item is still\n" \
+    "                              recognized as active download in RPC method.")
+#define TEXT_MIN_TLS_VERSION                                            \
+  _(" --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable.")
+#define TEXT_BT_FORCE_ENCRYPTION                                        \
+  _(" --bt-force-encryption[=true|false]\n"                             \
+    "                              Requires BitTorrent message payload encryption\n" \
+    "                              with arc4. This is a shorthand of\n" \
+    "                              --bt-require-crypto --bt-min-crypto-level=arc4.\n" \
+    "                              If true is given, deny legacy BitTorrent\n" \
+    "                              handshake and only use Obfuscation handshake and\n" \
+    "                              always encrypt message payload.")
+#define TEXT_SSH_HOST_KEY_MD                                            \
+  _(" --ssh-host-key-md=TYPE=DIGEST\n"                                  \
+    "                              Set checksum for SSH host public key. TYPE is\n" \
+    "                              hash type. The supported hash type is sha-1 or\n" \
+    "                              md5. DIGEST is hex digest. For example:\n" \
+    "                              sha-1=b030503d4de4539dc7885e6f0f5e256704edf4c3\n" \
+    "                              This option can be used to validate server's\n" \
+    "                              public key when SFTP is used. If this option is\n" \
+    "                              not set, which is default, no validation takes\n" \
+    "                              place.")
+#define TEXT_SOCKET_RECV_BUFFER_SIZE                                    \
+  _(" --socket-recv-buffer-size=SIZE\n"                                 \
+    "                              Set the maximum socket receive buffer in bytes.\n" \
+    "                              Specifing 0 will disable this option. This value\n" \
+    "                              will be set to socket file descriptor using\n" \
+    "                              SO_RCVBUF socket option with setsockopt() call.")
+#define TEXT_BT_ENABLE_HOOK_AFTER_HASH_CHECK                            \
+  _(" --bt-enable-hook-after-hash-check[=true|false] Allow hook command invocation\n" \
+    "                              after hash check (see -V option) in BitTorrent\n" \
+    "                              download. By default, when hash check succeeds,\n" \
+    "                              the command given by --on-bt-download-complete\n" \
+    "                              is executed. To disable this action, give false\n" \
+    "                              to this option.")
+#define TEXT_MAX_MMAP_LIMIT                                             \
+  _(" --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n" \
+    "                              --enable-mmap option). The file size is\n" \
+    "                              determined by the sum of all files contained in\n" \
+    "                              one download. For example, if a download\n" \
+    "                              contains 5 files, then file size is the total\n" \
+    "                              size of those files. If file size is strictly\n" \
+    "                              greater than the size specified in this option,\n" \
+    "                              mmap will be disabled.")
+
+// clang-format on

@@ -47,23 +47,21 @@ class BtRuntime;
 
 // Stop downloading torrent if in consecutive timeout_ seconds,
 // download speed is zero and the number of seeder is 0.
-class BtStopDownloadCommand:public TimeBasedCommand {
+class BtStopDownloadCommand : public TimeBasedCommand {
 private:
   RequestGroup* requestGroup_;
 
-  time_t timeout_;
+  std::chrono::seconds timeout_;
 
   Timer checkPoint_;
 
   std::shared_ptr<BtRuntime> btRuntime_;
 
   std::shared_ptr<PieceStorage> pieceStorage_;
+
 public:
-  BtStopDownloadCommand
-  (cuid_t cuid,
-   RequestGroup* requestGroup,
-   DownloadEngine* e,
-   time_t timeout);
+  BtStopDownloadCommand(cuid_t cuid, RequestGroup* requestGroup,
+                        DownloadEngine* e, std::chrono::seconds timeout);
 
   virtual void preProcess() CXX11_OVERRIDE;
 

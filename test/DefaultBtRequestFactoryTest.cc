@@ -16,7 +16,7 @@
 
 namespace aria2 {
 
-class DefaultBtRequestFactoryTest:public CppUnit::TestFixture {
+class DefaultBtRequestFactoryTest : public CppUnit::TestFixture {
 
   CPPUNIT_TEST_SUITE(DefaultBtRequestFactoryTest);
   CPPUNIT_TEST(testAddTargetPiece);
@@ -26,12 +26,14 @@ class DefaultBtRequestFactoryTest:public CppUnit::TestFixture {
   CPPUNIT_TEST(testRemoveTargetPiece);
   CPPUNIT_TEST(testGetTargetPieceIndexes);
   CPPUNIT_TEST_SUITE_END();
+
 private:
   std::shared_ptr<Peer> peer_;
   std::unique_ptr<DefaultBtRequestFactory> requestFactory_;
   std::unique_ptr<MockPieceStorage> pieceStorage_;
   std::unique_ptr<MockBtMessageFactory> messageFactory_;
   std::unique_ptr<MockBtMessageDispatcher> dispatcher_;
+
 public:
   void testAddTargetPiece();
   void testRemoveCompletedPiece();
@@ -45,8 +47,10 @@ public:
     size_t index;
     size_t blockIndex;
 
-    MockBtRequestMessage(size_t index, size_t blockIndex):
-      index(index), blockIndex(blockIndex) {}
+    MockBtRequestMessage(size_t index, size_t blockIndex)
+        : index(index), blockIndex(blockIndex)
+    {
+    }
   };
 
   class MockBtMessageFactory2 : public MockBtMessageFactory {
@@ -55,15 +59,14 @@ public:
     createRequestMessage(const std::shared_ptr<Piece>& piece,
                          size_t blockIndex) CXX11_OVERRIDE
     {
-      return make_unique<BtRequestMessage>(piece->getIndex(), 0, 0,
-                                           blockIndex);
+      return make_unique<BtRequestMessage>(piece->getIndex(), 0, 0, blockIndex);
     }
   };
 
   class MockBtMessageDispatcher2 : public MockBtMessageDispatcher {
   public:
-    virtual bool isOutstandingRequest(size_t index, size_t blockIndex)
-      CXX11_OVERRIDE
+    virtual bool isOutstandingRequest(size_t index,
+                                      size_t blockIndex) CXX11_OVERRIDE
     {
       return index == 0 && blockIndex == 0;
     }
@@ -75,8 +78,8 @@ public:
                     const std::unique_ptr<BtRequestMessage>& b)
     {
       return a->getIndex() < b->getIndex() ||
-        (a->getIndex() == b->getIndex() &&
-         a->getBlockIndex() < b->getBlockIndex());
+             (a->getIndex() == b->getIndex() &&
+              a->getBlockIndex() < b->getBlockIndex());
     }
   };
 
@@ -94,18 +97,17 @@ public:
   }
 };
 
-
 CPPUNIT_TEST_SUITE_REGISTRATION(DefaultBtRequestFactoryTest);
 
 void DefaultBtRequestFactoryTest::testAddTargetPiece()
 {
   {
-    auto piece = std::make_shared<Piece>(0, 16*1024*10);
+    auto piece = std::make_shared<Piece>(0, 160_k);
     requestFactory_->addTargetPiece(piece);
     CPPUNIT_ASSERT_EQUAL((size_t)1, requestFactory_->countTargetPiece());
   }
   {
-    auto piece = std::make_shared<Piece>(1, 16*1024*9);
+    auto piece = std::make_shared<Piece>(1, 16_k * 9);
     piece->completeBlock(0);
     requestFactory_->addTargetPiece(piece);
     CPPUNIT_ASSERT_EQUAL((size_t)2, requestFactory_->countTargetPiece());
@@ -115,8 +117,8 @@ void DefaultBtRequestFactoryTest::testAddTargetPiece()
 
 void DefaultBtRequestFactoryTest::testRemoveCompletedPiece()
 {
-  auto piece1 = std::make_shared<Piece>(0, 16*1024);
-  auto piece2 = std::make_shared<Piece>(1, 16*1024);
+  auto piece1 = std::make_shared<Piece>(0, 16_k);
+  auto piece2 = std::make_shared<Piece>(1, 16_k);
   piece2->setAllBlock();
   requestFactory_->addTargetPiece(piece1);
   requestFactory_->addTargetPiece(piece2);
@@ -129,7 +131,7 @@ void DefaultBtRequestFactoryTest::testRemoveCompletedPiece()
 
 void DefaultBtRequestFactoryTest::testCreateRequestMessages()
 {
-  int PIECE_LENGTH = 16*1024*2;
+  constexpr int PIECE_LENGTH = 32_k;
   auto piece1 = std::make_shared<Piece>(0, PIECE_LENGTH);
   auto piece2 = std::make_shared<Piece>(1, PIECE_LENGTH);
   requestFactory_->addTargetPiece(piece1);
@@ -160,7 +162,7 @@ void DefaultBtRequestFactoryTest::testCreateRequestMessages_onEndGame()
 
   requestFactory_->setBtMessageDispatcher(dispatcher.get());
 
-  int PIECE_LENGTH = 16*1024*2;
+  constexpr int PIECE_LENGTH = 32_k;
   auto piece1 = std::make_shared<Piece>(0, PIECE_LENGTH);
   auto piece2 = std::make_shared<Piece>(1, PIECE_LENGTH);
   requestFactory_->addTargetPiece(piece1);
@@ -183,7 +185,7 @@ void DefaultBtRequestFactoryTest::testCreateRequestMessages_onEndGame()
 
 void DefaultBtRequestFactoryTest::testRemoveTargetPiece()
 {
-  auto piece1 = std::make_shared<Piece>(0, 16*1024);
+  auto piece1 = std::make_shared<Piece>(0, 16_k);
 
   requestFactory_->addTargetPiece(piece1);
 
@@ -202,9 +204,9 @@ void DefaultBtRequestFactoryTest::testRemoveTargetPiece()
 
 void DefaultBtRequestFactoryTest::testGetTargetPieceIndexes()
 {
-  auto piece1 = std::make_shared<Piece>(1, 16*1024);
-  auto piece3 = std::make_shared<Piece>(3, 16*1024);
-  auto piece5 = std::make_shared<Piece>(5, 16*1024);
+  auto piece1 = std::make_shared<Piece>(1, 16_k);
+  auto piece3 = std::make_shared<Piece>(3, 16_k);
+  auto piece5 = std::make_shared<Piece>(5, 16_k);
 
   requestFactory_->addTargetPiece(piece3);
   requestFactory_->addTargetPiece(piece1);

@@ -37,14 +37,16 @@
 
 #include <gcrypt.h>
 
+#include "Adler32MessageDigestImpl.h"
+
 namespace aria2 {
 
 namespace {
-template<int hash>
-class MessageDigestBase : public MessageDigestImpl {
+template <int hash> class MessageDigestBase : public MessageDigestImpl {
 private:
   struct Deleter {
-    void operator()(gcry_md_hd_t ctx) {
+    void operator()(gcry_md_hd_t ctx)
+    {
       if (ctx) {
         gcry_md_close(ctx);
       }
@@ -62,19 +64,14 @@ public:
 
   virtual ~MessageDigestBase() {}
 
-  static size_t length()
-  {
-    return ::gcry_md_get_algo_dlen(hash);
-  }
+  static size_t length() { return ::gcry_md_get_algo_dlen(hash); }
 
   virtual size_t getDigestLength() const CXX11_OVERRIDE
   {
     return ::gcry_md_get_algo_dlen(hash);
   }
 
-  virtual void reset() CXX11_OVERRIDE {
-    ::gcry_md_reset(ctx_.get());
-  }
+  virtual void reset() CXX11_OVERRIDE { ::gcry_md_reset(ctx_.get()); }
 
   virtual void update(const void* data, size_t length) CXX11_OVERRIDE
   {
@@ -106,16 +103,16 @@ typedef MessageDigestBase<GCRY_MD_SHA512> MessageDigestSHA512;
 
 std::unique_ptr<MessageDigestImpl> MessageDigestImpl::sha1()
 {
-  return std::unique_ptr<MessageDigestImpl>(new MessageDigestSHA1());
+  return make_unique<MessageDigestSHA1>();
 }
 
 MessageDigestImpl::hashes_t MessageDigestImpl::hashes = {
-  { "sha-1", make_hi<MessageDigestSHA1>() },
-  { "sha-224", make_hi<MessageDigestSHA224>() },
-  { "sha-256", make_hi<MessageDigestSHA256>() },
-  { "sha-384", make_hi<MessageDigestSHA384>() },
-  { "sha-512", make_hi<MessageDigestSHA512>() },
-  { "md5", make_hi<MessageDigestMD5>() },
-};
+    {"sha-1", make_hi<MessageDigestSHA1>()},
+    {"sha-224", make_hi<MessageDigestSHA224>()},
+    {"sha-256", make_hi<MessageDigestSHA256>()},
+    {"sha-384", make_hi<MessageDigestSHA384>()},
+    {"sha-512", make_hi<MessageDigestSHA512>()},
+    {"md5", make_hi<MessageDigestMD5>()},
+    ADLER32_MESSAGE_DIGEST};
 
 } // namespace aria2

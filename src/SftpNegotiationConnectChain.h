@@ -1,7 +1,8 @@
+/* <!-- copyright */
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2010 Tatsuhiro Tsujikawa
+ * Copyright (C) 2015 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,11 +32,31 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_CLOCK_GETTIME_OSX_H
-#define D_CLOCK_GETTIME_OSX_H
+#ifndef SFTP_NEGOTIATION_CONNECT_CHAIN_H
+#define SFTP_NEGOTIATION_CONNECT_CHAIN_H
 
-#include "timespec.h"
+#include "ControlChain.h"
+#include "ConnectCommand.h"
+#include "DownloadEngine.h"
+#include "SftpNegotiationCommand.h"
 
-int clock_gettime(int dummyid, struct timespec* tp);
+namespace aria2 {
 
-#endif // D_CLOCK_GETTIME_OSX_H
+struct SftpNegotiationConnectChain : public ControlChain<ConnectCommand*> {
+  SftpNegotiationConnectChain() {}
+  virtual ~SftpNegotiationConnectChain() {}
+  virtual int run(ConnectCommand* t, DownloadEngine* e) CXX11_OVERRIDE
+  {
+    auto c = make_unique<SftpNegotiationCommand>(
+        t->getCuid(), t->getRequest(), t->getFileEntry(), t->getRequestGroup(),
+        t->getDownloadEngine(), t->getSocket());
+    c->setStatus(Command::STATUS_ONESHOT_REALTIME);
+    e->setNoWait(true);
+    e->addCommand(std::move(c));
+    return 0;
+  }
+};
+
+} // namespace aria2
+
+#endif // SFTP_NEGOTIATION_CONNECT_CHAIN_H

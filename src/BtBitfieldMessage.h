@@ -41,8 +41,9 @@ namespace aria2 {
 
 class BtBitfieldMessage : public SimpleBtMessage {
 private:
-  unsigned char* bitfield_;
+  std::unique_ptr<unsigned char[]> bitfield_;
   size_t bitfieldLength_;
+
 public:
   BtBitfieldMessage();
 
@@ -56,12 +57,12 @@ public:
 
   void setBitfield(const unsigned char* bitfield, size_t bitfieldLength);
 
-  const unsigned char* getBitfield() const { return bitfield_; }
+  const unsigned char* getBitfield() const { return bitfield_.get(); }
 
   size_t getBitfieldLength() const { return bitfieldLength_; }
 
-  static std::unique_ptr<BtBitfieldMessage> create
-  (const unsigned char* data, size_t dataLength);
+  static std::unique_ptr<BtBitfieldMessage> create(const unsigned char* data,
+                                                   size_t dataLength);
 
   virtual void doReceivedAction() CXX11_OVERRIDE;
 

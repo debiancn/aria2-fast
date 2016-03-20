@@ -38,7 +38,7 @@
 #include "RecoverableException.h"
 
 #ifdef HAVE_LIBGNUTLS
-# include <gnutls/gnutls.h>
+#include <gnutls/gnutls.h>
 #endif // HAVE_LIBGNUTLS
 
 namespace aria2 {
@@ -52,9 +52,9 @@ bool LogFactory::colorOutput_ = true;
 
 void LogFactory::openLogger(const std::shared_ptr<Logger>& logger)
 {
-  if(filename_ != DEV_NULL) {
+  if (filename_ != DEV_NULL) {
     // don't open file DEV_NULL for performance sake.
-    // This avoids costly unecessary message formatting and write.
+    // This avoids costly unnecessary message formatting and write.
     logger->openFile(filename_);
   }
   logger->setLogLevel(logLevel_);
@@ -63,7 +63,8 @@ void LogFactory::openLogger(const std::shared_ptr<Logger>& logger)
   logger->setColorOutput(colorOutput_);
 }
 
-void LogFactory::adjustDependentLevels() {
+void LogFactory::adjustDependentLevels()
+{
   auto level = consoleLogLevel_;
   if (filename_ != DEV_NULL) {
     level = std::min(level, logLevel_);
@@ -80,11 +81,12 @@ void LogFactory::adjustDependentLevels() {
 
 void LogFactory::reconfigure()
 {
-  if(logger_) {
+  if (logger_) {
     logger_->closeFile();
     try {
       openLogger(logger_);
-    } catch(RecoverableException& e) {
+    }
+    catch (RecoverableException& e) {
       logger_->closeFile();
       throw;
     }
@@ -93,8 +95,8 @@ void LogFactory::reconfigure()
 
 const std::shared_ptr<Logger>& LogFactory::getInstance()
 {
-  if(!logger_) {
-    std::shared_ptr<Logger> slogger(new Logger());
+  if (!logger_) {
+    auto slogger = std::make_shared<Logger>();
     openLogger(slogger);
     logger_.swap(slogger);
   }
@@ -103,11 +105,13 @@ const std::shared_ptr<Logger>& LogFactory::getInstance()
 
 void LogFactory::setLogFile(const std::string& name)
 {
-  if(name == "-") {
+  if (name == "-") {
     filename_ = DEV_STDOUT;
-  } else if(name == "") {
+  }
+  else if (name == "") {
     filename_ = DEV_NULL;
-  } else {
+  }
+  else {
     filename_ = name;
   }
   adjustDependentLevels();
@@ -116,17 +120,22 @@ void LogFactory::setLogFile(const std::string& name)
 namespace {
 Logger::LEVEL toLogLevel(const std::string& level)
 {
-  if(level == V_DEBUG) {
+  if (level == V_DEBUG) {
     return Logger::A2_DEBUG;
-  } else if(level == V_INFO) {
+  }
+  else if (level == V_INFO) {
     return Logger::A2_INFO;
-  } else if(level == V_NOTICE) {
+  }
+  else if (level == V_NOTICE) {
     return Logger::A2_NOTICE;
-  } else if(level == V_WARN) {
+  }
+  else if (level == V_WARN) {
     return Logger::A2_WARN;
-  } else if(level == V_ERROR) {
+  }
+  else if (level == V_ERROR) {
     return Logger::A2_ERROR;
-  } else {
+  }
+  else {
     return Logger::A2_NOTICE;
   }
 }
@@ -156,13 +165,8 @@ void LogFactory::setConsoleLogLevel(const std::string& level)
   adjustDependentLevels();
 }
 
-void LogFactory::setColorOutput(bool enabled)
-{
-  colorOutput_ = enabled;
-}
+void LogFactory::setColorOutput(bool enabled) { colorOutput_ = enabled; }
 
-void LogFactory::release() {
-  logger_.reset();
-}
+void LogFactory::release() { logger_.reset(); }
 
 } // namespace aria2

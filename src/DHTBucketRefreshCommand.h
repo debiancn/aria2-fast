@@ -45,15 +45,17 @@ class DHTRoutingTable;
 class DHTTaskQueue;
 class DHTTaskFactory;
 
-class DHTBucketRefreshCommand:public TimeBasedCommand {
+class DHTBucketRefreshCommand : public TimeBasedCommand {
 private:
   DHTRoutingTable* routingTable_;
 
   DHTTaskQueue* taskQueue_;
 
   DHTTaskFactory* taskFactory_;
+
 public:
-  DHTBucketRefreshCommand(cuid_t cuid, DownloadEngine* e, time_t interval);
+  DHTBucketRefreshCommand(cuid_t cuid, DownloadEngine* e,
+                          std::chrono::seconds interval);
 
   virtual ~DHTBucketRefreshCommand();
 

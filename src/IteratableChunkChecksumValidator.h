@@ -47,12 +47,11 @@ class PieceStorage;
 class BitfieldMan;
 class MessageDigest;
 
-class IteratableChunkChecksumValidator:public IteratableValidator
-{
+class IteratableChunkChecksumValidator : public IteratableValidator {
 private:
   std::shared_ptr<DownloadContext> dctx_;
   std::shared_ptr<PieceStorage> pieceStorage_;
-  std::shared_ptr<BitfieldMan> bitfield_;
+  std::unique_ptr<BitfieldMan> bitfield_;
   size_t currentIndex_;
   std::unique_ptr<MessageDigest> ctx_;
 
@@ -61,8 +60,9 @@ private:
   std::string digest(int64_t offset, size_t length);
 
 public:
-  IteratableChunkChecksumValidator(const std::shared_ptr<DownloadContext>& dctx,
-                                   const std::shared_ptr<PieceStorage>& pieceStorage);
+  IteratableChunkChecksumValidator(
+      const std::shared_ptr<DownloadContext>& dctx,
+      const std::shared_ptr<PieceStorage>& pieceStorage);
 
   virtual ~IteratableChunkChecksumValidator();
 

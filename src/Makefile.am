@@ -267,7 +267,9 @@ SRCS =  \
 	WrDiskCache.cc WrDiskCache.h\
 	WrDiskCacheEntry.cc WrDiskCacheEntry.h\
 	XmlRpcRequestParserController.cc XmlRpcRequestParserController.h\
-	OpenedFileCounter.cc OpenedFileCounter.h
+	OpenedFileCounter.cc OpenedFileCounter.h \
+	SHA1IOFile.cc SHA1IOFile.h \
+	EvictSocketPoolCommand.cc EvictSocketPoolCommand.h
 
 if ANDROID
 SRCS += android/android.c
@@ -417,7 +419,8 @@ if HAVE_ZLIB
 SRCS += \
 	GZipDecodingStreamFilter.cc GZipDecodingStreamFilter.h\
 	GZipEncoder.cc GZipEncoder.h\
-	GZipFile.cc GZipFile.h
+	GZipFile.cc GZipFile.h \
+	Adler32MessageDigestImpl.cc Adler32MessageDigestImpl.h
 endif # HAVE_ZLIB
 
 if HAVE_SQLITE3
@@ -425,6 +428,14 @@ SRCS += \
 	Sqlite3CookieParser.cc Sqlite3CookieParser.h\
 	Sqlite3CookieParserImpl.cc Sqlite3CookieParserImpl.h
 endif # HAVE_SQLITE3
+
+if HAVE_LIBSSH2
+SRCS += SSHSession.cc SSHSession.h \
+	SftpNegotiationCommand.cc SftpNegotiationCommand.h \
+	SftpNegotiationConnectChain.h \
+	SftpDownloadCommand.cc SftpDownloadCommand.h \
+	SftpFinishDownloadCommand.cc SftpFinishDownloadCommand.h
+endif # HAVE_LIBSSH2
 
 if ENABLE_ASYNC_DNS
 SRCS += \
@@ -666,14 +677,6 @@ if !HAVE_DAEMON
 SRCS += daemon.cc daemon.h
 endif # !HAVE_DAEMON
 
-if HAVE_TIMEGETTIME
-SRCS += clock_gettime_mingw.cc clock_gettime_mingw.h
-endif # HAVE_TIMEGETTIME
-
-if HAVE_MACH_ABSOLUTE_TIME
-SRCS += clock_gettime_osx.cc clock_gettime_osx.h
-endif # HAVE_MACH_ABSOLUTE_TIME
-
 if HAVE_POLL
 SRCS += PollEventPoll.cc PollEventPoll.h
 endif # HAVE_POLL
@@ -685,6 +688,10 @@ endif # HAVE_PORT_ASSOCIATE
 if HAVE_KQUEUE
 SRCS += KqueueEventPoll.cc KqueueEventPoll.h
 endif # HAVE_KQUEUE
+
+if HAVE_GETRANDOM_INTERFACE
+SRCS += getrandom_linux.c getrandom_linux.h
+endif # HAVE_GETRANDOM_INTERFACE
 
 if HAVE_LIBUV
 SRCS += LibuvEventPoll.cc LibuvEventPoll.h
@@ -708,11 +715,53 @@ endif # !ENABLE_LIBARIA2
 
 libaria2_la_SOURCES = $(SRCS)
 
-libaria2_la_LIBADD = @WSLAY_LIBS@
+libaria2_la_LIBADD = @WSLAY_LIBS@ @LTLIBINTL@
 
-LDADD = libaria2.la @LIBINTL@ @ALLOCA@ #-lprofiler
-#aria2c_LDFLAGS = -pg
-AM_CPPFLAGS =  -Wall\
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
 	-I$(srcdir)/includes -I$(builddir)/includes\
-	-DLOCALEDIR=\"@localedir@\" @DEFS@ #-pg
+	-DLOCALEDIR=\"@localedir@\" @DEFS@ \
+	@EXTRACPPFLAGS@ \
+	@ZLIB_CFLAGS@ \
+	@LIBUV_CFLAGS@ \
+	@XML_CPPFLAGS@ \
+	@EXPAT_CFLAGS@ \
+	@SQLITE3_CFLAGS@ \
+	@LIBGNUTLS_CFLAGS@ \
+	@OPENSSL_CFLAGS@ \
+	@LIBNETTLE_CFLAGS@ \
+	@LIBGMP_CFLAGS@ \
+	@LIBGCRYPT_CFLAGS@ \
+	@LIBSSH2_CFLAGS@ \
+	@LIBCARES_CFLAGS@ \
+	@WSLAY_CFLAGS@ \
+	@TCMALLOC_CFLAGS@ \
+	@JEMALLOC_CFLAGS@
+
+AM_LDFLAGS = \
+	@EXTRALDFLAGS@ \
+	@APPLETLS_LDFLAGS@
+
+LDADD = libaria2.la @ALLOCA@ \
+	@EXTRALIBS@ \
+	@ZLIB_LIBS@ \
+	@LIBUV_LIBS@ \
+	@XML_LIBS@ \
+	@EXPAT_LIBS@ \
+	@SQLITE3_LIBS@ \
+	@WINTLS_LIBS@ \
+	@LIBGNUTLS_LIBS@ \
+	@OPENSSL_LIBS@ \
+	@LIBNETTLE_LIBS@ \
+	@LIBGMP_LIBS@ \
+	@LIBGCRYPT_LIBS@ \
+	@LIBSSH2_LIBS@ \
+	@LIBCARES_LIBS@ \
+	@WSLAY_LIBS@ \
+	@TCMALLOC_LIBS@ \
+	@JEMALLOC_LIBS@
+
+AM_CFLAGS = @EXTRACFLAGS@
+
+AM_CXXFLAGS = @WARNCXXFLAGS@ @CXX1XCXXFLAGS@ @EXTRACXXFLAGS@
+

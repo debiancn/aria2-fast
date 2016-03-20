@@ -57,6 +57,7 @@ public:
     INITIATOR_RECEIVE_PAD_D_LENGTH,
     INITIATOR_RECEIVE_PAD_D,
   };
+
 private:
   RequestGroup* requestGroup_;
 
@@ -67,24 +68,24 @@ private:
   std::shared_ptr<BtRuntime> btRuntime_;
 
   Seq sequence_;
-  MSEHandshake* mseHandshake_;
+  std::unique_ptr<MSEHandshake> mseHandshake_;
 
   const std::shared_ptr<Option>& getOption() const;
 
   void tryNewPeer();
+
 protected:
   virtual bool executeInternal() CXX11_OVERRIDE;
   virtual bool prepareForNextPeer(time_t wait) CXX11_OVERRIDE;
   virtual void onAbort() CXX11_OVERRIDE;
   virtual bool exitBeforeExecute() CXX11_OVERRIDE;
+
 public:
-  InitiatorMSEHandshakeCommand
-  (cuid_t cuid,
-   RequestGroup* requestGroup,
-   const std::shared_ptr<Peer>& peer,
-   DownloadEngine* e,
-   const std::shared_ptr<BtRuntime>& btRuntime,
-   const std::shared_ptr<SocketCore>& s);
+  InitiatorMSEHandshakeCommand(cuid_t cuid, RequestGroup* requestGroup,
+                               const std::shared_ptr<Peer>& peer,
+                               DownloadEngine* e,
+                               const std::shared_ptr<BtRuntime>& btRuntime,
+                               const std::shared_ptr<SocketCore>& s);
 
   virtual ~InitiatorMSEHandshakeCommand();
 

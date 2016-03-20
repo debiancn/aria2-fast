@@ -49,10 +49,11 @@ private:
   std::string multicastAddress_;
   uint16_t multicastPort_;
   std::string localAddress_;
+
 public:
   // Currently only IPv4 multicastAddresses are supported.
-  LpdMessageReceiver
-  (const std::string& multicastAddress, uint16_t multicastPort);
+  LpdMessageReceiver(const std::string& multicastAddress,
+                     uint16_t multicastPort);
 
   ~LpdMessageReceiver();
 
@@ -62,18 +63,12 @@ public:
   // Receives LPD message and returns LpdMessage which contains
   // sender(peer) and infohash. If no data is available on socket,
   // returns std::shared_ptr<LpdMessage>().  If received data is bad,
-  // then returns std::shared_ptr<LpdMessage>(new LpdMessage())
+  // they are just skipped.
   std::unique_ptr<LpdMessage> receiveMessage();
 
-  const std::shared_ptr<SocketCore>& getSocket() const
-  {
-    return socket_;
-  }
+  const std::shared_ptr<SocketCore>& getSocket() const { return socket_; }
 
-  const std::string& getLocalAddress() const
-  {
-    return localAddress_;
-  }
+  const std::string& getLocalAddress() const { return localAddress_; }
 };
 
 } // namespace aria2

@@ -40,28 +40,25 @@
 
 namespace aria2 {
 
-Pref::Pref(const char* k, size_t i):k(k), i(i) {}
+Pref::Pref(const char* k, size_t i) : k(k), i(i) {}
 
 namespace {
 
 class PrefFactory {
 public:
-  PrefFactory():count_(0)
+  PrefFactory() : count_(0)
   {
     // We add special null pref whose ID is 0.
     makePref("");
   }
   ~PrefFactory()
   {
-    for(size_t i = 0; i < count_; ++i) {
+    for (size_t i = 0; i < count_; ++i) {
       delete i2p_[i];
     }
   }
 
-  size_t nextId()
-  {
-    return count_++;
-  }
+  size_t nextId() { return count_++; }
   Pref* makePref(const char* key)
   {
     size_t id = nextId();
@@ -70,10 +67,7 @@ public:
     k2p_[key] = pref;
     return pref;
   }
-  size_t getCount() const
-  {
-    return count_;
-  }
+  size_t getCount() const { return count_; }
   PrefPtr i2p(size_t id) const
   {
     assert(id < count_);
@@ -82,7 +76,7 @@ public:
   PrefPtr k2p(const std::string& k) const
   {
     auto i = k2p_.find(k);
-    if(i == k2p_.end()) {
+    if (i == k2p_.end()) {
       return i2p_[0];
     }
     return (*i).second;
@@ -101,34 +95,19 @@ PrefFactory* getPrefFactory()
   return pf;
 }
 
-Pref* makePref(const char* key)
-{
-  return getPrefFactory()->makePref(key);
-}
+Pref* makePref(const char* key) { return getPrefFactory()->makePref(key); }
 
 } // namespace
 
 namespace option {
 
-size_t countOption()
-{
-  return getPrefFactory()->getCount();
-}
+size_t countOption() { return getPrefFactory()->getCount(); }
 
-PrefPtr i2p(size_t id)
-{
-  return getPrefFactory()->i2p(id);
-}
+PrefPtr i2p(size_t id) { return getPrefFactory()->i2p(id); }
 
-PrefPtr k2p(const std::string& key)
-{
-  return getPrefFactory()->k2p(key);
-}
+PrefPtr k2p(const std::string& key) { return getPrefFactory()->k2p(key); }
 
-void deletePrefResource()
-{
-  delete getPrefFactory();
-}
+void deletePrefResource() { delete getPrefFactory(); }
 
 } // namespace option
 
@@ -169,6 +148,10 @@ const std::string V_ARC4("arc4");
 const std::string V_HTTP("http");
 const std::string V_HTTPS("https");
 const std::string V_FTP("ftp");
+const std::string A2_V_SSL3("SSLv3");
+const std::string A2_V_TLS10("TLSv1");
+const std::string A2_V_TLS11("TLSv1.1");
+const std::string A2_V_TLS12("TLSv1.2");
 
 PrefPtr PREF_VERSION = makePref("version");
 PrefPtr PREF_HELP = makePref("help");
@@ -203,7 +186,8 @@ PrefPtr PREF_LOWEST_SPEED_LIMIT = makePref("lowest-speed-limit");
 // value: 1*digit
 PrefPtr PREF_PIECE_LENGTH = makePref("piece-length");
 // value: 1*digit
-PrefPtr PREF_MAX_OVERALL_DOWNLOAD_LIMIT = makePref("max-overall-download-limit");
+PrefPtr PREF_MAX_OVERALL_DOWNLOAD_LIMIT =
+    makePref("max-overall-download-limit");
 // value: 1*digit
 PrefPtr PREF_MAX_DOWNLOAD_LIMIT = makePref("max-download-limit");
 // value: 1*digit
@@ -304,6 +288,8 @@ PrefPtr PREF_ON_DOWNLOAD_COMPLETE = makePref("on-download-complete");
 PrefPtr PREF_ON_DOWNLOAD_ERROR = makePref("on-download-error");
 // value: string
 PrefPtr PREF_INTERFACE = makePref("interface");
+// value: string
+PrefPtr PREF_MULTIPLE_INTERFACE = makePref("multiple-interface");
 // value: true | false
 PrefPtr PREF_DISABLE_IPV6 = makePref("disable-ipv6");
 // value: true | false
@@ -367,6 +353,12 @@ PrefPtr PREF_DSCP = makePref("dscp");
 PrefPtr PREF_PAUSE_METADATA = makePref("pause-metadata");
 // values: 1*digit
 PrefPtr PREF_RLIMIT_NOFILE = makePref("rlimit-nofile");
+// values: SSLv3 | TLSv1 | TLSv1.1 | TLSv1.2
+PrefPtr PREF_MIN_TLS_VERSION = makePref("min-tls-version");
+// value: 1*digit
+PrefPtr PREF_SOCKET_RECV_BUFFER_SIZE = makePref("socket-recv-buffer-size");
+// value: 1*digit
+PrefPtr PREF_MAX_MMAP_LIMIT = makePref("max-mmap-limit");
 
 /**
  * FTP related preferences
@@ -379,6 +371,8 @@ PrefPtr PREF_FTP_TYPE = makePref("ftp-type");
 PrefPtr PREF_FTP_PASV = makePref("ftp-pasv");
 // values: true | false
 PrefPtr PREF_FTP_REUSE_CONNECTION = makePref("ftp-reuse-connection");
+// values: hashType=digest
+PrefPtr PREF_SSH_HOST_KEY_MD = makePref("ssh-host-key-md");
 
 /**
  * HTTP related preferences
@@ -423,7 +417,7 @@ PrefPtr PREF_HTTP_PROXY = makePref("http-proxy");
 PrefPtr PREF_HTTPS_PROXY = makePref("https-proxy");
 PrefPtr PREF_FTP_PROXY = makePref("ftp-proxy");
 PrefPtr PREF_ALL_PROXY = makePref("all-proxy");
-// values: comma separeted hostname or domain
+// values: comma separated hostname or domain
 PrefPtr PREF_NO_PROXY = makePref("no-proxy");
 // values: get | tunnel
 PrefPtr PREF_PROXY_METHOD = makePref("proxy-method");
@@ -500,7 +494,8 @@ PrefPtr PREF_BT_MIN_CRYPTO_LEVEL = makePref("bt-min-crypto-level");
 // values:: true | false
 PrefPtr PREF_BT_REQUIRE_CRYPTO = makePref("bt-require-crypto");
 // values: 1*digit
-PrefPtr PREF_BT_REQUEST_PEER_SPEED_LIMIT = makePref("bt-request-peer-speed-limit");
+PrefPtr PREF_BT_REQUEST_PEER_SPEED_LIMIT =
+    makePref("bt-request-peer-speed-limit");
 // values: 1*digit
 PrefPtr PREF_BT_MAX_OPEN_FILES = makePref("bt-max-open-files");
 // values: true | false
@@ -530,7 +525,8 @@ PrefPtr PREF_BT_LPD_INTERFACE = makePref("bt-lpd-interface");
 // values: 1*digit
 PrefPtr PREF_BT_TRACKER_TIMEOUT = makePref("bt-tracker-timeout");
 // values: 1*digit
-PrefPtr PREF_BT_TRACKER_CONNECT_TIMEOUT = makePref("bt-tracker-connect-timeout");
+PrefPtr PREF_BT_TRACKER_CONNECT_TIMEOUT =
+    makePref("bt-tracker-connect-timeout");
 // values: 1*digit
 PrefPtr PREF_DHT_MESSAGE_TIMEOUT = makePref("dht-message-timeout");
 // values: string
@@ -540,8 +536,12 @@ PrefPtr PREF_BT_TRACKER = makePref("bt-tracker");
 // values: string
 PrefPtr PREF_BT_EXCLUDE_TRACKER = makePref("bt-exclude-tracker");
 // values: true | false
-PrefPtr PREF_BT_REMOVE_UNSELECTED_FILE =
-  makePref("bt-remove-unselected-file");
+PrefPtr PREF_BT_REMOVE_UNSELECTED_FILE = makePref("bt-remove-unselected-file");
+PrefPtr PREF_BT_DETACH_SEED_ONLY = makePref("bt-detach-seed-only");
+PrefPtr PREF_BT_FORCE_ENCRYPTION = makePref("bt-force-encryption");
+// values: true | false
+PrefPtr PREF_BT_ENABLE_HOOK_AFTER_HASH_CHECK =
+    makePref("bt-enable-hook-after-hash-check");
 
 /**
  * Metalink related preferences
@@ -559,9 +559,11 @@ PrefPtr PREF_METALINK_LOCATION = makePref("metalink-location");
 // values: true | false | mem
 PrefPtr PREF_FOLLOW_METALINK = makePref("follow-metalink");
 // values: http | https | ftp | none
-PrefPtr PREF_METALINK_PREFERRED_PROTOCOL = makePref("metalink-preferred-protocol");
+PrefPtr PREF_METALINK_PREFERRED_PROTOCOL =
+    makePref("metalink-preferred-protocol");
 // values: true | false
-PrefPtr PREF_METALINK_ENABLE_UNIQUE_PROTOCOL = makePref("metalink-enable-unique-protocol");
+PrefPtr PREF_METALINK_ENABLE_UNIQUE_PROTOCOL =
+    makePref("metalink-enable-unique-protocol");
 PrefPtr PREF_METALINK_BASE_URI = makePref("metalink-base-uri");
 
 } // namespace aria2

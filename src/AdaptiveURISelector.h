@@ -38,6 +38,7 @@
 #include "URISelector.h"
 
 #include <memory>
+#include <chrono>
 
 namespace aria2 {
 
@@ -45,15 +46,13 @@ class ServerStatMan;
 class RequestGroup;
 class ServerStat;
 
-class AdaptiveURISelector:public URISelector {
+class AdaptiveURISelector : public URISelector {
 private:
   std::shared_ptr<ServerStatMan> serverStatMan_;
   // No need to delete requestGroup_
   RequestGroup* requestGroup_;
   int nbServerToEvaluate_;
   int nbConnections_;
-
-  static const time_t MAX_TIMEOUT = 60;
 
   void mayRetryWithIncreasedTimeout(FileEntry* fileEntry);
 
@@ -70,20 +69,20 @@ private:
   std::shared_ptr<ServerStat> getServerStats(const std::string& uri) const;
   int getNbTestedServers(const std::deque<std::string>& uris) const;
   std::string getBestMirror(const std::deque<std::string>& uris) const;
+
 public:
   AdaptiveURISelector(std::shared_ptr<ServerStatMan> serverStatMan,
                       RequestGroup* requestGroup);
 
   virtual ~AdaptiveURISelector();
 
-  virtual std::string select
-  (FileEntry* fileEntry,
-   const std::vector<std::pair<size_t, std::string> >& usedHosts)
-    CXX11_OVERRIDE;
+  virtual std::string
+  select(FileEntry* fileEntry,
+         const std::vector<std::pair<size_t, std::string>>& usedHosts)
+      CXX11_OVERRIDE;
 
   virtual void tuneDownloadCommand(const std::deque<std::string>& uris,
-                                   DownloadCommand* command)
-    CXX11_OVERRIDE;
+                                   DownloadCommand* command) CXX11_OVERRIDE;
 
   virtual void resetCounters() CXX11_OVERRIDE;
 };

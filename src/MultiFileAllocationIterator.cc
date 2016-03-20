@@ -38,83 +38,116 @@
 #include "AdaptiveFileAllocationIterator.h"
 #include "TruncFileAllocationIterator.h"
 #ifdef HAVE_SOME_FALLOCATE
-# include "FallocFileAllocationIterator.h"
+#include "FallocFileAllocationIterator.h"
 #endif // HAVE_SOME_FALLOCATE
 #include "DiskWriter.h"
+#include "DefaultDiskWriterFactory.h"
+#include "LogFactory.h"
 
 namespace aria2 {
 
-MultiFileAllocationIterator::MultiFileAllocationIterator
-(MultiDiskAdaptor* diskAdaptor)
-  : diskAdaptor_{diskAdaptor},
-    entryItr_{std::begin(diskAdaptor_->getDiskWriterEntries())}
-{}
+MultiFileAllocationIterator::MultiFileAllocationIterator(
+    MultiDiskAdaptor* diskAdaptor)
+    : diskAdaptor_{diskAdaptor},
+      entryItr_{std::begin(diskAdaptor_->getDiskWriterEntries())}
+{
+}
 
-MultiFileAllocationIterator::~MultiFileAllocationIterator() {}
+MultiFileAllocationIterator::~MultiFileAllocationIterator()
+{
+  if (diskWriter_) {
+    diskWriter_->closeFile();
+  }
+}
 
 void MultiFileAllocationIterator::allocateChunk()
 {
-  while((!fileAllocationIterator_ ||
-         fileAllocationIterator_->finished()) &&
-        entryItr_ != std::end(diskAdaptor_->getDiskWriterEntries())) {
-    auto& fileEntry = (*entryItr_)->getFileEntry();
-    // Open file before calling DiskWriterEntry::size().  Calling
-    // private function of MultiDiskAdaptor.
-    diskAdaptor_->openIfNot((*entryItr_).get(), &DiskWriterEntry::openFile);
-    if((*entryItr_)->needsFileAllocation() &&
-       (*entryItr_)->size() < fileEntry->getLength()) {
-      switch(diskAdaptor_->getFileAllocationMethod()) {
-#ifdef HAVE_SOME_FALLOCATE
-      case(DiskAdaptor::FILE_ALLOC_FALLOC):
-        fileAllocationIterator_ = make_unique<FallocFileAllocationIterator>
-          ((*entryItr_)->getDiskWriter().get(),
-           (*entryItr_)->size(),
-           fileEntry->getLength());
-        break;
-#endif // HAVE_SOME_FALLOCATE
-      case(DiskAdaptor::FILE_ALLOC_TRUNC):
-        fileAllocationIterator_ = make_unique<TruncFileAllocationIterator>
-          ((*entryItr_)->getDiskWriter().get(),
-           (*entryItr_)->size(),
-           fileEntry->getLength());
-        break;
-      default:
-        fileAllocationIterator_ = make_unique<AdaptiveFileAllocationIterator>
-          ((*entryItr_)->getDiskWriter().get(),
-           (*entryItr_)->size(),
-           fileEntry->getLength());
-        break;
-      }
-      break;
+  if (fileAllocationIterator_) {
+    if (!fileAllocationIterator_->finished()) {
+      fileAllocationIterator_->allocateChunk();
+      return;
     }
+
+    if (diskWriter_) {
+      diskWriter_->closeFile();
+      diskWriter_.reset();
+    }
+    fileAllocationIterator_.reset();
     ++entryItr_;
   }
-  if(finished()) {
-    return;
+
+  while (entryItr_ != std::end(diskAdaptor_->getDiskWriterEntries())) {
+    if (!(*entryItr_)->getDiskWriter()) {
+      ++entryItr_;
+      continue;
+    }
+
+    auto& fileEntry = (*entryItr_)->getFileEntry();
+    // we use dedicated DiskWriter instead of
+    // (*entryItr_)->getDiskWriter().  This is because
+    // SingleFileAllocationIterator cannot reopen file if file is
+    // closed by OpenedFileCounter.
+    diskWriter_ =
+        DefaultDiskWriterFactory().newDiskWriter((*entryItr_)->getFilePath());
+    // Open file before calling DiskWriterEntry::size().  Calling
+    // private function of MultiDiskAdaptor.
+    diskWriter_->openFile(fileEntry->getLength());
+
+    if ((*entryItr_)->needsFileAllocation() &&
+        (*entryItr_)->size() < fileEntry->getLength()) {
+      A2_LOG_INFO(fmt("Allocating file %s: target size=%" PRId64
+                      ", current size=%" PRId64,
+                      (*entryItr_)->getFilePath().c_str(),
+                      fileEntry->getLength(), (*entryItr_)->size()));
+      switch (diskAdaptor_->getFileAllocationMethod()) {
+#ifdef HAVE_SOME_FALLOCATE
+      case (DiskAdaptor::FILE_ALLOC_FALLOC):
+        fileAllocationIterator_ = make_unique<FallocFileAllocationIterator>(
+            diskWriter_.get(), (*entryItr_)->size(), fileEntry->getLength());
+        break;
+#endif // HAVE_SOME_FALLOCATE
+      case (DiskAdaptor::FILE_ALLOC_TRUNC):
+        fileAllocationIterator_ = make_unique<TruncFileAllocationIterator>(
+            diskWriter_.get(), (*entryItr_)->size(), fileEntry->getLength());
+        break;
+      default:
+        fileAllocationIterator_ = make_unique<AdaptiveFileAllocationIterator>(
+            diskWriter_.get(), (*entryItr_)->size(), fileEntry->getLength());
+        break;
+      }
+      fileAllocationIterator_->allocateChunk();
+      return;
+    }
+
+    diskWriter_->closeFile();
+    diskWriter_.reset();
+
+    ++entryItr_;
   }
-  fileAllocationIterator_->allocateChunk();
 }
 
 bool MultiFileAllocationIterator::finished()
 {
   return entryItr_ == std::end(diskAdaptor_->getDiskWriterEntries()) &&
-    (!fileAllocationIterator_ || fileAllocationIterator_->finished());
+         (!fileAllocationIterator_ || fileAllocationIterator_->finished());
 }
 
 int64_t MultiFileAllocationIterator::getCurrentLength()
 {
-  if(!fileAllocationIterator_) {
+  if (!fileAllocationIterator_) {
     return 0;
-  } else {
+  }
+  else {
     return fileAllocationIterator_->getCurrentLength();
   }
 }
 
 int64_t MultiFileAllocationIterator::getTotalLength()
 {
-  if(!fileAllocationIterator_) {
+  if (!fileAllocationIterator_) {
     return 0;
-  } else {
+  }
+  else {
     return fileAllocationIterator_->getTotalLength();
   }
 }
