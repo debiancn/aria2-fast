@@ -1,2 +1,2 @@
 version=3
-http://sf.net/aria2/aria2-([\d.]*)\.tar\.bz2
+https://github.com/tatsuhiro-t/aria2/releases .*/aria2-(\d\S*)\.tar\.gz
