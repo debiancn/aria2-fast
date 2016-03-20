@@ -1,3 +1,13 @@
+aria2 (1.21.0-1) unstable; urgency=medium
+
+  * New upstream release:
+    + New upstream release (Closes: #815914)
+    + Fix problem connecting to some sites (Closes: #818711)
+  * debian/uscan:
+    + Updated for new location
+
+ -- Patrick Ruckstuhl <patrick@ch.tario.org>  Sun, 20 Mar 2016 13:57:03 +0100
+
 aria2 (1.18.8-1) unstable; urgency=medium
 
   * New upstream release:
