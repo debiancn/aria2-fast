@@ -61,7 +61,6 @@ private:
     bool recentUnchoking_;
     int uploadSpeed_;
 
-    const static time_t TIME_FRAME = 20;
   public:
     PeerEntry(const std::shared_ptr<Peer>& peer);
     PeerEntry(const PeerEntry& c);
@@ -81,6 +80,7 @@ private:
   };
 
   void unchoke(std::vector<PeerEntry>& peers);
+
 public:
   BtSeederStateChoke();
 
@@ -93,9 +93,7 @@ public:
   friend void swap(PeerEntry& a, PeerEntry& b);
 };
 
-void swap
-(BtSeederStateChoke::PeerEntry& a,
- BtSeederStateChoke::PeerEntry& b);
+void swap(BtSeederStateChoke::PeerEntry& a, BtSeederStateChoke::PeerEntry& b);
 
 } // namespace aria2
 

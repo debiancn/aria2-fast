@@ -59,48 +59,41 @@ void UTMetadataRequestTracker::remove(size_t index)
 {
   auto i = std::find(trackedRequests_.begin(), trackedRequests_.end(),
                      RequestEntry(index));
-  if(i != trackedRequests_.end()) {
+  if (i != trackedRequests_.end()) {
     trackedRequests_.erase(i);
   }
 }
 
 namespace {
-struct RemoveTimeoutEntry {
-  RemoveTimeoutEntry(std::vector<size_t>& indexes)
-    : indexes(indexes)
-  {}
-  bool operator()(const UTMetadataRequestTracker::RequestEntry& ent) const
-  {
-    if(ent.elapsed(TIMEOUT)) {
-      A2_LOG_DEBUG(fmt("ut_metadata request timeout. index=%lu",
-                       static_cast<unsigned long>(ent.index_)));
-      indexes.push_back(ent.index_);
-      return true;
-    } else {
-      return false;
-    }
-  }
-  std::vector<size_t>& indexes;
-  static const time_t TIMEOUT = 20;
-};
+constexpr auto TIMEOUT = 20_s;
 } // namespace
 
 std::vector<size_t> UTMetadataRequestTracker::removeTimeoutEntry()
 {
   std::vector<size_t> indexes;
-  trackedRequests_.erase(std::remove_if(trackedRequests_.begin(),
-                                        trackedRequests_.end(),
-                                        RemoveTimeoutEntry(indexes)),
-                         trackedRequests_.end());
+  trackedRequests_.erase(
+      std::remove_if(std::begin(trackedRequests_), std::end(trackedRequests_),
+                     [&indexes](const RequestEntry& ent) {
+                       if (ent.elapsed(TIMEOUT)) {
+                         A2_LOG_DEBUG(
+                             fmt("ut_metadata request timeout. index=%lu",
+                                 static_cast<unsigned long>(ent.index_)));
+                         indexes.push_back(ent.index_);
+                         return true;
+                       }
+                       return false;
+                     }),
+      std::end(trackedRequests_));
   return indexes;
 }
 
 size_t UTMetadataRequestTracker::avail() const
 {
   const size_t MAX_OUTSTANDING_REQUEST = 1;
-  if(MAX_OUTSTANDING_REQUEST > count()) {
-    return MAX_OUTSTANDING_REQUEST-count();
-  } else {
+  if (MAX_OUTSTANDING_REQUEST > count()) {
+    return MAX_OUTSTANDING_REQUEST - count();
+  }
+  else {
     return 0;
   }
 }
@@ -108,7 +101,7 @@ size_t UTMetadataRequestTracker::avail() const
 std::vector<size_t> UTMetadataRequestTracker::getAllTrackedIndex() const
 {
   std::vector<size_t> indexes;
-  for(auto& e: trackedRequests_) {
+  for (auto& e : trackedRequests_) {
     indexes.push_back(e.index_);
   }
   return indexes;

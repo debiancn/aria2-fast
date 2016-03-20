@@ -79,7 +79,7 @@ public:
   bool closeReceived();
   // Returns true if the close frame is sent.
   bool closeSent();
-  // Parses parital request body. This function returns the number of
+  // Parses partial request body. This function returns the number of
   // bytes processed if it succeeds, or negative error code.
   ssize_t parseUpdate(const uint8_t* data, size_t len);
   // Parses final part of request body and returns result.  The
@@ -89,35 +89,18 @@ public:
   std::unique_ptr<ValueBase> parseFinal(const uint8_t* data, size_t len,
                                         ssize_t& error);
 
-  const std::shared_ptr<SocketCore>& getSocket() const
-  {
-    return socket_;
-  }
+  const std::shared_ptr<SocketCore>& getSocket() const { return socket_; }
 
-  DownloadEngine* getDownloadEngine()
-  {
-    return e_;
-  }
+  DownloadEngine* getDownloadEngine() { return e_; }
 
-  WebSocketInteractionCommand* getCommand()
-  {
-    return command_;
-  }
+  WebSocketInteractionCommand* getCommand() { return command_; }
 
-  void setCommand(WebSocketInteractionCommand* command)
-  {
-    command_ = command;
-  }
+  void setCommand(WebSocketInteractionCommand* command) { command_ = command; }
 
-  bool getIgnorePayload() const
-  {
-    return ignorePayload_;
-  }
+  bool getIgnorePayload() const { return ignorePayload_; }
 
-  void setIgnorePayload(bool flag)
-  {
-    ignorePayload_ = flag;
-  }
+  void setIgnorePayload(bool flag) { ignorePayload_ = flag; }
+
 private:
   std::shared_ptr<SocketCore> socket_;
   DownloadEngine* e_;

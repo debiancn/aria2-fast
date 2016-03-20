@@ -43,11 +43,13 @@ namespace aria2 {
 
 class DHTTokenTracker;
 
-class DHTTokenUpdateCommand:public TimeBasedCommand {
+class DHTTokenUpdateCommand : public TimeBasedCommand {
 private:
   DHTTokenTracker* tokenTracker_;
+
 public:
-  DHTTokenUpdateCommand(cuid_t cuid, DownloadEngine* e, time_t interval);
+  DHTTokenUpdateCommand(cuid_t cuid, DownloadEngine* e,
+                        std::chrono::seconds interval);
 
   virtual ~DHTTokenUpdateCommand();
 

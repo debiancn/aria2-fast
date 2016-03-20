@@ -85,7 +85,7 @@ static inline const char* protoToString(SSLProtocol proto)
   case kSSLProtocol2:
     return "SSLv2 (!)";
   case kSSLProtocol3:
-    return "SSLv3";
+    return "SSLv3 (!)";
   case kTLSProtocol1:
     return "TLSv1";
   case kTLSProtocol11:
@@ -101,172 +101,180 @@ static inline const char* protoToString(SSLProtocol proto)
   {                                                                            \
     n, #s                                                                      \
   }
-static struct
-{
+static struct {
   SSLCipherSuite suite;
   const char* name;
 } kSuites[] = {
-      // From CipherSuite.h (10.9)
-      SUITE(SSL_NULL_WITH_NULL_NULL, 0x0000),
-      SUITE(SSL_RSA_WITH_NULL_MD5, 0x0001),
-      SUITE(SSL_RSA_WITH_NULL_SHA, 0x0002),
-      SUITE(SSL_RSA_EXPORT_WITH_RC4_40_MD5, 0x0003),
-      SUITE(SSL_RSA_WITH_RC4_128_MD5, 0x0004),
-      SUITE(SSL_RSA_WITH_RC4_128_SHA, 0x0005),
-      SUITE(SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5, 0x0006),
-      SUITE(SSL_RSA_WITH_IDEA_CBC_SHA, 0x0007),
-      SUITE(SSL_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x0008),
-      SUITE(SSL_RSA_WITH_DES_CBC_SHA, 0x0009),
-      SUITE(SSL_RSA_WITH_3DES_EDE_CBC_SHA, 0x000A),
-      SUITE(SSL_DH_DSS_EXPORT_WITH_DES40_CBC_SHA, 0x000B),
-      SUITE(SSL_DH_DSS_WITH_DES_CBC_SHA, 0x000C),
-      SUITE(SSL_DH_DSS_WITH_3DES_EDE_CBC_SHA, 0x000D),
-      SUITE(SSL_DH_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x000E),
-      SUITE(SSL_DH_RSA_WITH_DES_CBC_SHA, 0x000F),
-      SUITE(SSL_DH_RSA_WITH_3DES_EDE_CBC_SHA, 0x0010),
-      SUITE(SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA, 0x0011),
-      SUITE(SSL_DHE_DSS_WITH_DES_CBC_SHA, 0x0012),
-      SUITE(SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA, 0x0013),
-      SUITE(SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x0014),
-      SUITE(SSL_DHE_RSA_WITH_DES_CBC_SHA, 0x0015),
-      SUITE(SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA, 0x0016),
-      SUITE(SSL_DH_anon_EXPORT_WITH_RC4_40_MD5, 0x0017),
-      SUITE(SSL_DH_anon_WITH_RC4_128_MD5, 0x0018),
-      SUITE(SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA, 0x0019),
-      SUITE(SSL_DH_anon_WITH_DES_CBC_SHA, 0x001A),
-      SUITE(SSL_DH_anon_WITH_3DES_EDE_CBC_SHA, 0x001B),
-      SUITE(SSL_FORTEZZA_DMS_WITH_NULL_SHA, 0x001C),
-      SUITE(SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA, 0x001D),
-      SUITE(TLS_RSA_WITH_AES_128_CBC_SHA, 0x002F),
-      SUITE(TLS_DH_DSS_WITH_AES_128_CBC_SHA, 0x0030),
-      SUITE(TLS_DH_RSA_WITH_AES_128_CBC_SHA, 0x0031),
-      SUITE(TLS_DHE_DSS_WITH_AES_128_CBC_SHA, 0x0032),
-      SUITE(TLS_DHE_RSA_WITH_AES_128_CBC_SHA, 0x0033),
-      SUITE(TLS_DH_anon_WITH_AES_128_CBC_SHA, 0x0034),
-      SUITE(TLS_RSA_WITH_AES_256_CBC_SHA, 0x0035),
-      SUITE(TLS_DH_DSS_WITH_AES_256_CBC_SHA, 0x0036),
-      SUITE(TLS_DH_RSA_WITH_AES_256_CBC_SHA, 0x0037),
-      SUITE(TLS_DHE_DSS_WITH_AES_256_CBC_SHA, 0x0038),
-      SUITE(TLS_DHE_RSA_WITH_AES_256_CBC_SHA, 0x0039),
-      SUITE(TLS_DH_anon_WITH_AES_256_CBC_SHA, 0x003A),
-      SUITE(TLS_ECDH_ECDSA_WITH_NULL_SHA, 0xC001),
-      SUITE(TLS_ECDH_ECDSA_WITH_RC4_128_SHA, 0xC002),
-      SUITE(TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA, 0xC003),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA, 0xC004),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA, 0xC005),
-      SUITE(TLS_ECDHE_ECDSA_WITH_NULL_SHA, 0xC006),
-      SUITE(TLS_ECDHE_ECDSA_WITH_RC4_128_SHA, 0xC007),
-      SUITE(TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA, 0xC008),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, 0xC009),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA, 0xC00A),
-      SUITE(TLS_ECDH_RSA_WITH_NULL_SHA, 0xC00B),
-      SUITE(TLS_ECDH_RSA_WITH_RC4_128_SHA, 0xC00C),
-      SUITE(TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA, 0xC00D),
-      SUITE(TLS_ECDH_RSA_WITH_AES_128_CBC_SHA, 0xC00E),
-      SUITE(TLS_ECDH_RSA_WITH_AES_256_CBC_SHA, 0xC00F),
-      SUITE(TLS_ECDHE_RSA_WITH_NULL_SHA, 0xC010),
-      SUITE(TLS_ECDHE_RSA_WITH_RC4_128_SHA, 0xC011),
-      SUITE(TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA, 0xC012),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, 0xC013),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA, 0xC014),
-      SUITE(TLS_ECDH_anon_WITH_NULL_SHA, 0xC015),
-      SUITE(TLS_ECDH_anon_WITH_RC4_128_SHA, 0xC016),
-      SUITE(TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA, 0xC017),
-      SUITE(TLS_ECDH_anon_WITH_AES_128_CBC_SHA, 0xC018),
-      SUITE(TLS_ECDH_anon_WITH_AES_256_CBC_SHA, 0xC019),
-      SUITE(TLS_NULL_WITH_NULL_NULL, 0x0000),
-      SUITE(TLS_RSA_WITH_NULL_MD5, 0x0001),
-      SUITE(TLS_RSA_WITH_NULL_SHA, 0x0002),
-      SUITE(TLS_RSA_WITH_RC4_128_MD5, 0x0004),
-      SUITE(TLS_RSA_WITH_RC4_128_SHA, 0x0005),
-      SUITE(TLS_RSA_WITH_3DES_EDE_CBC_SHA, 0x000A),
-      SUITE(TLS_RSA_WITH_NULL_SHA256, 0x003B),
-      SUITE(TLS_RSA_WITH_AES_128_CBC_SHA256, 0x003C),
-      SUITE(TLS_RSA_WITH_AES_256_CBC_SHA256, 0x003D),
-      SUITE(TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA, 0x000D),
-      SUITE(TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA, 0x0010),
-      SUITE(TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA, 0x0013),
-      SUITE(TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA, 0x0016),
-      SUITE(TLS_DH_DSS_WITH_AES_128_CBC_SHA256, 0x003E),
-      SUITE(TLS_DH_RSA_WITH_AES_128_CBC_SHA256, 0x003F),
-      SUITE(TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, 0x0040),
-      SUITE(TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, 0x0067),
-      SUITE(TLS_DH_DSS_WITH_AES_256_CBC_SHA256, 0x0068),
-      SUITE(TLS_DH_RSA_WITH_AES_256_CBC_SHA256, 0x0069),
-      SUITE(TLS_DHE_DSS_WITH_AES_256_CBC_SHA256, 0x006A),
-      SUITE(TLS_DHE_RSA_WITH_AES_256_CBC_SHA256, 0x006B),
-      SUITE(TLS_DH_anon_WITH_RC4_128_MD5, 0x0018),
-      SUITE(TLS_DH_anon_WITH_3DES_EDE_CBC_SHA, 0x001B),
-      SUITE(TLS_DH_anon_WITH_AES_128_CBC_SHA256, 0x006C),
-      SUITE(TLS_DH_anon_WITH_AES_256_CBC_SHA256, 0x006D),
-      SUITE(TLS_PSK_WITH_RC4_128_SHA, 0x008A),
-      SUITE(TLS_PSK_WITH_3DES_EDE_CBC_SHA, 0x008B),
-      SUITE(TLS_PSK_WITH_AES_128_CBC_SHA, 0x008C),
-      SUITE(TLS_PSK_WITH_AES_256_CBC_SHA, 0x008D),
-      SUITE(TLS_DHE_PSK_WITH_RC4_128_SHA, 0x008E),
-      SUITE(TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA, 0x008F),
-      SUITE(TLS_DHE_PSK_WITH_AES_128_CBC_SHA, 0x0090),
-      SUITE(TLS_DHE_PSK_WITH_AES_256_CBC_SHA, 0x0091),
-      SUITE(TLS_RSA_PSK_WITH_RC4_128_SHA, 0x0092),
-      SUITE(TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA, 0x0093),
-      SUITE(TLS_RSA_PSK_WITH_AES_128_CBC_SHA, 0x0094),
-      SUITE(TLS_RSA_PSK_WITH_AES_256_CBC_SHA, 0x0095),
-      SUITE(TLS_PSK_WITH_NULL_SHA, 0x002C),
-      SUITE(TLS_DHE_PSK_WITH_NULL_SHA, 0x002D),
-      SUITE(TLS_RSA_PSK_WITH_NULL_SHA, 0x002E),
-      SUITE(TLS_RSA_WITH_AES_128_GCM_SHA256, 0x009C),
-      SUITE(TLS_RSA_WITH_AES_256_GCM_SHA384, 0x009D),
-      SUITE(TLS_DHE_RSA_WITH_AES_128_GCM_SHA256, 0x009E),
-      SUITE(TLS_DHE_RSA_WITH_AES_256_GCM_SHA384, 0x009F),
-      SUITE(TLS_DH_RSA_WITH_AES_128_GCM_SHA256, 0x00A0),
-      SUITE(TLS_DH_RSA_WITH_AES_256_GCM_SHA384, 0x00A1),
-      SUITE(TLS_DHE_DSS_WITH_AES_128_GCM_SHA256, 0x00A2),
-      SUITE(TLS_DHE_DSS_WITH_AES_256_GCM_SHA384, 0x00A3),
-      SUITE(TLS_DH_DSS_WITH_AES_128_GCM_SHA256, 0x00A4),
-      SUITE(TLS_DH_DSS_WITH_AES_256_GCM_SHA384, 0x00A5),
-      SUITE(TLS_DH_anon_WITH_AES_128_GCM_SHA256, 0x00A6),
-      SUITE(TLS_DH_anon_WITH_AES_256_GCM_SHA384, 0x00A7),
-      SUITE(TLS_PSK_WITH_AES_128_GCM_SHA256, 0x00A8),
-      SUITE(TLS_PSK_WITH_AES_256_GCM_SHA384, 0x00A9),
-      SUITE(TLS_DHE_PSK_WITH_AES_128_GCM_SHA256, 0x00AA),
-      SUITE(TLS_DHE_PSK_WITH_AES_256_GCM_SHA384, 0x00AB),
-      SUITE(TLS_RSA_PSK_WITH_AES_128_GCM_SHA256, 0x00AC),
-      SUITE(TLS_RSA_PSK_WITH_AES_256_GCM_SHA384, 0x00AD),
-      SUITE(TLS_PSK_WITH_AES_128_CBC_SHA256, 0x00AE),
-      SUITE(TLS_PSK_WITH_AES_256_CBC_SHA384, 0x00AF),
-      SUITE(TLS_PSK_WITH_NULL_SHA256, 0x00B0),
-      SUITE(TLS_PSK_WITH_NULL_SHA384, 0x00B1),
-      SUITE(TLS_DHE_PSK_WITH_AES_128_CBC_SHA256, 0x00B2),
-      SUITE(TLS_DHE_PSK_WITH_AES_256_CBC_SHA384, 0x00B3),
-      SUITE(TLS_DHE_PSK_WITH_NULL_SHA256, 0x00B4),
-      SUITE(TLS_DHE_PSK_WITH_NULL_SHA384, 0x00B5),
-      SUITE(TLS_RSA_PSK_WITH_AES_128_CBC_SHA256, 0x00B6),
-      SUITE(TLS_RSA_PSK_WITH_AES_256_CBC_SHA384, 0x00B7),
-      SUITE(TLS_RSA_PSK_WITH_NULL_SHA256, 0x00B8),
-      SUITE(TLS_RSA_PSK_WITH_NULL_SHA384, 0x00B9),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, 0xC023),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, 0xC024),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256, 0xC025),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384, 0xC026),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, 0xC027),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, 0xC028),
-      SUITE(TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256, 0xC029),
-      SUITE(TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384, 0xC02A),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, 0xC02B),
-      SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, 0xC02C),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256, 0xC02D),
-      SUITE(TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384, 0xC02E),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, 0xC02F),
-      SUITE(TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, 0xC030),
-      SUITE(TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256, 0xC031),
-      SUITE(TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384, 0xC032),
-      SUITE(TLS_EMPTY_RENEGOTIATION_INFO_SCSV, 0x00FF),
-      SUITE(SSL_RSA_WITH_RC2_CBC_MD5, 0xFF80),
-      SUITE(SSL_RSA_WITH_IDEA_CBC_MD5, 0xFF81),
-      SUITE(SSL_RSA_WITH_DES_CBC_MD5, 0xFF82),
-      SUITE(SSL_RSA_WITH_3DES_EDE_CBC_MD5, 0xFF83),
-      SUITE(SSL_NO_SUCH_CIPHERSUITE, 0xFFFF)
-};
+    // From CipherSuite.h (10.11)
+    SUITE(SSL_NULL_WITH_NULL_NULL, 0x0000),
+    SUITE(SSL_RSA_WITH_NULL_MD5, 0x0001), SUITE(SSL_RSA_WITH_NULL_SHA, 0x0002),
+    SUITE(SSL_RSA_EXPORT_WITH_RC4_40_MD5, 0x0003),
+    SUITE(SSL_RSA_WITH_RC4_128_MD5, 0x0004),
+    SUITE(SSL_RSA_WITH_RC4_128_SHA, 0x0005),
+    SUITE(SSL_RSA_EXPORT_WITH_RC2_CBC_40_MD5, 0x0006),
+    SUITE(SSL_RSA_WITH_IDEA_CBC_SHA, 0x0007),
+    SUITE(SSL_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x0008),
+    SUITE(SSL_RSA_WITH_DES_CBC_SHA, 0x0009),
+    SUITE(SSL_RSA_WITH_3DES_EDE_CBC_SHA, 0x000A),
+    SUITE(SSL_DH_DSS_EXPORT_WITH_DES40_CBC_SHA, 0x000B),
+    SUITE(SSL_DH_DSS_WITH_DES_CBC_SHA, 0x000C),
+    SUITE(SSL_DH_DSS_WITH_3DES_EDE_CBC_SHA, 0x000D),
+    SUITE(SSL_DH_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x000E),
+    SUITE(SSL_DH_RSA_WITH_DES_CBC_SHA, 0x000F),
+    SUITE(SSL_DH_RSA_WITH_3DES_EDE_CBC_SHA, 0x0010),
+    SUITE(SSL_DHE_DSS_EXPORT_WITH_DES40_CBC_SHA, 0x0011),
+    SUITE(SSL_DHE_DSS_WITH_DES_CBC_SHA, 0x0012),
+    SUITE(SSL_DHE_DSS_WITH_3DES_EDE_CBC_SHA, 0x0013),
+    SUITE(SSL_DHE_RSA_EXPORT_WITH_DES40_CBC_SHA, 0x0014),
+    SUITE(SSL_DHE_RSA_WITH_DES_CBC_SHA, 0x0015),
+    SUITE(SSL_DHE_RSA_WITH_3DES_EDE_CBC_SHA, 0x0016),
+    SUITE(SSL_DH_anon_EXPORT_WITH_RC4_40_MD5, 0x0017),
+    SUITE(SSL_DH_anon_WITH_RC4_128_MD5, 0x0018),
+    SUITE(SSL_DH_anon_EXPORT_WITH_DES40_CBC_SHA, 0x0019),
+    SUITE(SSL_DH_anon_WITH_DES_CBC_SHA, 0x001A),
+    SUITE(SSL_DH_anon_WITH_3DES_EDE_CBC_SHA, 0x001B),
+    SUITE(SSL_FORTEZZA_DMS_WITH_NULL_SHA, 0x001C),
+    SUITE(SSL_FORTEZZA_DMS_WITH_FORTEZZA_CBC_SHA, 0x001D),
+    SUITE(TLS_RSA_WITH_AES_128_CBC_SHA, 0x002F),
+    SUITE(TLS_DH_DSS_WITH_AES_128_CBC_SHA, 0x0030),
+    SUITE(TLS_DH_RSA_WITH_AES_128_CBC_SHA, 0x0031),
+    SUITE(TLS_DHE_DSS_WITH_AES_128_CBC_SHA, 0x0032),
+    SUITE(TLS_DHE_RSA_WITH_AES_128_CBC_SHA, 0x0033),
+    SUITE(TLS_DH_anon_WITH_AES_128_CBC_SHA, 0x0034),
+    SUITE(TLS_RSA_WITH_AES_256_CBC_SHA, 0x0035),
+    SUITE(TLS_DH_DSS_WITH_AES_256_CBC_SHA, 0x0036),
+    SUITE(TLS_DH_RSA_WITH_AES_256_CBC_SHA, 0x0037),
+    SUITE(TLS_DHE_DSS_WITH_AES_256_CBC_SHA, 0x0038),
+    SUITE(TLS_DHE_RSA_WITH_AES_256_CBC_SHA, 0x0039),
+    SUITE(TLS_DH_anon_WITH_AES_256_CBC_SHA, 0x003A),
+    SUITE(TLS_ECDH_ECDSA_WITH_NULL_SHA, 0xC001),
+    SUITE(TLS_ECDH_ECDSA_WITH_RC4_128_SHA, 0xC002),
+    SUITE(TLS_ECDH_ECDSA_WITH_3DES_EDE_CBC_SHA, 0xC003),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA, 0xC004),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA, 0xC005),
+    SUITE(TLS_ECDHE_ECDSA_WITH_NULL_SHA, 0xC006),
+    SUITE(TLS_ECDHE_ECDSA_WITH_RC4_128_SHA, 0xC007),
+    SUITE(TLS_ECDHE_ECDSA_WITH_3DES_EDE_CBC_SHA, 0xC008),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA, 0xC009),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA, 0xC00A),
+    SUITE(TLS_ECDH_RSA_WITH_NULL_SHA, 0xC00B),
+    SUITE(TLS_ECDH_RSA_WITH_RC4_128_SHA, 0xC00C),
+    SUITE(TLS_ECDH_RSA_WITH_3DES_EDE_CBC_SHA, 0xC00D),
+    SUITE(TLS_ECDH_RSA_WITH_AES_128_CBC_SHA, 0xC00E),
+    SUITE(TLS_ECDH_RSA_WITH_AES_256_CBC_SHA, 0xC00F),
+    SUITE(TLS_ECDHE_RSA_WITH_NULL_SHA, 0xC010),
+    SUITE(TLS_ECDHE_RSA_WITH_RC4_128_SHA, 0xC011),
+    SUITE(TLS_ECDHE_RSA_WITH_3DES_EDE_CBC_SHA, 0xC012),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA, 0xC013),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA, 0xC014),
+    SUITE(TLS_ECDH_anon_WITH_NULL_SHA, 0xC015),
+    SUITE(TLS_ECDH_anon_WITH_RC4_128_SHA, 0xC016),
+    SUITE(TLS_ECDH_anon_WITH_3DES_EDE_CBC_SHA, 0xC017),
+    SUITE(TLS_ECDH_anon_WITH_AES_128_CBC_SHA, 0xC018),
+    SUITE(TLS_ECDH_anon_WITH_AES_256_CBC_SHA, 0xC019),
+    SUITE(TLS_NULL_WITH_NULL_NULL, 0x0000),
+    SUITE(TLS_RSA_WITH_NULL_MD5, 0x0001), SUITE(TLS_RSA_WITH_NULL_SHA, 0x0002),
+    SUITE(TLS_RSA_WITH_RC4_128_MD5, 0x0004),
+    SUITE(TLS_RSA_WITH_RC4_128_SHA, 0x0005),
+    SUITE(TLS_RSA_WITH_3DES_EDE_CBC_SHA, 0x000A),
+    SUITE(TLS_RSA_WITH_AES_128_CBC_SHA, 0x002F),
+    SUITE(TLS_RSA_WITH_AES_256_CBC_SHA, 0x0035),
+    SUITE(TLS_RSA_WITH_NULL_SHA256, 0x003B),
+    SUITE(TLS_RSA_WITH_AES_128_CBC_SHA256, 0x003C),
+    SUITE(TLS_RSA_WITH_AES_256_CBC_SHA256, 0x003D),
+    SUITE(TLS_DH_DSS_WITH_3DES_EDE_CBC_SHA, 0x000D),
+    SUITE(TLS_DH_RSA_WITH_3DES_EDE_CBC_SHA, 0x0010),
+    SUITE(TLS_DHE_DSS_WITH_3DES_EDE_CBC_SHA, 0x0013),
+    SUITE(TLS_DHE_RSA_WITH_3DES_EDE_CBC_SHA, 0x0016),
+    SUITE(TLS_DH_DSS_WITH_AES_128_CBC_SHA, 0x0030),
+    SUITE(TLS_DH_RSA_WITH_AES_128_CBC_SHA, 0x0031),
+    SUITE(TLS_DHE_DSS_WITH_AES_128_CBC_SHA, 0x0032),
+    SUITE(TLS_DHE_RSA_WITH_AES_128_CBC_SHA, 0x0033),
+    SUITE(TLS_DH_DSS_WITH_AES_256_CBC_SHA, 0x0036),
+    SUITE(TLS_DH_RSA_WITH_AES_256_CBC_SHA, 0x0037),
+    SUITE(TLS_DHE_DSS_WITH_AES_256_CBC_SHA, 0x0038),
+    SUITE(TLS_DHE_RSA_WITH_AES_256_CBC_SHA, 0x0039),
+    SUITE(TLS_DH_DSS_WITH_AES_128_CBC_SHA256, 0x003E),
+    SUITE(TLS_DH_RSA_WITH_AES_128_CBC_SHA256, 0x003F),
+    SUITE(TLS_DHE_DSS_WITH_AES_128_CBC_SHA256, 0x0040),
+    SUITE(TLS_DHE_RSA_WITH_AES_128_CBC_SHA256, 0x0067),
+    SUITE(TLS_DH_DSS_WITH_AES_256_CBC_SHA256, 0x0068),
+    SUITE(TLS_DH_RSA_WITH_AES_256_CBC_SHA256, 0x0069),
+    SUITE(TLS_DHE_DSS_WITH_AES_256_CBC_SHA256, 0x006A),
+    SUITE(TLS_DHE_RSA_WITH_AES_256_CBC_SHA256, 0x006B),
+    SUITE(TLS_DH_anon_WITH_RC4_128_MD5, 0x0018),
+    SUITE(TLS_DH_anon_WITH_3DES_EDE_CBC_SHA, 0x001B),
+    SUITE(TLS_DH_anon_WITH_AES_128_CBC_SHA, 0x0034),
+    SUITE(TLS_DH_anon_WITH_AES_256_CBC_SHA, 0x003A),
+    SUITE(TLS_DH_anon_WITH_AES_128_CBC_SHA256, 0x006C),
+    SUITE(TLS_DH_anon_WITH_AES_256_CBC_SHA256, 0x006D),
+    SUITE(TLS_PSK_WITH_RC4_128_SHA, 0x008A),
+    SUITE(TLS_PSK_WITH_3DES_EDE_CBC_SHA, 0x008B),
+    SUITE(TLS_PSK_WITH_AES_128_CBC_SHA, 0x008C),
+    SUITE(TLS_PSK_WITH_AES_256_CBC_SHA, 0x008D),
+    SUITE(TLS_DHE_PSK_WITH_RC4_128_SHA, 0x008E),
+    SUITE(TLS_DHE_PSK_WITH_3DES_EDE_CBC_SHA, 0x008F),
+    SUITE(TLS_DHE_PSK_WITH_AES_128_CBC_SHA, 0x0090),
+    SUITE(TLS_DHE_PSK_WITH_AES_256_CBC_SHA, 0x0091),
+    SUITE(TLS_RSA_PSK_WITH_RC4_128_SHA, 0x0092),
+    SUITE(TLS_RSA_PSK_WITH_3DES_EDE_CBC_SHA, 0x0093),
+    SUITE(TLS_RSA_PSK_WITH_AES_128_CBC_SHA, 0x0094),
+    SUITE(TLS_RSA_PSK_WITH_AES_256_CBC_SHA, 0x0095),
+    SUITE(TLS_PSK_WITH_NULL_SHA, 0x002C),
+    SUITE(TLS_DHE_PSK_WITH_NULL_SHA, 0x002D),
+    SUITE(TLS_RSA_PSK_WITH_NULL_SHA, 0x002E),
+    SUITE(TLS_RSA_WITH_AES_128_GCM_SHA256, 0x009C),
+    SUITE(TLS_RSA_WITH_AES_256_GCM_SHA384, 0x009D),
+    SUITE(TLS_DHE_RSA_WITH_AES_128_GCM_SHA256, 0x009E),
+    SUITE(TLS_DHE_RSA_WITH_AES_256_GCM_SHA384, 0x009F),
+    SUITE(TLS_DH_RSA_WITH_AES_128_GCM_SHA256, 0x00A0),
+    SUITE(TLS_DH_RSA_WITH_AES_256_GCM_SHA384, 0x00A1),
+    SUITE(TLS_DHE_DSS_WITH_AES_128_GCM_SHA256, 0x00A2),
+    SUITE(TLS_DHE_DSS_WITH_AES_256_GCM_SHA384, 0x00A3),
+    SUITE(TLS_DH_DSS_WITH_AES_128_GCM_SHA256, 0x00A4),
+    SUITE(TLS_DH_DSS_WITH_AES_256_GCM_SHA384, 0x00A5),
+    SUITE(TLS_DH_anon_WITH_AES_128_GCM_SHA256, 0x00A6),
+    SUITE(TLS_DH_anon_WITH_AES_256_GCM_SHA384, 0x00A7),
+    SUITE(TLS_PSK_WITH_AES_128_GCM_SHA256, 0x00A8),
+    SUITE(TLS_PSK_WITH_AES_256_GCM_SHA384, 0x00A9),
+    SUITE(TLS_DHE_PSK_WITH_AES_128_GCM_SHA256, 0x00AA),
+    SUITE(TLS_DHE_PSK_WITH_AES_256_GCM_SHA384, 0x00AB),
+    SUITE(TLS_RSA_PSK_WITH_AES_128_GCM_SHA256, 0x00AC),
+    SUITE(TLS_RSA_PSK_WITH_AES_256_GCM_SHA384, 0x00AD),
+    SUITE(TLS_PSK_WITH_AES_128_CBC_SHA256, 0x00AE),
+    SUITE(TLS_PSK_WITH_AES_256_CBC_SHA384, 0x00AF),
+    SUITE(TLS_PSK_WITH_NULL_SHA256, 0x00B0),
+    SUITE(TLS_PSK_WITH_NULL_SHA384, 0x00B1),
+    SUITE(TLS_DHE_PSK_WITH_AES_128_CBC_SHA256, 0x00B2),
+    SUITE(TLS_DHE_PSK_WITH_AES_256_CBC_SHA384, 0x00B3),
+    SUITE(TLS_DHE_PSK_WITH_NULL_SHA256, 0x00B4),
+    SUITE(TLS_DHE_PSK_WITH_NULL_SHA384, 0x00B5),
+    SUITE(TLS_RSA_PSK_WITH_AES_128_CBC_SHA256, 0x00B6),
+    SUITE(TLS_RSA_PSK_WITH_AES_256_CBC_SHA384, 0x00B7),
+    SUITE(TLS_RSA_PSK_WITH_NULL_SHA256, 0x00B8),
+    SUITE(TLS_RSA_PSK_WITH_NULL_SHA384, 0x00B9),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256, 0xC023),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_CBC_SHA384, 0xC024),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_128_CBC_SHA256, 0xC025),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_256_CBC_SHA384, 0xC026),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256, 0xC027),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384, 0xC028),
+    SUITE(TLS_ECDH_RSA_WITH_AES_128_CBC_SHA256, 0xC029),
+    SUITE(TLS_ECDH_RSA_WITH_AES_256_CBC_SHA384, 0xC02A),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256, 0xC02B),
+    SUITE(TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384, 0xC02C),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_128_GCM_SHA256, 0xC02D),
+    SUITE(TLS_ECDH_ECDSA_WITH_AES_256_GCM_SHA384, 0xC02E),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, 0xC02F),
+    SUITE(TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384, 0xC030),
+    SUITE(TLS_ECDH_RSA_WITH_AES_128_GCM_SHA256, 0xC031),
+    SUITE(TLS_ECDH_RSA_WITH_AES_256_GCM_SHA384, 0xC032),
+    SUITE(TLS_EMPTY_RENEGOTIATION_INFO_SCSV, 0x00FF),
+    SUITE(SSL_RSA_WITH_RC2_CBC_MD5, 0xFF80),
+    SUITE(SSL_RSA_WITH_IDEA_CBC_MD5, 0xFF81),
+    SUITE(SSL_RSA_WITH_DES_CBC_MD5, 0xFF82),
+    SUITE(SSL_RSA_WITH_3DES_EDE_CBC_MD5, 0xFF83),
+    SUITE(SSL_NO_SUCH_CIPHERSUITE, 0xFFFF)};
 #undef SUITE
 
 static inline std::string suiteToString(const SSLCipherSuite suite)
@@ -276,15 +284,15 @@ static inline std::string suiteToString(const SSLCipherSuite suite)
       return s.name;
     }
   }
+
   std::stringstream ss;
   ss << "Unknown suite (0x" << std::hex << suite
      << ") like TLS_NULL_WITH_NULL_NULL";
   return ss.str();
 }
 
-static const char* kBlocked[] = {
-  "NULL", "anon",    "MD5",   "EXPORT", "DES", "IDEA", "NO_SUCH", "EMPTY", "PSK"
-};
+static const char* kBlocked[] = {"NULL", "anon", "MD5",     "EXPORT",
+                                 "DES",  "IDEA", "NO_SUCH", "PSK"};
 
 static inline bool isBlockedSuite(SSLCipherSuite suite)
 {
@@ -298,6 +306,7 @@ static inline bool isBlockedSuite(SSLCipherSuite suite)
       return true;
     }
   }
+
   return false;
 }
 
@@ -307,7 +316,7 @@ static SSLCipherSuiteList constructEnabledSuites(SSLContextRef ctx)
 #ifndef CIPHER_CONSTRUCT_ALWAYS
   static
 #endif
-  SSLCipherSuiteList rv(0);
+      SSLCipherSuiteList rv(0);
 
 #ifndef CIPHER_CONSTRUCT_ALWAYS
   if (!rv.empty()) {
@@ -328,7 +337,8 @@ static SSLCipherSuiteList constructEnabledSuites(SSLContextRef ctx)
     return rv;
   }
 
-  rv.erase(std::remove_if(rv.begin(), rv.end(), isBlockedSuite), rv.end());
+  rv.erase(std::remove_if(std::begin(rv), std::end(rv), isBlockedSuite),
+           std::end(rv));
   return rv;
 }
 
@@ -342,34 +352,60 @@ TLSSession* TLSSession::make(TLSContext* ctx)
 }
 
 AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
-  : sslCtx_(nullptr),
-    sockfd_(0),
-    state_(st_constructed),
-    lastError_(noErr),
-    writeBuffered_(0)
+    : sslCtx_(nullptr),
+      sockfd_(0),
+      state_(st_constructed),
+      lastError_(noErr),
+      writeBuffered_(0)
 {
 #if defined(__MAC_10_8)
-  sslCtx_ = SSLCreateContext(nullptr,
-                             ctx->getSide() == TLS_SERVER ? kSSLServerSide :
-                                                            kSSLClientSide,
-                             kSSLStreamType);
+  sslCtx_ = SSLCreateContext(
+      nullptr, ctx->getSide() == TLS_SERVER ? kSSLServerSide : kSSLClientSide,
+      kSSLStreamType);
   lastError_ = sslCtx_ ? noErr : paramErr;
 #else
   lastError_ = SSLNewContext(ctx->getSide() == TLS_SERVER, &sslCtx_);
 #endif
+
   if (lastError_ != noErr) {
     state_ = st_error;
     return;
   }
+
 #if defined(__MAC_10_8)
-  (void)SSLSetProtocolVersionMin(sslCtx_, kSSLProtocol3);
-  (void)SSLSetProtocolVersionMax(sslCtx_, kTLSProtocol12);
+  switch (ctx->getMinTLSVersion()) {
+  case TLS_PROTO_SSL3:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kSSLProtocol3);
+    break;
+  case TLS_PROTO_TLS10:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol1);
+    break;
+  case TLS_PROTO_TLS11:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol11);
+    break;
+  case TLS_PROTO_TLS12:
+    (void)SSLSetProtocolVersionMin(sslCtx_, kTLSProtocol12);
+    break;
+  default:
+    break;
+  }
 #else
   (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocolAll, false);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocol3, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol1, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol11, true);
-  (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol12, true);
+  switch (ctx->getMinTLSVersion()) {
+  case TLS_PROTO_SSL3:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kSSLProtocol3, true);
+  // fall through
+  case TLS_PROTO_TLS10:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol1, true);
+  // fall through
+  case TLS_PROTO_TLS11:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol11, true);
+  // fall through
+  case TLS_PROTO_TLS12:
+    (void)SSLSetProtocolVersionEnabled(sslCtx_, kTLSProtocol12, true);
+  default:
+    break;
+  }
 #endif
 
   // BEAST
@@ -380,12 +416,16 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
                             (SSLSessionOption)0x4, // kSSLSessionOptionSendOneByteRecord
 #endif
                             true);
+// False Start, if available
+#if defined(__MAC_10_9)
+  (void)SSLSetSessionOption(sslCtx_, kSSLSessionOptionFalseStart, true);
+#endif
 
 #if defined(__MAC_10_8)
   if (!ctx->getVerifyPeer()) {
     // This disables client verification
-    (void)SSLSetSessionOption(
-        sslCtx_, kSSLSessionOptionBreakOnServerAuth, true);
+    (void)SSLSetSessionOption(sslCtx_, kSSLSessionOptionBreakOnServerAuth,
+                              true);
   }
 #else
   (void)SSLSetEnableCertVerify(sslCtx_, ctx->getVerifyPeer());
@@ -420,12 +460,14 @@ AppleTLSSession::AppleTLSSession(AppleTLSContext* ctx)
     state_ = st_error;
     return;
   }
+
   CFArrayRef certs = CFArrayCreate(nullptr, (const void**)&creds, 1, nullptr);
   if (!certs) {
     A2_LOG_ERROR("AppleTLS: Failed to setup credentials");
     state_ = st_error;
     return;
   }
+
   std::unique_ptr<void, decltype(&CFRelease)> del_certs((void*)certs,
                                                         CFRelease);
   lastError_ = SSLSetCertificate(sslCtx_, certs);
@@ -467,17 +509,20 @@ int AppleTLSSession::init(sock_t sockfd)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
+  sockfd_ = sockfd;
   lastError_ = SSLSetIOFuncs(sslCtx_, SocketRead, SocketWrite);
   if (lastError_ != noErr) {
     state_ = st_error;
     return TLS_ERR_ERROR;
   }
+
   lastError_ = SSLSetConnection(sslCtx_, this);
   if (lastError_ != noErr) {
     state_ = st_error;
     return TLS_ERR_ERROR;
   }
-  sockfd_ = sockfd;
+
   state_ = st_initialized;
   return TLS_ERR_OK;
 }
@@ -488,6 +533,7 @@ int AppleTLSSession::setSNIHostname(const std::string& hostname)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   lastError_ =
       SSLSetPeerDomainName(sslCtx_, hostname.c_str(), hostname.length());
   return (lastError_ != noErr) ? TLS_ERR_ERROR : TLS_ERR_OK;
@@ -499,6 +545,7 @@ int AppleTLSSession::closeConnection()
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   lastError_ = SSLClose(sslCtx_);
   state_ = st_closed;
   return lastError_ == noErr ? TLS_ERR_OK : TLS_ERR_ERROR;
@@ -530,6 +577,7 @@ ssize_t AppleTLSSession::writeData(const void* data, size_t len)
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   size_t processed = 0;
   if (writeBuffered_) {
     lastError_ = SSLWrite(sslCtx_, nullptr, 0, &processed);
@@ -574,6 +622,7 @@ ssize_t AppleTLSSession::writeData(const void* data, size_t len)
     return TLS_ERR_ERROR;
   }
 }
+
 OSStatus AppleTLSSession::sockWrite(const void* data, size_t* len)
 {
   size_t remain = *len;
@@ -596,12 +645,14 @@ OSStatus AppleTLSSession::sockWrite(const void* data, size_t* len)
   }
   return noErr;
 }
+
 ssize_t AppleTLSSession::readData(void* data, size_t len)
 {
   if (state_ != st_connected) {
     lastError_ = noErr;
     return TLS_ERR_ERROR;
   }
+
   size_t processed = 0;
   lastError_ = SSLRead(sslCtx_, data, len, &processed);
   switch (lastError_) {
@@ -659,11 +710,12 @@ OSStatus AppleTLSSession::sockRead(void* data, size_t* len)
 }
 
 int AppleTLSSession::tlsConnect(const std::string& hostname,
-                                std::string& handshakeErr)
+                                TLSVersion& version, std::string& handshakeErr)
 {
   if (state_ != st_initialized) {
     return TLS_ERR_ERROR;
   }
+
   if (!hostname.empty()) {
     setSNIHostname(hostname);
   }
@@ -676,30 +728,48 @@ int AppleTLSSession::tlsConnect(const std::string& hostname,
     return TLS_ERR_WOULDBLOCK;
 
   case errSSLServerAuthCompleted:
-    return tlsConnect(hostname, handshakeErr);
+    return tlsConnect(hostname, version, handshakeErr);
 
   default:
     handshakeErr = getLastErrorString();
+    state_ = st_error;
     return TLS_ERR_ERROR;
   }
+
   state_ = st_connected;
 
   SSLProtocol proto = kSSLProtocolUnknown;
   (void)SSLGetNegotiatedProtocolVersion(sslCtx_, &proto);
   SSLCipherSuite suite = SSL_NO_SUCH_CIPHERSUITE;
   (void)SSLGetNegotiatedCipher(sslCtx_, &suite);
-  A2_LOG_INFO(fmt("AppleTLS: Connected to %s with %s (%s)",
-                  hostname.c_str(),
-                  protoToString(proto),
-                  suiteToString(suite).c_str()));
+  A2_LOG_INFO(fmt("AppleTLS: Connected to %s with %s (%s)", hostname.c_str(),
+                  protoToString(proto), suiteToString(suite).c_str()));
+
+  switch (proto) {
+  case kSSLProtocol3:
+    version = TLS_PROTO_SSL3;
+    break;
+  case kTLSProtocol1:
+    version = TLS_PROTO_TLS10;
+    break;
+  case kTLSProtocol11:
+    version = TLS_PROTO_TLS11;
+    break;
+  case kTLSProtocol12:
+    version = TLS_PROTO_TLS12;
+    break;
+  default:
+    version = TLS_PROTO_NONE;
+    break;
+  }
 
   return TLS_ERR_OK;
 }
 
-int AppleTLSSession::tlsAccept()
+int AppleTLSSession::tlsAccept(TLSVersion& version)
 {
   std::string hostname, err;
-  return tlsConnect(hostname, err);
+  return tlsConnect(hostname, version, err);
 }
 
 std::string AppleTLSSession::getLastErrorString()
@@ -776,4 +846,5 @@ std::string AppleTLSSession::getLastErrorString()
     return fmt("Unspecified error %ld", (long)lastError_);
   }
 }
+
 } // namespace aria2

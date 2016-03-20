@@ -9,16 +9,21 @@ DESCRIPTION
 -----------
 
 aria2 is a utility for downloading files. The supported protocols are
-HTTP(S), FTP, BitTorrent, and Metalink. aria2 can download a file from
-multiple sources/protocols and tries to utilize your maximum download
-bandwidth. It supports downloading a file from HTTP(S)/FTP and
-BitTorrent at the same time, while the data downloaded from
-HTTP(S)/FTP is uploaded to the BitTorrent swarm. Using Metalink
+HTTP(S), FTP, SFTP, BitTorrent, and Metalink. aria2 can download a
+file from multiple sources/protocols and tries to utilize your maximum
+download bandwidth. It supports downloading a file from HTTP(S)/FTP
+/SFTP and BitTorrent at the same time, while the data downloaded from
+HTTP(S)/FTP/SFTP is uploaded to the BitTorrent swarm. Using Metalink
 chunk checksums, aria2 automatically validates chunks of data while
 downloading a file.
 
 OPTIONS
 -------
+
+.. note::
+
+  Most FTP related options are applicable to SFTP as well.
+  Some options are not effective against SFTP (e.g., :option:`--ftp-pasv`)
 
 Basic Options
 ~~~~~~~~~~~~~
@@ -38,7 +43,7 @@ Basic Options
   When ``FILE`` is specified as ``-``, aria2 will read the input from ``stdin``.
   See the `Input File`_ subsection for details.
   See also the :option:`--deferred-input` option.
-  See also the :option:`--save-session-file` option.
+  See also the :option:`--save-session` option.
 
 .. option:: -l, --log=<LOG>
 
@@ -84,8 +89,9 @@ Basic Options
    ``#checksum``, ``#experimental``, ``#deprecated``, ``#help``, ``#all``
    Default: ``#basic``
 
-HTTP/FTP Options
-~~~~~~~~~~~~~~~~
+HTTP/FTP/SFTP Options
+~~~~~~~~~~~~~~~~~~~~~
+
 .. option:: --all-proxy=<PROXY>
 
   Use a proxy server for all protocols.  To override a previously
@@ -164,8 +170,11 @@ HTTP/FTP Options
 
   If aria2 receives "file not found" status from the remote HTTP/FTP
   servers NUM times without getting a single byte, then force the
-  download to fail. Specify ``0`` to disable this option. This options is
-  effective only when using HTTP/FTP servers.
+  download to fail. Specify ``0`` to disable this option. This options
+  is effective only when using HTTP/FTP servers.  The number of retry
+  attempt is counted toward :option:`--max-tries`, so it should be
+  configured too.
+
   Default: ``0``
 
 .. option:: -m, --max-tries=<N>
@@ -183,6 +192,17 @@ HTTP/FTP Options
   since 2*15M > 20MiB, aria2 does not split file and download it using
   1 source.  You can append ``K`` or ``M`` (1K = 1024, 1M = 1024K).
   Possible Values: ``1M`` -``1024M`` Default: ``20M``
+
+
+.. option:: --netrc-path=<FILE>
+
+   Specify the path to the netrc file.
+   Default: ``$(HOME)/.netrc``
+
+   .. note::
+
+       Permission of the .netrc file must be 600.  Otherwise, the file
+       will be ignored.
 
 .. option:: -n, --no-netrc[=true|false]
 
@@ -520,8 +540,8 @@ HTTP Specific Options
   Set user agent for HTTP(S) downloads.
   Default: ``aria2/$VERSION``, $VERSION is replaced by package version.
 
-FTP Specific Options
-~~~~~~~~~~~~~~~~~~~~
+FTP/SFTP Specific Options
+~~~~~~~~~~~~~~~~~~~~~~~~~
 .. option:: --ftp-user=<USER>
 
   Set FTP user. This affects all URIs.
@@ -541,6 +561,10 @@ FTP Specific Options
   Use the passive mode in FTP.
   If ``false`` is given, the active mode will be used.
   Default: ``true``
+
+  .. note::
+
+    This option is ignored for SFTP transfer.
 
 .. option:: --ftp-proxy=<PROXY>
 
@@ -562,10 +586,23 @@ FTP Specific Options
   Set FTP transfer type. TYPE is either ``binary`` or ``ascii``.
   Default: ``binary``
 
+  .. note::
+
+    This option is ignored for SFTP transfer.
+
 .. option:: --ftp-reuse-connection[=true|false]
 
   Reuse connection in FTP.
   Default: ``true``
+
+.. option:: --ssh-host-key-md=<TYPE>=<DIGEST>
+
+  Set checksum for SSH host public key. TYPE is hash type. The
+  supported hash type is ``sha-1`` or ``md5``. DIGEST is hex
+  digest. For example:
+  ``sha-1=b030503d4de4539dc7885e6f0f5e256704edf4c3``.  This option can
+  be used to validate server's public key when SFTP is used. If this
+  option is not set, which is default, no validation takes place.
 
 BitTorrent/Metalink Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -595,6 +632,24 @@ BitTorrent/Metalink Options
 BitTorrent Specific Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+.. option:: --bt-detach-seed-only[=true|false]
+
+  Exclude seed only downloads when counting concurrent active
+  downloads (See :option:`-j` option).  This means that if ``-j3`` is
+  given and this option is turned on and 3 downloads are active and
+  one of those enters seed mode, then it is excluded from active
+  download count (thus it becomes 2), and the next download waiting in
+  queue gets started. But be aware that seeding item is still
+  recognized as active download in RPC method.  Default: ``false``
+
+.. option:: --bt-enable-hook-after-hash-check[=true|false]
+
+  Allow hook command invocation after hash check (see :option:`-V`
+  option) in BitTorrent download. By default, when hash check
+  succeeds, the command given by :option:`--on-bt-download-complete`
+  is executed. To disable this action, give ``false`` to this option.
+  Default: ``true``
+
 .. option:: --bt-enable-lpd[=true|false]
 
   Enable Local Peer Discovery.  If a private flag is set in a torrent,
@@ -614,6 +669,15 @@ BitTorrent Specific Options
   Specify the external IP address to report to a BitTorrent
   tracker. Although this function is named ``external``, it can accept
   any kind of IP addresses. IPADDRESS must be a numeric IP address.
+
+.. option:: --bt-force-encryption[=true|false]
+
+  Requires BitTorrent message payload encryption with arc4.  This is a
+  shorthand of :option:`--bt-require-crypto`
+  :option:`--bt-min-crypto-level`\=arc4.  This option does not change
+  the option value of those options.  If ``true`` is given, deny
+  legacy BitTorrent handshake and only use Obfuscation handshake and
+  always encrypt message payload.  Default: ``false``
 
 .. option:: --bt-hash-check-seed[=true|false]
 
@@ -678,8 +742,8 @@ BitTorrent Specific Options
 
 .. option:: --bt-require-crypto[=true|false]
 
-  If true is given, aria2 doesn't accept and establish connection with legacy
-  BitTorrent handshake(\19BitTorrent protocol).
+  If ``true`` is given, aria2 doesn't accept and establish connection with legacy
+  BitTorrent handshake(\\19BitTorrent protocol).
   Thus aria2 always uses Obfuscation handshake.
   Default: ``false`` 
 
@@ -748,12 +812,14 @@ BitTorrent Specific Options
 .. option:: --dht-file-path=<PATH>
 
   Change the IPv4 DHT routing table file to PATH.
-  Default: ``$HOME/.aria2/dht.dat``
+  Default: ``$HOME/.aria2/dht.dat`` if present, otherwise
+  ``$XDG_CACHE_HOME/aria2/dht.dat``.
 
 .. option:: --dht-file-path6=<PATH>
 
   Change the IPv6 DHT routing table file to PATH.
-  Default: ``$HOME/.aria2/dht6.dat``
+  Default: ``$HOME/.aria2/dht6.dat`` if present, otherwise
+  ``$XDG_CACHE_HOME/aria2/dht6.dat``.
 
 .. option:: --dht-listen-addr6=<ADDR>
 
@@ -849,7 +915,10 @@ BitTorrent Specific Options
   bytes are specified, only first 20 bytes are
   used. If less than 20 bytes are specified, random
   byte data are added to make its length 20 bytes.
-  Default: ``aria2/$VERSION-``, $VERSION is replaced by package version.
+
+  Default: ``A2-$MAJOR-$MINOR-$PATCH-``, $MAJOR, $MINOR and $PATCH are
+  replaced by major, minor and patch version number respectively.  For
+  instance, aria2 version 1.18.8 has prefix ID ``A2-1-18-8-``.
 
 .. option:: --seed-ratio=<RATIO>
 
@@ -1125,7 +1194,8 @@ Advanced Options
 .. option:: --conf-path=<PATH>
 
   Change the configuration file path to PATH.
-  Default: ``$HOME/.aria2/aria2.conf``
+  Default: ``$HOME/.aria2/aria2.conf`` if present, otherwise
+  ``$XDG_CONFIG_HOME/aria2/aria2.conf``.
 
 .. option:: --console-log-level=<LEVEL>
 
@@ -1147,6 +1217,11 @@ Advanced Options
   lot of URIs to download.  If ``false`` is given, aria2 reads all URIs
   and options at startup.
   Default: ``false``
+
+  .. Warning::
+
+    :option:`--deferred-input` option will be disabled when
+    :option:`--save-session` is used together.
 
 .. option:: --disable-ipv6[=true|false]
 
@@ -1186,7 +1261,7 @@ Advanced Options
   you take commonly used values from RFC, network vendors'
   documentation, Wikipedia or any other source, use them as they are.
 
-.. option:: --rlimit-nofile=NUM
+.. option:: --rlimit-nofile=<NUM>
 
   Set the soft limit of open file descriptors.
   This open will only have effect when:
@@ -1300,6 +1375,16 @@ Advanced Options
   downloads. Specifying 0 means no download result is kept. Default:
   ``1000``
 
+.. option:: --max-mmap-limit=<SIZE>
+
+  Set the maximum file size to enable mmap (see
+  :option:`--enable-mmap` option). The file size is determined by the
+  sum of all files contained in one download. For example, if a
+  download contains 5 files, then file size is the total size of those
+  files. If file size is strictly greater than the size specified in
+  this option, mmap will be disabled.
+  Default: ``9223372036854775807``
+
 .. option:: --max-resume-failure-tries=<N>
 
   When used with :option:`--always-resume=false, <--always-resume>` aria2 downloads file from
@@ -1307,6 +1392,20 @@ Advanced Options
   resume. If N is ``0``, aria2 downloads file from scratch when all
   given URIs do not support resume.  See :option:`--always-resume` option.
   Default: ``0``
+
+.. option:: --min-tls-version=<VERSION>
+
+  Specify minimum SSL/TLS version to enable.
+  Possible Values: ``SSLv3``, ``TLSv1``, ``TLSv1.1``, ``TLSv1.2``
+  Default: ``TLSv1``
+
+.. option:: --multiple-interface=<INTERFACES>
+
+  Comma separated list of interfaces to bind sockets to. Requests will
+  be splited among the interfaces to achieve link aggregation. You can
+  specify interface name, IP address and hostname. If
+  :option:`--interface` is used, this option will be ignored.
+  Possible Values: interface, IP address, hostname
 
 .. option:: --log-level=<LEVEL>
 
@@ -1467,22 +1566,30 @@ Advanced Options
     use meta data (e.g., BitTorrent and Metalink). In this case, there
     are some restrictions.
 
-    1. magnet URI, and followed by torrent download
-        GID of BitTorrent meta data download is saved.
-    2. URI to torrent file, and followed by torrent download
-        GID of torrent file download is saved.
-    3. URI to metalink file, and followed by file downloads described in metalink file
-        GID of metalink file download is saved.
-    4. local torrent file
-        GID of torrent download is saved.
-    5. local metalink file
-        Any meaningful GID is not saved.
+    magnet URI, and followed by torrent download
+       GID of BitTorrent meta data download is saved.
+    URI to torrent file, and followed by torrent download
+       GID of torrent file download is saved.
+    URI to metalink file, and followed by file downloads described in metalink file
+       GID of metalink file download is saved.
+    local torrent file
+       GID of torrent download is saved.
+    local metalink file
+       Any meaningful GID is not saved.
 
 .. option:: --save-session-interval=<SEC>
 
   Save error/unfinished downloads to a file specified by
   :option:`--save-session` option every SEC seconds. If ``0`` is
   given, file will be saved only when aria2 exits. Default: ``0``
+
+
+.. option:: --socket-recv-buffer-size=<SIZE>
+
+  Set the maximum socket receive buffer in bytes.  Specifing ``0``
+  will disable this option. This value will be set to socket file
+  descriptor using ``SO_RCVBUF`` socket option with ``setsockopt()``
+  call.  Default: ``0``
 
 .. option:: --stop=<SEC>
 
@@ -1551,12 +1658,12 @@ treated as a separate download. Both Metalink4 and Metalink version
 3.0 are supported.
 
 You can specify both torrent file with -T option and URIs. By doing
-this, you can download a file from both torrent swarm and HTTP(S)/FTP
-server at the same time, while the data from HTTP(S)/FTP are uploaded
-to the torrent swarm.  For single file torrents, URI can be a complete
-URI pointing to the resource or if URI ends with /, name in torrent
-file in torrent is added. For multi-file torrents, name and path are
-added to form a URI for each file.
+this, you can download a file from both torrent swarm and
+HTTP(S)/FTP/SFTP server at the same time, while the data from
+HTTP(S)/FTP/SFTP are uploaded to the torrent swarm.  For single file
+torrents, URI can be a complete URI pointing to the resource or if URI
+ends with /, name in torrent file in torrent is added. For multi-file
+torrents, name and path are added to form a URI for each file.
 
 .. note::
 
@@ -1587,15 +1694,14 @@ occurred. Currently following options are available:
 
 aria2 passes 3 arguments to specified command when it is executed.
 These arguments are: GID, the number of files and file path.  For
-HTTP, FTP downloads, usually the number of files is 1.  BitTorrent
-download can contain multiple files.
-If number of files is more than one, file path is first one.  In
-other words, this is the value of path key of first struct whose
-selected key is true in the response of :func:`aria2.getFiles`
-RPC method.
-If you want to get all file paths, consider to use JSON-RPC/XML-RPC.  Please
-note that file path may change during download in HTTP because of
-redirection or Content-Disposition header.
+HTTP, FTP, and SFTP downloads, usually the number of files is 1.
+BitTorrent download can contain multiple files.  If number of files is
+more than one, file path is first one.  In other words, this is the
+value of path key of first struct whose selected key is true in the
+response of :func:`aria2.getFiles` RPC method.  If you want to get all
+file paths, consider to use JSON-RPC/XML-RPC.  Please note that file
+path may change during download in HTTP because of redirection or
+Content-Disposition header.
 
 Let's see an example of how arguments are passed to command:
 
@@ -1718,6 +1824,12 @@ based on the last error encountered.
 30
   If aria2 could not parse JSON-RPC request.
 
+31
+  Reserved.  Not used.
+
+32
+  If checksum validation failed.
+
 .. note::
 
   An error occurred in a finished download will not be reported
@@ -1764,10 +1876,12 @@ FILES
 aria2.conf
 ~~~~~~~~~~
 
-By default, aria2 parses ``$HOME/.aria2/aria2.conf`` as a
-configuration file. You can specify the path to configuration file
-using :option:`--conf-path` option.  If you don't want to use the
-configuration file, use :option:`--no-conf` option.
+By default, aria2 checks whether the legacy path
+``$HOME/.aria2/aria2.conf`` is present, otherwise it parses
+``$XDG_CONFIG_HOME/aria2/aria2.conf`` as its configuration file.  You
+can specify the path to configuration file using :option:`--conf-path`
+option.  If you don't want to use the configuration file, use
+:option:`--no-conf` option.
 
 The configuration file is a text file and has 1 option per each
 line. In each line, you can specify name-value pair in the format:
@@ -1792,16 +1906,18 @@ lines beginning ``#`` are treated as comments::
 dht.dat
 ~~~~~~~~
 
-By default, the routing table of IPv4 DHT is saved to the path
-``$HOME/.aria2/dht.dat`` and the routing table of IPv6 DHT is saved to
-the path ``$HOME/.aria2/dht6.dat``.
+Unless the legacy file paths ``$HOME/.aria2/dht.dat`` and
+``$HOME/.aria2/dht6.dat`` are pointing to existing files, the routing
+table of IPv4 DHT is saved to the path
+``$XDG_CACHE_HOME/aria2/dht.dat`` and the routing table of IPv6 DHT is
+saved to the path ``$XDG_CACHE_HOME/aria2/dht6.dat``.
 
 Netrc
 ~~~~~
 
-Netrc support is enabled by default for HTTP(S)/FTP.  To disable netrc
-support, specify :option:`--no-netrc <-n>` option.  Your .netrc file should have correct
-permissions(600).
+Netrc support is enabled by default for HTTP(S)/FTP/SFTP.  To disable
+netrc support, specify :option:`--no-netrc <-n>` option.  Your .netrc
+file should have correct permissions(600).
 
 If machine name starts ``.``, aria2 performs domain-match instead of
 exact match. This is an extension of aria2. For example of domain
@@ -1872,9 +1988,11 @@ of URIs. These optional lines must start with white space(s).
   * :option:`always-resume <--always-resume>`
   * :option:`async-dns <--async-dns>`
   * :option:`auto-file-renaming <--auto-file-renaming>`
+  * :option:`bt-enable-hook-after-hash-check <--bt-enable-hook-after-hash-check>`
   * :option:`bt-enable-lpd <--bt-enable-lpd>`
   * :option:`bt-exclude-tracker <--bt-exclude-tracker>`
   * :option:`bt-external-ip <--bt-external-ip>`
+  * :option:`bt-force-encryption <--bt-force-encryption>`
   * :option:`bt-hash-check-seed <--bt-hash-check-seed>`
   * :option:`bt-max-peers <--bt-max-peers>`
   * :option:`bt-metadata-only <--bt-metadata-only>`
@@ -1932,6 +2050,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`max-connection-per-server <-x>`
   * :option:`max-download-limit <--max-download-limit>`
   * :option:`max-file-not-found <--max-file-not-found>`
+  * :option:`max-mmap-limit <--max-mmap-limit>`
   * :option:`max-resume-failure-tries <--max-resume-failure-tries>`
   * :option:`max-tries <-m>`
   * :option:`max-upload-limit <-u>`
@@ -1963,6 +2082,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`seed-time <--seed-time>`
   * :option:`select-file <--select-file>`
   * :option:`split <-s>`
+  * :option:`ssh-host-key-md <--ssh-host-key-md>`
   * :option:`stream-piece-selector <--stream-piece-selector>`
   * :option:`timeout <-t>`
   * :option:`uri-selector <--uri-selector>`
@@ -2105,7 +2225,7 @@ will removed from the parameter list before the request is being processed.
 For example, if the RPC secret authorization token is ``$$secret$$``,
 calling `aria2.addUri` RPC method would have to look like this::
 
-  aria2.addUri("token::$$secret$$", ["http://example.org/file"])
+  aria2.addUri("token:$$secret$$", ["http://example.org/file"])
 
 The `system.multicall` RPC method is treated specially. Since the XML-RPC
 specification only allows a single array as a parameter for this method, we
@@ -2119,6 +2239,10 @@ to provide the token as the first parameter as described above.
   interface. Therefore it is recommended to prefer Batch or `system.multicall`
   requests when appropriate.
 
+  `system.listMethods` can be executed without token.  Since it just
+  returns the all available methods, and does not alter anything, it
+  is safe without secret token.
+
 Methods
 ~~~~~~~
 
@@ -2127,19 +2251,19 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
 .. function:: aria2.addUri([secret], uris[, options[, position]])
 
-  This method adds a new download. *uris* is an array of HTTP/FTP/BitTorrent
-  URIs (strings) pointing to the same resource.  If you mix URIs pointing to
-  different resources, then the download may fail or be corrupted without aria2
-  complaining.
-  When adding BitTorrent Magnet URIs, *uris* must have only one element and it
-  should be BitTorrent Magnet URI.
-  *options* is a struct and its members are pairs of option name and value.
-  See :ref:`rpc_options` below for more details.
-  If *position* is given, it must be an integer starting from 0. The new
-  download will be inserted at *position* in the waiting queue. If
-  *position* is omitted or *position* is larger than the current size of the
-  queue, the new download is appended to the end of the queue.
-  This method returns the GID of the newly registered download.
+  This method adds a new download. *uris* is an array of
+  HTTP/FTP/SFTP/BitTorrent URIs (strings) pointing to the same
+  resource.  If you mix URIs pointing to different resources, then the
+  download may fail or be corrupted without aria2 complaining.  When
+  adding BitTorrent Magnet URIs, *uris* must have only one element and
+  it should be BitTorrent Magnet URI.  *options* is a struct and its
+  members are pairs of option name and value.  See :ref:`rpc_options`
+  below for more details.  If *position* is given, it must be an
+  integer starting from 0. The new download will be inserted at
+  *position* in the waiting queue. If *position* is omitted or
+  *position* is larger than the current size of the queue, the new
+  download is appended to the end of the queue.  This method returns
+  the GID of the newly registered download.
 
   **JSON-RPC Example**
 
@@ -2221,7 +2345,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
     >>> import xmlrpclib
     >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
-    >>> s.aria2.addTorrent(xmlrpclib.Binary(open('file.torrent').read()))
+    >>> s.aria2.addTorrent(xmlrpclib.Binary(open('file.torrent', mode='rb').read()))
     '2089b05ecca3d829'
 
 .. function:: aria2.addMetalink([secret], metalink[, options[, position]])
@@ -2267,7 +2391,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
     >>> import xmlrpclib
     >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
-    >>> s.aria2.addMetalink(xmlrpclib.Binary(open('file.meta4').read()))
+    >>> s.aria2.addMetalink(xmlrpclib.Binary(open('file.meta4', mode='rb').read()))
     ['2089b05ecca3d829']
 
 .. function:: aria2.remove([secret], gid)
@@ -2321,7 +2445,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
   This method is equal to calling :func:`aria2.pause` for every active/waiting
   download. This methods returns ``OK``.
 
-.. function:: aria2.forcePause([secret], pid)
+.. function:: aria2.forcePause([secret], gid)
 
   This method pauses the download denoted by *gid*.  This method
   behaves just like :func:`aria2.pause` except that this method pauses
@@ -2394,6 +2518,10 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
   ``numSeeders``
     The number of seeders aria2 has connected to. BitTorrent only.
 
+  ``seeder``
+    ``true`` if the local endpoint is a seeder. Otherwise ``false``.
+    BitTorrent only.
+
   ``pieceLength``
     Piece length in bytes.
 
@@ -2408,6 +2536,10 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
     is a string. The error codes are defined in the `EXIT STATUS`_ section.
     This value is only available for stopped/completed downloads.
 
+  ``errorMessage``
+    The (hopefully) human readable error message associated to
+    ``errorCode``.
+
   ``followedBy``
     List of GIDs which are generated as the result of this
     download. For example, when aria2 downloads a Metalink file, it
@@ -2415,6 +2547,10 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
     :option:`--follow-metalink` option). This value is useful to track
     auto-generated downloads. If there are no such downloads, this key will not
     be included in the response.
+
+  ``following``
+    The reverse link for ``followedBy``.  A download included in
+    ``followedBy`` has this object's GID in its ``following`` value.
 
   ``belongsTo``
     GID of a parent download. Some downloads are a part of another
@@ -2684,7 +2820,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
     Upload speed(byte/sec) that this client uploads to the peer.
 
   ``seeder``
-    ``true`` is this peer is a seeder. Otherwise ``false``.
+    ``true`` if this peer is a seeder. Otherwise ``false``.
 
   **JSON-RPC Example**
   ::
@@ -2746,9 +2882,9 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
 .. function:: aria2.getServers([secret], gid)
 
-  This method returns currently connected HTTP(S)/FTP servers of the download
-  denoted by *gid* (string). The response is an array of structs and contains
-  the following keys. Values are strings.
+  This method returns currently connected HTTP(S)/FTP/SFTP servers of
+  the download denoted by *gid* (string). The response is an array of
+  structs and contains the following keys. Values are strings.
 
   ``index``
     Index of the file, starting at 1, in the same order as files appear in the
@@ -3311,10 +3447,40 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
     >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
     >>> mc = xmlrpclib.MultiCall(s)
     >>> mc.aria2.addUri(['http://example.org/file'])
-    >>> mc.aria2.addTorrent(xmlrpclib.Binary(open('file.torrent').read()))
+    >>> mc.aria2.addTorrent(xmlrpclib.Binary(open('file.torrent', mode='rb').read()))
     >>> r = mc()
     >>> tuple(r)
     ('2089b05ecca3d829', 'd2703803b52216d1')
+
+.. function:: system.listMethods()
+
+  This method returns the all available RPC methods in an array of
+  string.  Unlike other methods, this method does not require secret
+  token.  This is safe because this method jsut returns the available
+  method names.
+
+  **JSON-RPC Example**
+  ::
+
+    >>> import urllib2, json
+    >>> from pprint import pprint
+    >>> jsonreq = json.dumps({'jsonrpc':'2.0', 'id':'qwer',
+    ...                       'method':'system.listMethods'})
+    >>> c = urllib2.urlopen('http://localhost:6800/jsonrpc', jsonreq)
+    >>> pprint(json.loads(c.read()))
+    {u'id': u'qwer',
+     u'jsonrpc': u'2.0',
+     u'result': [u'aria2.addUri',
+                 u'aria2.addTorrent',
+    ...
+
+  **XML-RPC Example**
+  ::
+
+    >>> import xmlrpclib
+    >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
+    >>> s.system.listMethods()
+    ['aria2.addUri', 'aria2.addTorrent', ...
 
 Error Handling
 ~~~~~~~~~~~~~~
@@ -4070,7 +4236,7 @@ Encrypt the whole payload using ARC4 (obfuscation):
 
 SEE ALSO
 --------
-Project Web Site: http://aria2.sourceforge.net/
+Project Web Site: https://aria2.github.io/
 
 Metalink Homepage: http://www.metalinker.org/
 
@@ -4078,7 +4244,7 @@ The Metalink Download Description Format: :rfc:`5854`
 
 COPYRIGHT
 ---------
-Copyright (C) 2006, 2014 Tatsuhiro Tsujikawa
+Copyright (C) 2006, 2015 Tatsuhiro Tsujikawa
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

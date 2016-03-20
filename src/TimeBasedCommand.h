@@ -42,14 +42,13 @@ namespace aria2 {
 
 class DownloadEngine;
 
-class TimeBasedCommand : public Command
-{
+class TimeBasedCommand : public Command {
 private:
   DownloadEngine* e_;
 
   Timer checkPoint_;
 
-  time_t interval_; // unit: sec
+  std::chrono::seconds interval_;
 
   /**
    * setting exit_ to true if this command's job has finished and you want to
@@ -63,25 +62,17 @@ private:
   bool routineCommand_;
 
 protected:
-  DownloadEngine* getDownloadEngine() const
-  {
-    return e_;
-  }
+  DownloadEngine* getDownloadEngine() const { return e_; }
 
-  void enableExit()
-  {
-    exit_ = true;
-  }
+  void enableExit() { exit_ = true; }
 
-  time_t getInterval() const
-  {
-    return interval_;
-  }
+  const std::chrono::seconds& getInterval() const { return interval_; }
+
 public:
   /**
    * preProcess() is called each time when excute() is called.
    */
-  virtual void preProcess() {};
+  virtual void preProcess(){};
 
   /**
    * process() is called only when excute() is called and specified time has
@@ -92,11 +83,11 @@ public:
   /**
    * postProcess() is called each time when excute() is called.
    */
-  virtual void postProcess() {};
+  virtual void postProcess(){};
 
 public:
-  TimeBasedCommand(cuid_t cuid, DownloadEngine* e, time_t interval,
-                   bool routineCommand = false);
+  TimeBasedCommand(cuid_t cuid, DownloadEngine* e,
+                   std::chrono::seconds interval, bool routineCommand = false);
 
   virtual ~TimeBasedCommand();
 

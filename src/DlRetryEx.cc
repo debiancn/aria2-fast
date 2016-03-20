@@ -38,19 +38,24 @@ namespace aria2 {
 
 std::shared_ptr<Exception> DlRetryEx::copy() const
 {
-  std::shared_ptr<Exception> e(new DlRetryEx(*this));
-  return e;
+  return std::make_shared<DlRetryEx>(*this);
 }
 
-DlRetryEx::DlRetryEx(const char* file, int line, const std::string& msg):
-  RecoverableException(file, line, msg) {}
+DlRetryEx::DlRetryEx(const char* file, int line, const std::string& msg)
+    : RecoverableException(file, line, msg)
+{
+}
 
 DlRetryEx::DlRetryEx(const char* file, int line, const std::string& msg,
-                     const Exception& cause):
-  RecoverableException(file, line, msg, cause) {}
+                     const Exception& cause)
+    : RecoverableException(file, line, msg, cause)
+{
+}
 
 DlRetryEx::DlRetryEx(const char* file, int line, const std::string& msg,
-                     error_code::Value code):
-  RecoverableException(file, line, msg, code) {}
+                     error_code::Value code)
+    : RecoverableException(file, line, msg, code)
+{
+}
 
 } // namespace aria2

@@ -1,7 +1,8 @@
+/* <!-- copyright */
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2010 Tatsuhiro Tsujikawa
+ * Copyright (C) 2015 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,28 +32,27 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#include "clock_gettime_mingw.h"
+#ifndef D_SFTP_FINISH_DOWNLOAD_COMMAND_H
+#define D_SFTP_FINISH_DOWNLOAD_COMMAND_H
 
-#include <windows.h>
-#include <mmsystem.h>
+#include "AbstractCommand.h"
 
-int clock_gettime(int dummyid, struct timespec* tp)
-{
-  timeBeginPeriod(1);
-  static DWORD lasttime = timeGetTime();
-  timeEndPeriod(1);
-  static struct timespec monotime = {2678400, 0}; // 1month offset(24*3600*31)
-  timeBeginPeriod(1);
-  DWORD now = timeGetTime();
-  timeEndPeriod(1);
-  DWORD elapsed = now-lasttime;
-  monotime.tv_sec += elapsed/1000;
-  monotime.tv_nsec += elapsed%1000*1000000;
-  if(monotime.tv_nsec >= 1000000000) {
-    monotime.tv_sec += monotime.tv_nsec/1000000000;
-    monotime.tv_nsec %= 1000000000;
-  }
-  lasttime = now;
-  *tp = monotime;
-  return 0;
-}
+namespace aria2 {
+
+class SftpFinishDownloadCommand : public AbstractCommand {
+protected:
+  virtual bool execute() CXX11_OVERRIDE;
+
+  virtual bool executeInternal() CXX11_OVERRIDE;
+
+public:
+  SftpFinishDownloadCommand(cuid_t cuid, const std::shared_ptr<Request>& req,
+                            const std::shared_ptr<FileEntry>& fileEntry,
+                            RequestGroup* requestGroup, DownloadEngine* e,
+                            const std::shared_ptr<SocketCore>& socket);
+  virtual ~SftpFinishDownloadCommand();
+};
+
+} // namespace aria2
+
+#endif // D_SFTP_FINISH_DOWNLOAD_COMMAND_H

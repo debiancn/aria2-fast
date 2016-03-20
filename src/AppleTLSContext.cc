@@ -56,17 +56,11 @@ using namespace aria2;
 #if defined(__MAC_10_6)
 
 #if defined(__MAC_10_7)
-static const void* query_keys[] = {
-  kSecClass,
-  kSecReturnRef,
-  kSecMatchPolicy,
-  kSecMatchLimit
-};
+static const void* query_keys[] = {kSecClass, kSecReturnRef, kSecMatchPolicy,
+                                   kSecMatchLimit};
 #endif // defined(__MAC_10_7)
 
-template <typename T>
-class CFRef
-{
+template <typename T> class CFRef {
   T ref_;
 
 public:
@@ -74,10 +68,7 @@ public:
 
   CFRef(T ref) : ref_(ref) {}
 
-  ~CFRef()
-  {
-    reset(nullptr);
-  }
+  ~CFRef() { reset(nullptr); }
 
   void reset(T ref)
   {
@@ -87,20 +78,11 @@ public:
     ref_ = ref;
   }
 
-  T get()
-  {
-    return ref_;
-  }
+  T get() { return ref_; }
 
-  const T get() const
-  {
-    return ref_;
-  }
+  const T get() const { return ref_; }
 
-  operator bool() const
-  {
-    return !!ref_;
-  }
+  operator bool() const { return !!ref_; }
 };
 
 static inline bool isWhitespace(char c)
@@ -111,12 +93,12 @@ static inline bool isWhitespace(char c)
 
 static inline std::string stripWhitespace(std::string str)
 {
-  str.erase(std::remove_if(str.begin(), str.end(), isWhitespace), str.end());
+  str.erase(std::remove_if(std::begin(str), std::end(str), isWhitespace),
+            std::end(str));
   return str;
 }
 
-struct hash_validator
-{
+struct hash_validator {
   const std::string& hash_;
 
   hash_validator(const std::string& hash) : hash_(hash) {}
@@ -127,14 +109,14 @@ struct hash_validator
   }
 };
 
-struct hash_finder
-{
+struct hash_finder {
   CFDataRef data_;
   const std::string& hash_;
 
   hash_finder(CFDataRef data, const std::string& hash)
-    : data_(data), hash_(hash)
-  {}
+      : data_(data), hash_(hash)
+  {
+  }
 
   inline bool operator()(std::string type) const
   {
@@ -162,8 +144,7 @@ std::string errToString(OSStatus err)
   return rv;
 }
 
-bool checkIdentity(const SecIdentityRef id,
-                   const std::string& fingerPrint,
+bool checkIdentity(const SecIdentityRef id, const std::string& fingerPrint,
                    const std::vector<std::string> supported)
 {
   CFRef<SecCertificateRef> ref;
@@ -185,9 +166,9 @@ bool checkIdentity(const SecIdentityRef id,
   // future-proof. Also "usually" doesn't cut it; there is already software
   // using SHA-2 class algos, and SHA-3 is standardized and potential users
   // cannot be far.
-  return std::find_if(supported.begin(),
-                      supported.end(),
-                      hash_finder(data.get(), fingerPrint)) != supported.end();
+  return std::find_if(std::begin(supported), std::end(supported),
+                      hash_finder(data.get(), fingerPrint)) !=
+         std::end(supported);
 }
 
 #endif // defined(__MAC_10_6)
@@ -195,9 +176,9 @@ bool checkIdentity(const SecIdentityRef id,
 
 namespace aria2 {
 
-TLSContext* TLSContext::make(TLSSessionSide side)
+TLSContext* TLSContext::make(TLSSessionSide side, TLSVersion ver)
 {
-  return new AppleTLSContext(side);
+  return new AppleTLSContext(side, ver);
 }
 
 AppleTLSContext::~AppleTLSContext()
@@ -234,20 +215,18 @@ bool AppleTLSContext::addTrustedCACertFile(const std::string& certfile)
   return false;
 }
 
-SecIdentityRef AppleTLSContext::getCredentials()
-{
-  return credentials_;
-}
+SecIdentityRef AppleTLSContext::getCredentials() { return credentials_; }
 
 bool AppleTLSContext::tryAsFingerprint(const std::string& fingerprint)
 {
   auto fp = stripWhitespace(fingerprint);
   // Verify this is a valid hex representation and normalize.
-  fp = util::toHex(util::fromHex(fp.begin(), fp.end()));
+  fp = util::toHex(util::fromHex(std::begin(fp), std::end(fp)));
 
   // Verify this can represent a hash
   auto ht = MessageDigest::getSupportedHashTypes();
-  if (std::find_if(ht.begin(), ht.end(), hash_validator(fp)) == ht.end()) {
+  if (std::find_if(std::begin(ht), std::end(ht), hash_validator(fp)) ==
+      std::end(ht)) {
     A2_LOG_INFO(fmt("%s is not a fingerprint, invalid hash representation",
                     fingerprint.c_str()));
     return false;
@@ -262,12 +241,8 @@ bool AppleTLSContext::tryAsFingerprint(const std::string& fingerprint)
     A2_LOG_ERROR("Failed to create SecPolicy");
     return false;
   }
-  const void* query_values[] = {
-    kSecClassIdentity,
-    kCFBooleanTrue,
-    policy.get(),
-    kSecMatchLimitAll
-  };
+  const void* query_values[] = {kSecClassIdentity, kCFBooleanTrue, policy.get(),
+                                kSecMatchLimitAll};
   CFRef<CFDictionaryRef> query(CFDictionaryCreate(
       nullptr, query_keys, query_values, 4, nullptr, nullptr));
   if (!query) {
@@ -370,18 +345,12 @@ bool AppleTLSContext::tryAsPKCS12(CFDataRef data, const char* password)
 #if defined(__MAC_10_6)
   CFRef<CFStringRef> passwordRef;
   if (password) {
-    passwordRef.reset(CFStringCreateWithBytes(nullptr,
-                                              (const UInt8*)password,
+    passwordRef.reset(CFStringCreateWithBytes(nullptr, (const UInt8*)password,
                                               strlen(password),
-                                              kCFStringEncodingUTF8,
-                                              false));
+                                              kCFStringEncodingUTF8, false));
   }
-  const void* keys[] = {
-    kSecImportExportPassphrase
-  };
-  const void* values[] = {
-    passwordRef.get()
-  };
+  const void* keys[] = {kSecImportExportPassphrase};
+  const void* values[] = {passwordRef.get()};
   CFRef<CFDictionaryRef> options(
       CFDictionaryCreate(nullptr, keys, values, 1, nullptr, nullptr));
   if (!options) {

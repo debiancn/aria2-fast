@@ -45,8 +45,7 @@
 namespace aria2 {
 
 namespace wintls {
-struct Buffer
-{
+struct Buffer {
 private:
   size_t off_, free_, cap_;
   std::vector<char> buf_;
@@ -54,15 +53,9 @@ private:
 public:
   inline Buffer() : off_(0), free_(0), cap_(0) {}
 
-  inline size_t size() const
-  {
-    return off_;
-  }
+  inline size_t size() const { return off_; }
 
-  inline size_t free() const
-  {
-    return free_;
-  }
+  inline size_t free() const { return free_; }
 
   inline void resize(size_t len)
   {
@@ -74,15 +67,9 @@ public:
     free_ = cap_ - off_;
   }
 
-  inline char* data()
-  {
-    return buf_.data();
-  }
+  inline char* data() { return buf_.data(); }
 
-  inline char* end()
-  {
-    return buf_.data() + off_;
-  }
+  inline char* end() { return buf_.data() + off_; }
 
   inline void eat(size_t len)
   {
@@ -93,10 +80,7 @@ public:
     free_ = cap_ - off_;
   }
 
-  inline void clear()
-  {
-    eat(off_);
-  }
+  inline void clear() { eat(off_); }
 
   inline void advance(size_t len)
   {
@@ -116,8 +100,7 @@ public:
 };
 } // namespace wintls
 
-class WinTLSSession : public TLSSession
-{
+class WinTLSSession : public TLSSession {
   enum state_t {
     st_constructed,
     st_initialized,
@@ -138,7 +121,7 @@ public:
   virtual ~WinTLSSession();
 
   // Initializes SSL/TLS session. The |sockfd| is the underlying
-  // tranport socket. This function returns TLS_ERR_OK if it
+  // transport socket. This function returns TLS_ERR_OK if it
   // succeeds, or TLS_ERR_ERROR.
   virtual int init(sock_t sockfd) CXX11_OVERRIDE;
 
@@ -161,12 +144,12 @@ public:
 
   // Sends |data| with length |len|. This function returns the number
   // of bytes sent if it succeeds, or TLS_ERR_WOULDBLOCK if the
-  // underlying tranport blocks, or TLS_ERR_ERROR.
+  // underlying transport blocks, or TLS_ERR_ERROR.
   virtual ssize_t writeData(const void* data, size_t len) CXX11_OVERRIDE;
 
   // Receives data into |data| with length |len|. This function returns
   // the number of bytes received if it succeeds, or TLS_ERR_WOULDBLOCK
-  // if the underlying tranport blocks, or TLS_ERR_ERROR.
+  // if the underlying transport blocks, or TLS_ERR_ERROR.
   virtual ssize_t readData(void* data, size_t len) CXX11_OVERRIDE;
 
   // Performs client side handshake. The |hostname| is the hostname of
@@ -175,16 +158,18 @@ public:
   // if the underlying transport blocks, or TLS_ERR_ERROR.
   // When returning TLS_ERR_ERROR, provide certificate validation error
   // in |handshakeErr|.
-  virtual int tlsConnect(const std::string& hostname,
+  virtual int tlsConnect(const std::string& hostname, TLSVersion& version,
                          std::string& handshakeErr) CXX11_OVERRIDE;
 
   // Performs server side handshake. This function returns TLS_ERR_OK
   // if it succeeds, or TLS_ERR_WOULDBLOCK if the underlying transport
   // blocks, or TLS_ERR_ERROR.
-  virtual int tlsAccept() CXX11_OVERRIDE;
+  virtual int tlsAccept(TLSVersion& version) CXX11_OVERRIDE;
 
   // Returns last error string
   virtual std::string getLastErrorString() CXX11_OVERRIDE;
+
+  virtual size_t getRecvBufferedLength() CXX11_OVERRIDE;
 
 private:
   std::string hostname_;
@@ -196,7 +181,7 @@ private:
   // Buffer for already encrypted writes
   wintls::Buffer writeBuf_;
   // While the writeBuf_ holds encrypted messages, writeBuffered_ has the
-  // corresponding size of unencrpted data used to procude the messages.
+  // corresponding size of unencrypted data used to produce the messages.
   size_t writeBuffered_;
   // Buffer for still encrypted reads
   wintls::Buffer readBuf_;

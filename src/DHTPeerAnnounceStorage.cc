@@ -53,13 +53,13 @@
 namespace aria2 {
 
 DHTPeerAnnounceStorage::DHTPeerAnnounceStorage()
-  : taskQueue_{nullptr},
-    taskFactory_{nullptr}
-{}
+    : taskQueue_{nullptr}, taskFactory_{nullptr}
+{
+}
 
-bool DHTPeerAnnounceStorage::InfoHashLess::operator()
-  (const std::shared_ptr<DHTPeerAnnounceEntry>& lhs,
-   const std::shared_ptr<DHTPeerAnnounceEntry>& rhs)
+bool DHTPeerAnnounceStorage::InfoHashLess::
+operator()(const std::shared_ptr<DHTPeerAnnounceEntry>& lhs,
+           const std::shared_ptr<DHTPeerAnnounceEntry>& rhs)
 {
   return memcmp(lhs->getInfoHash(), rhs->getInfoHash(), DHT_ID_LENGTH) < 0;
 }
@@ -67,22 +67,23 @@ bool DHTPeerAnnounceStorage::InfoHashLess::operator()
 std::shared_ptr<DHTPeerAnnounceEntry>
 DHTPeerAnnounceStorage::getPeerAnnounceEntry(const unsigned char* infoHash)
 {
-  std::shared_ptr<DHTPeerAnnounceEntry> entry(new DHTPeerAnnounceEntry(infoHash));
+  auto entry = std::make_shared<DHTPeerAnnounceEntry>(infoHash);
 
   auto i = entries_.lower_bound(entry);
 
-  if(i != entries_.end() &&
-     memcmp(infoHash, (*i)->getInfoHash(), DHT_ID_LENGTH) == 0) {
+  if (i != entries_.end() &&
+      memcmp(infoHash, (*i)->getInfoHash(), DHT_ID_LENGTH) == 0) {
     entry = *i;
-  } else {
+  }
+  else {
     entries_.insert(i, entry);
   }
   return entry;
 }
 
-void
-DHTPeerAnnounceStorage::addPeerAnnounce(const unsigned char* infoHash,
-                                        const std::string& ipaddr, uint16_t port)
+void DHTPeerAnnounceStorage::addPeerAnnounce(const unsigned char* infoHash,
+                                             const std::string& ipaddr,
+                                             uint16_t port)
 {
   A2_LOG_DEBUG(fmt("Adding %s:%u to peer announce list: infoHash=%s",
                    ipaddr.c_str(), port,
@@ -92,43 +93,36 @@ DHTPeerAnnounceStorage::addPeerAnnounce(const unsigned char* infoHash,
 
 bool DHTPeerAnnounceStorage::contains(const unsigned char* infoHash) const
 {
-  std::shared_ptr<DHTPeerAnnounceEntry> entry(new DHTPeerAnnounceEntry(infoHash));
-  return
-    std::binary_search(entries_.begin(), entries_.end(), entry, InfoHashLess());
+  auto entry = std::make_shared<DHTPeerAnnounceEntry>(infoHash);
+  return std::binary_search(entries_.begin(), entries_.end(), entry,
+                            InfoHashLess());
 }
 
-void DHTPeerAnnounceStorage::getPeers(std::vector<std::shared_ptr<Peer> >& peers,
+void DHTPeerAnnounceStorage::getPeers(std::vector<std::shared_ptr<Peer>>& peers,
                                       const unsigned char* infoHash)
 {
-  std::shared_ptr<DHTPeerAnnounceEntry> entry(new DHTPeerAnnounceEntry(infoHash));
+  auto entry = std::make_shared<DHTPeerAnnounceEntry>(infoHash);
 
   auto i = entries_.find(entry);
-  if(i != entries_.end()) {
+  if (i != entries_.end()) {
     (*i)->getPeers(peers);
   }
 }
-
-namespace {
-class RemoveStalePeerAddrEntry
-{
-public:
-  void operator()(const std::shared_ptr<DHTPeerAnnounceEntry>& e)
-  {
-    e->removeStalePeerAddrEntry(DHT_PEER_ANNOUNCE_PURGE_INTERVAL);
-  }
-};
-} // namespace
 
 void DHTPeerAnnounceStorage::handleTimeout()
 {
   A2_LOG_DEBUG(fmt("Now purge peer announces(%lu entries) which are timed out.",
                    static_cast<unsigned long>(entries_.size())));
-  std::for_each(entries_.begin(), entries_.end(), RemoveStalePeerAddrEntry());
-  for(auto i = entries_.begin(),
-        eoi = entries_.end(); i != eoi;) {
-    if((*i)->empty()) {
+  std::for_each(std::begin(entries_), std::end(entries_),
+                [](const std::shared_ptr<DHTPeerAnnounceEntry>& e) {
+                  e->removeStalePeerAddrEntry(DHT_PEER_ANNOUNCE_PURGE_INTERVAL);
+                });
+
+  for (auto i = std::begin(entries_); i != std::end(entries_);) {
+    if ((*i)->empty()) {
       entries_.erase(i++);
-    } else {
+    }
+    else {
       ++i;
     }
   }
@@ -139,8 +133,9 @@ void DHTPeerAnnounceStorage::handleTimeout()
 void DHTPeerAnnounceStorage::announcePeer()
 {
   A2_LOG_DEBUG("Now announcing peer.");
-  for (auto& e: entries_) {
-    if(e->getLastUpdated().difference(global::wallclock()) < DHT_PEER_ANNOUNCE_INTERVAL) {
+  for (auto& e : entries_) {
+    if (e->getLastUpdated().difference(global::wallclock()) <
+        DHT_PEER_ANNOUNCE_INTERVAL) {
       continue;
     }
     e->notifyUpdate();

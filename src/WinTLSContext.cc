@@ -61,30 +61,72 @@
 #define SCH_USE_STRONG_CRYPTO 0x00400000
 #endif
 
+#define WEAK_CIPHER_BITS 56
+#define STRONG_CIPHER_BITS 128
+
 namespace aria2 {
 
-WinTLSContext::WinTLSContext(TLSSessionSide side) : side_(side), store_(0)
+WinTLSContext::WinTLSContext(TLSSessionSide side, TLSVersion ver)
+    : side_(side), store_(0)
 {
   memset(&credentials_, 0, sizeof(credentials_));
   credentials_.dwVersion = SCHANNEL_CRED_VERSION;
+  credentials_.grbitEnabledProtocols = 0;
   if (side_ == TLS_CLIENT) {
-    credentials_.grbitEnabledProtocols =
-        SP_PROT_SSL3_CLIENT | SP_PROT_TLS1_CLIENT | SP_PROT_TLS1_1_CLIENT |
-        SP_PROT_TLS1_2_CLIENT;
+    switch (ver) {
+    case TLS_PROTO_SSL3:
+      credentials_.grbitEnabledProtocols |= SP_PROT_SSL3_CLIENT;
+    // fall through
+    case TLS_PROTO_TLS10:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_CLIENT;
+    // fall through
+    case TLS_PROTO_TLS11:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_1_CLIENT;
+    // fall through
+    case TLS_PROTO_TLS12:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_2_CLIENT;
+    // fall through
+    default:
+      break;
+    }
   }
   else {
-    credentials_.grbitEnabledProtocols =
-        SP_PROT_SSL3_SERVER | SP_PROT_TLS1_SERVER | SP_PROT_TLS1_1_SERVER |
-        SP_PROT_TLS1_2_SERVER;
+    switch (ver) {
+    case TLS_PROTO_SSL3:
+      credentials_.grbitEnabledProtocols |= SP_PROT_SSL3_SERVER;
+    // fall through
+    case TLS_PROTO_TLS10:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_SERVER;
+    // fall through
+    case TLS_PROTO_TLS11:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_1_SERVER;
+    // fall through
+    case TLS_PROTO_TLS12:
+      credentials_.grbitEnabledProtocols |= SP_PROT_TLS1_2_SERVER;
+    // fall through
+    default:
+      break;
+    }
   }
-  credentials_.dwMinimumCipherStrength = 128; // bit
+
+  switch (ver) {
+  case TLS_PROTO_SSL3:
+    // User explicitly wanted SSLv3 and therefore weak ciphers.
+    credentials_.dwMinimumCipherStrength = WEAK_CIPHER_BITS;
+    break;
+
+  default:
+    // Strong protocol versions: Use a minimum strength, which might be later
+    // refined using SCH_USE_STRONG_CRYPTO in the flags.
+    credentials_.dwMinimumCipherStrength = STRONG_CIPHER_BITS;
+  }
 
   setVerifyPeer(side_ == TLS_CLIENT);
 }
 
-TLSContext* TLSContext::make(TLSSessionSide side)
+TLSContext* TLSContext::make(TLSSessionSide side, TLSVersion ver)
 {
-  return new WinTLSContext(side);
+  return new WinTLSContext(side, ver);
 }
 
 WinTLSContext::~WinTLSContext()
@@ -104,19 +146,29 @@ void WinTLSContext::setVerifyPeer(bool verify)
 {
   cred_.reset();
 
+  // Never automatically push any client or server certs. We'll do cert setup
+  // ourselves.
+  credentials_.dwFlags = SCH_CRED_NO_DEFAULT_CREDS;
+
+  if (credentials_.dwMinimumCipherStrength > WEAK_CIPHER_BITS) {
+    // Enable strong crypto if we already set a minimum cipher streams.
+    // This might actually require even stronger algorithms, which is a good
+    // thing.
+    credentials_.dwFlags |= SCH_USE_STRONG_CRYPTO;
+  }
+
   if (side_ != TLS_CLIENT || !verify) {
-    credentials_.dwFlags = SCH_CRED_NO_DEFAULT_CREDS |
-                           SCH_CRED_MANUAL_CRED_VALIDATION |
-                           SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
-                           SCH_CRED_IGNORE_REVOCATION_OFFLINE |
-                           SCH_CRED_NO_SERVERNAME_CHECK | SCH_USE_STRONG_CRYPTO;
+    // No verification for servers and if user explicitly requested it
+    credentials_.dwFlags |=
+        SCH_CRED_MANUAL_CRED_VALIDATION | SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
+        SCH_CRED_IGNORE_REVOCATION_OFFLINE | SCH_CRED_NO_SERVERNAME_CHECK;
     return;
   }
 
-  credentials_.dwFlags =
-      SCH_CRED_NO_DEFAULT_CREDS | SCH_CRED_AUTO_CRED_VALIDATION |
-      SCH_CRED_REVOCATION_CHECK_CHAIN | SCH_CRED_IGNORE_NO_REVOCATION_CHECK |
-      SCH_USE_STRONG_CRYPTO;
+  // Verify other side's cert chain.
+  credentials_.dwFlags |= SCH_CRED_AUTO_CRED_VALIDATION |
+                          SCH_CRED_REVOCATION_CHECK_CHAIN |
+                          SCH_CRED_IGNORE_NO_REVOCATION_CHECK;
 }
 
 CredHandle* WinTLSContext::getCredHandle()
@@ -142,15 +194,9 @@ CredHandle* WinTLSContext::getCredHandle()
     credentials_.paCred = nullptr;
   }
   SECURITY_STATUS status = ::AcquireCredentialsHandleW(
-      nullptr,
-      (SEC_WCHAR*)UNISP_NAME_W,
-      side_ == TLS_CLIENT ? SECPKG_CRED_OUTBOUND : SECPKG_CRED_INBOUND,
-      nullptr,
-      &credentials_,
-      nullptr,
-      nullptr,
-      cred_.get(),
-      &ts);
+      nullptr, (SEC_WCHAR*)UNISP_NAME_W,
+      side_ == TLS_CLIENT ? SECPKG_CRED_OUTBOUND : SECPKG_CRED_INBOUND, nullptr,
+      &credentials_, nullptr, nullptr, cred_.get(), &ts);
   if (ctx) {
     ::CertFreeCertificateContext(ctx);
   }
@@ -167,10 +213,7 @@ bool WinTLSContext::addCredentialFile(const std::string& certfile,
   std::stringstream ss;
   BufferedFile(certfile.c_str(), "rb").transfer(ss);
   auto data = ss.str();
-  CRYPT_DATA_BLOB blob = {
-    (DWORD)data.length(),
-    (BYTE*)data.c_str()
-  };
+  CRYPT_DATA_BLOB blob = {(DWORD)data.length(), (BYTE*)data.c_str()};
   if (!::PFXIsPFXBlob(&blob)) {
     A2_LOG_ERROR("Not a valid PKCS12 file");
     return false;
@@ -178,8 +221,8 @@ bool WinTLSContext::addCredentialFile(const std::string& certfile,
   HCERTSTORE store =
       ::PFXImportCertStore(&blob, L"", CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
   if (!store_) {
-    store = ::PFXImportCertStore(
-        &blob, nullptr, CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
+    store = ::PFXImportCertStore(&blob, nullptr,
+                                 CRYPT_EXPORTABLE | CRYPT_USER_KEYSET);
   }
   if (!store) {
     A2_LOG_ERROR("Failed to import PKCS12 store");

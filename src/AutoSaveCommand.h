@@ -39,10 +39,10 @@
 
 namespace aria2 {
 
-class AutoSaveCommand : public TimeBasedCommand
-{
+class AutoSaveCommand : public TimeBasedCommand {
 public:
-  AutoSaveCommand(cuid_t cuid, DownloadEngine* e, time_t interval);
+  AutoSaveCommand(cuid_t cuid, DownloadEngine* e,
+                  std::chrono::seconds interval);
 
   virtual ~AutoSaveCommand();
 

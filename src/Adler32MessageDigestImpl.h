@@ -1,7 +1,8 @@
+/* <!-- copyright */
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2010 Tatsuhiro Tsujikawa
+ * Copyright (C) 2014 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -31,11 +32,40 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_CLOCK_GETTIME_MINGW_H
-#define D_CLOCK_GETTIME_MINGW_H
+#ifndef D_ADLER32_MESSAGE_DIGEST_H
+#define D_ADLER32_MESSAGE_DIGEST_H
 
-#include "timespec.h"
+#include "MessageDigestImpl.h"
 
-int clock_gettime(int dummyid, struct timespec* tp);
+namespace aria2 {
 
-#endif // D_CLOCK_GETTIME_MINGW_H
+#ifdef HAVE_ZLIB
+
+#define ADLER32_MESSAGE_DIGEST                                                 \
+  {                                                                            \
+    "adler32", make_hi<Adler32MessageDigestImpl>()                             \
+  }                                                                            \
+  ,
+
+class Adler32MessageDigestImpl : public MessageDigestImpl {
+public:
+  Adler32MessageDigestImpl();
+  virtual size_t getDigestLength() const CXX11_OVERRIDE;
+  virtual void reset() CXX11_OVERRIDE;
+  virtual void update(const void* data, size_t length) CXX11_OVERRIDE;
+  virtual void digest(unsigned char* md) CXX11_OVERRIDE;
+  static size_t length();
+
+private:
+  unsigned long adler_;
+};
+
+#else // !HAVE_ZLIB
+
+#define ADLER32_MESSAGE_DIGEST
+
+#endif // !HAVE_ZLIB
+
+} // namespace aria2
+
+#endif // D_ADLER32_MESSAGE_DIGEST_H

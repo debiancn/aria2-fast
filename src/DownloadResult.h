@@ -52,16 +52,14 @@ class Option;
 class FileEntry;
 class MetadataInfo;
 
-struct DownloadResult
-{
+struct DownloadResult {
   // This field contains GID. See comment in
   // RequestGroup.cc::belongsToGID_.
   a2_gid_t belongsTo;
 
   uint64_t sessionDownloadLength;
 
-  // milliseconds
-  int64_t sessionTime;
+  std::chrono::milliseconds sessionTime;
 
   int64_t totalLength;
 
@@ -75,11 +73,14 @@ struct DownloadResult
 
   std::shared_ptr<MetadataInfo> metadataInfo;
 
-  std::vector<std::shared_ptr<FileEntry> > fileEntries;
+  std::vector<std::shared_ptr<FileEntry>> fileEntries;
 
   // This field contains GIDs. See comment in
   // RequestGroup.cc::followedByGIDs_.
   std::vector<a2_gid_t> followedBy;
+
+  // The reverse link for followedBy.
+  a2_gid_t following;
 
   std::string bitfield;
 
@@ -92,6 +93,8 @@ struct DownloadResult
   int32_t pieceLength;
 
   error_code::Value result;
+
+  std::string resultMessage;
 
   bool inMemoryDownload;
 

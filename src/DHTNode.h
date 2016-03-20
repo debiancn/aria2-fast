@@ -52,12 +52,12 @@ private:
 
   uint16_t port_;
 
-  // in milli sec
-  int rtt_;
+  std::chrono::milliseconds rtt_;
 
   int condition_;
 
   Timer lastContact_;
+
 public:
   DHTNode();
 
@@ -70,34 +70,19 @@ public:
 
   void generateID();
 
-  const unsigned char* getID() const
-  {
-    return id_;
-  }
+  const unsigned char* getID() const { return id_; }
 
-  void updateRTT(int millisec)
-  {
-    rtt_ = millisec;
-  }
+  void updateRTT(std::chrono::milliseconds t) { rtt_ = std::move(t); }
 
-  const std::string& getIPAddress() const
-  {
-    return ipaddr_;
-  }
+  const std::string& getIPAddress() const { return ipaddr_; }
 
   void setIPAddress(const std::string& ipaddr);
 
   void setID(const unsigned char* id);
 
-  uint16_t getPort() const
-  {
-    return port_;
-  }
+  uint16_t getPort() const { return port_; }
 
-  void setPort(uint16_t port)
-  {
-    port_ = port;
-  }
+  void setPort(uint16_t port) { port_ = port; }
 
   bool isGood() const;
 

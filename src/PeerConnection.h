@@ -42,6 +42,7 @@
 
 #include "SocketBuffer.h"
 #include "Command.h"
+#include "a2functional.h"
 
 namespace aria2 {
 
@@ -52,7 +53,7 @@ class ARC4Encryptor;
 // The maximum length of buffer. If the message length (including 4
 // bytes length and payload length) is larger than this value, it is
 // dropped.
-#define MAX_BUFFER_CAPACITY (16*1024+128)
+constexpr size_t MAX_BUFFER_CAPACITY = 16_k + 128;
 
 class PeerConnection {
 private:
@@ -64,7 +65,7 @@ private:
   // The capacity of the buffer resbuf_
   size_t bufferCapacity_;
   // The internal buffer of incoming handshakes and messages
-  unsigned char* resbuf_;
+  std::unique_ptr<unsigned char[]> resbuf_;
   // The number of bytes written in resbuf_
   size_t resbufLength_;
   // The length of message (not handshake) currently receiving
@@ -87,10 +88,8 @@ private:
   ssize_t sendData(const unsigned char* data, size_t length, bool encryption);
 
 public:
-  PeerConnection
-  (cuid_t cuid,
-   const std::shared_ptr<Peer>& peer,
-   const std::shared_ptr<SocketCore>& socket);
+  PeerConnection(cuid_t cuid, const std::shared_ptr<Peer>& peer,
+                 const std::shared_ptr<SocketCore>& socket);
 
   ~PeerConnection();
 
@@ -98,7 +97,7 @@ public:
   // ownership of data, so caller must not delete or alter it.
   void pushBytes(unsigned char* data, size_t len,
                  std::unique_ptr<ProgressUpdate> progressUpdate =
-                 std::unique_ptr<ProgressUpdate>{});
+                     std::unique_ptr<ProgressUpdate>{});
 
   bool receiveMessage(unsigned char* data, size_t& dataLength);
 
@@ -108,8 +107,8 @@ public:
    * In both cases, 'msg' is filled with received bytes and the filled length
    * is assigned to 'length'.
    */
-  bool receiveHandshake
-  (unsigned char* data, size_t& dataLength, bool peek = false);
+  bool receiveHandshake(unsigned char* data, size_t& dataLength,
+                        bool peek = false);
 
   void enableEncryption(std::unique_ptr<ARC4Encryptor> encryptor,
                         std::unique_ptr<ARC4Encryptor> decryptor);
@@ -122,15 +121,9 @@ public:
 
   ssize_t sendPendingData();
 
-  const unsigned char* getBuffer() const
-  {
-    return resbuf_;
-  }
+  const unsigned char* getBuffer() const { return resbuf_.get(); }
 
-  size_t getBufferLength() const
-  {
-    return resbufLength_;
-  }
+  size_t getBufferLength() const { return resbufLength_; }
 
   // Returns the pointer to the message in wire format.  This method
   // must be called after receiveMessage() returned true.
@@ -140,10 +133,7 @@ public:
   // buffer length < minSize
   void reserveBuffer(size_t minSize);
 
-  size_t getBufferCapacity()
-  {
-    return bufferCapacity_;
-  }
+  size_t getBufferCapacity() { return bufferCapacity_; }
 };
 
 } // namespace aria2
