@@ -4,7 +4,7 @@ Priority: optional
 Maintainer: Patrick Ruckstuhl <patrick@ch.tario.org>
 Uploaders: Kartik Mistry <kartik@debian.org>
 Build-Depends: autotools-dev,
-               debhelper (>= 7),
+               debhelper (>= 9),
                dpkg-dev (>= 1.16.1~),
                libc-ares-dev,
                libgcrypt11-dev (>= 1.5.0-3) | libgcrypt-dev,
@@ -13,10 +13,10 @@ Build-Depends: autotools-dev,
                libxml2-dev,
                pkg-config,
                zlib1g-dev | libz-dev
-Standards-Version: 3.9.6
+Standards-Version: 3.9.7
 Homepage: http://aria2.sourceforge.net/
-Vcs-Git: git://anonscm.debian.org/collab-maint/aria2.git
-Vcs-Browser: http://anonscm.debian.org/gitweb/?p=collab-maint/aria2.git;a=summary
+Vcs-Git: https://anonscm.debian.org/collab-maint/aria2.git
+Vcs-Browser: https://anonscm.debian.org/gitweb/?p=collab-maint/aria2.git;a=summary
 XS-Testsuite: autopkgtest
 
 Package: aria2
