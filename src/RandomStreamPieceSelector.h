@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2015 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,37 +32,30 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_BT_CONSTANTS_H
-#define D_BT_CONSTANTS_H
+#ifndef D_RANDOM_STREAM_PIECE_SELECTOR_H
+#define D_RANDOM_STREAM_PIECE_SELECTOR_H
 
-#include "common.h"
-#include "a2functional.h"
+#include "StreamPieceSelector.h"
 
 namespace aria2 {
 
-constexpr size_t INFO_HASH_LENGTH = 20;
+class BitfieldMan;
 
-constexpr size_t PIECE_HASH_LENGTH = 20;
+class RandomStreamPieceSelector : public StreamPieceSelector {
+public:
+  RandomStreamPieceSelector(BitfieldMan* bitfieldMan);
+  virtual ~RandomStreamPieceSelector();
 
-constexpr size_t PEER_ID_LENGTH = 20;
+  virtual bool select(size_t& index, size_t minSplitSize,
+                      const unsigned char* ignoreBitfield,
+                      size_t length) CXX11_OVERRIDE;
 
-constexpr size_t MAX_BLOCK_LENGTH = 32_k;
+  virtual void onBitfieldInit() CXX11_OVERRIDE;
 
-constexpr size_t DEFAULT_MAX_OUTSTANDING_REQUEST = 6;
-
-// Upper Bound of the number of outstanding request
-constexpr size_t UB_MAX_OUTSTANDING_REQUEST = 256;
-
-constexpr size_t METADATA_PIECE_SIZE = 16_k;
-
-constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
-
-constexpr uint16_t LPD_MULTICAST_PORT = 6771;
-
-constexpr size_t COMPACT_LEN_IPV4 = 6;
-
-constexpr size_t COMPACT_LEN_IPV6 = 18;
+private:
+  BitfieldMan* bitfieldMan_;
+};
 
 } // namespace aria2
 
-#endif // D_BT_CONSTANTS_H
+#endif // D_RANDOM_STREAM_PIECE_SELECTOR_H

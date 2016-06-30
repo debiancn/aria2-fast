@@ -543,6 +543,7 @@ am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	InitiateConnectionCommandFactory.cc \
 	InitiateConnectionCommandFactory.h \
 	InorderStreamPieceSelector.cc InorderStreamPieceSelector.h \
+	RandomStreamPieceSelector.cc RandomStreamPieceSelector.h \
 	InorderURISelector.cc InorderURISelector.h IOFile.cc IOFile.h \
 	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
 	IteratableChunkChecksumValidator.cc \
@@ -1063,8 +1064,8 @@ am__objects_50 = A2STR.lo AbstractAuthResolver.lo AbstractCommand.lo \
 	HttpServerResponseCommand.lo HttpSkipResponseCommand.lo \
 	InitiateConnectionCommand.lo \
 	InitiateConnectionCommandFactory.lo \
-	InorderStreamPieceSelector.lo InorderURISelector.lo IOFile.lo \
-	IteratableChecksumValidator.lo \
+	InorderStreamPieceSelector.lo RandomStreamPieceSelector.lo \
+	InorderURISelector.lo IOFile.lo IteratableChecksumValidator.lo \
 	IteratableChunkChecksumValidator.lo json.lo JsonParser.lo \
 	LogFactory.lo Logger.lo LongestSequencePieceSelector.lo \
 	MessageDigest.lo message_digest_helper.lo MetadataInfo.lo \
@@ -1352,6 +1353,7 @@ LTLIBOBJS = @LTLIBOBJS@
 LT_AGE = @LT_AGE@
 LT_CURRENT = @LT_CURRENT@
 LT_REVISION = @LT_REVISION@
+LT_SYS_LIBRARY_PATH = @LT_SYS_LIBRARY_PATH@
 MAKEINFO = @MAKEINFO@
 MANIFEST_TOOL = @MANIFEST_TOOL@
 MKDIR_P = @MKDIR_P@
@@ -1560,6 +1562,7 @@ SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 	InitiateConnectionCommandFactory.cc \
 	InitiateConnectionCommandFactory.h \
 	InorderStreamPieceSelector.cc InorderStreamPieceSelector.h \
+	RandomStreamPieceSelector.cc RandomStreamPieceSelector.h \
 	InorderURISelector.cc InorderURISelector.h IOFile.cc IOFile.h \
 	IteratableChecksumValidator.cc IteratableChecksumValidator.h \
 	IteratableChunkChecksumValidator.cc \
@@ -2164,6 +2167,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PortEventPoll.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/PriorityPieceSelector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ProtocolDetector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RandomStreamPieceSelector.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Range.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessage.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RangeBtMessageValidator.Plo@am__quote@

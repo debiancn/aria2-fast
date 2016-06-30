@@ -64,9 +64,9 @@ void BtInterestedMessageTest::testCreateMessage()
   BtInterestedMessage msg;
   unsigned char data[5];
   bittorrent::createPeerMessageString(data, sizeof(data), 1, 2);
-  unsigned char* rawmsg = msg.createMessage();
-  CPPUNIT_ASSERT(memcmp(rawmsg, data, 5) == 0);
-  delete[] rawmsg;
+  auto rawmsg = msg.createMessage();
+  CPPUNIT_ASSERT_EQUAL((size_t)5, rawmsg.size());
+  CPPUNIT_ASSERT(std::equal(std::begin(rawmsg), std::end(rawmsg), data));
 }
 
 void BtInterestedMessageTest::testDoReceivedAction()
@@ -83,7 +83,7 @@ void BtInterestedMessageTest::testDoReceivedAction()
   CPPUNIT_ASSERT(!peer->peerInterested());
   msg.doReceivedAction();
   CPPUNIT_ASSERT(peer->peerInterested());
-  CPPUNIT_ASSERT_EQUAL(0, peerStorage->getNumChokeExecuted());
+  CPPUNIT_ASSERT_EQUAL(1, peerStorage->getNumChokeExecuted());
 
   peer->amChoking(false);
   msg.doReceivedAction();

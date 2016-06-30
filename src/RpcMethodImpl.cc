@@ -77,6 +77,7 @@
 #include "BtRuntime.h"
 #include "BtAnnounce.h"
 #endif // ENABLE_BITTORRENT
+#include "CheckIntegrityEntry.h"
 
 namespace aria2 {
 
@@ -144,6 +145,8 @@ const char KEY_NUM_WAITING[] = "numWaiting";
 const char KEY_NUM_STOPPED[] = "numStopped";
 const char KEY_NUM_ACTIVE[] = "numActive";
 const char KEY_NUM_STOPPED_TOTAL[] = "numStoppedTotal";
+const char KEY_VERIFIED_LENGTH[] = "verifiedLength";
+const char KEY_VERIFY_PENDING[] = "verifyIntegrityPending";
 } // namespace
 
 namespace {
@@ -793,6 +796,23 @@ void gatherProgress(Dict* entryDict, const std::shared_ptr<RequestGroup>& group,
                              e->getBtRegistry()->get(group->getGID()), keys);
   }
 #endif // ENABLE_BITTORRENT
+  if (e->getCheckIntegrityMan()) {
+    if (e->getCheckIntegrityMan()->isPicked(
+            [&group](const CheckIntegrityEntry& ent) {
+              return ent.getRequestGroup() == group.get();
+            })) {
+      entryDict->put(
+          KEY_VERIFIED_LENGTH,
+          util::itos(
+              e->getCheckIntegrityMan()->getPickedEntry()->getCurrentLength()));
+    }
+    if (e->getCheckIntegrityMan()->isQueued(
+            [&group](const CheckIntegrityEntry& ent) {
+              return ent.getRequestGroup() == group.get();
+            })) {
+      entryDict->put(KEY_VERIFY_PENDING, VLB_TRUE);
+    }
+  }
 }
 } // namespace
 
@@ -887,6 +907,18 @@ void gatherStoppedDownload(Dict* entryDict,
   if (requested_key(keys, KEY_DIR)) {
     entryDict->put(KEY_DIR, ds->dir);
   }
+
+#ifdef ENABLE_BITTORRENT
+  if (ds->attrs.size() > CTX_ATTR_BT && ds->attrs[CTX_ATTR_BT]) {
+    const auto attrs =
+        static_cast<TorrentAttribute*>(ds->attrs[CTX_ATTR_BT].get());
+    if (requested_key(keys, KEY_BITTORRENT)) {
+      auto btDict = Dict::g();
+      gatherBitTorrentMetadata(btDict.get(), attrs);
+      entryDict->put(KEY_BITTORRENT, std::move(btDict));
+    }
+  }
+#endif // ENABLE_BITTORRENT
 }
 
 std::unique_ptr<ValueBase> GetFilesRpcMethod::process(const RpcRequest& req,
@@ -1081,10 +1113,22 @@ std::unique_ptr<ValueBase> ChangeOptionRpcMethod::process(const RpcRequest& req,
 
   a2_gid_t gid = str2Gid(gidParam);
   auto group = e->getRequestGroupMan()->findGroup(gid);
-  Option option;
   if (group) {
+    Option option;
+    std::shared_ptr<Option> pendingOption;
     if (group->getState() == RequestGroup::STATE_ACTIVE) {
-      gatherChangeableOption(&option, optsParam);
+      pendingOption = std::make_shared<Option>();
+      gatherChangeableOption(&option, pendingOption.get(), optsParam);
+      if (!pendingOption->emptyLocal()) {
+        group->setPendingOption(pendingOption);
+        // pauseRequestGroup() may fail if group has been told to
+        // stop/pause already.  In that case, we can still apply the
+        // pending options on pause.
+        if (pauseRequestGroup(group, false, false)) {
+          group->setRestartRequested(true);
+          e->setRefreshInterval(std::chrono::milliseconds(0));
+        }
+      }
     }
     else {
       gatherChangeableOptionForReserved(&option, optsParam);
@@ -1451,6 +1495,26 @@ RpcResponse SystemListMethodsRpcMethod::execute(RpcRequest req,
                      std::move(req.id));
 }
 
+std::unique_ptr<ValueBase>
+SystemListNotificationsRpcMethod::process(const RpcRequest& req,
+                                          DownloadEngine* e)
+{
+  auto list = List::g();
+  for (auto& s : allNotificationsNames()) {
+    list->append(s);
+  }
+
+  return std::move(list);
+}
+
+RpcResponse SystemListNotificationsRpcMethod::execute(RpcRequest req,
+                                                      DownloadEngine* e)
+{
+  auto r = process(req, e);
+  return RpcResponse(0, RpcResponse::AUTHORIZED, std::move(r),
+                     std::move(req.id));
+}
+
 std::unique_ptr<ValueBase> NoSuchMethodRpcMethod::process(const RpcRequest& req,
                                                           DownloadEngine* e)
 {
@@ -1592,8 +1656,12 @@ void changeGlobalOption(const Option& option, DownloadEngine* e)
         option.getAsInt(PREF_MAX_OVERALL_UPLOAD_LIMIT));
   }
   if (option.defined(PREF_MAX_CONCURRENT_DOWNLOADS)) {
-    e->getRequestGroupMan()->setMaxSimultaneousDownloads(
+    e->getRequestGroupMan()->setMaxConcurrentDownloads(
         option.getAsInt(PREF_MAX_CONCURRENT_DOWNLOADS));
+    e->getRequestGroupMan()->requestQueueCheck();
+  }
+  if (option.defined(PREF_OPTIMIZE_CONCURRENT_DOWNLOADS)) {
+    e->getRequestGroupMan()->setupOptimizeConcurrentDownloads();
     e->getRequestGroupMan()->requestQueueCheck();
   }
   if (option.defined(PREF_MAX_DOWNLOAD_RESULT)) {

@@ -1,174 +1,425 @@
-commit f0f1b8ef47c391550ff99982f1cad3dd4e1d410d (HEAD, tag: release-1.21.0, origin/master, origin/HEAD, master)
+commit 09e7cfc4c088b239050ca8ec1a8da18e208ae669 (HEAD, tag: release-1.24.0, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-15
+AuthorDate: 2016-06-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-15
-
-    clang-format-3.6
-
-commit 6e884bea6300bb1110577a87b9512ddd1739b40c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-15
-
-    Bump up version number to 1.21.0
-
-commit 1da03c7b7922ccc7119be32508c8707245eb011d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-15
+CommitDate: 2016-06-14
 
     Update NEWS
 
-commit 18bda5516eb33a4fbfe191db8191f372620ddb6c
+commit dd7efdefc02ce294bfcdab8b065c0cb803437b3c
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-13
+AuthorDate: 2016-06-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-13
+CommitDate: 2016-06-14
 
-    Update third party libraries used in binary distributions
+    Update sqlite3 version for mingw build
 
-commit 4595aa75e17884f36982e9ba2d56c24725d30538
+commit 9e42dc7c0b6eb78aa98de13fbb8d426f64aca9c6
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-13
+AuthorDate: 2016-06-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-13
+CommitDate: 2016-06-14
 
-    SessionSerializer: Fix bug that pause=true is added to wrong item
-    
-    This change also defers writing metadata download to the location
-    where first its follower download is written.
+    Bump up version number to 1.24.0
 
-commit 1a0e5e32f3291e79908edfab584f38cb9bd652c4
-Merge: 21754fa e9b94ec
+commit 4494d71a807af5ff556ed41a3bcdbaf2bf6c7806
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-06
+AuthorDate: 2016-06-14
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-06
+CommitDate: 2016-06-14
 
-    Merge pull request #586 from ITriskTI/patch-1
+    Update AUTHORS
+
+commit 8ead47536cdb17cdd9b5534330bdc7e610ea6d3d
+Merge: fa07d0b 0d02f12
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-14
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2016-06-14
+
+    Merge pull request #676 from ITriskTI/patch-1
     
     Update aria2c.rst
 
-commit e9b94ecffd1b1cd656025e3f7c7f5a9d2543633e
+commit fa07d0be35666b78750aa32878945ba3d1e97113
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-14
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-14
+
+    Fix uninitialized variable
+
+commit 2dd10c96456043da0e3a56f7d709f5ecf3ff7c8c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-12
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-12
+
+    Revert "Remove dead code"
+    
+    This reverts commit fd024e677307798ae27b61f14cc89a5b7cf9182d.
+
+commit 0d02f12125f2ccd61b3dd190c35b3a4d4dd28eb6
 Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2016-03-06
-Commit:     ITriskTI <ITriskTI@gmail.com>
-CommitDate: 2016-03-06
+AuthorDate: 2016-06-09
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2016-06-09
 
     Update aria2c.rst
 
-commit 21754fa103647395b3eeb100506ce1b12aaed60a
+commit 6425ec8684b7dafd11ed6210f9d4de72f121130a
+Merge: fd024e6 21bac1c
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-05
+AuthorDate: 2016-06-10
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-05
+CommitDate: 2016-06-10
 
-    Add following to aria2.tellStatus response key as reverse link for followedBy
-
-commit 74811ddaff123e331368f69d93de4c9741f82fee
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-03
-
-    mingw: Add warning for falloc
-
-commit e6e3cd2e325d24137eb3bc328768d2f4377e89af
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-03-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
-
-    Allow to run clang-format with external build dir
-
-commit fc490ac05cc575113bfcdd154af5b01e9398999a
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-01-12
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
-
-    Update ciphers in AppleTLS
+    Merge pull request #675 from ITriskTI/patch-1
     
-    Also enable fast start while at it
+    local IP address to DHT
 
-commit ba7315b76da2229246456bb8419c812014a4f48c
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-03-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
+commit 21bac1ccc0772470d44a129276f02909e9d48a52
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2016-06-09
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2016-06-09
 
-    Remove universal build
+    local IP address to DHT
     
-    It's kinda broken and interfering with libssh2
+    for commit 3e00be26e8f8fe44c7344a3e8026031a99b22400
 
-commit c1dbd9f6a53304c0d0c17fdc9e1ce0da9cb743cc
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-03-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
+commit fd024e677307798ae27b61f14cc89a5b7cf9182d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-10
 
-    Enable libssh2 and sftp
+    Remove dead code
+
+commit e220c5384961f9261f19c28cd0b85f76f06d8993
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-10
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-10
+
+    BitTorrent: Allow 32KiB request
     
-    Closes GH-468
+    It looks like the 32KiB is the default request size of python
+    bittorrent client.  Previously, aria2 only allowed maximum 16KiB
+    request.
 
-commit 7d88ef6606d5a75e47034f879f60198101c99b0e
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-03-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
+commit c7d242e27d8e9c9160c58e89f0ab196eb77fc9f7
+Merge: 887f7a6 0d14444
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-07
 
-    Update OSX dependencies
+    Merge branch 'dynamic-select-file'
+
+commit 0d14444f0b735e84b0f372f55395e37aab00b9ce
+Merge: d658fde 887f7a6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-07
+
+    Merge branch 'master' into dynamic-select-file
+
+commit 887f7a6b90edca2215f2a86cb745b3ffff4ba2b6
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-06
+
+    Fix busy loop when upload rate limit hits
+
+commit ae6067d2a9b701b3059ff28c5bff190ec0ad6474
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Fix failed test
+
+commit 5ec84f9eae25f57af9a328a9faff5f132023c782
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Enable write socket check when there is pending messages to send
+
+commit 93bd6cfbb8e46b53c042984d295fb152e0ec6982
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Disable opt unchoking for bad peer
+
+commit 22a91dfe121b2c12841c8615ef6aaf62356bd1ae
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Set Peer::chokingRequired(true) for all active peers
+
+commit 12b903f3121683cd287c2f27dfdcd1fc19bab894
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Set Peer::chokingRequired(true) for all active peer
+
+commit e31a49b8ee56f2068d9d10bcc055ec7c58ea1208
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Don't unchoke peer which is not interested in us
+
+commit ef9e67aeb2d24736d283c6f6f760fd8f30ecd09a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-05
+
+    Fix bug that evaluation of Peer::amChoking is negated
+
+commit b95d7fbfec4a7ea26a81db33d056ccafc8b809e5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-04
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-04
+
+    Remove PeerStorage:scheduleForcedChokeRound since it is not effective
+
+commit 6b8611885bf5f6c358b09ff4bb2711a13743e814
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-04
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-04
+
+    Unchoke not-uploading peer if we could not find 3 regular unchokers
+
+commit 482cf6aca45bdc8733c88db24058eca59143f923
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-02
+
+    Fasten seed/download on fast connection
+
+commit a0706f5a44ccc171e5b861e4649a7ba861a218b3
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-06-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-06-02
+
+    Make seeder do more get_peers to announce its presence
+
+commit 9486663259a809a965daf78b9e94f70b769b7d44
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-31
+
+    Increase DHT task concurrency to 15
+
+commit b64ea39c7b488a566dea0ce20bba946ac3be0e0b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-31
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-31
+
+    Clang-format and small amends
     
-    Closes GH-466
+    mapaddr_ is always nullptr in this context, so no need to set to
+    nullptr again.
 
-commit 981597bc544f7cce6db53747311a8e62f11dd30a
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-03-03
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-03-03
-
-    Force libc++
-
-commit 99e7d981935b40330786d47e769cc49c061ccec9
+commit 134c804b86735f1b0ba73df7ac96bf731025aa99
+Merge: 3e00be2 eac72b9
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-03-02
+AuthorDate: 2016-05-31
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-03-02
+CommitDate: 2016-05-31
 
-    Fix sqlite3 download URI
+    Merge branch 'c3V6a2Vy-fix-mmap-check'
 
-commit 8985d66e71f980e7d2765753800078f47761f1ba
+commit eac72b90452a5af61108b53f80a41aebcc227906
+Merge: 3e00be2 fa43431
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-02-23
+AuthorDate: 2016-05-31
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-02-23
+CommitDate: 2016-05-31
 
-    Fix compile error without TLS support
+    Merge branch 'fix-mmap-check' of https://github.com/c3V6a2Vy/aria2 into c3V6a2Vy-fix-mmap-check
 
-commit a82db8e4626a1551e0c89301ac1d47db2bbcfa03
-Merge: b090946 c275b6f
+commit 3e00be26e8f8fe44c7344a3e8026031a99b22400
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-02-18
+AuthorDate: 2016-05-27
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-02-18
+CommitDate: 2016-05-27
 
-    Merge branch 'athmane-master'
+    Include local IP address to DHT GetPeers reply message
+    
+    This is required when DHT is used in private network, where seeder is
+    initially not known to all nodes.  This functionality requires
+    --bt-external-ip is set since aria2 cannot figure out external IP
+    address to advertise in general.
 
-commit c275b6f297a50801cb4cc7b343d1a7b3d8871262
-Author:     Athmane Madjoudj <athmane@fedoraproject.org>
-AuthorDate: 2016-02-17
-Commit:     Athmane Madjoudj <athmane@fedoraproject.org>
-CommitDate: 2016-02-17
+commit fa434319746e7ca9fb023cf8b1a4c1d0de67ed58
+Author:     suzker <szhiliang@gmail.com>
+AuthorDate: 2016-05-27
+Commit:     suzker <szhiliang@gmail.com>
+CommitDate: 2016-05-27
 
-    Remove trailing spaces
+    fixed mmap failure check with MAP_FAILED flag
 
-commit 1849ccfbba57038f1fa57fd0621b80e77a198a4c
-Author:     Athmane Madjoudj <athmane@fedoraproject.org>
-AuthorDate: 2016-02-17
-Commit:     Athmane Madjoudj <athmane@fedoraproject.org>
-CommitDate: 2016-02-17
+commit ef0a2e601f64904b87cf56244e5600a1c6baa3e9
+Author:     suzker <szhiliang@gmail.com>
+AuthorDate: 2016-05-25
+Commit:     suzker <szhiliang@gmail.com>
+CommitDate: 2016-05-25
 
-    Add support for using gnutls system wide crypto policy
+    Compare filesize directly to the numeric max of size_t
+
+commit 43aea5c9402ff0a4c2bc8365ea9aa2ff3447a356
+Author:     suzker <szhiliang@gmail.com>
+AuthorDate: 2016-05-24
+Commit:     suzker <szhiliang@gmail.com>
+CommitDate: 2016-05-24
+
+    added filesize overflow check for mmap on 32bit os
+
+commit c57259f8e719e34e7f3dbe2e73735b18aa46bc23
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-23
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-23
+
+    Use standard percent-encode for tracker request query
+
+commit d658fdecc66c0b2fac3ea37cc10f16942efb524a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-22
+
+    Document about restart when certain option is changed by RPC method
+
+commit 9d40c47799bbec12bb02f7579736fbc1fcc35c08
+Merge: 9727b5b 0b906f4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-22
+
+    Merge branch 'master' into dynamic-select-file
+
+commit 0b906f40f1204e79cb43af3867468ab02a371075
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-22
+
+    Use expat-2.1.1 for mingw32 Docker build
+
+commit 5b5e08b2164d9dec32b6c7120ec27d8ce2ff5aac
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-22
+
+    Use expat-2.1.1 for binary builds
+
+commit 949a580a14cd3afcdf9904acd1d32397c344dd28
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-18
+
+    mingw32: Gain privilege before opening files
+
+commit 1603d8ea7bb0074f8e268f37bc941fa5dffba067
+Merge: cc8375f 56a1147
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-16
+
+    Merge branch 'refactor-bt-msg'
+
+commit 9727b5b256bb12cff42e6aa230ba2020a933562f
+Merge: 8897d7e cc8375f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-16
+
+    Merge branch 'master' into dynamic-select-file
+
+commit 56a114746a88aa7be71a1da011abee35a8334d0b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-16
+
+    Use std::make_shared for efficiency
+
+commit cef9109070f586f49bed06ad731a4d5339d778c5
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-16
+
+    Refactor BtBitfieldMessage
+
+commit dae42d0cd0c932f0642cff68ba922760a67bdd75
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-15
+
+    Remove unused SimpleBtMessage::getMessageLength
+
+commit a7237c69f7befce7af174087bf770acd0187fb9b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-15
+
+    Refactor BitTorrent message buffer usage
+
+commit cc8375f0b04918ace028bf58e09f9e25a0440c23
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-15
+
+    Refactor BtHandshakeMessage
+
+commit 8897d7ec702fca9780033db42db48cced2580112
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-05-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-05-06
+
+    Restart active download to apply previously not applicable options
+    
+    Previously, we categorized options that can be used in
+    aria2.changeOption RPC method into 2 categories.  The options in one
+    category can be applied on the fly, meaning that download continues to
+    be active while applying options.  Another category includes options
+    which are only applicable when downloads are waiting or paused.
+    
+    In this change, when active download is ordered to change options
+    which only applicable in waiting or paused state, it is now paused,
+    and then automatically restarted.  Although we have limited number of
+    download concurrency, the pause and restart is done atomically, and
+    the download is inserted at the front of the queue, it is picked up
+    immediately if the concurrency regulation allows.

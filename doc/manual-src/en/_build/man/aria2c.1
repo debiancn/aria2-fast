@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "March 16, 2016" "1.21.0" "aria2"
+.TH "ARIA2C" "1" "June 15, 2016" "1.24.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -405,6 +405,8 @@ honors
 \fI\%\-\-min\-split\-size\fP option,
 so it will be necessary to specify a reasonable value to
 \fI\%\-\-min\-split\-size\fP option.
+If \fBrandom\fP is given, aria2 selects piece randomly. Like
+\fBinorder\fP, \fI\%\-\-min\-split\-size\fP option is honored.
 If \fBgeom\fP is given, at the beginning aria2 selects piece which has
 minimum index like \fBinorder\fP, but it exponentially increasingly
 keeps space from previously selected piece. This will reduce the
@@ -817,9 +819,12 @@ command\-line, don\(aqt forget to escape or quote it.  See also
 .INDENT 0.0
 .TP
 .B \-\-bt\-external\-ip=<IPADDRESS>
-Specify the external IP address to report to a BitTorrent
-tracker. Although this function is named \fBexternal\fP, it can accept
-any kind of IP addresses. IPADDRESS must be a numeric IP address.
+Specify the external IP address to use in BitTorrent download and DHT.
+It may be sent to BitTorrent tracker. For DHT, this option should be
+set to report that local node is downloading a particular torrent.
+This is critical to use DHT in a private network. Although this
+function is named \fBexternal\fP, it can accept any kind of IP
+addresses.
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1490,13 +1495,14 @@ need to read them from the disk.  SIZE can include \fBK\fP or \fBM\fP
 .INDENT 0.0
 .TP
 .B \-\-download\-result=<OPT>
-This option changes the way \fBDownload Results\fP is formatted. If OPT
-is \fBdefault\fP, print GID, status, average download speed and
+This option changes the way \fBDownload Results\fP is formatted. If
+OPT is \fBdefault\fP, print GID, status, average download speed and
 path/URI. If multiple files are involved, path/URI of first
 requested file is printed and remaining ones are omitted.  If OPT is
 \fBfull\fP, print GID, status, average download speed, percentage of
 progress and path/URI. The percentage of progress and path/URI are
-printed for each requested file in each row.
+printed for each requested file in each row.  If OPT is \fBhide\fP,
+\fBDownload Results\fP is hidden.
 Default: \fBdefault\fP
 .UNINDENT
 .INDENT 0.0
@@ -1579,6 +1585,16 @@ length.
 .sp
 Possible Values: \fBnone\fP, \fBprealloc\fP, \fBtrunc\fP, \fBfalloc\fP
 Default: \fBprealloc\fP
+.sp
+\fBWARNING:\fP
+.INDENT 7.0
+.INDENT 3.5
+Using \fBtrunc\fP seemingly allocates disk space very quickly, but
+what it actually does is that it sets file length metadata in
+file system, and does not allocate disk space at all.  This means
+that it does not help avoiding fragmentation.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -1740,6 +1756,21 @@ Possible Values: \fB/path/to/command\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-optimize\-concurrent\-downloads[=true|false|<A>:<B>]
+Optimizes the number of concurrent downloads according to the
+bandwidth available. aria2 uses the download speed observed in the
+previous downloads to adapt the number of downloads launched in
+parallel according to the rule N = A + B Log10(speed in Mbps). The
+coefficients A and B can be customized in the option arguments with
+A and B separated by a colon. The default values (A=5, B=25) lead to
+using typically 5 parallel downloads on 1Mbps networks and above 50
+on 100Mbps networks. The number of parallel downloads remains
+constrained under the maximum defined by the
+\fI\%\-\-max\-concurrent\-downloads\fP parameter.
+Default: \fBfalse\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-piece\-length=<LENGTH>
 Set a piece length for HTTP/FTP downloads. This is the boundary when
 aria2 splits a file. All splits occur at multiple of this
@@ -1761,6 +1792,12 @@ To enable HTTP pipelining use
 .TP
 .B \-\-show\-console\-readout[=true|false]
 Show console readout. Default: \fBtrue\fP
+.UNINDENT
+.INDENT 0.0
+.TP
+.B \-\-stderr[=true|false]
+Redirect all console output that would be otherwise printed in
+stdout to stderr.  Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2691,9 +2728,8 @@ amount of time to mitigate brute\-force/dictionary attacks against the RPC
 interface. Therefore it is recommended to prefer Batch or \fIsystem.multicall\fP
 requests when appropriate.
 .sp
-\fIsystem.listMethods\fP can be executed without token.  Since it just
-returns the all available methods, and does not alter anything, it
-is safe without secret token.
+\fIsystem.listMethods\fP and \fIsystem.listNotifications\fP can be executed without token. Since they just
+return available methods/notifications, they do not alter anything, they\(aqre safe without secret token.
 .UNINDENT
 .UNINDENT
 .SS Methods
@@ -3126,6 +3162,15 @@ following keys.
 name in info dictionary. \fBname.utf\-8\fP is used if available.
 .UNINDENT
 .UNINDENT
+.TP
+.B \fBverifiedLength\fP
+The number of verified number of bytes while the files are being
+hash checked.  This key exists only when this download is being
+hash checked.
+.TP
+.B \fBverifyIntegrityPending\fP
+\fBtrue\fP if this download is waiting for the hash check in a
+queue.  This key exists only when this download is in the queue.
 .UNINDENT
 .sp
 \fBJSON\-RPC Example\fP
@@ -3802,7 +3847,26 @@ GID#2089b05ecca3d829.
 .B aria2.changeOption([secret], gid, options)
 This method changes options of the download denoted by \fIgid\fP (string)
 dynamically.  \fIoptions\fP is a struct.
-The following options are available for active downloads:
+The options listed in \fI\%Input File\fP subsection are available,
+\fBexcept\fP for following options:
+.INDENT 7.0
+.IP \(bu 2
+\fI\%dry\-run\fP
+.IP \(bu 2
+\fI\%metalink\-base\-uri\fP
+.IP \(bu 2
+\fI\%parameterized\-uri\fP
+.IP \(bu 2
+\fI\%pause\fP
+.IP \(bu 2
+\fI\%piece\-length\fP
+.IP \(bu 2
+\fI\%rpc\-save\-upload\-metadata\fP
+.UNINDENT
+.sp
+Except for the following options, changing the other options of
+active download makes it restart (restart itself is managed by
+aria2, and no user intervention is required):
 .INDENT 7.0
 .IP \(bu 2
 \fI\%bt\-max\-peers\fP
@@ -3818,15 +3882,6 @@ The following options are available for active downloads:
 \fI\%max\-upload\-limit\fP
 .UNINDENT
 .sp
-For waiting or paused downloads, in addition to the above options,
-options listed in \fI\%Input File\fP subsection are available,
-\fBexcept\fP for following options:
-\fI\%dry\-run\fP,
-\fI\%metalink\-base\-uri\fP,
-\fI\%parameterized\-uri\fP,
-\fI\%pause\fP,
-\fI\%piece\-length\fP and
-\fI\%rpc\-save\-upload\-metadata\fP option.
 This method returns \fBOK\fP for success.
 .sp
 The following examples set the \fI\%max\-download\-limit\fP option to \fB20K\fP for the download
@@ -3900,6 +3955,8 @@ The following options are available:
 \fI\%max\-overall\-download\-limit\fP
 .IP \(bu 2
 \fI\%max\-overall\-upload\-limit\fP
+.IP \(bu 2
+\fI\%optimize\-concurrent\-downloads\fP
 .IP \(bu 2
 \fI\%save\-cookies\fP
 .IP \(bu 2
@@ -4258,9 +4315,9 @@ JSON\-RPC 2.0 Specification:
 .INDENT 0.0
 .TP
 .B system.listMethods()
-This method returns the all available RPC methods in an array of
+This method returns all the available RPC methods in an array of
 string.  Unlike other methods, this method does not require secret
-token.  This is safe because this method jsut returns the available
+token.  This is safe because this method just returns the available
 method names.
 .sp
 \fBJSON\-RPC Example\fP
@@ -4295,6 +4352,51 @@ method names.
 >>> s = xmlrpclib.ServerProxy(\(aqhttp://localhost:6800/rpc\(aq)
 >>> s.system.listMethods()
 [\(aqaria2.addUri\(aq, \(aqaria2.addTorrent\(aq, ...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.UNINDENT
+.INDENT 0.0
+.TP
+.B system.listNotifications()
+This method returns all the available RPC notifications in an array of
+string.  Unlike other methods, this method does not require secret
+token.  This is safe because this method just returns the available
+notifications names.
+.sp
+\fBJSON\-RPC Example\fP
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+>>> import urllib2, json
+>>> from pprint import pprint
+>>> jsonreq = json.dumps({\(aqjsonrpc\(aq:\(aq2.0\(aq, \(aqid\(aq:\(aqqwer\(aq,
+\&...                       \(aqmethod\(aq:\(aqsystem.listNotifications\(aq})
+>>> c = urllib2.urlopen(\(aqhttp://localhost:6800/jsonrpc\(aq, jsonreq)
+>>> pprint(json.loads(c.read()))
+{u\(aqid\(aq: u\(aqqwer\(aq,
+ u\(aqjsonrpc\(aq: u\(aq2.0\(aq,
+ u\(aqresult\(aq: [u\(aqaria2.onDownloadStart\(aq,
+             u\(aqaria2.onDownloadPause\(aq,
+\&...
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+\fBXML\-RPC Example\fP
+.INDENT 7.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+>>> import xmlrpclib
+>>> s = xmlrpclib.ServerProxy(\(aqhttp://localhost:6800/rpc\(aq)
+>>> s.system.listNotifications()
+[\(aqaria2.onDownloadStart\(aq, \(aqaria2.onDownloadPause\(aq, ...
 .ft P
 .fi
 .UNINDENT

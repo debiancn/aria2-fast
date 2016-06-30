@@ -54,6 +54,7 @@ namespace aria2 {
 
 struct DownloadResult;
 class RequestGroup;
+class CheckIntegrityEntry;
 
 namespace rpc {
 
@@ -535,6 +536,17 @@ public:
   virtual RpcResponse execute(RpcRequest req, DownloadEngine* e) CXX11_OVERRIDE;
 
   static const char* getMethodName() { return "system.listMethods"; }
+};
+
+class SystemListNotificationsRpcMethod : public RpcMethod {
+protected:
+  virtual std::unique_ptr<ValueBase> process(const RpcRequest& req,
+                                             DownloadEngine* e) CXX11_OVERRIDE;
+
+public:
+  virtual RpcResponse execute(RpcRequest req, DownloadEngine* e) CXX11_OVERRIDE;
+
+  static const char* getMethodName() { return "system.listNotifications"; }
 };
 
 class NoSuchMethodRpcMethod : public RpcMethod {

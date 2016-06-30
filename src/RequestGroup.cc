@@ -150,6 +150,7 @@ RequestGroup::RequestGroup(const std::shared_ptr<GroupId>& gid,
       haltRequested_(false),
       forceHaltRequested_(false),
       pauseRequested_(false),
+      restartRequested_(false),
       inMemoryDownload_(false),
       seedOnly_(false)
 {
@@ -557,8 +558,7 @@ void RequestGroup::initPieceStorage()
               downloadContext_->getFileEntries().begin(),
               downloadContext_->getFileEntries().end())) {
         // Use LongestSequencePieceSelector when HTTP/FTP/BitTorrent
-        // integrated downloads. Currently multi-file integrated
-        // download is not supported.
+        // integrated downloads.
         A2_LOG_DEBUG("Using LongestSequencePieceSelector");
         ps->setPieceSelector(make_unique<LongestSequencePieceSelector>());
       }
@@ -605,6 +605,35 @@ void RequestGroup::initPieceStorage()
   segmentMan_ =
       std::make_shared<SegmentMan>(downloadContext_, tempPieceStorage);
   pieceStorage_ = tempPieceStorage;
+
+#ifdef __MINGW32__
+  // Windows build: --file-allocation=falloc uses SetFileValidData
+  // which requires SE_MANAGE_VOLUME_NAME privilege.  SetFileValidData
+  // has security implications (see
+  // https://msdn.microsoft.com/en-us/library/windows/desktop/aa365544%28v=vs.85%29.aspx).
+  static auto gainPrivilegeAttempted = false;
+
+  if (!gainPrivilegeAttempted &&
+      pieceStorage_->getDiskAdaptor()->getFileAllocationMethod() ==
+          DiskAdaptor::FILE_ALLOC_FALLOC &&
+      isFileAllocationEnabled()) {
+    if (!util::gainPrivilege(SE_MANAGE_VOLUME_NAME)) {
+      A2_LOG_WARN("--file-allocation=falloc will not work properly.");
+    }
+    else {
+      A2_LOG_DEBUG("SE_MANAGE_VOLUME_NAME privilege acquired");
+
+      A2_LOG_WARN(
+          "--file-allocation=falloc will use SetFileValidData() API, and "
+          "aria2 uses uninitialized disk space which may contain "
+          "confidential data as the download file space. If it is "
+          "undesirable, --file-allocation=prealloc is slower, but safer "
+          "option.");
+    }
+
+    gainPrivilegeAttempted = true;
+  }
+#endif // __MINGW32__
 }
 
 void RequestGroup::dropPieceStorage()
@@ -958,6 +987,8 @@ void RequestGroup::setForceHaltRequested(bool f, HaltReason haltReason)
 
 void RequestGroup::setPauseRequested(bool f) { pauseRequested_ = f; }
 
+void RequestGroup::setRestartRequested(bool f) { restartRequested_ = f; }
+
 void RequestGroup::releaseRuntimeResource(DownloadEngine* e)
 {
 #ifdef ENABLE_BITTORRENT
@@ -1111,6 +1142,7 @@ std::shared_ptr<DownloadResult> RequestGroup::createDownloadResult() const
   TransferStat st = calculateStat();
   auto res = std::make_shared<DownloadResult>();
   res->gid = gid_;
+  res->attrs = downloadContext_->getAttributes();
   res->fileEntries = downloadContext_->getFileEntries();
   res->inMemoryDownload = inMemoryDownload_;
   res->sessionDownloadLength = st.sessionDownloadLength;
@@ -1148,7 +1180,9 @@ std::shared_ptr<DownloadResult> RequestGroup::createDownloadResult() const
 void RequestGroup::reportDownloadFinished()
 {
   A2_LOG_NOTICE(fmt(MSG_FILE_DOWNLOAD_COMPLETED,
-                    downloadContext_->getBasePath().c_str()));
+                    inMemoryDownload()
+                        ? getFirstFilePath().c_str()
+                        : downloadContext_->getBasePath().c_str()));
   uriSelector_->resetCounters();
 #ifdef ENABLE_BITTORRENT
   if (downloadContext_->hasAttribute(CTX_ATTR_BT)) {
@@ -1275,6 +1309,11 @@ bool RequestGroup::isSeeder() const
 #else  // !ENABLE_BITTORRENT
   return false;
 #endif // !ENABLE_BITTORRENT
+}
+
+void RequestGroup::setPendingOption(std::shared_ptr<Option> option)
+{
+  pendingOption_ = std::move(option);
 }
 
 } // namespace aria2
