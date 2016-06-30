@@ -1,40 +1,67 @@
-aria2 1.21.0
+aria2 1.24.0
 ============
 
 Release Note
 ------------
 
-This release fixes several bugs, see the Changes for details.  We
-added "following" key to the response of aria2.tellStatus RPC method
-as reverse link for followedBy.
+This release fixes several bugs.  The new functionality is that when
+options which is only applicable in waiting state are submitted to an
+active download via RPC, the download is now automatically restarted
+to reflect the changes.  Previously, those options were just ignored.
 
 Changes
 -------
 
-* SessionSerializer: Fix bug that pause=true is added to wrong item
+* BitTorrent: Allow 32KiB request
 
-  This change also defers writing metadata download to the location
-  where first its follower download is written.
+  It looks like the 32KiB is the default request size of python
+  bittorrent client.  Previously, aria2 only allowed maximum 16KiB
+  request.
 
-* Add "following" to aria2.tellStatus response key as reverse link for
-  followedBy
+* Don't unchoke peer which is not interested in us
 
-* mingw: Add warning for falloc
+* Fix bug that evaluation of Peer::amChoking is negated
 
-* Update ciphers in AppleTLS
+* Faster seed/download on fast connection
 
-  Also enable fast start while at it
+* Increase DHT task concurrency to 15
 
-* OSX: Enable libssh2 and sftp
+  Fix GH-653
 
-  Closes GH-468
+* Fixed mmap failure check with MAP_FAILED flag
 
-* Update OSX dependencies
+  Fix GH-662
 
-  Closes GH-466
+  Patch from suzker
 
-* Fix compile error without TLS support
+* Added file size overflow check for mmap on 32bit os
 
-* Add support for using gnutls system wide crypto policy
+  Fix GH-662
 
-  Patch from Athmane Madjoudj
+  Patch from suzker
+
+* Use standard percent-encode for tracker request query
+
+  Fix GH-659
+
+* mingw32: Gain privilege before opening files
+
+  Fix GH-657
+
+* Restart active download to apply previously not applicable options
+
+  Previously, we categorized options that can be used in
+  aria2.changeOption RPC method into 2 categories.  The options in one
+  category can be applied on the fly, meaning that download continues
+  to be active while applying options.  Another category includes
+  options which are only applicable when downloads are waiting or
+  paused.
+
+  In this change, when active download is ordered to change options
+  which only applicable in waiting or paused state, it is now paused,
+  and then automatically restarted.  Although we have limited number
+  of download concurrency, the pause and restart is done atomically,
+  and the download is inserted at the front of the queue, it is picked
+  up immediately if the concurrency regulation allows.
+
+  Fix GH-640 and GH-644

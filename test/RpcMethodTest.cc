@@ -67,6 +67,9 @@ class RpcMethodTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testGetVersion);
   CPPUNIT_TEST(testNoSuchMethod);
   CPPUNIT_TEST(testGatherStoppedDownload);
+#ifdef ENABLE_BITTORRENT
+  CPPUNIT_TEST(testGatherStoppedDownload_bt);
+#endif // ENABLE_BITTORRENT
   CPPUNIT_TEST(testGatherProgressCommon);
 #ifdef ENABLE_BITTORRENT
   CPPUNIT_TEST(testGatherBitTorrentMetadata);
@@ -80,6 +83,7 @@ class RpcMethodTest : public CppUnit::TestFixture {
   CPPUNIT_TEST(testSystemMulticall);
   CPPUNIT_TEST(testSystemMulticall_fail);
   CPPUNIT_TEST(testSystemListMethods);
+  CPPUNIT_TEST(testSystemListNotifications);
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -133,6 +137,9 @@ public:
   void testGetVersion();
   void testNoSuchMethod();
   void testGatherStoppedDownload();
+#ifdef ENABLE_BITTORRENT
+  void testGatherStoppedDownload_bt();
+#endif // ENABLE_BITTORRENT
   void testGatherProgressCommon();
 #ifdef ENABLE_BITTORRENT
   void testGatherBitTorrentMetadata();
@@ -146,6 +153,7 @@ public:
   void testSystemMulticall();
   void testSystemMulticall_fail();
   void testSystemListMethods();
+  void testSystemListNotifications();
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(RpcMethodTest);
@@ -948,6 +956,29 @@ void RpcMethodTest::testGatherStoppedDownload()
   CPPUNIT_ASSERT(entry->containsKey("gid"));
 }
 
+#ifdef ENABLE_BITTORRENT
+void RpcMethodTest::testGatherStoppedDownload_bt()
+{
+  auto d = std::make_shared<DownloadResult>();
+  d->gid = GroupId::create();
+  d->infoHash = "2089b05ecca3d829cee5497d2703803b52216d19";
+  d->attrs = std::vector<std::shared_ptr<ContextAttribute>>(MAX_CTX_ATTR);
+
+  auto torrentAttr = std::make_shared<TorrentAttribute>();
+  torrentAttr->creationDate = 1000000007;
+  d->attrs[CTX_ATTR_BT] = torrentAttr;
+
+  auto entry = Dict::g();
+  gatherStoppedDownload(entry.get(), d, {});
+
+  auto btDict = downcast<Dict>(entry->get("bittorrent"));
+  CPPUNIT_ASSERT(btDict);
+
+  CPPUNIT_ASSERT_EQUAL((int64_t)1000000007,
+                       downcast<Integer>(btDict->get("creationDate"))->i());
+}
+#endif // ENABLE_BITTORRENT
+
 void RpcMethodTest::testGatherProgressCommon()
 {
   auto dctx = std::make_shared<DownloadContext>(0, 0, "aria2.tar.bz2");
@@ -1386,6 +1417,24 @@ void RpcMethodTest::testSystemListMethods()
 
   const auto resParams = downcast<List>(res.param);
   auto& allNames = allMethodNames();
+
+  CPPUNIT_ASSERT_EQUAL(allNames.size(), resParams->size());
+
+  for (size_t i = 0; i < allNames.size(); ++i) {
+    const auto s = downcast<String>(resParams->get(i));
+    CPPUNIT_ASSERT(s);
+    CPPUNIT_ASSERT_EQUAL(allNames[i], s->s());
+  }
+}
+
+void RpcMethodTest::testSystemListNotifications()
+{
+  SystemListNotificationsRpcMethod m;
+  auto res = m.execute(createReq("system.listNotifications"), e_.get());
+  CPPUNIT_ASSERT_EQUAL(0, res.code);
+
+  const auto resParams = downcast<List>(res.param);
+  auto& allNames = allNotificationsNames();
 
   CPPUNIT_ASSERT_EQUAL(allNames.size(), resParams->size());
 

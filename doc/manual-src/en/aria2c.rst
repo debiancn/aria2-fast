@@ -103,7 +103,7 @@ HTTP/FTP/SFTP Options
   See also `ENVIRONMENT`_ section.
 
   .. note::
-    
+
     If user and password are embedded in proxy URI and they are also
     specified by *--{http,https,ftp,all}-proxy-{user,passwd}* options,
     those specified later override prior options. For example, if you specified
@@ -209,7 +209,7 @@ HTTP/FTP/SFTP Options
   Disables netrc support. netrc support is enabled by default.
 
   .. note::
-    
+
     netrc file is only read at the startup if
     :option:`--no-netrc <-n>` is ``false``.
     So if :option:`--no-netrc <-n>` is ``true`` at the startup,
@@ -305,7 +305,7 @@ HTTP/FTP/SFTP Options
   Default: ``5``
 
   .. note::
-    
+
     Some Metalinks regulate the number of servers to connect.  aria2
     strictly respects them.  This means that if Metalink defines the
     ``maxconnections`` attribute lower than N, then aria2 uses the
@@ -327,6 +327,8 @@ HTTP/FTP/SFTP Options
   :option:`--min-split-size <-k>` option,
   so it will be necessary to specify a reasonable value to
   :option:`--min-split-size <-k>` option.
+  If ``random`` is given, aria2 selects piece randomly. Like
+  ``inorder``, :option:`--min-split-size <-k>` option is honored.
   If ``geom`` is given, at the beginning aria2 selects piece which has
   minimum index like ``inorder``, but it exponentially increasingly
   keeps space from previously selected piece. This will reduce the
@@ -415,7 +417,7 @@ HTTP Specific Options
   ``Content-Encoding: deflate``.  Default: ``false``
 
   .. note::
-    
+
     Some server responds with ``Content-Encoding: gzip`` for files which
     itself is gzipped file. aria2 inflates them anyway because of the
     response header.
@@ -498,7 +500,7 @@ HTTP Specific Options
   Default: ``false``
 
   .. note::
-    
+
     In performance perspective, there is usually no advantage to enable
     this option.
 
@@ -666,9 +668,12 @@ BitTorrent Specific Options
 
 .. option:: --bt-external-ip=<IPADDRESS>
 
-  Specify the external IP address to report to a BitTorrent
-  tracker. Although this function is named ``external``, it can accept
-  any kind of IP addresses. IPADDRESS must be a numeric IP address.
+  Specify the external IP address to use in BitTorrent download and DHT.
+  It may be sent to BitTorrent tracker. For DHT, this option should be
+  set to report that local node is downloading a particular torrent.
+  This is critical to use DHT in a private network. Although this
+  function is named ``external``, it can accept any kind of IP
+  addresses.
 
 .. option:: --bt-force-encryption[=true|false]
 
@@ -745,7 +750,7 @@ BitTorrent Specific Options
   If ``true`` is given, aria2 doesn't accept and establish connection with legacy
   BitTorrent handshake(\\19BitTorrent protocol).
   Thus aria2 always uses Obfuscation handshake.
-  Default: ``false`` 
+  Default: ``false``
 
 .. option:: --bt-request-peer-speed-limit=<SPEED>
 
@@ -935,7 +940,7 @@ BitTorrent Specific Options
   Specify seeding time in minutes. Also see the :option:`--seed-ratio` option.
 
   .. note::
-    
+
     Specifying :option:`--seed-time=0 <--seed-time>` disables seeding after download completed.
 
 .. option:: -T, --torrent-file=<TORRENT_FILE>
@@ -992,7 +997,7 @@ Metalink Specific Options
   The possible values are ``http``, ``https``, ``ftp`` and ``none``.
   Specify ``none`` to disable this feature.
   Default: ``none``
- 
+
 .. option:: --metalink-enable-unique-protocol[=true|false]
 
   If ``true`` is given and several protocols are available for a mirror in a
@@ -1242,13 +1247,14 @@ Advanced Options
 
 .. option:: --download-result=<OPT>
 
-  This option changes the way ``Download Results`` is formatted. If OPT
-  is ``default``, print GID, status, average download speed and
+  This option changes the way ``Download Results`` is formatted. If
+  OPT is ``default``, print GID, status, average download speed and
   path/URI. If multiple files are involved, path/URI of first
   requested file is printed and remaining ones are omitted.  If OPT is
   ``full``, print GID, status, average download speed, percentage of
   progress and path/URI. The percentage of progress and path/URI are
-  printed for each requested file in each row.
+  printed for each requested file in each row.  If OPT is ``hide``,
+  ``Download Results`` is hidden.
   Default: ``default``
 
 .. option:: --dscp=<DSCP>
@@ -1318,6 +1324,12 @@ Advanced Options
   Possible Values: ``none``, ``prealloc``, ``trunc``, ``falloc``
   Default: ``prealloc``
 
+  .. Warning::
+
+     Using ``trunc`` seemingly allocates disk space very quickly, but
+     what it actually does is that it sets file length metadata in
+     file system, and does not allocate disk space at all.  This means
+     that it does not help avoiding fragmentation.
 
 .. option:: --force-save[=true|false]
 
@@ -1457,6 +1469,21 @@ Advanced Options
   See `Event Hook`_ for more details about COMMAND.
   Possible Values: ``/path/to/command``
 
+
+.. option:: --optimize-concurrent-downloads[=true|false|<A>:<B>]
+
+  Optimizes the number of concurrent downloads according to the
+  bandwidth available. aria2 uses the download speed observed in the
+  previous downloads to adapt the number of downloads launched in
+  parallel according to the rule N = A + B Log10(speed in Mbps). The
+  coefficients A and B can be customized in the option arguments with
+  A and B separated by a colon. The default values (A=5, B=25) lead to
+  using typically 5 parallel downloads on 1Mbps networks and above 50
+  on 100Mbps networks. The number of parallel downloads remains
+  constrained under the maximum defined by the
+  :option:`--max-concurrent-downloads` parameter.
+  Default: ``false``
+
 .. option:: --piece-length=<LENGTH>
 
   Set a piece length for HTTP/FTP downloads. This is the boundary when
@@ -1466,7 +1493,7 @@ Advanced Options
   Default: ``1M``
 
   .. note::
-    
+
     The possible use case of :option:`--piece-length`
     option is change the request range in one HTTP pipelined request.
     To enable HTTP pipelining use
@@ -1475,6 +1502,12 @@ Advanced Options
 .. option:: --show-console-readout[=true|false]
 
   Show console readout. Default: ``true``
+
+
+.. option:: --stderr[=true|false]
+
+  Redirect all console output that would be otherwise printed in
+  stdout to stderr.  Default: ``false``
 
 .. option:: --summary-interval=<SEC>
 
@@ -1608,7 +1641,7 @@ Advanced Options
 
   Truncate console readout to fit in a single line.
   Default: ``true``
- 
+
 .. option:: -v, --version
 
   Print the version number, copyright and the configuration information and
@@ -1860,7 +1893,7 @@ aria2 recognizes the following environment variables.
   The command-line option :option:`--all-proxy` overrides this value.
 
 .. note::
-  
+
   Although aria2 accepts ``ftp://`` and ``https://`` scheme in proxy URI, it
   simply assumes that ``http://`` is specified and does not change its
   behavior based on the specified scheme.
@@ -2088,7 +2121,7 @@ of URIs. These optional lines must start with white space(s).
   * :option:`uri-selector <--uri-selector>`
   * :option:`use-head <--use-head>`
   * :option:`user-agent <-U>`
-  
+
 These options have exactly same meaning of the ones in the
 command-line options, but it just applies to the URIs it belongs to.
 Please note that for options in input file ``--`` prefix must be
@@ -2239,9 +2272,8 @@ to provide the token as the first parameter as described above.
   interface. Therefore it is recommended to prefer Batch or `system.multicall`
   requests when appropriate.
 
-  `system.listMethods` can be executed without token.  Since it just
-  returns the all available methods, and does not alter anything, it
-  is safe without secret token.
+  `system.listMethods` and `system.listNotifications` can be executed without token. Since they just
+  return available methods/notifications, they do not alter anything, they're safe without secret token.
 
 Methods
 ~~~~~~~
@@ -2591,6 +2623,15 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
       ``name``
         name in info dictionary. ``name.utf-8`` is used if available.
+
+  ``verifiedLength``
+    The number of verified number of bytes while the files are being
+    hash checked.  This key exists only when this download is being
+    hash checked.
+
+  ``verifyIntegrityPending``
+    ``true`` if this download is waiting for the hash check in a
+    queue.  This key exists only when this download is in the queue.
 
   **JSON-RPC Example**
 
@@ -3121,7 +3162,19 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
   This method changes options of the download denoted by *gid* (string)
   dynamically.  *options* is a struct.
-  The following options are available for active downloads:
+  The options listed in `Input File`_ subsection are available,
+  **except** for following options:
+
+  * :option:`dry-run <--dry-run>`
+  * :option:`metalink-base-uri <--metalink-base-uri>`
+  * :option:`parameterized-uri <-P>`
+  * :option:`pause <--pause>`
+  * :option:`piece-length <--piece-length>`
+  * :option:`rpc-save-upload-metadata <--rpc-save-upload-metadata>`
+
+  Except for the following options, changing the other options of
+  active download makes it restart (restart itself is managed by
+  aria2, and no user intervention is required):
 
   * :option:`bt-max-peers <--bt-max-peers>`
   * :option:`bt-request-peer-speed-limit <--bt-request-peer-speed-limit>`
@@ -3130,15 +3183,6 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
   * :option:`max-download-limit <--max-download-limit>`
   * :option:`max-upload-limit <-u>`
 
-  For waiting or paused downloads, in addition to the above options,
-  options listed in `Input File`_ subsection are available,
-  **except** for following options:
-  :option:`dry-run <--dry-run>`,
-  :option:`metalink-base-uri <--metalink-base-uri>`,
-  :option:`parameterized-uri <-P>`,
-  :option:`pause <--pause>`,
-  :option:`piece-length <--piece-length>` and
-  :option:`rpc-save-upload-metadata <--rpc-save-upload-metadata>` option.
   This method returns ``OK`` for success.
 
   The following examples set the :option:`max-download-limit
@@ -3191,6 +3235,7 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
   * :option:`max-download-result <--max-download-result>`
   * :option:`max-overall-download-limit <--max-overall-download-limit>`
   * :option:`max-overall-upload-limit <--max-overall-upload-limit>`
+  * :option:`optimize-concurrent-downloads <--optimize-concurrent-downloads>`
   * :option:`save-cookies <--save-cookies>`
   * :option:`save-session <--save-session>`
   * :option:`server-stat-of <--server-stat-of>`
@@ -3454,9 +3499,9 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
 
 .. function:: system.listMethods()
 
-  This method returns the all available RPC methods in an array of
+  This method returns all the available RPC methods in an array of
   string.  Unlike other methods, this method does not require secret
-  token.  This is safe because this method jsut returns the available
+  token.  This is safe because this method just returns the available
   method names.
 
   **JSON-RPC Example**
@@ -3481,6 +3526,36 @@ For information on the *secret* parameter, see :ref:`rpc_auth`.
     >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
     >>> s.system.listMethods()
     ['aria2.addUri', 'aria2.addTorrent', ...
+
+.. function:: system.listNotifications()
+
+  This method returns all the available RPC notifications in an array of
+  string.  Unlike other methods, this method does not require secret
+  token.  This is safe because this method just returns the available
+  notifications names.
+
+  **JSON-RPC Example**
+  ::
+
+    >>> import urllib2, json
+    >>> from pprint import pprint
+    >>> jsonreq = json.dumps({'jsonrpc':'2.0', 'id':'qwer',
+    ...                       'method':'system.listNotifications'})
+    >>> c = urllib2.urlopen('http://localhost:6800/jsonrpc', jsonreq)
+    >>> pprint(json.loads(c.read()))
+    {u'id': u'qwer',
+     u'jsonrpc': u'2.0',
+     u'result': [u'aria2.onDownloadStart',
+                 u'aria2.onDownloadPause',
+    ...
+
+  **XML-RPC Example**
+  ::
+
+    >>> import xmlrpclib
+    >>> s = xmlrpclib.ServerProxy('http://localhost:6800/rpc')
+    >>> s.system.listNotifications()
+    ['aria2.onDownloadStart', 'aria2.onDownloadPause', ...
 
 Error Handling
 ~~~~~~~~~~~~~~
@@ -3641,50 +3716,50 @@ notification method. Following notification methods are defined.
   This notification will be sent when a download is started.
   The *event* is of type struct and it contains following keys.
   The value type is string.
-  
+
   ``gid``
     GID of the download.
-  
+
 
 .. function:: aria2.onDownloadPause(event)
 
   This notification will be sent when a download is paused.  The *event*
   is the same struct as the *event* argument of
   :func:`aria2.onDownloadStart` method.
-  
+
 
 .. function:: aria2.onDownloadStop(event)
 
   This notification will be sent when a download is stopped by the user.
   The *event* is the same struct as the *event* argument of
   :func:`aria2.onDownloadStart` method.
-  
+
 
 .. function:: aria2.onDownloadComplete(event)
 
-  
+
   This notification will be sent when a download is complete.  For
   BitTorrent downloads, this notification is sent when the download is
   complete and seeding is over. The *event* is the same struct of the
-  *event* argument of 
+  *event* argument of
   :func:`aria2.onDownloadStart` method.
-  
+
 
 .. function:: aria2.onDownloadError(event)
 
-  
+
   This notification will be sent when a download is stopped due to an error.
   The *event* is the same struct as the *event* argument of
   :func:`aria2.onDownloadStart` method.
-  
+
 
 .. function:: aria2.onBtDownloadComplete(event)
 
-  
+
   This notification will be sent when a torrent download is complete but seeding
   is still going on.  The *event* is the same struct as the *event* argument of
   :func:`aria2.onDownloadStart` method.
-  
+
 Sample XML-RPC Client Code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -3695,15 +3770,15 @@ prints the RPC response:
 .. code-block:: ruby
 
   #!/usr/bin/env ruby
-  
+
   require 'xmlrpc/client'
   require 'pp'
-  
+
   client=XMLRPC::Client.new2("http://localhost:6800/rpc")
-  
+
   options={ "dir" => "/downloads" }
   result=client.call("aria2.addUri", [ "http://localhost/aria2.tar.bz2" ], options)
-  
+
   pp result
 
 
@@ -3712,7 +3787,7 @@ xmlrpc.client instead) to interact with aria2::
 
   import xmlrpclib
   from pprint import pprint
-  
+
   s = xmlrpclib.ServerProxy("http://localhost:6800/rpc")
   r = s.aria2.addUri(["http://localhost/aria2.tar.bz2"], {"dir":"/downloads"})
   pprint(r)
@@ -3846,7 +3921,7 @@ For FTP:
   $ aria2c --ftp-proxy="http://proxy:8080" "ftp://host/file"
 
 .. note::
-  
+
   See :option:`--http-proxy`, :option:`--https-proxy`, :option:`--ftp-proxy`,
   :option:`--all-proxy` and :option:`--no-proxy` for details.  You can specify
   proxy in the environment variables. See `ENVIRONMENT`_ section.
@@ -4172,7 +4247,7 @@ Repair a damaged download
   $ aria2c -V file.metalink
 
 .. note::
-  
+
   Repairing damaged downloads can be done efficiently when used with
   BitTorrent or Metalink with chunk checksums.
 

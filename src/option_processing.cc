@@ -300,6 +300,9 @@ error_code::Value option_processing(Option& op, bool standalone,
     showUsage("", oparser, global::cerr());
     return e.getErrorCode();
   }
+  if (standalone && op.getAsBool(PREF_STDERR)) {
+    global::redirectStdoutToStderr();
+  }
   if (standalone && !op.getAsBool(PREF_ENABLE_RPC) &&
 #ifdef ENABLE_BITTORRENT
       op.blank(PREF_TORRENT_FILE) &&
@@ -337,16 +340,6 @@ error_code::Value option_processing(Option& op, bool standalone,
                 "--save-session");
     op.remove(PREF_DEFERRED_INPUT);
   }
-
-#ifdef __MINGW32__
-  if (op.get(PREF_FILE_ALLOCATION) == V_FALLOC) {
-    A2_LOG_WARN(
-        "--file-allocation=falloc will use SetFileValidData() API, and "
-        "aria2 uses uninitialized disk space which may contain "
-        "confidential data as the download file space. If it is "
-        "undesirable, --file-allocation=prealloc is slower, but safer option.");
-  }
-#endif // __MINGW32__
 
   return error_code::FINISHED;
 }

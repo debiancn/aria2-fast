@@ -151,9 +151,9 @@ void BtRequestMessageTest::testCreateMessage()
   bittorrent::setIntParam(&data[5], 12345);
   bittorrent::setIntParam(&data[9], 256);
   bittorrent::setIntParam(&data[13], 1_k);
-  unsigned char* rawmsg = msg.createMessage();
-  CPPUNIT_ASSERT(memcmp(rawmsg, data, 17) == 0);
-  delete[] rawmsg;
+  auto rawmsg = msg.createMessage();
+  CPPUNIT_ASSERT_EQUAL((size_t)17, rawmsg.size());
+  CPPUNIT_ASSERT(std::equal(std::begin(rawmsg), std::end(rawmsg), data));
 }
 
 void BtRequestMessageTest::testDoReceivedAction_hasPieceAndAmNotChoking()
@@ -266,7 +266,7 @@ void BtRequestMessageTest::testValidate()
 
 void BtRequestMessageTest::testValidate_lengthTooLong()
 {
-  BtRequestMessage msg(0, 0, 16_k + 1);
+  BtRequestMessage msg(0, 0, 32_k + 1);
   msg.setBtMessageValidator(
       make_unique<RangeBtMessageValidator>(&msg, 1_k, 256_k));
   try {
@@ -274,7 +274,7 @@ void BtRequestMessageTest::testValidate_lengthTooLong()
     CPPUNIT_FAIL("exception must be thrown.");
   }
   catch (DlAbortEx& e) {
-    CPPUNIT_ASSERT_EQUAL(std::string("Length too long: 16385 > 16KB"),
+    CPPUNIT_ASSERT_EQUAL(std::string("Length too long: 32769 > 32KB"),
                          std::string(e.what()));
   }
 }

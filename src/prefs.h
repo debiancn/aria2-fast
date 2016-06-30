@@ -78,6 +78,7 @@ extern const std::string V_NONE;
 extern const std::string V_MEM;
 extern const std::string V_ALL;
 extern const std::string A2_V_FULL;
+extern const std::string A2_V_HIDE;
 extern const std::string A2_V_GEOM;
 extern const std::string V_PREALLOC;
 extern const std::string V_FALLOC;
@@ -88,6 +89,7 @@ extern const std::string V_NOTICE;
 extern const std::string V_WARN;
 extern const std::string V_ERROR;
 extern const std::string V_INORDER;
+extern const std::string A2_V_RANDOM;
 extern const std::string V_FEEDBACK;
 extern const std::string V_ADAPTIVE;
 extern const std::string V_LIBUV;
@@ -172,6 +174,12 @@ extern PrefPtr PREF_INPUT_FILE;
 extern PrefPtr PREF_DEFERRED_INPUT;
 // value: 1*digit
 extern PrefPtr PREF_MAX_CONCURRENT_DOWNLOADS;
+// value: true | false
+extern PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS;
+// value: 1*digit ['.' [ 1*digit ] ]
+extern PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS_COEFFA;
+// value: 1*digit ['.' [ 1*digit ] ]
+extern PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS_COEFFB;
 // value: true | false
 extern PrefPtr PREF_FORCE_SEQUENTIAL;
 // value: true | false
@@ -282,7 +290,7 @@ extern PrefPtr PREF_STREAM_PIECE_SELECTOR;
 extern PrefPtr PREF_TRUNCATE_CONSOLE_READOUT;
 // value: true | false
 extern PrefPtr PREF_PAUSE;
-// value: default | full
+// value: default | full | hide
 extern PrefPtr PREF_DOWNLOAD_RESULT;
 // value: true | false
 extern PrefPtr PREF_HASH_CHECK_ONLY;
@@ -316,6 +324,8 @@ extern PrefPtr PREF_MIN_TLS_VERSION;
 extern PrefPtr PREF_SOCKET_RECV_BUFFER_SIZE;
 // value: 1*digit
 extern PrefPtr PREF_MAX_MMAP_LIMIT;
+// value: true | false
+extern PrefPtr PREF_STDERR;
 
 /**
  * FTP related preferences

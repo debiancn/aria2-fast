@@ -43,6 +43,7 @@
 #include "SocketBuffer.h"
 #include "Command.h"
 #include "a2functional.h"
+#include "BtConstants.h"
 
 namespace aria2 {
 
@@ -53,7 +54,7 @@ class ARC4Encryptor;
 // The maximum length of buffer. If the message length (including 4
 // bytes length and payload length) is larger than this value, it is
 // dropped.
-constexpr size_t MAX_BUFFER_CAPACITY = 16_k + 128;
+constexpr size_t MAX_BUFFER_CAPACITY = MAX_BLOCK_LENGTH + 128;
 
 class PeerConnection {
 private:
@@ -95,7 +96,7 @@ public:
 
   // Pushes data into send buffer. After this call, this object gets
   // ownership of data, so caller must not delete or alter it.
-  void pushBytes(unsigned char* data, size_t len,
+  void pushBytes(std::vector<unsigned char> data,
                  std::unique_ptr<ProgressUpdate> progressUpdate =
                      std::unique_ptr<ProgressUpdate>{});
 

@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2015 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,37 +32,43 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#ifndef D_BT_CONSTANTS_H
-#define D_BT_CONSTANTS_H
-
-#include "common.h"
-#include "a2functional.h"
+#include "RandomStreamPieceSelector.h"
+#include "BitfieldMan.h"
+#include "SimpleRandomizer.h"
 
 namespace aria2 {
 
-constexpr size_t INFO_HASH_LENGTH = 20;
+RandomStreamPieceSelector::RandomStreamPieceSelector(BitfieldMan* bitfieldMan)
+    : bitfieldMan_(bitfieldMan)
+{
+}
 
-constexpr size_t PIECE_HASH_LENGTH = 20;
+RandomStreamPieceSelector::~RandomStreamPieceSelector() {}
 
-constexpr size_t PEER_ID_LENGTH = 20;
+bool RandomStreamPieceSelector::select(size_t& index, size_t minSplitSize,
+                                       const unsigned char* ignoreBitfield,
+                                       size_t length)
+{
+  size_t start = SimpleRandomizer::getInstance()->getRandomNumber(
+      bitfieldMan_->countBlock());
 
-constexpr size_t MAX_BLOCK_LENGTH = 32_k;
+  auto rv = bitfieldMan_->getInorderMissingUnusedIndex(
+      index, start, bitfieldMan_->countBlock(), minSplitSize, ignoreBitfield,
+      length);
+  if (rv) {
+    return true;
+  }
+  rv = bitfieldMan_->getInorderMissingUnusedIndex(index, 0, start, minSplitSize,
+                                                  ignoreBitfield, length);
+  if (rv) {
+    return true;
+  }
+  // Fall back to inorder search because randomized search may fail
+  // because of |minSplitSize| constraint.
+  return bitfieldMan_->getInorderMissingUnusedIndex(index, minSplitSize,
+                                                    ignoreBitfield, length);
+}
 
-constexpr size_t DEFAULT_MAX_OUTSTANDING_REQUEST = 6;
-
-// Upper Bound of the number of outstanding request
-constexpr size_t UB_MAX_OUTSTANDING_REQUEST = 256;
-
-constexpr size_t METADATA_PIECE_SIZE = 16_k;
-
-constexpr const char LPD_MULTICAST_ADDR[] = "239.192.152.143";
-
-constexpr uint16_t LPD_MULTICAST_PORT = 6771;
-
-constexpr size_t COMPACT_LEN_IPV4 = 6;
-
-constexpr size_t COMPACT_LEN_IPV6 = 18;
+void RandomStreamPieceSelector::onBitfieldInit() {}
 
 } // namespace aria2
-
-#endif // D_BT_CONSTANTS_H

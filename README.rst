@@ -98,11 +98,11 @@ How to get source code
 ----------------------
 
 We maintain the source code at Github:
-https://github.com/tatsuhiro-t/aria2
+https://github.com/aria2/aria2
 
 To get the latest source code, run following command::
 
-    $ git clone https://github.com/tatsuhiro-t/aria2.git
+    $ git clone https://github.com/aria2/aria2.git
 
 This will create aria2 directory in your current directory and source
 files are stored there.
@@ -183,7 +183,7 @@ script respectively.
 
 In order to enable async DNS support, you need c-ares.
 
-* c-ares: http://daniel.haxx.se/projects/c-ares/
+* c-ares: http://c-ares.haxx.se/
 
 How to build
 ------------
@@ -307,7 +307,7 @@ Cross-compiling Windows binary
 ------------------------------
 
 In this section, we describe how to build a Windows binary using a
-mingw-w64 (http://mingw-w64.sourceforge.net/) cross-compiler on Debian
+mingw-w64 (http://mingw-w64.org/doku.php) cross-compiler on Debian
 Linux. The MinGW (http://www.mingw.org/) may not be able to build
 aria2.
 
@@ -584,4 +584,4 @@ References
 * `BitTorrent: Private Torrents <http://www.bittorrent.org/beps/bep_0027.html>`_
 * `BitTorrent: BitTorrent DHT Extensions for IPv6 <http://www.bittorrent.org/beps/bep_0032.html>`_
 * `BitTorrent: Message Stream Encryption <http://wiki.vuze.com/w/Message_Stream_Encryption>`_
-* `Kademlia: A Peer-to-peer Information System Based on the  XOR Metric <http://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf>`_
+* `Kademlia: A Peer-to-peer Information System Based on the  XOR Metric <https://pdos.csail.mit.edu/~petar/papers/maymounkov-kademlia-lncs.pdf>`_

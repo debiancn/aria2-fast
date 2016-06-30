@@ -121,6 +121,7 @@ const std::string V_NONE("none");
 const std::string V_MEM("mem");
 const std::string V_ALL("all");
 const std::string A2_V_FULL("full");
+const std::string A2_V_HIDE("hide");
 const std::string A2_V_GEOM("geom");
 const std::string V_PREALLOC("prealloc");
 const std::string V_FALLOC("falloc");
@@ -131,6 +132,7 @@ const std::string V_NOTICE("notice");
 const std::string V_WARN("warn");
 const std::string V_ERROR("error");
 const std::string V_INORDER("inorder");
+const std::string A2_V_RANDOM("random");
 const std::string V_FEEDBACK("feedback");
 const std::string V_ADAPTIVE("adaptive");
 const std::string V_LIBUV("libuv");
@@ -216,6 +218,15 @@ PrefPtr PREF_INPUT_FILE = makePref("input-file");
 PrefPtr PREF_DEFERRED_INPUT = makePref("deferred-input");
 // value: 1*digit
 PrefPtr PREF_MAX_CONCURRENT_DOWNLOADS = makePref("max-concurrent-downloads");
+// value: true | false | A:B
+PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS =
+    makePref("optimize-concurrent-downloads");
+// values: 1*digit ['.' [ 1*digit ] ]
+PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS_COEFFA =
+    makePref("optimize-concurrent-downloads-coeffA");
+// values: 1*digit ['.' [ 1*digit ] ]
+PrefPtr PREF_OPTIMIZE_CONCURRENT_DOWNLOADS_COEFFB =
+    makePref("optimize-concurrent-downloads-coeffB");
 // value: true | false
 PrefPtr PREF_FORCE_SEQUENTIAL = makePref("force-sequential");
 // value: true | false
@@ -326,7 +337,7 @@ PrefPtr PREF_STREAM_PIECE_SELECTOR = makePref("stream-piece-selector");
 PrefPtr PREF_TRUNCATE_CONSOLE_READOUT = makePref("truncate-console-readout");
 // value: true | false
 PrefPtr PREF_PAUSE = makePref("pause");
-// value: default | full
+// value: default | full | hide
 PrefPtr PREF_DOWNLOAD_RESULT = makePref("download-result");
 // value: true | false
 PrefPtr PREF_HASH_CHECK_ONLY = makePref("hash-check-only");
@@ -359,6 +370,8 @@ PrefPtr PREF_MIN_TLS_VERSION = makePref("min-tls-version");
 PrefPtr PREF_SOCKET_RECV_BUFFER_SIZE = makePref("socket-recv-buffer-size");
 // value: 1*digit
 PrefPtr PREF_MAX_MMAP_LIMIT = makePref("max-mmap-limit");
+// value: true | false
+PrefPtr PREF_STDERR = makePref("stderr");
 
 /**
  * FTP related preferences

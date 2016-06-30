@@ -235,9 +235,9 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(
-        new ParameterOptionHandler(PREF_DOWNLOAD_RESULT, TEXT_DOWNLOAD_RESULT,
-                                   A2_V_DEFAULT, {A2_V_DEFAULT, A2_V_FULL}));
+    OptionHandler* op(new ParameterOptionHandler(
+        PREF_DOWNLOAD_RESULT, TEXT_DOWNLOAD_RESULT, A2_V_DEFAULT,
+        {A2_V_DEFAULT, A2_V_FULL, A2_V_HIDE}));
     op->addTag(TAG_ADVANCED);
     op->setChangeGlobalOption(true);
     handlers.push_back(op);
@@ -562,6 +562,14 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new OptimizeConcurrentDownloadsOptionHandler(
+        PREF_OPTIMIZE_CONCURRENT_DOWNLOADS, TEXT_OPTIMIZE_CONCURRENT_DOWNLOADS,
+        A2_V_FALSE, OptionHandler::OPT_ARG));
+    op->addTag(TAG_ADVANCED);
+    op->setChangeGlobalOption(true);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(
         new BooleanOptionHandler(PREF_PARAMETERIZED_URI, TEXT_PARAMETERIZED_URI,
                                  A2_V_FALSE, OptionHandler::OPT_ARG, 'P'));
@@ -668,6 +676,13 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     OptionHandler* op(new UnitNumberOptionHandler(PREF_SOCKET_RECV_BUFFER_SIZE,
                                                   TEXT_SOCKET_RECV_BUFFER_SIZE,
                                                   "0", 0, 16_m));
+    op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new BooleanOptionHandler(
+        PREF_STDERR, TEXT_STDERR, A2_V_FALSE, OptionHandler::OPT_ARG));
+
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
   }
@@ -946,7 +961,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
   {
     OptionHandler* op(new ParameterOptionHandler(
         PREF_STREAM_PIECE_SELECTOR, TEXT_STREAM_PIECE_SELECTOR, A2_V_DEFAULT,
-        {A2_V_DEFAULT, V_INORDER, A2_V_GEOM}));
+        {A2_V_DEFAULT, V_INORDER, A2_V_RANDOM, A2_V_GEOM}));
     op->addTag(TAG_FTP);
     op->addTag(TAG_HTTP);
     op->setInitialOption(true);

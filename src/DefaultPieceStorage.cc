@@ -58,6 +58,7 @@
 #include "RarestPieceSelector.h"
 #include "DefaultStreamPieceSelector.h"
 #include "InorderStreamPieceSelector.h"
+#include "RandomStreamPieceSelector.h"
 #include "GeomStreamPieceSelector.h"
 #include "array_fun.h"
 #include "PieceStatMan.h"
@@ -98,6 +99,10 @@ DefaultPieceStorage::DefaultPieceStorage(
   else if (pieceSelectorOpt == V_INORDER) {
     streamPieceSelector_ =
         make_unique<InorderStreamPieceSelector>(bitfieldMan_.get());
+  }
+  else if (pieceSelectorOpt == A2_V_RANDOM) {
+    streamPieceSelector_ =
+        make_unique<RandomStreamPieceSelector>(bitfieldMan_.get());
   }
   else if (pieceSelectorOpt == A2_V_GEOM) {
     streamPieceSelector_ =
@@ -621,7 +626,7 @@ void DefaultPieceStorage::initStorage()
 {
   if (downloadContext_->getFileEntries().size() == 1) {
     A2_LOG_DEBUG("Instantiating DirectDiskAdaptor");
-    auto directDiskAdaptor = make_unique<DirectDiskAdaptor>();
+    auto directDiskAdaptor = std::make_shared<DirectDiskAdaptor>();
     directDiskAdaptor->setTotalLength(downloadContext_->getTotalLength());
     directDiskAdaptor->setFileEntries(
         downloadContext_->getFileEntries().begin(),
@@ -633,7 +638,7 @@ void DefaultPieceStorage::initStorage()
   }
   else {
     A2_LOG_DEBUG("Instantiating MultiDiskAdaptor");
-    auto multiDiskAdaptor = make_unique<MultiDiskAdaptor>();
+    auto multiDiskAdaptor = std::make_shared<MultiDiskAdaptor>();
     multiDiskAdaptor->setFileEntries(downloadContext_->getFileEntries().begin(),
                                      downloadContext_->getFileEntries().end());
     multiDiskAdaptor->setPieceLength(downloadContext_->getPieceLength());
