@@ -1,3 +1,13 @@
+aria2 (1.24.0-1) UNRELEASED; urgency=low
+
+  * New upstream release (Closes: #811997)
+  * debian/control:
+    + Removed XS-Testsuite field.
+    + Updated Standards-Version to 3.9.8
+    + Fixed Vcs-* URLs
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 30 Jun 2016 13:37:49 +0530
+
 aria2 (1.21.0-1) unstable; urgency=medium
 
   [ Patrick Ruckstuhl ]
