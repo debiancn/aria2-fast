@@ -1,10 +1,13 @@
 aria2 (1.25.0-1) unstable; urgency=low
 
   * New upstream release.
-  * debian/control, debian/copyright:
-    + Updated for new Homepage/Source fields.
+  * debian/control:
+    + Updated Homepage field.
+  * debian/copyright:
+    + Updated Source field.
+    + Updated list of Authors and contact.
 
- -- Kartik Mistry <kartik@debian.org>  Sun, 24 Jul 2016 17:40:45 +0530
+ -- Kartik Mistry <kartik@debian.org>  Sun, 24 Jul 2016 20:01:44 +0530
 
 aria2 (1.24.0-1) unstable; urgency=low
 
