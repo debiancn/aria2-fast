@@ -92,8 +92,8 @@ DefaultBtInteractive::DefaultBtInteractive(
       peer_(peer),
       metadataGetMode_(false),
       localNode_(nullptr),
+      lastHaveIndex_(0),
       allowedFastSetSize_(10),
-      haveTimer_(global::wallclock()),
       keepAliveTimer_(global::wallclock()),
       floodingTimer_(global::wallclock()),
       inactiveTimer_(global::wallclock()),
@@ -105,8 +105,7 @@ DefaultBtInteractive::DefaultBtInteractive(
       numReceivedMessage_(0),
       maxOutstandingRequest_(DEFAULT_MAX_OUTSTANDING_REQUEST),
       requestGroupMan_(nullptr),
-      tcpPort_(0),
-      haveLastSent_(global::wallclock())
+      tcpPort_(0)
 {
 }
 
@@ -173,7 +172,6 @@ DefaultBtInteractive::receiveAndSendHandshake()
 void DefaultBtInteractive::doPostHandshakeProcessing()
 {
   // Set time 0 to haveTimer to cache http/ftp download piece completion
-  haveTimer_ = Timer::zero();
   keepAliveTimer_ = global::wallclock();
   floodingTimer_ = global::wallclock();
   pexTimer_ = Timer::zero();
@@ -251,47 +249,43 @@ void DefaultBtInteractive::decideChoking()
 {
   if (peer_->shouldBeChoking()) {
     if (!peer_->amChoking()) {
+      peer_->amChoking(true);
+      dispatcher_->doChokingAction();
       dispatcher_->addMessageToQueue(messageFactory_->createChokeMessage());
     }
   }
   else {
     if (peer_->amChoking()) {
+      peer_->amChoking(false);
       dispatcher_->addMessageToQueue(messageFactory_->createUnchokeMessage());
     }
   }
 }
 
-namespace {
-constexpr auto MAX_HAVE_DELAY_SEC = 10_s;
-} // namespace
-
 void DefaultBtInteractive::checkHave()
 {
-  const size_t MIN_HAVE_PACK_SIZE = 20;
-  pieceStorage_->getAdvertisedPieceIndexes(haveIndexes_, cuid_, haveTimer_);
-  haveTimer_ = global::wallclock();
-  if (haveIndexes_.size() >= MIN_HAVE_PACK_SIZE) {
+  std::vector<size_t> haveIndexes;
+
+  lastHaveIndex_ = pieceStorage_->getAdvertisedPieceIndexes(haveIndexes, cuid_,
+                                                            lastHaveIndex_);
+
+  // Use bitfield message if it is equal to or less than the total
+  // size of have messages.
+  if (5 + pieceStorage_->getBitfieldLength() <= haveIndexes.size() * 9) {
     if (peer_->isFastExtensionEnabled() &&
         pieceStorage_->allDownloadFinished()) {
       dispatcher_->addMessageToQueue(messageFactory_->createHaveAllMessage());
+
+      return;
     }
-    else {
-      dispatcher_->addMessageToQueue(messageFactory_->createBitfieldMessage());
-    }
-    haveIndexes_.clear();
+
+    dispatcher_->addMessageToQueue(messageFactory_->createBitfieldMessage());
+
+    return;
   }
-  else {
-    if (haveIndexes_.size() >= MIN_HAVE_PACK_SIZE ||
-        haveLastSent_.difference(global::wallclock()) >= MAX_HAVE_DELAY_SEC) {
-      haveLastSent_ = global::wallclock();
-      for (std::vector<size_t>::const_iterator itr = haveIndexes_.begin(),
-                                               eoi = haveIndexes_.end();
-           itr != eoi; ++itr) {
-        dispatcher_->addMessageToQueue(
-            messageFactory_->createHaveMessage(*itr));
-      }
-      haveIndexes_.clear();
-    }
+
+  for (auto idx : haveIndexes) {
+    dispatcher_->addMessageToQueue(messageFactory_->createHaveMessage(idx));
   }
 }
 
@@ -360,6 +354,7 @@ void DefaultBtInteractive::decideInterest()
   if (pieceStorage_->hasMissingPiece(peer_)) {
     if (!peer_->amInterested()) {
       A2_LOG_DEBUG(fmt(MSG_PEER_INTERESTED, cuid_));
+      peer_->amInterested(true);
       dispatcher_->addMessageToQueue(
           messageFactory_->createInterestedMessage());
     }
@@ -367,6 +362,7 @@ void DefaultBtInteractive::decideInterest()
   else {
     if (peer_->amInterested()) {
       A2_LOG_DEBUG(fmt(MSG_PEER_NOT_INTERESTED, cuid_));
+      peer_->amInterested(false);
       dispatcher_->addMessageToQueue(
           messageFactory_->createNotInterestedMessage());
     }
@@ -567,17 +563,17 @@ void DefaultBtInteractive::doInteractionProcessing()
   }
   else {
     checkActiveInteraction();
-    decideChoking();
-    detectMessageFlooding();
     if (perSecTimer_.difference(global::wallclock()) >= 1_s) {
       perSecTimer_ = global::wallclock();
       dispatcher_->checkRequestSlotAndDoNecessaryThing();
     }
+    numReceivedMessage_ = receiveMessages();
+    detectMessageFlooding();
+    decideChoking();
+    decideInterest();
     checkHave();
     sendKeepAlive();
-    numReceivedMessage_ = receiveMessages();
     btRequestFactory_->removeCompletedPiece();
-    decideInterest();
     if (!pieceStorage_->downloadFinished()) {
       addRequests();
     }
