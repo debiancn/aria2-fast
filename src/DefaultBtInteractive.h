@@ -124,8 +124,10 @@ private:
 
   DHTNode* localNode_;
 
+  // The last haveIndex we have advertised to the peer.
+  uint64_t lastHaveIndex_;
+
   size_t allowedFastSetSize_;
-  Timer haveTimer_;
   Timer keepAliveTimer_;
   Timer floodingTimer_;
   FloodingStat floodingStat_;
@@ -143,9 +145,6 @@ private:
   RequestGroupMan* requestGroupMan_;
 
   uint16_t tcpPort_;
-
-  std::vector<size_t> haveIndexes_;
-  Timer haveLastSent_;
 
   void addBitfieldMessageToQueue();
   void addAllowedFastMessageToQueue();

@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "June 15, 2016" "1.24.0" "aria2"
+.TH "ARIA2C" "1" "Jul 15, 2016" "1.25.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -289,8 +289,10 @@ if URI has numeric IP addresses.
 .INDENT 0.0
 .TP
 .B \-o, \-\-out=<FILE>
-The file name of the downloaded file. When the
-\fI\%\-\-force\-sequential\fP option is used, this option is ignored.
+The file name of the downloaded file.  It is always relative to the
+directory given in \fI\%\-\-dir\fP option.  When the
+\fI\%\-\-force\-sequential\fP option is used, this option is
+ignored.
 .sp
 \fBNOTE:\fP
 .INDENT 7.0
@@ -1578,8 +1580,8 @@ legacy file systems such as ext3 and FAT32 because it takes
 almost same time as \fBprealloc\fP and it blocks aria2
 entirely until allocation finishes. \fBfalloc\fP may
 not be available if your system doesn\(aqt have
-\fIposix_fallocate(3)\fP function.
-\fBtrunc\fP uses \fIftruncate(2)\fP system call or
+\fBposix_fallocate(3)\fP function.
+\fBtrunc\fP uses \fBftruncate(2)\fP system call or
 platform\-specific counterpart to truncate a file to a specified
 length.
 .sp
@@ -1643,7 +1645,7 @@ Possible Values: interface, IP address, host name
 .INDENT 3.5
 If an interface has multiple addresses, it is highly recommended to
 specify IP address explicitly. See also \fI\%\-\-disable\-ipv6\fP\&.  If your
-system doesn\(aqt have \fIgetifaddrs(3)\fP, this option doesn\(aqt accept interface
+system doesn\(aqt have \fBgetifaddrs(3)\fP, this option doesn\(aqt accept interface
 name.
 .UNINDENT
 .UNINDENT
