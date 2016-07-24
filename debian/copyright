@@ -1,7 +1,7 @@
 Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: aria2
 Upstream-Contact: Tatsuhiro Tsujikawa <tujikawa@rednoah.com>
-Source: http://aria2.sourceforge.net
+Source: https://aria2.github.io
 
 Files: *
 Copyright: (C) 2006-2013, Tatsuhiro Tsujikawa <tujikawa@rednoah.com>

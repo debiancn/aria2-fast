@@ -14,7 +14,7 @@ Build-Depends: autotools-dev,
                pkg-config,
                zlib1g-dev | libz-dev
 Standards-Version: 3.9.8
-Homepage: http://aria2.sourceforge.net/
+Homepage: https://aria2.github.io/
 Vcs-Git: https://anonscm.debian.org/cgit/collab-maint/aria2.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/aria2.git
 
