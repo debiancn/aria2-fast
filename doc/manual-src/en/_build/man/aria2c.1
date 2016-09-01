@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "Jul 15, 2016" "1.25.0" "aria2"
+.TH "ARIA2C" "1" "Aug 28, 2016" "1.26.1" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1132,7 +1132,8 @@ Default: \fB1.0\fP
 .INDENT 0.0
 .TP
 .B \-\-seed\-time=<MINUTES>
-Specify seeding time in minutes. Also see the \fI\%\-\-seed\-ratio\fP option.
+Specify seeding time in (fractional) minutes. Also see the
+\fI\%\-\-seed\-ratio\fP option.
 .sp
 \fBNOTE:\fP
 .INDENT 7.0
@@ -1410,7 +1411,8 @@ user does not have the permission to create it.
 .B \-\-auto\-file\-renaming[=true|false]
 Rename file name if the same file already exists.
 This option works only in HTTP(S)/FTP download.
-The new file name has a dot and a number(1..9999) appended.
+The new file name has a dot and a number(1..9999) appended after the
+name, but before the file extension, if any.
 Default: \fBtrue\fP
 .UNINDENT
 .INDENT 0.0
@@ -1595,6 +1597,14 @@ Using \fBtrunc\fP seemingly allocates disk space very quickly, but
 what it actually does is that it sets file length metadata in
 file system, and does not allocate disk space at all.  This means
 that it does not help avoiding fragmentation.
+.UNINDENT
+.UNINDENT
+.sp
+\fBNOTE:\fP
+.INDENT 7.0
+.INDENT 3.5
+In multi file torrent downloads, the files adjacent forward to the specified files
+are also allocated if they share the same piece.
 .UNINDENT
 .UNINDENT
 .UNINDENT
@@ -1807,14 +1817,6 @@ stdout to stderr.  Default: \fBfalse\fP
 Set interval in seconds to output download progress summary.
 Setting \fB0\fP suppresses the output.
 Default: \fB60\fP
-.sp
-\fBNOTE:\fP
-.INDENT 7.0
-.INDENT 3.5
-In multi file torrent downloads, the files adjacent forward to the specified files
-are also allocated if they share the same piece.
-.UNINDENT
-.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP

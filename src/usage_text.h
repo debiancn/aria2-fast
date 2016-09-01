@@ -175,7 +175,8 @@
     "                              exists. This option works only in http(s)/ftp\n" \
     "                              download.\n"                         \
     "                              The new file name has a dot and a number(1..9999)\n" \
-    "                              appended.")
+    "                              appended after the name, but before the file\n" \
+    "                              extension, if any.")
 #define TEXT_PARAMETERIZED_URI                                          \
   _(" -P, --parameterized-uri[=true|false] Enable parameterized URI support.\n" \
     "                              You can specify set of parts:\n"     \
@@ -313,8 +314,8 @@
     "                              To limit the overall upload speed, use\n" \
     "                              --max-overall-upload-limit option.")
 #define TEXT_SEED_TIME                                                  \
-  _(" --seed-time=MINUTES          Specify seeding time in minutes. Also see the\n" \
-    "                              --seed-ratio option.")
+  _(" --seed-time=MINUTES          Specify seeding time in (fractional) minutes.\n" \
+    "                              Also see the --seed-ratio option.")
 #define TEXT_SEED_RATIO                                                 \
   _(" --seed-ratio=RATIO           Specify share ratio. Seed completed torrents\n" \
     "                              until share ratio reaches RATIO.\n"  \
