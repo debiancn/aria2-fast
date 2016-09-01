@@ -397,6 +397,7 @@ bin_PROGRAMS = aria2c$(EXEEXT)
 @ENABLE_LIBARIA2_TRUE@	aria2api.cc aria2api.h \
 @ENABLE_LIBARIA2_TRUE@	KeepRunningCommand.cc KeepRunningCommand.h
 
+@ENABLE_LIBARIA2_FALSE@am__append_51 = $(EXTLDADD)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/aria2_arg.m4 \
@@ -450,7 +451,9 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgconfigdir)"
 LTLIBRARIES = $(lib_LTLIBRARIES) $(noinst_LTLIBRARIES)
-libaria2_la_DEPENDENCIES =
+am__DEPENDENCIES_1 = @ALLOCA@
+@ENABLE_LIBARIA2_TRUE@libaria2_la_DEPENDENCIES =  \
+@ENABLE_LIBARIA2_TRUE@	$(am__DEPENDENCIES_1)
 am__libaria2_la_SOURCES_DIST = a2algo.h a2functional.h a2io.h \
 	a2iterator.h a2netcompat.h A2STR.cc A2STR.h a2time.h \
 	AbstractAuthResolver.cc AbstractAuthResolver.h \
@@ -1128,7 +1131,8 @@ PROGRAMS = $(bin_PROGRAMS)
 am_aria2c_OBJECTS = main.$(OBJEXT)
 aria2c_OBJECTS = $(am_aria2c_OBJECTS)
 aria2c_LDADD = $(LDADD)
-aria2c_DEPENDENCIES = libaria2.la @ALLOCA@
+@ENABLE_LIBARIA2_FALSE@am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1)
+aria2c_DEPENDENCIES = libaria2.la $(am__DEPENDENCIES_2)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -1662,7 +1666,6 @@ SRCS = a2algo.h a2functional.h a2io.h a2iterator.h a2netcompat.h \
 @ENABLE_LIBARIA2_TRUE@lib_LTLIBRARIES = libaria2.la
 @ENABLE_LIBARIA2_FALSE@noinst_LTLIBRARIES = libaria2.la
 libaria2_la_SOURCES = $(SRCS)
-libaria2_la_LIBADD = @WSLAY_LIBS@ @LTLIBINTL@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/lib -I$(top_srcdir)/intl\
 	-I$(srcdir)/includes -I$(builddir)/includes\
@@ -1688,7 +1691,7 @@ AM_LDFLAGS = \
 	@EXTRALDFLAGS@ \
 	@APPLETLS_LDFLAGS@
 
-LDADD = libaria2.la @ALLOCA@ \
+EXTLDADD = @ALLOCA@ \
 	@EXTRALIBS@ \
 	@ZLIB_LIBS@ \
 	@LIBUV_LIBS@ \
@@ -1707,6 +1710,8 @@ LDADD = libaria2.la @ALLOCA@ \
 	@TCMALLOC_LIBS@ \
 	@JEMALLOC_LIBS@
 
+LDADD = libaria2.la $(am__append_51)
+@ENABLE_LIBARIA2_TRUE@libaria2_la_LIBADD = $(EXTLDADD)
 AM_CFLAGS = @EXTRACFLAGS@
 AM_CXXFLAGS = @WARNCXXFLAGS@ @CXX1XCXXFLAGS@ @EXTRACXXFLAGS@
 all: all-recursive

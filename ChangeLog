@@ -1,242 +1,27 @@
-commit f6ac3fa6913b10509ed50427a7c3e6191c551069 (HEAD, tag: release-1.25.0, origin/master, origin/HEAD, master)
+commit 9b26aa46e0f904a53e4428a136850255fb107cc2 (HEAD, tag: release-1.26.1, origin/release-1.26.x, origin/HEAD, release-1.26.x)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-15
+AuthorDate: 2016-08-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-15
+CommitDate: 2016-08-28
 
     Update NEWS
 
-commit 020859f8de8eef60f2488e3f1b3f09cf7d958764
+commit 753d00da99c0e760af419147be7b2e509021d2f3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-15
+AuthorDate: 2016-08-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-15
+CommitDate: 2016-08-28
 
-    Update third-party libraries for binary releases
+    Bump up version number to 1.26.1
 
-commit 7251167e585a465c61f4b05b19981f76255fa61d
+commit 1640139a0da84bca73f1bb9e7c63afe8a0155d12
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-15
+AuthorDate: 2016-08-20
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-15
+CommitDate: 2016-08-28
 
-    Bump up version to 1.25.0
-
-commit 777b81869086c8c01b18fd06f252c16274aebd91
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-14
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-14
-
-    Add offset value to Timer::clock::now() to treat 0 as special value
-
-commit 01f870221b2044ed14be828e02b00d4f6452d70d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-11
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-11
-
-    Fix have entry removal
-
-commit babdcb2c7d249b19ad38a07158e829f52a08e75a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-10
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-10
-
-    Change have entry indexing method
+    Make assertion hold
     
-    Now use increasing sequence of integer rather than timer value.
-
-commit f2aa7564b09f6c80d9975533401396f11a0e8439
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-10
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-10
-
-    Remove unnecessary condition
-
-commit 4d27668d7c16a096c796e647d13c5f44ea11045f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-10
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-10
-
-    Decide interest and choking after receiving messages
-
-commit c4cf8fa61d12eafe686ad05be4b4fe050bfb9285
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-09
-
-    Send have message without too much delay
-    
-    Also send bitfield rather than have messages if bitfield message is
-    equal to or less than the sum of have messages which otherwise would
-    be sent.
-
-commit ae11b7a85d43b42520a2846e9c9eabd443e38ee2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-09
-
-    Fix bug that causes bogus EOF connection failure in BitTorrent downloads
-
-commit 41df1607f6d879d3ad49e874f8cb902c82892212
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-09
-
-    Fix frequent interested/not interested message transmission
-
-commit 570d46725fda98e546acab1d338cd72336836188
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-09
-
-    Fix frequent choke/unchoke message transmission
-
-commit 360ca57231276648c8a26556ee06f7484176323c
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-07
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-07
-
-    Try to use available URI if all pooled requests are sleeping
-
-commit b7e19eede72760bc08047d877389639c0a26061a
-Author:     Nils Maier <maierman@web.de>
-AuthorDate: 2016-07-05
-Commit:     Nils Maier <maierman@web.de>
-CommitDate: 2016-07-05
-
-    Update expat in OSX build
-    
-    Closes GH-694
-
-commit a9fe783484e9196d05b9ea99f441f129365c7034
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-05
-
-    aria2mon: Add --secret option
-
-commit a1ce6d2e7f8824b1c1cd18d4e531d84ba58a07df
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-05
-
-    Set server status error on network failure
-
-commit 295affe16029b7bc2d86e7a60385294487d6a156
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-04
-
-    Disable AI_ADDRCONFIG if no IPv4/IPv6 address is configured for any interface
-
-commit 4df7b540a2263b87577a8805b3ca08e5e3e4da65
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-03
-
-    Fix warning "Cannot fid peer ... in usedPeers_"
-
-commit f7cbbfd209d8df2dec21da907e48bb09c5429484
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-07-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-07-02
-
-    Retain peers obtained earlier
-
-commit 9cee162716d0be894e1b87fad78e9737e30356ed
-Merge: bc77e48 ae2bda8
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-27
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-06-27
-
-    Merge pull request #693 from ITriskTI/patch-1
-    
-    Update aria2c.rst
-
-commit ae2bda8222094648b488accbd7f56de29aa6df31
-Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2016-06-27
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-06-27
-
-    Update aria2c.rst
-
-commit bc77e4821786a7b8080bec5bf7c6f7a96392a461
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-22
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-22
-
-    Use 1 in 2nd parameter of fwrite for consistency
-
-commit d38da969a5f2274d022a2c934416922d2014340b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-21
-
-    Apply --retry-wait on 503 only
-
-commit e8fcedf092ecacab7e79b9bdea3f243da6b3b85d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-21
-
-    Take into account timeout
-
-commit 10b64e281a0e72d8769b69a7f1953562609451b2
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-21
-
-    Ensure that lowest speed check is done even when download speed is 0
-
-commit 2365c919941d8d5b7e316a4fe8f6d8f27ea9e8bf
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-21
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-21
-
-    Document that -o is always relative to -d option
-
-commit 1e59e357af626edc870b7f53c1ae8083658d0d1a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-19
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-19
-
-    Fix compile error on OS X
-
-commit f6f672f4d9d6b176807f00b2e0ac4916b620dacd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-17
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-17
-
-    Allow larger ut_metadata size
-
-commit a86a823f507b0c7866fe7e46eaf1b75dd9f25ec6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-06-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-06-16
-
-    mingw: Change FD_SETSIZE to 32768
+    If we have peer which is already used, make addAndCheckoutPeer() fail.
+    If peer is in unused list, first remove the old entry, and then add
+    new one.  This would make assertion in ~DefaultPeerStorage hold.

@@ -17,6 +17,8 @@ autoreconf -i
     make dist-bzip2 && make dist-gzip && make dist-xz || echo "error"
 make distclean
 
+exit 0
+
 # mingw 32bit
 export HOST=i686-w64-mingw32
 export LABEL=win-32bit
