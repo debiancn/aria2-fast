@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "Aug 28, 2016" "1.26.1" "aria2"
+.TH "ARIA2C" "1" "Sep 17, 2016" "1.27.1" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1619,6 +1619,14 @@ Default: \fBfalse\fP
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-save\-not\-found[=true|false]
+Save download with \fI\%\-\-save\-session\fP option
+even if the file was not found on the server. This option also saves
+control file in that situations.
+Default: \fBtrue\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-gid=<GID>
 Set GID manually. aria2 identifies each download by the ID called
 GID. The GID must be hex string of 16 characters, thus [0\-9a\-zA\-Z]
@@ -1936,7 +1944,7 @@ given, file will be saved only when aria2 exits. Default: \fB0\fP
 .INDENT 0.0
 .TP
 .B \-\-socket\-recv\-buffer\-size=<SIZE>
-Set the maximum socket receive buffer in bytes.  Specifing \fB0\fP
+Set the maximum socket receive buffer in bytes.  Specifying \fB0\fP
 will disable this option. This value will be set to socket file
 descriptor using \fBSO_RCVBUF\fP socket option with \fBsetsockopt()\fP
 call.  Default: \fB0\fP

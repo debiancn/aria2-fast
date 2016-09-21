@@ -150,7 +150,7 @@ void executeCommand(std::deque<std::unique_ptr<Command>>& commands,
 namespace {
 class GlobalHaltRequestedFinalizer {
 public:
-  GlobalHaltRequestedFinalizer() {}
+  GlobalHaltRequestedFinalizer() = default;
   ~GlobalHaltRequestedFinalizer() { global::globalHaltRequested = 5; }
 };
 } // namespace
@@ -316,7 +316,7 @@ void DownloadEngine::evictSocketPool()
   }
 
   std::multimap<std::string, SocketPoolEntry> newPool;
-  A2_LOG_DEBUG("Scaning SocketPool and erasing timed out entry.");
+  A2_LOG_DEBUG("Scanning SocketPool and erasing timed out entry.");
   for (auto& elem : socketPool_) {
     if (!elem.second.isTimeout()) {
       newPool.insert(elem);
@@ -519,7 +519,7 @@ DownloadEngine::SocketPoolEntry::SocketPoolEntry(
 {
 }
 
-DownloadEngine::SocketPoolEntry::~SocketPoolEntry() {}
+DownloadEngine::SocketPoolEntry::~SocketPoolEntry() = default;
 
 bool DownloadEngine::SocketPoolEntry::isTimeout() const
 {

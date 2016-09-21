@@ -46,12 +46,9 @@ Option::Option()
 {
 }
 
-Option::~Option() {}
+Option::~Option() = default;
 
-Option::Option(const Option& option)
-    : table_(option.table_), use_(option.use_), parent_(option.parent_)
-{
-}
+Option::Option(const Option& option) = default;
 
 Option& Option::operator=(const Option& option)
 {

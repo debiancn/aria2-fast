@@ -42,6 +42,7 @@
 #include "LibsslTLSContext.h"
 #include "TLSSession.h"
 #include "a2netcompat.h"
+#include "libssl_compat.h"
 
 namespace aria2 {
 

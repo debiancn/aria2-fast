@@ -10,16 +10,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2016-08-28 15:09+0900\n"
-"PO-Revision-Date: 2016-07-13 09:13+0000\n"
+"POT-Creation-Date: 2016-09-17 09:16+0900\n"
+"PO-Revision-Date: 2016-09-13 15:15+0000\n"
 "Last-Translator: ITriskTI <Unknown>\n"
 "Language-Team: <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2016-08-28 03:01+0000\n"
-"X-Generator: Launchpad (build 18179)\n"
+"X-Launchpad-Export-Date: 2016-09-16 12:24+0000\n"
+"X-Generator: Launchpad (build 18186)\n"
 
 #: src/DownloadEngine.cc:247
 msgid ""
@@ -499,7 +499,6 @@ msgstr ""
 "                              загрузки командной строки."
 
 #: src/usage_text.h:174
-#, fuzzy
 msgid ""
 " --auto-file-renaming[=true|false] Rename file name if the same file "
 "already\n"
@@ -510,11 +509,12 @@ msgid ""
 "                              appended after the name, but before the file\n"
 "                              extension, if any."
 msgstr ""
-" --auto-file-renaming[=true|false] Переименовывает файл, если такой уже\n"
-"                              существует. Этот параметр работает только для\n"
-"                              загрузок по http(s)/ftp.\n"
-"                              К имени файла будет добавлена точка и число\n"
-"                              от 1 до 9999."
+" --auto-file-renaming[=true|false] Переименовать файл, если такой уже\n"
+"                              существует. Этот параметр работает только\n"
+"                              для HTTP(S)/FTP-загрузок.\n"
+"                              К имени файла, но перед расширением\n"
+"                              (если оно есть), будет добавлена точка и\n"
+"                              число от 1 до 9999."
 
 #: src/usage_text.h:181
 msgid ""
@@ -920,13 +920,12 @@ msgstr ""
 "                              параметр --max-overall-upload-limit."
 
 #: src/usage_text.h:317
-#, fuzzy
 msgid ""
 " --seed-time=MINUTES          Specify seeding time in (fractional) minutes.\n"
 "                              Also see the --seed-ratio option."
 msgstr ""
-" --seed-time=MINUTES          Указать время сидирования (раздачи) в "
-"минутах.\n"
+" --seed-time=MINUTES          Указать время сидирования [раздачи] в\n"
+"                              (дробных) минутах.\n"
 "                              Смотрите также параметр --seed-ratio."
 
 #: src/usage_text.h:320
@@ -1747,17 +1746,16 @@ msgid ""
 " --on-download-start=COMMAND  Set the command to be executed after download\n"
 "                              got started. aria2 passes 3 arguments to "
 "COMMAND:\n"
-"                              GID, the nubmer of files and file path. See "
+"                              GID, the number of files and file path. See "
 "Event\n"
 "                              Hook in man page for more details."
 msgstr ""
 " --on-download-start=COMMAND  Задать команду, которая будет выполнена\n"
-"                              после того, как началась загрузка.\n"
-"                              aria2 принимает 3 аргумента к COMMAND:\n"
-"                              GID, число файлов и путь к файлу. Смотрите "
-"раздел\n"
-"                              Перехват сообщения в man, для более подробной\n"
-"                              информации."
+"                              после того, как началась загрузка. aria2\n"
+"                              принимает 3 аргумента к COMMAND:\n"
+"                              GID, число файлов и путь к файлу. Смотрите\n"
+"                              раздел Перехват сообщения в man, для более\n"
+"                              подробной информации."
 
 #: src/usage_text.h:591
 msgid ""
@@ -2904,6 +2902,20 @@ msgstr ""
 
 #: src/usage_text.h:975
 msgid ""
+" --save-not-found[=true|false] Save download with --save-session option "
+"even\n"
+"                              if the file was not found on the server. This\n"
+"                              option also saves control file in that\n"
+"                              situations."
+msgstr ""
+" --save-not-found[=true|false] Сохранить загрузку с параметром --save-"
+"session,\n"
+"                              даже если файл не был найден на сервере.\n"
+"                              В этой ситуации параметр также сохраняет\n"
+"                              контрольный файл."
+
+#: src/usage_text.h:980
+msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
 "                              is disabled. This feature caches the "
@@ -2938,7 +2950,7 @@ msgstr ""
 "                              включать букву ``K`` или ``M`` (1K = 1024, 1M "
 "= 1024K)."
 
-#: src/usage_text.h:988
+#: src/usage_text.h:993
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -2971,12 +2983,12 @@ msgstr ""
 "                              параметр не использован, то новый GID будет\n"
 "                              сгенерирован aria2."
 
-#: src/usage_text.h:1000
+#: src/usage_text.h:1005
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr ""
 " --console-log-level=LEVEL    Задать уровень вывода событий на консоль."
 
-#: src/usage_text.h:1002
+#: src/usage_text.h:1007
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
@@ -2991,15 +3003,15 @@ msgstr ""
 "                              только тогда, когда aria2 завершит\n"
 "                              работу."
 
-#: src/usage_text.h:1007
+#: src/usage_text.h:1012
 msgid " --enable-color[=true|false]  Enable color output for a terminal."
 msgstr " --enable-color[=true|false]  Включить цветной вывод для терминала."
 
-#: src/usage_text.h:1009
+#: src/usage_text.h:1014
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
 msgstr " --rpc-secret=TOKEN           Задать секретный маркер RPC-авторизации."
 
-#: src/usage_text.h:1011
+#: src/usage_text.h:1016
 msgid ""
 " --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
 "                              BitTorrent traffic for QoS. This parameter "
@@ -3029,7 +3041,7 @@ msgstr ""
 "                              Википедии или других источников, то\n"
 "                              используйте их как есть."
 
-#: src/usage_text.h:1022
+#: src/usage_text.h:1027
 msgid ""
 " --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
@@ -3055,7 +3067,7 @@ msgstr ""
 "                              ulimit, за исключением того, оно никогда\n"
 "                              не будет уменьшать ограничение."
 
-#: src/usage_text.h:1031
+#: src/usage_text.h:1036
 msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
@@ -3087,7 +3099,7 @@ msgstr ""
 "                              Этот параметр действует только когда задано\n"
 "                              --enable-rpc=true."
 
-#: src/usage_text.h:1042
+#: src/usage_text.h:1047
 msgid ""
 " --bt-detach-seed-only[=true|false]\n"
 "                              Exclude seed only downloads when counting\n"
@@ -3119,14 +3131,14 @@ msgstr ""
 "                              сидирующий элемент всё ещё признаётся\n"
 "                              как активная загрузка."
 
-#: src/usage_text.h:1053
+#: src/usage_text.h:1058
 msgid ""
 " --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
 msgstr ""
 " --min-tls-version=VERSION    Указать для использования минимальную\n"
 "                              версию SSL/TLS."
 
-#: src/usage_text.h:1055
+#: src/usage_text.h:1060
 msgid ""
 " --bt-force-encryption[=true|false]\n"
 "                              Requires BitTorrent message payload "
@@ -3151,7 +3163,7 @@ msgstr ""
 "                              обфускация рукопожатия (handshake) и\n"
 "                              всегда шифруется полезная нагрузка."
 
-#: src/usage_text.h:1063
+#: src/usage_text.h:1068
 msgid ""
 " --ssh-host-key-md=TYPE=DIGEST\n"
 "                              Set checksum for SSH host public key. TYPE is\n"
@@ -3179,25 +3191,25 @@ msgstr ""
 "                              (по умолчанию), то никакой проверки не\n"
 "                              происходит."
 
-#: src/usage_text.h:1073
+#: src/usage_text.h:1078
 msgid ""
 " --socket-recv-buffer-size=SIZE\n"
 "                              Set the maximum socket receive buffer in "
 "bytes.\n"
-"                              Specifing 0 will disable this option. This "
+"                              Specifying 0 will disable this option. This "
 "value\n"
 "                              will be set to socket file descriptor using\n"
 "                              SO_RCVBUF socket option with setsockopt() call."
 msgstr ""
 " --socket-recv-buffer-size=SIZE\n"
-"                              Задать максимальный приёмный буфер\n"
-"                              сокета в байтах. Указание 0 отключит\n"
-"                              этот параметр. Это значение будет\n"
-"                              установлено для дескриптора файла сокета\n"
-"                              с помощью SO_RCVBUF, параметра сокета\n"
-"                              в вызове setsockopt()."
+"                              Задать максимальный приёмный буфер сокета\n"
+"                              в байтах. Указание 0 отключит этот параметр.\n"
+"                              Это значение будет установлено для\n"
+"                              дескриптора файла сокета с помощью\n"
+"                              SO_RCVBUF, параметра сокета в вызове\n"
+"                              setsockopt()."
 
-#: src/usage_text.h:1079
+#: src/usage_text.h:1084
 msgid ""
 " --bt-enable-hook-after-hash-check[=true|false] Allow hook command "
 "invocation\n"
@@ -3221,7 +3233,7 @@ msgstr ""
 "                              Укажите для этого параметра false, чтобы\n"
 "                              отключить это действие."
 
-#: src/usage_text.h:1086
+#: src/usage_text.h:1091
 msgid ""
 " --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n"
 "                              --enable-mmap option). The file size is\n"
@@ -3249,7 +3261,7 @@ msgstr ""
 "                              указанный в этом параметре, то mmap будет "
 "отключён."
 
-#: src/usage_text.h:1095
+#: src/usage_text.h:1100
 msgid ""
 " --stderr[=true|false]        Redirect all console output that would be\n"
 "                              otherwise printed in stdout to stderr."

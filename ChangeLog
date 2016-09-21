@@ -1,27 +1,23 @@
-commit 9b26aa46e0f904a53e4428a136850255fb107cc2 (HEAD, tag: release-1.26.1, origin/release-1.26.x, origin/HEAD, release-1.26.x)
+commit 561d49d6e530eb4ea4499f5bd7ce80416ff79738 (HEAD, tag: release-1.27.1, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-08-28
+AuthorDate: 2016-09-17
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-08-28
+CommitDate: 2016-09-17
+
+    Bump up version number to 1.27.1
+
+commit 812136dd8b568bfe797744bcfcd496aaa2e1b714
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-09-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-09-17
 
     Update NEWS
 
-commit 753d00da99c0e760af419147be7b2e509021d2f3
+commit cfaec39be1ae9ac2c9b6a02470791b46ef15d934
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-08-28
+AuthorDate: 2016-09-17
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-08-28
+CommitDate: 2016-09-17
 
-    Bump up version number to 1.26.1
-
-commit 1640139a0da84bca73f1bb9e7c63afe8a0155d12
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-08-20
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-08-28
-
-    Make assertion hold
-    
-    If we have peer which is already used, make addAndCheckoutPeer() fail.
-    If peer is in unused list, first remove the old entry, and then add
-    new one.  This would make assertion in ~DefaultPeerStorage hold.
+    Add missing libssl_compat.h to SRCS
