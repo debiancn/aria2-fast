@@ -2,7 +2,7 @@
 /*
  * aria2 - The high speed download utility
  *
- * Copyright (C) 2006 Tatsuhiro Tsujikawa
+ * Copyright (C) 2016 Tatsuhiro Tsujikawa
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,53 +32,12 @@
  * files in the program, then also delete it here.
  */
 /* copyright --> */
-#include "DHTBucketRefreshCommand.h"
-#include "DHTRoutingTable.h"
-#include "DHTTaskQueue.h"
-#include "DHTTaskFactory.h"
-#include "DHTTask.h"
-#include "DownloadEngine.h"
-#include "RequestGroupMan.h"
+#ifndef LIBSSL_COMPAT_H
+#define LIBSSL_COMPAT_H
 
-namespace aria2 {
+#include <openssl/opensslv.h>
 
-DHTBucketRefreshCommand::DHTBucketRefreshCommand(cuid_t cuid, DownloadEngine* e,
-                                                 std::chrono::seconds interval)
-    : TimeBasedCommand{cuid, e, std::move(interval)},
-      routingTable_{nullptr},
-      taskQueue_{nullptr},
-      taskFactory_{nullptr}
-{
-}
+#define OPENSSL_101_API                                                        \
+  (!defined(LIBRESSL_VERSION_NUMBER) && OPENSSL_VERSION_NUMBER >= 0x1010000fL)
 
-DHTBucketRefreshCommand::~DHTBucketRefreshCommand() = default;
-
-void DHTBucketRefreshCommand::preProcess()
-{
-  if (getDownloadEngine()->getRequestGroupMan()->downloadFinished() ||
-      getDownloadEngine()->isHaltRequested()) {
-    enableExit();
-  }
-}
-
-void DHTBucketRefreshCommand::process()
-{
-  taskQueue_->addPeriodicTask1(taskFactory_->createBucketRefreshTask());
-}
-
-void DHTBucketRefreshCommand::setRoutingTable(DHTRoutingTable* routingTable)
-{
-  routingTable_ = routingTable;
-}
-
-void DHTBucketRefreshCommand::setTaskQueue(DHTTaskQueue* taskQueue)
-{
-  taskQueue_ = taskQueue;
-}
-
-void DHTBucketRefreshCommand::setTaskFactory(DHTTaskFactory* taskFactory)
-{
-  taskFactory_ = taskFactory;
-}
-
-} // namespace aria2
+#endif // LIBSSL_COMPAT_H

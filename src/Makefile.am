@@ -270,25 +270,12 @@ SRCS =  \
 	XmlRpcRequestParserController.cc XmlRpcRequestParserController.h\
 	OpenedFileCounter.cc OpenedFileCounter.h \
 	SHA1IOFile.cc SHA1IOFile.h \
-	EvictSocketPoolCommand.cc EvictSocketPoolCommand.h
+	EvictSocketPoolCommand.cc EvictSocketPoolCommand.h\
+	libssl_compat.h
 
 if ANDROID
 SRCS += android/android.c
 endif # ANDROID
-
-# Android NDK R8e does not provide ftruncate64. Use assembly code from
-# android source code and link it.
-if ANDROID_ARM
-SRCS += android/arm-ftruncate64.S
-endif # ANDROID_ARM
-
-if ANDROID_MIPS
-SRCS += android/mips-ftruncate64.S
-endif # ANDROID_MIPS
-
-if ANDROID_X86
-SRCS += android/x86-ftruncate64.S android/x86-asm.h
-endif # ANDROID_X86
 
 if MINGW_BUILD
 SRCS += WinConsoleFile.cc WinConsoleFile.h

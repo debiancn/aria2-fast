@@ -75,7 +75,7 @@ HTTPAnnRequest::HTTPAnnRequest(std::unique_ptr<RequestGroup> rg)
 {
 }
 
-HTTPAnnRequest::~HTTPAnnRequest() {}
+HTTPAnnRequest::~HTTPAnnRequest() = default;
 
 bool HTTPAnnRequest::stopped() const { return rg_->getNumCommand() == 0; }
 
@@ -139,7 +139,7 @@ UDPAnnRequest::UDPAnnRequest(const std::shared_ptr<UDPTrackerRequest>& req)
 {
 }
 
-UDPAnnRequest::~UDPAnnRequest() {}
+UDPAnnRequest::~UDPAnnRequest() = default;
 
 bool UDPAnnRequest::stopped() const
 {
@@ -155,6 +155,7 @@ bool UDPAnnRequest::success() const
 void UDPAnnRequest::stop(DownloadEngine* e)
 {
   if (req_) {
+    req_->user_data = nullptr;
     req_.reset();
   }
 }

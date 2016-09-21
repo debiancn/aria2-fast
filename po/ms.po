@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2016-08-28 15:09+0900\n"
+"POT-Creation-Date: 2016-09-17 09:16+0900\n"
 "PO-Revision-Date: 2010-02-15 08:25+0000\n"
 "Last-Translator: hashim <anderson112001@yahoo.com>\n"
 "Language-Team: Malay <ms@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2016-08-28 03:00+0000\n"
-"X-Generator: Launchpad (build 18179)\n"
+"X-Launchpad-Export-Date: 2016-09-16 12:24+0000\n"
+"X-Generator: Launchpad (build 18186)\n"
 
 #: src/DownloadEngine.cc:247
 msgid ""
@@ -1114,7 +1114,7 @@ msgid ""
 " --on-download-start=COMMAND  Set the command to be executed after download\n"
 "                              got started. aria2 passes 3 arguments to "
 "COMMAND:\n"
-"                              GID, the nubmer of files and file path. See "
+"                              GID, the number of files and file path. See "
 "Event\n"
 "                              Hook in man page for more details."
 msgstr ""
@@ -1815,6 +1815,15 @@ msgstr ""
 
 #: src/usage_text.h:975
 msgid ""
+" --save-not-found[=true|false] Save download with --save-session option "
+"even\n"
+"                              if the file was not found on the server. This\n"
+"                              option also saves control file in that\n"
+"                              situations."
+msgstr ""
+
+#: src/usage_text.h:980
+msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
 "                              is disabled. This feature caches the "
@@ -1834,7 +1843,7 @@ msgid ""
 "                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
 msgstr ""
 
-#: src/usage_text.h:988
+#: src/usage_text.h:993
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -1853,11 +1862,11 @@ msgid ""
 "                              by aria2."
 msgstr ""
 
-#: src/usage_text.h:1000
+#: src/usage_text.h:1005
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr ""
 
-#: src/usage_text.h:1002
+#: src/usage_text.h:1007
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
@@ -1866,15 +1875,15 @@ msgid ""
 "                              when aria2 exits."
 msgstr ""
 
-#: src/usage_text.h:1007
+#: src/usage_text.h:1012
 msgid " --enable-color[=true|false]  Enable color output for a terminal."
 msgstr ""
 
-#: src/usage_text.h:1009
+#: src/usage_text.h:1014
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
 msgstr ""
 
-#: src/usage_text.h:1011
+#: src/usage_text.h:1016
 msgid ""
 " --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
 "                              BitTorrent traffic for QoS. This parameter "
@@ -1892,7 +1901,7 @@ msgid ""
 "                              use them as they are."
 msgstr ""
 
-#: src/usage_text.h:1022
+#: src/usage_text.h:1027
 msgid ""
 " --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
@@ -1906,7 +1915,7 @@ msgid ""
 "                              except that it will never decrease the limit."
 msgstr ""
 
-#: src/usage_text.h:1031
+#: src/usage_text.h:1036
 msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
@@ -1924,7 +1933,7 @@ msgid ""
 "                              only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/usage_text.h:1042
+#: src/usage_text.h:1047
 msgid ""
 " --bt-detach-seed-only[=true|false]\n"
 "                              Exclude seed only downloads when counting\n"
@@ -1943,12 +1952,12 @@ msgid ""
 "                              recognized as active download in RPC method."
 msgstr ""
 
-#: src/usage_text.h:1053
+#: src/usage_text.h:1058
 msgid ""
 " --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
 msgstr ""
 
-#: src/usage_text.h:1055
+#: src/usage_text.h:1060
 msgid ""
 " --bt-force-encryption[=true|false]\n"
 "                              Requires BitTorrent message payload "
@@ -1962,7 +1971,7 @@ msgid ""
 "                              always encrypt message payload."
 msgstr ""
 
-#: src/usage_text.h:1063
+#: src/usage_text.h:1068
 msgid ""
 " --ssh-host-key-md=TYPE=DIGEST\n"
 "                              Set checksum for SSH host public key. TYPE is\n"
@@ -1978,18 +1987,18 @@ msgid ""
 "                              place."
 msgstr ""
 
-#: src/usage_text.h:1073
+#: src/usage_text.h:1078
 msgid ""
 " --socket-recv-buffer-size=SIZE\n"
 "                              Set the maximum socket receive buffer in "
 "bytes.\n"
-"                              Specifing 0 will disable this option. This "
+"                              Specifying 0 will disable this option. This "
 "value\n"
 "                              will be set to socket file descriptor using\n"
 "                              SO_RCVBUF socket option with setsockopt() call."
 msgstr ""
 
-#: src/usage_text.h:1079
+#: src/usage_text.h:1084
 msgid ""
 " --bt-enable-hook-after-hash-check[=true|false] Allow hook command "
 "invocation\n"
@@ -2004,7 +2013,7 @@ msgid ""
 "                              to this option."
 msgstr ""
 
-#: src/usage_text.h:1086
+#: src/usage_text.h:1091
 msgid ""
 " --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n"
 "                              --enable-mmap option). The file size is\n"
@@ -2018,7 +2027,7 @@ msgid ""
 "                              mmap will be disabled."
 msgstr ""
 
-#: src/usage_text.h:1095
+#: src/usage_text.h:1100
 msgid ""
 " --stderr[=true|false]        Redirect all console output that would be\n"
 "                              otherwise printed in stdout to stderr."
