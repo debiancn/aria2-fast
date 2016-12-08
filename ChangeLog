@@ -1,23 +1,80 @@
-commit 561d49d6e530eb4ea4499f5bd7ce80416ff79738 (HEAD, tag: release-1.27.1, origin/master, origin/HEAD, master)
+commit e12693c02787c9ec26175909a080f420be4ca85b (HEAD, tag: release-1.29.0, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-09-17
+AuthorDate: 2016-11-15
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-09-17
-
-    Bump up version number to 1.27.1
-
-commit 812136dd8b568bfe797744bcfcd496aaa2e1b714
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-09-17
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-09-17
+CommitDate: 2016-11-15
 
     Update NEWS
 
-commit cfaec39be1ae9ac2c9b6a02470791b46ef15d934
+commit 10e7830050abf8b104a30ff3c6c323bf02a0c0f2
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-09-17
+AuthorDate: 2016-11-15
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-09-17
+CommitDate: 2016-11-15
 
-    Add missing libssl_compat.h to SRCS
+    Update third-party libraries
+
+commit dd5a3b672c45b07bfb864acb2314f1dcc70b2421
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-11-15
+
+    Bump up version number to 1.29.0
+
+commit d289dc1108324ff5589ab103ef0863faaa3c5de1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-11-09
+
+    WinTLS: Fix busy loop on write error
+
+commit b4010a52c8249fe46771004013e3d6a700c0d4f0
+Merge: a9a60ce 2df30b1
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-03
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2016-11-03
+
+    Merge pull request #766 from aria2/support-1xx
+    
+    Support 1xx non-final response
+
+commit 2df30b144748dda434aa0002d636220e1f3aa87b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-03
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-11-03
+
+    Support 1xx non-final response
+
+commit a9a60cef1bac42512940d77fd031c3b301629498
+Merge: 90452ae fb380d4
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-02
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2016-11-02
+
+    Merge pull request #765 from aria2/update-wslay
+    
+    Update wslay
+
+commit fb380d40166a2c8cc2c04cf060104bc983e2984b
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-11-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-11-02
+
+    Update wslay
+
+commit 90452ae11b51cb7c7e411a939f81f2d455bac59a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2016-10-26
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2016-10-26
+
+    Don't download piece which is filtered out (e.g., --select-file)
+    
+    This commit fixes the bug that piece which is not requested by
+    --select-file is downloaded in multi-file WebSeeding.

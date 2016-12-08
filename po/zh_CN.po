@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2016-09-17 09:16+0900\n"
-"PO-Revision-Date: 2016-06-28 17:30+0000\n"
-"Last-Translator: 张海 <Unknown>\n"
+"POT-Creation-Date: 2016-11-15 23:10+0900\n"
+"PO-Revision-Date: 2016-10-13 10:13+0000\n"
+"Last-Translator: 落雨離愁 <Unknown>\n"
 "Language-Team: Simplified Chinese <zh_CN@li.org>\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2016-09-16 12:24+0000\n"
-"X-Generator: Launchpad (build 18186)\n"
+"X-Launchpad-Export-Date: 2016-11-15 12:24+0000\n"
+"X-Generator: Launchpad (build 18261)\n"
 "X-Poedit-Bookmarks: 82,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
 #: src/DownloadEngine.cc:247
@@ -110,6 +110,9 @@ msgid ""
 "option\n"
 "                              will be ignored."
 msgstr ""
+" -o, --out=FILE   文件保存名字。此文件将以此名字永久保存在 -d \n"
+"                              参数所指定的相对路径下。当 -Z 参数被启用时， \n"
+"                              此选项报废。"
 
 #: src/usage_text.h:46
 msgid ""
@@ -447,6 +450,10 @@ msgid ""
 "                              appended after the name, but before the file\n"
 "                              extension, if any."
 msgstr ""
+" --auto-file-renaming[=true|false] 如果存在同名文件将自动重命名。\n"
+"                              此选项将仅在 http(s)/ftp 下载时运行。新文\n"
+"                              件将在文件名之后，后缀名（如果有）之前'插'\n"
+"                              入“.X”字段（X=1-9999）。"
 
 #: src/usage_text.h:181
 msgid ""
@@ -1397,6 +1404,12 @@ msgid ""
 "IP\n"
 "                              addresses."
 msgstr ""
+" --bt-external-ip=IPADDRESS 指定在使用BT下载和DHT时的外部IP地址。\n"
+"                              它可能被用于BT跟踪。对于DHT来说，此选\n"
+"                              项应该被设置以报告本地节点正在下载一个特\n"
+"                              定种子。这对于在私有网络使用DHT来说十分\n"
+"                              重要。尽管名为‘外部'，但它依然可以填写任何\n"
+"                              类型的IP地址。"
 
 #: src/usage_text.h:552
 msgid ""
@@ -1431,6 +1444,10 @@ msgid ""
 "multiple\n"
 "                              times."
 msgstr ""
+" -O, --index-out=INDEX=PATH 使用 index=INDEX的形式设置文件路径。\n"
+"                              你可以使用 --show-files 选项找到文件索引。\n"
+"                              PATH 是相对于 --dir 选项所指定路径的相对\n"
+"                              路径。你可以多次使用此选项，反正不收钱。"
 
 #: src/usage_text.h:566
 msgid ""
@@ -1462,6 +1479,10 @@ msgid ""
 "download\n"
 "                              progress."
 msgstr ""
+" --bt-tracker-interval=SEC 设置跟踪请求间隔时间（秒）。\n"
+"                              将完全覆盖间隔值，aria2将使用此值而忽略最小\n"
+"                              间隔值和跟踪响应的间隔值。如果设置为0，aria2\n"
+"                              将使间隔值基于跟踪响应的间隔和下载进度。"
 
 #: src/usage_text.h:580
 msgid ""
@@ -1485,6 +1506,10 @@ msgid ""
 "Event\n"
 "                              Hook in man page for more details."
 msgstr ""
+" --on-download-start=COMMAND  设置开始下载后执行的命令。\n"
+"                              aria2传递3个参数给COMMAND:GID, 文件号和文件路"
+"径。\n"
+"                              在操作说明-事件钩子中可查看更多详细资料。"
 
 #: src/usage_text.h:591
 msgid ""
@@ -1562,6 +1587,17 @@ msgid ""
 "1M =\n"
 "                              1024K). If SIZE is omitted, SIZE=1M is used."
 msgstr ""
+" --bt-prioritize-piece=head[=SIZE],tail[=SIZE] 尝试下载每个文件的起始和结尾片"
+"段。\n"
+"                              用于预览文件。此参数包含两个关键词: head 和"
+"tail，需要用逗\n"
+"                              号隔开。这些关键词可以带一个参数:SIZE。举个栗"
+"子，如果指定\n"
+"                              head=SIZE，则在每个文件头体积为SIZE的片段获得更"
+"高的优先\n"
+"                              级，tail=SIZE则为尾部SIZE大小的片段。SIZE可以为"
+"K或M（具体\n"
+"                              换算请谷歌或度娘）。若未填写，默认SIZE=1M。"
 
 #: src/usage_text.h:627
 msgid ""
@@ -1633,6 +1669,10 @@ msgid ""
 "                              has effect only when BitTorrent Magnet URI is\n"
 "                              used. See also --bt-save-metadata option."
 msgstr ""
+" --bt-metadata-only[=true|false] 只下载元数据，元数据中描述的文件将不会被下"
+"载。\n"
+"                              此选项仅当使用磁力链接时有效。参见 --bt-save-"
+"metadata 选项。"
 
 #: src/usage_text.h:658
 msgid ""
@@ -1657,6 +1697,9 @@ msgid ""
 "interface\n"
 "                              name and IP address."
 msgstr ""
+" --bt-lpd-interface=INTERFACE 使用给定的接口来进行本地Peer的发现。\n"
+"                              如果没有指定此选项，则选择默认接口。您可以指定"
+"接口名称和IP地址。"
 
 #: src/usage_text.h:668
 msgid ""
@@ -1705,6 +1748,10 @@ msgid ""
 "                              users behind proxy server which disables "
 "resume."
 msgstr ""
+" --remove-control-file[=true|false] 在下载之前删除控制文件。\n"
+"                              使用 --allow-overwrite=true 下载总是从头开始。"
+"适用于代理不支持重\n"
+"                              连的用户。"
 
 #: src/usage_text.h:692
 msgid ""
@@ -1750,6 +1797,10 @@ msgid ""
 "used\n"
 "                              instead."
 msgstr ""
+" --bt-tracker-connect-timeout=SEC 设置与跟踪节点建立连接超时时间。\n"
+"                              连接建立后此选项将不造成影响。--bt-tracker-"
+"timeout \n"
+"                              选项已被替换。"
 
 #: src/usage_text.h:717
 msgid " --dht-message-timeout=SEC    Set timeout in seconds."
@@ -1846,6 +1897,8 @@ msgid ""
 "when\n"
 "                              --async-dns=false."
 msgstr ""
+" --enable-async-dns6[=true|false] 启用异步IPv6 DNS域名解析。\n"
+"                              如果 --async-dns=false 此选项报废"
 
 #: src/usage_text.h:761
 msgid ""
@@ -1866,6 +1919,8 @@ msgid ""
 "the\n"
 "                              host."
 msgstr ""
+" --dht-listen-addr6=ADDR 指定要绑定的IPv6 DHT套接字地址。\n"
+"                             它应该是一个全球单播IPv6地址的主机。"
 
 #: src/usage_text.h:770
 msgid ""
@@ -1923,10 +1978,14 @@ msgid ""
 "                              option may result high memory consumption "
 "after\n"
 "                              thousands of downloads. Specifying 0 means no\n"
-"                              download result is kept."
+"                              download result is kept. Note that unfinished\n"
+"                              downloads are kept in memory regardless of "
+"this\n"
+"                              option value. See\n"
+"                              --keep-unfinished-download-result option."
 msgstr ""
 
-#: src/usage_text.h:800
+#: src/usage_text.h:803
 msgid ""
 " --async-dns-server=IPADDRESS[,...] Comma separated list of DNS server "
 "address\n"
@@ -1945,7 +2004,7 @@ msgid ""
 "                              permission to create it."
 msgstr ""
 
-#: src/usage_text.h:811
+#: src/usage_text.h:814
 msgid ""
 " --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"
 "                              It is strongly recommended to set secret\n"
@@ -1953,8 +2012,12 @@ msgid ""
 "option.\n"
 "                              See also --rpc-listen-port option."
 msgstr ""
+" --enable-rpc[=true|false]  启用RPC和XML-RPC服务器。 \n"
+"                              强烈建议使用 --rpc-secret 选项设置秘密授权令"
+"牌！\n"
+"                              参见 --rpc-listen-port 选项。"
 
-#: src/usage_text.h:816
+#: src/usage_text.h:819
 msgid ""
 " --rpc-max-request-size=SIZE  Set max size of JSON-RPC/XML-RPC request. If "
 "aria2\n"
@@ -1962,16 +2025,22 @@ msgid ""
 "it\n"
 "                              drops connection."
 msgstr ""
+" --rpc-max-request-size=SIZE 设置最大JSON-RPC / XML-RPC请求大小。\n"
+"                              如果aria2检测到请求超过所指定的字节将断开连接。"
 
-#: src/usage_text.h:820
+#: src/usage_text.h:823
 msgid ""
 " --rpc-user=USER              Set JSON-RPC/XML-RPC user. This option will "
 "be\n"
 "                              deprecated in the future release. Migrate to\n"
 "                              --rpc-secret option as soon as possible."
 msgstr ""
+" --rpc-user=USER              设置JSON-RPC/XML-RPC 用户。This option will "
+"be\n"
+"                              此选项将在未来宣布废弃！请尽快迁移到--rpc-"
+"secret 选项！"
 
-#: src/usage_text.h:824
+#: src/usage_text.h:827
 msgid ""
 " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password. This option "
 "will\n"
@@ -1979,8 +2048,11 @@ msgid ""
 "to\n"
 "                              --rpc-secret option as soon as possible."
 msgstr ""
+" --rpc-passwd=PASSWD          设置JSON-RPC/XML-RPC密码。 This option will\n"
+"                              此选项将在未来宣布废弃！请尽快迁移到--rpc-"
+"secret 选项！"
 
-#: src/usage_text.h:828
+#: src/usage_text.h:831
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -1988,19 +2060,21 @@ msgid ""
 "only\n"
 "                              on local loopback interface."
 msgstr ""
+" --rpc-listen-all[=true|false] 监听进入所有网络接口的 JSON-RPC/XML-RPC请求\n"
+"                              如果指定false，只监听本地回环接口。"
 
-#: src/usage_text.h:832
+#: src/usage_text.h:835
 msgid ""
 " --rpc-listen-port=PORT       Specify a port number for JSON-RPC/XML-RPC "
 "server\n"
 "                              to listen to."
-msgstr ""
+msgstr " --rpc-listen-port=PORT       指定JSON-RPC/XML-RPC 服务监听端口号。"
 
-#: src/usage_text.h:835
+#: src/usage_text.h:838
 msgid " --show-console-readout[=true|false] Show console readout."
 msgstr " --show-console-readout[=true|false] 在控制台显示读数。"
 
-#: src/usage_text.h:837
+#: src/usage_text.h:840
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -2010,7 +2084,7 @@ msgid ""
 "                              to a directory, URI must end with '/'."
 msgstr ""
 
-#: src/usage_text.h:842
+#: src/usage_text.h:845
 msgid ""
 " --stream-piece-selector=SELECTOR Specify piece selection algorithm\n"
 "                              used in HTTP/FTP download. Piece means fixed\n"
@@ -2051,25 +2125,30 @@ msgid ""
 "                              useful to view movie while downloading it."
 msgstr ""
 
-#: src/usage_text.h:872
+#: src/usage_text.h:875
 msgid ""
 " --truncate-console-readout[=true|false] Truncate console readout to fit in\n"
 "                              a single line."
-msgstr ""
+msgstr " --truncate-console-readout[=true|false] 缩短控制台指令到单行。"
 
-#: src/usage_text.h:875
+#: src/usage_text.h:878
 msgid ""
 " --pause[=true|false]         Pause download after added. This option is\n"
 "                              effective only when --enable-rpc=true is given."
 msgstr ""
+" --pause[=true|false]         添加后暂停下载。\n"
+"                              此选项仅当  --enable-rpc=true时有效"
 
-#: src/usage_text.h:878
+#: src/usage_text.h:881
 msgid ""
 " --rpc-allow-origin-all[=true|false] Add Access-Control-Allow-Origin header\n"
 "                              field with value '*' to the RPC response."
 msgstr ""
+" --rpc-allow-origin-all[=true|false] 添加RPC服务器对 Access-Control-Allow-"
+"Origin\n"
+"                              头部字段值为 '*'的响应。"
 
-#: src/usage_text.h:881
+#: src/usage_text.h:884
 msgid ""
 " --download-result=OPT        This option changes the way \"Download Results"
 "\"\n"
@@ -2091,15 +2170,17 @@ msgid ""
 "hidden."
 msgstr ""
 
-#: src/usage_text.h:894
+#: src/usage_text.h:897
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
 "whether\n"
 "                              or not download is complete."
 msgstr ""
+" --hash-check-only[=true|false] 若为true，使用 --check-integrity选项哈\n"
+"                              希校验后，无论下载是否完成都终止下载"
 
-#: src/usage_text.h:898
+#: src/usage_text.h:901
 msgid ""
 " --checksum=TYPE=DIGEST       Set checksum. TYPE is hash type. The "
 "supported\n"
@@ -2112,7 +2193,7 @@ msgid ""
 "                              downloads."
 msgstr ""
 
-#: src/usage_text.h:907
+#: src/usage_text.h:910
 msgid ""
 " --piece-length=LENGTH        Set a piece length for HTTP/FTP downloads. "
 "This\n"
@@ -2124,7 +2205,7 @@ msgid ""
 "                              contains piece hashes."
 msgstr ""
 
-#: src/usage_text.h:914
+#: src/usage_text.h:917
 msgid ""
 " --stop-with-process=PID      Stop application when process PID is not "
 "running.\n"
@@ -2139,7 +2220,7 @@ msgid ""
 "                              itself."
 msgstr ""
 
-#: src/usage_text.h:921
+#: src/usage_text.h:924
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -2153,7 +2234,7 @@ msgid ""
 "                              options at startup."
 msgstr ""
 
-#: src/usage_text.h:929
+#: src/usage_text.h:932
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -2164,11 +2245,11 @@ msgid ""
 "                              your disk."
 msgstr ""
 
-#: src/usage_text.h:937
+#: src/usage_text.h:940
 msgid " --enable-mmap[=true|false]   Map files into memory."
 msgstr ""
 
-#: src/usage_text.h:939
+#: src/usage_text.h:942
 msgid ""
 " --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
 "                              The certificate must be in PEM format.\n"
@@ -2178,7 +2259,7 @@ msgid ""
 "                              encryption."
 msgstr ""
 
-#: src/usage_text.h:945
+#: src/usage_text.h:948
 msgid ""
 " --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
 "                              The private key must be decrypted and in PEM\n"
@@ -2186,7 +2267,7 @@ msgid ""
 "                              encryption. See also --rpc-certificate option."
 msgstr ""
 
-#: src/usage_text.h:950
+#: src/usage_text.h:953
 msgid ""
 " --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
 "                              The RPC clients must use https scheme to "
@@ -2197,7 +2278,7 @@ msgid ""
 "                              server certificate and private key."
 msgstr ""
 
-#: src/usage_text.h:957
+#: src/usage_text.h:960
 msgid ""
 " --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
 "                              metalink metadata in the directory specified\n"
@@ -2211,7 +2292,7 @@ msgid ""
 "                              --save-session option."
 msgstr ""
 
-#: src/usage_text.h:968
+#: src/usage_text.h:971
 msgid ""
 " --force-save[=true|false]    Save download with --save-session option even\n"
 "                              if the download is completed or removed. This\n"
@@ -2221,7 +2302,7 @@ msgid ""
 "                              completed state."
 msgstr ""
 
-#: src/usage_text.h:975
+#: src/usage_text.h:978
 msgid ""
 " --save-not-found[=true|false] Save download with --save-session option "
 "even\n"
@@ -2230,7 +2311,7 @@ msgid ""
 "                              situations."
 msgstr ""
 
-#: src/usage_text.h:980
+#: src/usage_text.h:983
 msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
@@ -2251,7 +2332,7 @@ msgid ""
 "                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
 msgstr ""
 
-#: src/usage_text.h:993
+#: src/usage_text.h:996
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -2270,11 +2351,11 @@ msgid ""
 "                              by aria2."
 msgstr ""
 
-#: src/usage_text.h:1005
+#: src/usage_text.h:1008
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr " --console-log-level=级别     设置要输出到控制台的日志级别。"
 
-#: src/usage_text.h:1007
+#: src/usage_text.h:1010
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
@@ -2283,15 +2364,15 @@ msgid ""
 "                              when aria2 exits."
 msgstr ""
 
-#: src/usage_text.h:1012
+#: src/usage_text.h:1015
 msgid " --enable-color[=true|false]  Enable color output for a terminal."
 msgstr " --enable-color[=true|false]  为终端启用彩色输出。"
 
-#: src/usage_text.h:1014
+#: src/usage_text.h:1017
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
 msgstr ""
 
-#: src/usage_text.h:1016
+#: src/usage_text.h:1019
 msgid ""
 " --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
 "                              BitTorrent traffic for QoS. This parameter "
@@ -2309,7 +2390,7 @@ msgid ""
 "                              use them as they are."
 msgstr ""
 
-#: src/usage_text.h:1027
+#: src/usage_text.h:1030
 msgid ""
 " --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
@@ -2323,7 +2404,7 @@ msgid ""
 "                              except that it will never decrease the limit."
 msgstr ""
 
-#: src/usage_text.h:1036
+#: src/usage_text.h:1039
 msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
@@ -2341,7 +2422,7 @@ msgid ""
 "                              only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/usage_text.h:1047
+#: src/usage_text.h:1050
 msgid ""
 " --bt-detach-seed-only[=true|false]\n"
 "                              Exclude seed only downloads when counting\n"
@@ -2360,12 +2441,12 @@ msgid ""
 "                              recognized as active download in RPC method."
 msgstr ""
 
-#: src/usage_text.h:1058
+#: src/usage_text.h:1061
 msgid ""
 " --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
 msgstr " --min-tls-version=版本       指定要启用的最低 SSL/TLS 版本。"
 
-#: src/usage_text.h:1060
+#: src/usage_text.h:1063
 msgid ""
 " --bt-force-encryption[=true|false]\n"
 "                              Requires BitTorrent message payload "
@@ -2379,7 +2460,7 @@ msgid ""
 "                              always encrypt message payload."
 msgstr ""
 
-#: src/usage_text.h:1068
+#: src/usage_text.h:1071
 msgid ""
 " --ssh-host-key-md=TYPE=DIGEST\n"
 "                              Set checksum for SSH host public key. TYPE is\n"
@@ -2395,7 +2476,7 @@ msgid ""
 "                              place."
 msgstr ""
 
-#: src/usage_text.h:1078
+#: src/usage_text.h:1081
 msgid ""
 " --socket-recv-buffer-size=SIZE\n"
 "                              Set the maximum socket receive buffer in "
@@ -2406,7 +2487,7 @@ msgid ""
 "                              SO_RCVBUF socket option with setsockopt() call."
 msgstr ""
 
-#: src/usage_text.h:1084
+#: src/usage_text.h:1087
 msgid ""
 " --bt-enable-hook-after-hash-check[=true|false] Allow hook command "
 "invocation\n"
@@ -2421,7 +2502,7 @@ msgid ""
 "                              to this option."
 msgstr ""
 
-#: src/usage_text.h:1091
+#: src/usage_text.h:1094
 msgid ""
 " --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n"
 "                              --enable-mmap option). The file size is\n"
@@ -2435,10 +2516,27 @@ msgid ""
 "                              mmap will be disabled."
 msgstr ""
 
-#: src/usage_text.h:1100
+#: src/usage_text.h:1103
 msgid ""
 " --stderr[=true|false]        Redirect all console output that would be\n"
 "                              otherwise printed in stdout to stderr."
+msgstr ""
+
+#: src/usage_text.h:1106
+msgid ""
+" --keep-unfinished-download-result[=true|false]\n"
+"                              Keep unfinished download results even if "
+"doing\n"
+"                              so exceeds --max-download-result. This is "
+"useful\n"
+"                              if all unfinished downloads must be saved in\n"
+"                              session file (see --save-session option). "
+"Please\n"
+"                              keep in mind that there is no upper bound to "
+"the\n"
+"                              number of unfinished download result to keep. "
+"If\n"
+"                              that is undesirable, turn this option off."
 msgstr ""
 
 #: src/version_usage.cc:56
@@ -2464,82 +2562,82 @@ msgstr ""
 "于适销性或对某一特定用途的适用性的保证。参见 GNU 通用公共许可证以获取\n"
 "更多信息。\n"
 
-#: src/version_usage.cc:71
+#: src/version_usage.cc:72
 msgid "** Configuration **"
 msgstr "** 配置 **"
 
-#: src/version_usage.cc:71
+#: src/version_usage.cc:73
 msgid "Enabled Features"
 msgstr "已开启的特性"
 
-#: src/version_usage.cc:72
+#: src/version_usage.cc:74
 msgid "Hash Algorithms"
 msgstr "哈希算法"
 
-#: src/version_usage.cc:73
+#: src/version_usage.cc:76
 msgid "Libraries"
 msgstr "库"
 
-#: src/version_usage.cc:74
+#: src/version_usage.cc:77
 msgid "Compiler"
 msgstr "编译器"
 
-#: src/version_usage.cc:75
+#: src/version_usage.cc:78
 msgid "System"
 msgstr "系统"
 
-#: src/version_usage.cc:77
+#: src/version_usage.cc:80
 #, c-format
 msgid "Report bugs to %s"
 msgstr "报告问题至 %s"
 
-#: src/version_usage.cc:78
+#: src/version_usage.cc:81
 msgid "Visit"
 msgstr "访问"
 
-#: src/version_usage.cc:84
+#: src/version_usage.cc:87
 #, c-format
 msgid ""
 "Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
 msgstr ""
 "用法：aria2c [OPTIONS] [URI | MAGNET | TORRENTFILEILE | METALINK_FILE]..."
 
-#: src/version_usage.cc:89
+#: src/version_usage.cc:92
 #, c-format
 msgid "See 'aria2c -h'."
 msgstr "参见“aria2c -h”。"
 
-#: src/version_usage.cc:98
+#: src/version_usage.cc:101
 #, c-format
 msgid "Printing all options."
 msgstr "正列出所有选项。"
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:104
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "正列出附有标签“%s”的选项。"
 
-#: src/version_usage.cc:103
+#: src/version_usage.cc:106
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr "参见“aria2c -h#help”以获知所有可用标签。"
 
-#: src/version_usage.cc:106 src/version_usage.cc:122
+#: src/version_usage.cc:109 src/version_usage.cc:126
 #, c-format
 msgid "Options:"
 msgstr "选项："
 
-#: src/version_usage.cc:119
+#: src/version_usage.cc:123
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "正列出名称包含“%s”的选项。"
 
-#: src/version_usage.cc:133
+#: src/version_usage.cc:137
 #, c-format
 msgid "No option matching with '%s'."
 msgstr "没有匹配“%s”的选项。"
 
-#: src/version_usage.cc:141
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2549,7 +2647,7 @@ msgstr ""
 " 您可以指定多个 HTTP(S)/FTP URI。除非您设置了 -Z 选项，所有 URI 必须指向\n"
 " 同一文件，否则下载会失败。"
 
-#: src/version_usage.cc:145
+#: src/version_usage.cc:149
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2559,7 +2657,7 @@ msgstr ""
 " 您也可以指定任意数量的 BitTorrent Magnet URI 或储存在本地的 torrent/\n"
 " metalink 文件。请注意，它们总是作为单独的下载处理。"
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2574,14 +2672,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:163
+#: src/version_usage.cc:167
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:169
+#: src/version_usage.cc:173
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2594,7 +2692,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:178
+#: src/version_usage.cc:182
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "参见 man 手册页面以获取更多信息。"
@@ -2638,7 +2736,7 @@ msgstr "未知选项“%s”"
 msgid "Errors occurred while binding port.\n"
 msgstr "绑定端口时发生错误。\n"
 
-#: src/AbstractCommand.cc:502
+#: src/AbstractCommand.cc:503
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr "CUID#%<PRId64> - 无法继续下载。将重新下载。"

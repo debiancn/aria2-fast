@@ -299,21 +299,21 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
 #endif // defined(HAVE_EPOLL)
                                                  {
 #ifdef HAVE_EPOLL
-                                                  V_EPOLL,
+                                                     V_EPOLL,
 #endif // HAVE_EPOLL
 #ifdef HAVE_KQUEUE
-                                                  V_KQUEUE,
+                                                     V_KQUEUE,
 #endif // HAVE_KQUEUE
 #ifdef HAVE_PORT_ASSOCIATE
-                                                  V_PORT,
+                                                     V_PORT,
 #endif // HAVE_PORT_ASSOCIATE
 #ifdef HAVE_LIBUV
-                                                  V_LIBUV,
+                                                     V_LIBUV,
 #endif // HAVE_LIBUV
 #ifdef HAVE_POLL
-                                                  V_POLL,
+                                                     V_POLL,
 #endif // HAVE_POLL
-                                                  V_SELECT}));
+                                                     V_SELECT}));
     op->addTag(TAG_ADVANCED);
     handlers.push_back(op);
   }
@@ -401,6 +401,15 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
         PREF_INTERFACE, TEXT_INTERFACE, NO_DEFAULT_VALUE,
         "interface, IP address, hostname", OptionHandler::REQ_ARG));
     op->addTag(TAG_ADVANCED);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(
+        new BooleanOptionHandler(PREF_KEEP_UNFINISHED_DOWNLOAD_RESULT,
+                                 TEXT_KEEP_UNFINISHED_DOWNLOAD_RESULT,
+                                 A2_V_TRUE, OptionHandler::OPT_ARG));
+    op->addTag(TAG_ADVANCED);
+    op->setChangeGlobalOption(true);
     handlers.push_back(op);
   }
   {
