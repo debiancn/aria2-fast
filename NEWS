@@ -1,59 +1,31 @@
-aria2 1.27.1
+aria2 1.29.0
 ============
 
 Release Note
 ------------
 
-This release fixes the packaging bug that libssl_compat.h is missing
-in the tar balls.
+This release fixes several bugs.  See Changes below for detailed bug
+fixes.  This release adds 1xx non-final response support.  Wslay
+library is updated to the latest revision.
 
 Changes
 -------
 
-* Add missing libssl_compat.h to SRCS
+* WinTLS: Fix busy loop on write error
 
-  GH-744
+  GH-767
 
-
+* Support 1xx non-final response
 
-aria2 1.27.0
-============
+  GH-763
 
-Release Note
-------------
+* Update wslay
 
-This release fixes bug which may cause crash if UDP tracker is used.
-It adds new option --save-not-found which prevents downloads failed by
-"not found" error from being saved in session file.
+  GH-764
 
-Changes
--------
+* Don't download piece which is filtered out (e.g., --select-file)
 
-* Hard-disable openssl in osx build
+  This commit fixes the bug that piece which is not requested by
+  --select-file is downloaded in multi-file Web-Seeding.
 
-  Closes #739
-
-* Fix possible cause of crash if UDP tracker is used
-
-* Remove custom ftruncate64 for Android
-
-  The latest NDK versions support ftruncate64, so building a local
-  copy of ftruncate64 is no longer needed.
-
-  Also, the arm and x86 builds of ftruncate64 failed when targeting
-  API level 21 or higher, as they include <linux/err.h> which are not
-  present starting from API level 21.
-
-  Patch from Fredrik Fornwall
-
-* Fix typo found by Debian's Lintian
-
-* Add --save-not-found option
-
-* Update comment to match code
-
-  Patch from Torbjörn Lönnemark
-
-* WinTLS: Better errors (from WSA)
-
-* Compile with openssl 1.1.0
+  GH-769

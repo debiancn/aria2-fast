@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2016-09-17 09:16+0900\n"
+"POT-Creation-Date: 2016-11-15 23:10+0900\n"
 "PO-Revision-Date: 2012-01-27 11:38+0000\n"
 "Last-Translator: stian1990 <crizan90@gmail.com>\n"
 "Language-Team: Italian <it@li.org>\n"
@@ -15,8 +15,8 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2016-09-16 12:24+0000\n"
-"X-Generator: Launchpad (build 18186)\n"
+"X-Launchpad-Export-Date: 2016-11-15 12:24+0000\n"
+"X-Generator: Launchpad (build 18261)\n"
 "X-Poedit-Bookmarks: 81,324,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
 #: src/DownloadEngine.cc:247
@@ -1933,10 +1933,14 @@ msgid ""
 "                              option may result high memory consumption "
 "after\n"
 "                              thousands of downloads. Specifying 0 means no\n"
-"                              download result is kept."
+"                              download result is kept. Note that unfinished\n"
+"                              downloads are kept in memory regardless of "
+"this\n"
+"                              option value. See\n"
+"                              --keep-unfinished-download-result option."
 msgstr ""
 
-#: src/usage_text.h:800
+#: src/usage_text.h:803
 msgid ""
 " --async-dns-server=IPADDRESS[,...] Comma separated list of DNS server "
 "address\n"
@@ -1955,7 +1959,7 @@ msgid ""
 "                              permission to create it."
 msgstr ""
 
-#: src/usage_text.h:811
+#: src/usage_text.h:814
 msgid ""
 " --enable-rpc[=true|false]    Enable JSON-RPC/XML-RPC server.\n"
 "                              It is strongly recommended to set secret\n"
@@ -1964,7 +1968,7 @@ msgid ""
 "                              See also --rpc-listen-port option."
 msgstr ""
 
-#: src/usage_text.h:816
+#: src/usage_text.h:819
 msgid ""
 " --rpc-max-request-size=SIZE  Set max size of JSON-RPC/XML-RPC request. If "
 "aria2\n"
@@ -1973,7 +1977,7 @@ msgid ""
 "                              drops connection."
 msgstr ""
 
-#: src/usage_text.h:820
+#: src/usage_text.h:823
 msgid ""
 " --rpc-user=USER              Set JSON-RPC/XML-RPC user. This option will "
 "be\n"
@@ -1981,7 +1985,7 @@ msgid ""
 "                              --rpc-secret option as soon as possible."
 msgstr ""
 
-#: src/usage_text.h:824
+#: src/usage_text.h:827
 msgid ""
 " --rpc-passwd=PASSWD          Set JSON-RPC/XML-RPC password. This option "
 "will\n"
@@ -1990,7 +1994,7 @@ msgid ""
 "                              --rpc-secret option as soon as possible."
 msgstr ""
 
-#: src/usage_text.h:828
+#: src/usage_text.h:831
 msgid ""
 " --rpc-listen-all[=true|false] Listen incoming JSON-RPC/XML-RPC requests on "
 "all\n"
@@ -1999,18 +2003,18 @@ msgid ""
 "                              on local loopback interface."
 msgstr ""
 
-#: src/usage_text.h:832
+#: src/usage_text.h:835
 msgid ""
 " --rpc-listen-port=PORT       Specify a port number for JSON-RPC/XML-RPC "
 "server\n"
 "                              to listen to."
 msgstr ""
 
-#: src/usage_text.h:835
+#: src/usage_text.h:838
 msgid " --show-console-readout[=true|false] Show console readout."
 msgstr ""
 
-#: src/usage_text.h:837
+#: src/usage_text.h:840
 msgid ""
 " --metalink-base-uri=URI      Specify base URI to resolve relative URI in\n"
 "                              metalink:url and metalink:metaurl element in "
@@ -2020,7 +2024,7 @@ msgid ""
 "                              to a directory, URI must end with '/'."
 msgstr ""
 
-#: src/usage_text.h:842
+#: src/usage_text.h:845
 msgid ""
 " --stream-piece-selector=SELECTOR Specify piece selection algorithm\n"
 "                              used in HTTP/FTP download. Piece means fixed\n"
@@ -2061,25 +2065,25 @@ msgid ""
 "                              useful to view movie while downloading it."
 msgstr ""
 
-#: src/usage_text.h:872
+#: src/usage_text.h:875
 msgid ""
 " --truncate-console-readout[=true|false] Truncate console readout to fit in\n"
 "                              a single line."
 msgstr ""
 
-#: src/usage_text.h:875
+#: src/usage_text.h:878
 msgid ""
 " --pause[=true|false]         Pause download after added. This option is\n"
 "                              effective only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/usage_text.h:878
+#: src/usage_text.h:881
 msgid ""
 " --rpc-allow-origin-all[=true|false] Add Access-Control-Allow-Origin header\n"
 "                              field with value '*' to the RPC response."
 msgstr ""
 
-#: src/usage_text.h:881
+#: src/usage_text.h:884
 msgid ""
 " --download-result=OPT        This option changes the way \"Download Results"
 "\"\n"
@@ -2101,7 +2105,7 @@ msgid ""
 "hidden."
 msgstr ""
 
-#: src/usage_text.h:894
+#: src/usage_text.h:897
 msgid ""
 " --hash-check-only[=true|false] If true is given, after hash check using\n"
 "                              --check-integrity option, abort download "
@@ -2109,7 +2113,7 @@ msgid ""
 "                              or not download is complete."
 msgstr ""
 
-#: src/usage_text.h:898
+#: src/usage_text.h:901
 msgid ""
 " --checksum=TYPE=DIGEST       Set checksum. TYPE is hash type. The "
 "supported\n"
@@ -2122,7 +2126,7 @@ msgid ""
 "                              downloads."
 msgstr ""
 
-#: src/usage_text.h:907
+#: src/usage_text.h:910
 msgid ""
 " --piece-length=LENGTH        Set a piece length for HTTP/FTP downloads. "
 "This\n"
@@ -2134,7 +2138,7 @@ msgid ""
 "                              contains piece hashes."
 msgstr ""
 
-#: src/usage_text.h:914
+#: src/usage_text.h:917
 msgid ""
 " --stop-with-process=PID      Stop application when process PID is not "
 "running.\n"
@@ -2149,7 +2153,7 @@ msgid ""
 "                              itself."
 msgstr ""
 
-#: src/usage_text.h:921
+#: src/usage_text.h:924
 msgid ""
 " --deferred-input[=true|false] If true is given, aria2 does not read all "
 "URIs\n"
@@ -2163,7 +2167,7 @@ msgid ""
 "                              options at startup."
 msgstr ""
 
-#: src/usage_text.h:929
+#: src/usage_text.h:932
 msgid ""
 " --bt-remove-unselected-file[=true|false] Removes the unselected files when\n"
 "                              download is completed in BitTorrent. To\n"
@@ -2174,11 +2178,11 @@ msgid ""
 "                              your disk."
 msgstr ""
 
-#: src/usage_text.h:937
+#: src/usage_text.h:940
 msgid " --enable-mmap[=true|false]   Map files into memory."
 msgstr ""
 
-#: src/usage_text.h:939
+#: src/usage_text.h:942
 msgid ""
 " --rpc-certificate=FILE       Use the certificate in FILE for RPC server.\n"
 "                              The certificate must be in PEM format.\n"
@@ -2188,7 +2192,7 @@ msgid ""
 "                              encryption."
 msgstr ""
 
-#: src/usage_text.h:945
+#: src/usage_text.h:948
 msgid ""
 " --rpc-private-key=FILE       Use the private key in FILE for RPC server.\n"
 "                              The private key must be decrypted and in PEM\n"
@@ -2196,7 +2200,7 @@ msgid ""
 "                              encryption. See also --rpc-certificate option."
 msgstr ""
 
-#: src/usage_text.h:950
+#: src/usage_text.h:953
 msgid ""
 " --rpc-secure[=true|false]    RPC transport will be encrypted by SSL/TLS.\n"
 "                              The RPC clients must use https scheme to "
@@ -2207,7 +2211,7 @@ msgid ""
 "                              server certificate and private key."
 msgstr ""
 
-#: src/usage_text.h:957
+#: src/usage_text.h:960
 msgid ""
 " --rpc-save-upload-metadata[=true|false] Save the uploaded torrent or\n"
 "                              metalink metadata in the directory specified\n"
@@ -2221,7 +2225,7 @@ msgid ""
 "                              --save-session option."
 msgstr ""
 
-#: src/usage_text.h:968
+#: src/usage_text.h:971
 msgid ""
 " --force-save[=true|false]    Save download with --save-session option even\n"
 "                              if the download is completed or removed. This\n"
@@ -2231,7 +2235,7 @@ msgid ""
 "                              completed state."
 msgstr ""
 
-#: src/usage_text.h:975
+#: src/usage_text.h:978
 msgid ""
 " --save-not-found[=true|false] Save download with --save-session option "
 "even\n"
@@ -2240,7 +2244,7 @@ msgid ""
 "                              situations."
 msgstr ""
 
-#: src/usage_text.h:980
+#: src/usage_text.h:983
 msgid ""
 " --disk-cache=SIZE            Enable disk cache. If SIZE is 0, the disk "
 "cache\n"
@@ -2261,7 +2265,7 @@ msgid ""
 "                              SIZE can include K or M(1K = 1024, 1M = 1024K)."
 msgstr ""
 
-#: src/usage_text.h:993
+#: src/usage_text.h:996
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
@@ -2280,11 +2284,11 @@ msgid ""
 "                              by aria2."
 msgstr ""
 
-#: src/usage_text.h:1005
+#: src/usage_text.h:1008
 msgid " --console-log-level=LEVEL    Set log level to output to console."
 msgstr ""
 
-#: src/usage_text.h:1007
+#: src/usage_text.h:1010
 msgid ""
 " --save-session-interval=SEC  Save error/unfinished downloads to a file\n"
 "                              specified by --save-session option every SEC\n"
@@ -2293,15 +2297,15 @@ msgid ""
 "                              when aria2 exits."
 msgstr ""
 
-#: src/usage_text.h:1012
+#: src/usage_text.h:1015
 msgid " --enable-color[=true|false]  Enable color output for a terminal."
 msgstr ""
 
-#: src/usage_text.h:1014
+#: src/usage_text.h:1017
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
 msgstr ""
 
-#: src/usage_text.h:1016
+#: src/usage_text.h:1019
 msgid ""
 " --dscp=DSCP                  Set DSCP value in outgoing IP packets of\n"
 "                              BitTorrent traffic for QoS. This parameter "
@@ -2319,7 +2323,7 @@ msgid ""
 "                              use them as they are."
 msgstr ""
 
-#: src/usage_text.h:1027
+#: src/usage_text.h:1030
 msgid ""
 " --rlimit-nofile=NUM          Set the soft limit of open file descriptors.\n"
 "                              This open will only have effect when:\n"
@@ -2333,7 +2337,7 @@ msgid ""
 "                              except that it will never decrease the limit."
 msgstr ""
 
-#: src/usage_text.h:1036
+#: src/usage_text.h:1039
 msgid ""
 " --pause-metadata[=true|false]\n"
 "                              Pause downloads created as a result of "
@@ -2351,7 +2355,7 @@ msgid ""
 "                              only when --enable-rpc=true is given."
 msgstr ""
 
-#: src/usage_text.h:1047
+#: src/usage_text.h:1050
 msgid ""
 " --bt-detach-seed-only[=true|false]\n"
 "                              Exclude seed only downloads when counting\n"
@@ -2370,12 +2374,12 @@ msgid ""
 "                              recognized as active download in RPC method."
 msgstr ""
 
-#: src/usage_text.h:1058
+#: src/usage_text.h:1061
 msgid ""
 " --min-tls-version=VERSION    Specify minimum SSL/TLS version to enable."
 msgstr ""
 
-#: src/usage_text.h:1060
+#: src/usage_text.h:1063
 msgid ""
 " --bt-force-encryption[=true|false]\n"
 "                              Requires BitTorrent message payload "
@@ -2389,7 +2393,7 @@ msgid ""
 "                              always encrypt message payload."
 msgstr ""
 
-#: src/usage_text.h:1068
+#: src/usage_text.h:1071
 msgid ""
 " --ssh-host-key-md=TYPE=DIGEST\n"
 "                              Set checksum for SSH host public key. TYPE is\n"
@@ -2405,7 +2409,7 @@ msgid ""
 "                              place."
 msgstr ""
 
-#: src/usage_text.h:1078
+#: src/usage_text.h:1081
 msgid ""
 " --socket-recv-buffer-size=SIZE\n"
 "                              Set the maximum socket receive buffer in "
@@ -2416,7 +2420,7 @@ msgid ""
 "                              SO_RCVBUF socket option with setsockopt() call."
 msgstr ""
 
-#: src/usage_text.h:1084
+#: src/usage_text.h:1087
 msgid ""
 " --bt-enable-hook-after-hash-check[=true|false] Allow hook command "
 "invocation\n"
@@ -2431,7 +2435,7 @@ msgid ""
 "                              to this option."
 msgstr ""
 
-#: src/usage_text.h:1091
+#: src/usage_text.h:1094
 msgid ""
 " --max-mmap-limit=SIZE        Set the maximum file size to enable mmap (see\n"
 "                              --enable-mmap option). The file size is\n"
@@ -2445,10 +2449,27 @@ msgid ""
 "                              mmap will be disabled."
 msgstr ""
 
-#: src/usage_text.h:1100
+#: src/usage_text.h:1103
 msgid ""
 " --stderr[=true|false]        Redirect all console output that would be\n"
 "                              otherwise printed in stdout to stderr."
+msgstr ""
+
+#: src/usage_text.h:1106
+msgid ""
+" --keep-unfinished-download-result[=true|false]\n"
+"                              Keep unfinished download results even if "
+"doing\n"
+"                              so exceeds --max-download-result. This is "
+"useful\n"
+"                              if all unfinished downloads must be saved in\n"
+"                              session file (see --save-session option). "
+"Please\n"
+"                              keep in mind that there is no upper bound to "
+"the\n"
+"                              number of unfinished download result to keep. "
+"If\n"
+"                              that is undesirable, turn this option off."
 msgstr ""
 
 #: src/version_usage.cc:56
@@ -2468,82 +2489,82 @@ msgid ""
 "GNU General Public License for more details.\n"
 msgstr ""
 
-#: src/version_usage.cc:71
+#: src/version_usage.cc:72
 msgid "** Configuration **"
 msgstr ""
 
-#: src/version_usage.cc:71
+#: src/version_usage.cc:73
 msgid "Enabled Features"
 msgstr ""
 
-#: src/version_usage.cc:72
+#: src/version_usage.cc:74
 msgid "Hash Algorithms"
 msgstr ""
 
-#: src/version_usage.cc:73
+#: src/version_usage.cc:76
 msgid "Libraries"
 msgstr ""
 
-#: src/version_usage.cc:74
+#: src/version_usage.cc:77
 msgid "Compiler"
 msgstr ""
 
-#: src/version_usage.cc:75
+#: src/version_usage.cc:78
 msgid "System"
 msgstr ""
 
-#: src/version_usage.cc:77
+#: src/version_usage.cc:80
 #, c-format
 msgid "Report bugs to %s"
 msgstr "Segnala i bachi (bug) a %s"
 
-#: src/version_usage.cc:78
+#: src/version_usage.cc:81
 msgid "Visit"
 msgstr ""
 
-#: src/version_usage.cc:84
+#: src/version_usage.cc:87
 #, c-format
 msgid ""
 "Usage: aria2c [OPTIONS] [URI | MAGNET | TORRENT_FILE | METALINK_FILE]..."
 msgstr ""
 "Utilizzo: aria2c [OPZIONI] [URI | MAGNET | FILE_TORRENT | FILE_METALINK]..."
 
-#: src/version_usage.cc:89
+#: src/version_usage.cc:92
 #, c-format
 msgid "See 'aria2c -h'."
 msgstr ""
 
-#: src/version_usage.cc:98
+#: src/version_usage.cc:101
 #, c-format
 msgid "Printing all options."
 msgstr "Sono visualizzate tutte le opzioni."
 
-#: src/version_usage.cc:101
+#: src/version_usage.cc:104
 #, c-format
 msgid "Printing options tagged with '%s'."
 msgstr "Sono visualizzate le opzioni relative a '%s'."
 
-#: src/version_usage.cc:103
+#: src/version_usage.cc:106
 #, c-format
 msgid "See 'aria2c -h#help' to know all available tags."
 msgstr ""
 
-#: src/version_usage.cc:106 src/version_usage.cc:122
+#: src/version_usage.cc:109 src/version_usage.cc:126
 #, c-format
 msgid "Options:"
 msgstr "Opzioni:"
 
-#: src/version_usage.cc:119
+#: src/version_usage.cc:123
 #, c-format
 msgid "Printing options whose name includes '%s'."
 msgstr "Sono visualizzate le opzioni il cui nome include '%s'."
 
-#: src/version_usage.cc:133
+#: src/version_usage.cc:137
 #, c-format
 msgid "No option matching with '%s'."
 msgstr "Nessuna opzione corrispondente con '%s'."
 
-#: src/version_usage.cc:141
+#: src/version_usage.cc:145
 #, c-format
 msgid ""
 " You can specify multiple HTTP(S)/FTP URIs. Unless you specify -Z option, "
@@ -2551,7 +2572,7 @@ msgid ""
 " URIs must point to the same file or downloading will fail."
 msgstr ""
 
-#: src/version_usage.cc:145
+#: src/version_usage.cc:149
 #, c-format
 msgid ""
 " You can also specify arbitrary number of BitTorrent Magnet URIs, torrent/\n"
@@ -2559,7 +2580,7 @@ msgid ""
 " treated as a separate download."
 msgstr ""
 
-#: src/version_usage.cc:151
+#: src/version_usage.cc:155
 #, c-format
 msgid ""
 " You can specify both torrent file with -T option and URIs. By doing this,\n"
@@ -2574,14 +2595,14 @@ msgid ""
 " 'path' in torrent are added to form a URI for each file."
 msgstr ""
 
-#: src/version_usage.cc:163
+#: src/version_usage.cc:167
 #, c-format
 msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
 
-#: src/version_usage.cc:169
+#: src/version_usage.cc:173
 #, c-format
 msgid ""
 "About the number of connections\n"
@@ -2594,7 +2615,7 @@ msgid ""
 "\n"
 msgstr ""
 
-#: src/version_usage.cc:178
+#: src/version_usage.cc:182
 #, c-format
 msgid "Refer to man page for more information."
 msgstr "Fare riferimento alla pagina di manuale per ulteriori informazioni"
@@ -2638,7 +2659,7 @@ msgstr ""
 msgid "Errors occurred while binding port.\n"
 msgstr "Ci sono stati degli errori durante il binding della porta.\n"
 
-#: src/AbstractCommand.cc:502
+#: src/AbstractCommand.cc:503
 #, c-format
 msgid "CUID#%<PRId64> - Failed to resume download. Download from scratch."
 msgstr ""

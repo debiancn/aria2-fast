@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "Sep 17, 2016" "1.27.1" "aria2"
+.TH "ARIA2C" "1" "Nov 15, 2016" "1.29.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1670,6 +1670,16 @@ name.
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-keep\-unfinished\-download\-result[=true|false]
+Keep unfinished download results even if doing so exceeds
+\fI\%\-\-max\-download\-result\fP\&.  This is useful if all unfinished
+downloads must be saved in session file (see
+\fI\%\-\-save\-session\fP option).  Please keep in mind that there is
+no upper bound to the number of unfinished download result to keep.
+If that is undesirable, turn this option off.  Default: \fBtrue\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-\-max\-download\-result=<NUM>
 Set maximum number of download result kept in memory. The download
 results are completed/error/removed downloads. The download results
@@ -1678,8 +1688,10 @@ results. When queue is full and new download result is created,
 oldest download result is removed from the front of the queue and
 new one is pushed to the back. Setting big number in this option may
 result high memory consumption after thousands of
-downloads. Specifying 0 means no download result is kept. Default:
-\fB1000\fP
+downloads. Specifying 0 means no download result is kept.  Note that
+unfinished downloads are kept in memory regardless of this option
+value. See \fI\%\-\-keep\-unfinished\-download\-result\fP option.
+Default: \fB1000\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3955,6 +3967,8 @@ The following options are available:
 \fI\%bt\-max\-open\-files\fP
 .IP \(bu 2
 \fI\%download\-result\fP
+.IP \(bu 2
+\fI\%keep\-unfinished\-download\-result\fP
 .IP \(bu 2
 \fI\%log\fP
 .IP \(bu 2
