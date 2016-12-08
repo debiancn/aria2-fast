@@ -1,3 +1,9 @@
+aria2 (1.29.0-1) unstable; urgency=low
+
+  * New upstream release (Closes: #847474).
+
+ -- Kartik Mistry <kartik@debian.org>  Thu, 08 Dec 2016 21:20:24 +0530
+
 aria2 (1.27.1-1) unstable; urgency=low
 
   * New upstream release.
