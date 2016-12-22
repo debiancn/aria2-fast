@@ -525,15 +525,14 @@ bool createRequestGroupFromUriListParser(
 std::shared_ptr<UriListParser> openUriListParser(const std::string& filename)
 {
   std::string listPath;
-  if (filename == "-") {
-    listPath = DEV_STDIN;
+
+  auto f = File(filename);
+  if (!f.exists() || f.isDir()) {
+    throw DL_ABORT_EX(fmt(EX_FILE_OPEN, filename.c_str(),
+                          "File not found or it is a directory"));
   }
-  else {
-    if (!File(filename).isFile()) {
-      throw DL_ABORT_EX(fmt(EX_FILE_OPEN, filename.c_str(), "No such file"));
-    }
-    listPath = filename;
-  }
+  listPath = filename;
+
   return std::make_shared<UriListParser>(listPath);
 }
 
