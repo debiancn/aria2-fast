@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "Nov 15, 2016" "1.29.0" "aria2"
+.TH "ARIA2C" "1" "Dec 15, 2016" "1.30.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1331,7 +1331,7 @@ hash hex string of meta data plus extension. For torrent, the
 extension is \(aq.torrent\(aq. For metalink, it is \(aq.meta4\(aq.  If false is
 given to this option, the downloads added by
 \fI\%aria2.addTorrent()\fP or \fI\%aria2.addMetalink()\fP will not be
-saved by \fI\%\-\-save\-session\fP option. Default: \fBfalse\fP
+saved by \fI\%\-\-save\-session\fP option. Default: \fBtrue\fP
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -2289,6 +2289,69 @@ bits of the configuration file (e.g., \fBchmod 600 aria2.conf\fP), so
 that other user cannot see the contents of the file.
 .UNINDENT
 .UNINDENT
+.sp
+The environment variables, such as \fB${HOME}\fP, are expanded by shell.
+This means that those variables used in configuration file are not
+expanded.  However, it is useful to \fB${HOME}\fP to refer user\(aqs home
+directory in configuration file to specify file paths.  Therefore,
+aria2 expands \fB${HOME}\fP found in the following option values to
+user\(aqs home directory:
+.INDENT 0.0
+.IP \(bu 2
+\fI\%ca\-certificate\fP
+.IP \(bu 2
+\fI\%certificate\fP
+.IP \(bu 2
+\fI\%dht\-file\-path\fP
+.IP \(bu 2
+\fI\%dht\-file\-path6\fP
+.IP \(bu 2
+\fI\%dir\fP
+.IP \(bu 2
+\fI\%input\-file\fP
+.IP \(bu 2
+\fI\%load\-cookies\fP
+.IP \(bu 2
+\fI\%log\fP
+.IP \(bu 2
+\fI\%metalink\-file\fP
+.IP \(bu 2
+\fI\%netrc\-path\fP
+.IP \(bu 2
+\fI\%on\-bt\-download\-complete\fP
+.IP \(bu 2
+\fI\%on\-download\-complete\fP
+.IP \(bu 2
+\fI\%on\-download\-error\fP
+.IP \(bu 2
+\fI\%on\-download\-start\fP
+.IP \(bu 2
+\fI\%on\-download\-stop\fP
+.IP \(bu 2
+\fI\%on\-download\-pause\fP
+.IP \(bu 2
+\fI\%out\fP
+.IP \(bu 2
+\fI\%private\-key\fP
+.IP \(bu 2
+\fI\%rpc\-certificate\fP
+.IP \(bu 2
+\fI\%rpc\-private\-key\fP
+.IP \(bu 2
+\fI\%save\-cookies\fP
+.IP \(bu 2
+\fI\%save\-session\fP
+.IP \(bu 2
+\fI\%server\-stat\-if\fP
+.IP \(bu 2
+\fI\%server\-stat\-of\fP
+.IP \(bu 2
+\fI\%torrent\-file\fP
+.UNINDENT
+.sp
+Note that this expansion occurs even if the above options are used in
+the command\-line.  This means that expansion may occur 2 times: first,
+shell and then aria2c.
 .SS dht.dat
 .sp
 Unless the legacy file paths \fB$HOME/.aria2/dht.dat\fP and

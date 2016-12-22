@@ -30,10 +30,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: aria2 1.29.0\n"
+"Project-Id-Version: aria2 1.30.0\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2016-11-15 23:10+0900\n"
-"PO-Revision-Date: 2016-11-15 23:10+0900\n"
+"POT-Creation-Date: 2016-12-15 23:01+0900\n"
+"PO-Revision-Date: 2016-12-15 23:01+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: en@boldquot\n"
@@ -3528,7 +3528,7 @@ msgstr "IPv%d RPC: listening on TCP port %u"
 msgid "IPv%d BitTorrent: listening on TCP port %u"
 msgstr "IPv%d BitTorrent: listening on TCP port %u"
 
-#: src/RequestGroup.cc:387
+#: src/RequestGroup.cc:399
 msgid ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
@@ -3536,7 +3536,7 @@ msgstr ""
 "For BitTorrent Magnet URI, enabling DHT is strongly recommended. See --"
 "enable-dht option."
 
-#: src/RequestGroup.cc:682
+#: src/RequestGroup.cc:694
 #, c-format
 msgid "Removed control file for %s because it is requested by user."
 msgstr "Removed control file for %s because it is requested by user."

@@ -182,6 +182,9 @@
    function. */
 #undef HAVE_GNUTLS_CERTIFICATE_SET_X509_SYSTEM_TRUST
 
+/* Define to 1 if you have the `gzbuffer' function. */
+#undef HAVE_GZBUFFER
+
 /* Define to 1 if you have the `gzsetparams' function. */
 #undef HAVE_GZSETPARAMS
 
