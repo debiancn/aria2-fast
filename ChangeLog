@@ -1,346 +1,158 @@
-commit f542f84b836b1fd89d89537155ea7e25e07f49be (HEAD, tag: release-1.30.0, origin/master, origin/HEAD, master)
+commit 36902526b66907f1f4b0add9900d8a82521b45d4 (HEAD, tag: release-1.31.0, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
+AuthorDate: 2017-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
+CommitDate: 2017-01-16
 
     Update NEWS
 
-commit 8d41656662070279041f03b8d37388bb72c17c63
+commit dc84ca14e5951646e49d2eaccde9f9b8a7841a44
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
+AuthorDate: 2017-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    Bump up version number to 1.30.0
-
-commit f42a4362f5402c4e551434df66aea737dd1f99ad
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    Update AUTHORS
-
-commit 388ae843ca822bc1e71904d8b5032a1b44a4149d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    `make clang-format`
-
-commit 18a51ce3143266d30d3daf35cf25b146f425596b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    We are not bothered by NDK zlib anymore
-
-commit 0ec2db9f34b662e1f9c0a3401210d541e95a5f35
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    Fix typo
-
-commit 46460c81373d16450ff67e86fd6914fdc78f3ff6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    configure: Don't stop when cppunit is not found
-
-commit 834bce71d257649adecd52244f0b9f5dbf02c0c6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    android: We build zlib in ourselves
-
-commit fdeb75dbc3d28ea6049b6b64c61f94c22bf8e5f6
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-15
-
-    mingw: Use sqlite 3.15.2
-
-commit b76435fe779ca67d2b1cc794ebb7fafc4d0955ff
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-10
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-10
-
-    Fix bug that --disable-websocket causes build error
-
-commit ec02ae65bb4b7e5ffdf75f093fec677ad62d4bbb
-Merge: 42334744 ddc1f1bf
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-09
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-12-09
-
-    Merge pull request #798 from aria2/fix-optimize-concurrent-downloads-lower-bound
-    
-    Fix bug that lower bound of optimize-concurrent-downloads becomes 1
-
-commit ddc1f1bfdab769914377804da05344e11fe3ecb7
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-05
-
-    Fix bug that lower bound of optimize-concurrent-downloads becomes 1
-
-commit 423347447114ed19a707617af622bc91bd242161
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-04
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-04
+CommitDate: 2017-01-16
 
     Update doc
 
-commit 4473b870f49f0339491eeb2443f21848b59f2c1f
-Merge: 7a089ae0 c6793903
+commit b3ece25fde9b05b2d3187c119891d717f325564e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-04
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-12-04
-
-    Merge pull request #795 from aria2/show-dht-nodes
-    
-    Print DHT nodes with -S option
-
-commit 7a089ae04aff2e4e4dacb97ec12387cd6f407a0e
-Merge: b24a3c3c 3d5c7680
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-04
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-12-04
-
-    Merge pull request #794 from aria2/fix-dht-node-resolv
-    
-    Take into account address family when resolving DHT node address
-
-commit b24a3c3c2ee3e65c82aa5b04b3b9a1ca9f5e5aae
-Merge: 3b75514d e4f3d633
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-04
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-12-04
-
-    Merge pull request #786 from aria2/use-stdin
-    
-    Use stdin for *NIX as well
-
-commit c679390392fb4e3d34ace91fd1a6802d8bbb3d51
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-03
+AuthorDate: 2017-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-03
+CommitDate: 2017-01-16
 
-    Print DHT nodes with -S option
+    Bump up version number to 1.31.0
 
-commit 3d5c76800d7d041368eeca34b4bbe5099f35a964
+commit f55fced91f6205294843a5f8afcaafc41e92f30f
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-12-03
+AuthorDate: 2017-01-16
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-12-03
+CommitDate: 2017-01-16
 
-    Take into account address family when resolving DHT node address
+    Update bash_completion
 
-commit 3b75514db4fa25e27737da0b74eab3f4fad77343
-Merge: d0a06458 d9f2f1c6
+commit eecb5e055e5e2659d7da8d33d8acf83efac63a94
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-27
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-11-27
+AuthorDate: 2017-01-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-16
 
-    Merge pull request #787 from ITriskTI/patch-1
+    clang-format
+
+commit c7551a173f4cee50a7b3dad9a1dc1d17f5c2628f
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-16
+
+    Update AUTHORS
+
+commit 7cd92850851535caffdcc7640d30fee0ebe99357
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-16
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-16
+
+    Update binary build dependencies
+
+commit 6625f8cadbb59134a675c2fbd12357e6d19df9a4
+Merge: c1a0b335 744a5a55
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-16
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2017-01-16
+
+    Merge pull request #836 from aria2/better-file-status-error-msg
+    
+    Better error message when local file status cannot be retrieved
+
+commit 744a5a550df748dcbbbd2587bc7c84381f52ed0c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-15
+
+    Better error message when local file status cannot be retrieved
+
+commit c1a0b335159a6d002f4cc35f0b66397af0f39759
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-09
+
+    Add constexpr if possible
+
+commit 6abf2388ccec6332d03bb6e606227d5f527f24d9
+Merge: 5d2742da e2dc0902
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-07
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2017-01-07
+
+    Merge pull request #823 from aria2/fix-getrandom-assertion-failure
+    
+    Fix assertion failure in SimpleRandomizer::getRandomBytes
+
+commit e2dc0902bb379986835f119828b86dc0100bafaa
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2017-01-06
+
+    Fix assertion failure in SimpleRandomizer::getRandomBytes
+    
+    errno might not be initialized to 0, and we may get both rv == -1 and
+    errno != ENOSYS.  This leads to assertion failure.  Since
+    getrandom_linux always returns -1 on failure, checking errno is
+    useless in this function.
+
+commit 5d2742da154b388d69b59bf28716c4c3c8970646
+Merge: b5d64230 12798e77
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2017-01-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2017-01-01
+
+    Merge pull request #821 from ITriskTI/patch-1
     
     Update aria2c.rst
 
-commit d9f2f1c684cb3af287e546e6f8f1fbd791ac4684
+commit 12798e778e5fcc9bee04916b973990ff83e844e2
 Author:     ITriskTI <ITriskTI@gmail.com>
-AuthorDate: 2016-11-27
+AuthorDate: 2016-12-31
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-11-27
+CommitDate: 2016-12-31
 
     Update aria2c.rst
 
-commit e4f3d633c1823beb09ac7a9671b72b6c9472e251
+commit b5d64230ba24ae1995806252594eab137209d1a7
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-26
+AuthorDate: 2016-12-31
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-26
+CommitDate: 2016-12-31
 
-    Use stdin for *NIX as well
-    
-    We thought that we can use /dev/stdin for *NIX, but some variants,
-    like Android, does not have one or root permission is required.  Just
-    like we do for Windows build, we just use stdin if /dev/stdin is used.
+    Cast to unsigned char before passing it as uint32_t
 
-commit d0a0645836e2221148200d2da0ae9166f59f6bc3
+commit b9e51e9b1509f2d7d379608755fa0503ee7a64d1
+Merge: f542f84b 2efc5a92
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-26
+AuthorDate: 2016-12-31
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-26
+CommitDate: 2016-12-31
 
-    We already replaced "-" with DEV_STDIN in LocalFilePathOptionHandler
+    Merge branch 'Jimmy-Z-master'
 
-commit 380e5aa451514b9fb10fc543a024ed7a70086b6c
-Merge: 14e995d2 63f47cbb
+commit 2efc5a9288bd208e58372a66c79ac7f04d649a36
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-26
+AuthorDate: 2016-12-31
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-26
+CommitDate: 2016-12-31
 
-    Merge branch 'user-home-variable-expansion'
+    Document --content-disposition-default-utf8 opiton
 
-commit 14e995d2bcca571fe2414e6fa3253f074788b5ed
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-26
+commit da730478af0cdae2936053d6f9789cee12c95b7d
+Author:     JimmyZ <jimmy.z.z@gmail.com>
+AuthorDate: 2016-12-28
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-26
+CommitDate: 2016-12-31
 
-    Allow block device file to -i option
-
-commit bebd602ba7ee686b7eb7a176e71efa1c0621108f
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-26
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-26
-
-    Fix bug that HAVE_LIBEXPAT is not defined
-
-commit 9df50804d47b5e503d9ea4a84d469fe9dd87cddf
-Merge: c087ab1b d974c935
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-23
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-11-23
-
-    Merge pull request #772 from aria2/refactor-wintls-write
-    
-    WinTLS: Rewrite writeData
-
-commit c087ab1ba1234899db2b5e7aa6f221ae8a930e1b
-Merge: 9d58ad91 02985711
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-23
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2016-11-23
-
-    Merge pull request #773 from mgorny/pkgconfig
-    
-    configure: Use pkg-config to find libs whenever possible
-
-commit 63f47cbbc5d9b8e1dae09b06a6d2eda4fb0f2297
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-23
-
-    Document about ${HOME} expansion
-
-commit 9214e7250148135675db18c3d697f095454170c3
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-23
-
-    Expand ${HOME} to user's home directory in several options
-    
-    The following options implement this substitution:
-    
-    * --ca-certificate
-    * --certificate
-    * --dht-file-path
-    * --dht-file-path6
-    * --dir
-    * --input-file
-    * --load-cookies
-    * --log
-    * --metalink-file
-    * --netrc-path
-    * --on-bt-download-complete
-    * --on-download-complete
-    * --on-download-error
-    * --on-download-start
-    * --on-download-stop
-    * --on-download_pause
-    * --out
-    * --private-key
-    * --rpc-certificate
-    * --rpc-private-key
-    * --save-cookies
-    * --save-session
-    * --server-stat-if
-    * --server-stat-of
-    * --torrent-file
-
-commit 9d58ad912a8da9e25725d053598c8f5fdf76e41b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-16
-
-    Document that libaria2 is not thread safe
-
-commit 02985711df432e5fa8349cec5a05f0445c1d48b0
-Author:     Michał Górny <mgorny@gentoo.org>
-AuthorDate: 2016-11-12
-Commit:     Michał Górny <mgorny@gentoo.org>
-CommitDate: 2016-11-12
-
-    configure: Use pkg-config to find libs whenever possible
-    
-    Use pkg-config to find cppunit, libxml2 and expat. All those libraries
-    provide pkg-config files, and in all of those cases the pkg-config macro
-    is superior to the custom macros used currently.
-    
-    The advantages of pkg-config files include:
-    
-    - Explicit static linking support via --static. Currently, e.g.
-    'xml2-config --libs' prints all libraries needed for static linking when
-    doing dynamic linking unnecessary, resulting in unnecessary direct deps.
-    
-    - Better cross-build support. You don't have to build the additional
-    *-config tools for target.
-    
-    - Better multilib support. Per-ABI pkgconfig directories are commonly
-    supported while packages usually fail to look for per-CHOST *-config
-    variants.
-    
-    - Better override support. The current macros allow little to no
-    result overrides, the pkg-config macros let you pass FOO_CFLAGS
-    and FOO_LIBS manually.
-    
-    - Cleaner version checks. The code used in libxml.m4 is really creepy.
-
-commit d974c935cdfd90ffe412e287cef058377a55e755 (origin/refactor-wintls-write)
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2016-11-11
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2016-11-12
-
-    WinTLS: Rewrite writeData
-    
-    We re-wrote WinTLSSession::writeData.  The major points are:
-    
-    * Buffer is now preallocated once handshake is finished.  Previously,
-      they are allocated each time when we send one TLS record.
-    
-    * Schannel uses header, body and trailer for each secBuffer.  Now we
-      send them off at once using WSASend which is windows counterpart of
-      sendv.  Previously, we do memmove if some of them are truncated.
-    
-    * We don't try to send application data in
-      WinTLSSession::closeConnection, since semantically we need same
-      application data used to create TLS record before.  Using 0 length
-      data to finish sending buffered data looks like a hack.
+    new option content-disposition-default-utf8

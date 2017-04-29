@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "Dec 15, 2016" "1.30.0" "aria2"
+.TH "ARIA2C" "1" "Jan 16, 2017" "1.31.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1453,6 +1453,13 @@ Set log level to output to console.  LEVEL is either \fBdebug\fP,
 .UNINDENT
 .INDENT 0.0
 .TP
+.B \-\-content\-disposition\-default\-utf8[=true|false]
+Handle quoted string in Content\-Disposition header as UTF\-8 instead
+of ISO\-8859\-1, for example, the filename parameter, but not the
+extended version filename*.  Default: \fBfalse\fP
+.UNINDENT
+.INDENT 0.0
+.TP
 .B \-D, \-\-daemon[=true|false]
 Run as daemon. The current working directory will be changed to \fB/\fP
 and standard input, standard output and standard error will be
@@ -2489,6 +2496,8 @@ of URIs. These optional lines must start with white space(s).
 \fI\%conditional\-get\fP
 .IP \(bu 2
 \fI\%connect\-timeout\fP
+.IP \(bu 2
+\fI\%content\-disposition\-default\-utf8\fP
 .IP \(bu 2
 \fI\%continue\fP
 .IP \(bu 2
