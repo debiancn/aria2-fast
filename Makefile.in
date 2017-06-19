@@ -980,7 +980,7 @@ uninstall-am: uninstall-dist_docDATA
 @HAVE_RST2HTML_FALSE@	echo "<p>Readme has not been built!.<br>Instead see <a href='README.rst'>README.rst</a></p>" >> $@
 
 # Format source files using clang-format.  Don't format source files
-# under deps directory since we are not responsible for thier coding
+# under deps directory since we are not responsible for their coding
 # style.
 clang-format:
 	CLANGFORMAT=`git config --get clangformat.binary`; \
