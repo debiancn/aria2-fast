@@ -362,7 +362,7 @@ void SocketCore::bind(const struct sockaddr* addr, socklen_t addrlen)
 
 void SocketCore::beginListen()
 {
-  if (listen(sockfd_, 1) == -1) {
+  if (listen(sockfd_, 1024) == -1) {
     int errNum = SOCKET_ERRNO;
     throw DL_ABORT_EX(fmt(EX_SOCKET_LISTEN, errorMsg(errNum).c_str()));
   }
@@ -581,8 +581,8 @@ void SocketCore::applyIpDscp()
     if (family == AF_INET) {
       setSockOpt(IPPROTO_IP, IP_TOS, &ipDscp_, sizeof(ipDscp_));
     }
-#if defined(__linux__) || defined(__FreeBSD__) || defined(__NetBSD__) ||       \
-    defined(__OpenBSD__) || defined(__DragonFly__)
+#if defined(IPV6_TCLASS) || defined(__linux__) || defined(__FreeBSD__) ||      \
+    defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
     else if (family == AF_INET6) {
       setSockOpt(IPPROTO_IPV6, IPV6_TCLASS, &ipDscp_, sizeof(ipDscp_));
     }

@@ -1,7 +1,7 @@
 .\" -*- mode: troff; coding: utf-8 -*-
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "янв. 16, 2017" "1.31.0" "aria2"
+.TH "ARIA2C" "1" "мая 17, 2017" "1.32.0" "aria2"
 .SH NAME
 aria2c \- сверхбыстрая утилита загрузки
 .
@@ -90,6 +90,34 @@ stdin (стандартный поток ввода).
 элемента очереди.
 Смотрите также параметр \fI\%\-\-split\fP\&.
 По умолчанию: \fB5\fP
+.sp
+\fBПРИМЕЧАНИЕ:\fP
+.INDENT 7.0
+.INDENT 3.5
+\fI\%\-\-max\-concurrent\-downloads\fP ограничивает количество
+элементов, которые загружаются одновременно.
+\fI\%\-\-split\fP и \fI\%\-\-min\-split\-size\fP влияет
+на количество соединений внутри каждого элемента.
+Допустим у вас есть такой входной файл (см. параметр \fI\%\-\-input\-file\fP):
+.INDENT 0.0
+.INDENT 3.5
+.sp
+.nf
+.ft C
+http://example.com/foo
+http://example.com/bar
+.ft P
+.fi
+.UNINDENT
+.UNINDENT
+.sp
+Здесь 2 загружаемых элемента. aria2 может загрузить эти элементы
+одновременно, если значение, заданное в \fI\%\-\-max\-concurrent\-downloads\fP,
+больше или равно 2. В каждом загружаемом элементе, вы можете задать
+количество соединений, используя \fI\%\-\-split\fP
+и/или \fI\%\-\-min\-split\-size\fP\&.
+.UNINDENT
+.UNINDENT
 .UNINDENT
 .INDENT 0.0
 .TP
@@ -3236,7 +3264,7 @@ URI для каждого файла, будут добавлены имя и п
 .TP
 .B aria2.unpauseAll([secret])
 Этот метод эквивалентен по вызову \fI\%aria2.unpause()\fP, для каждой
-активной/ожидающей закачки. Этот метод возвращает \fBOK\fP\&.
+приостановленной загрузки. Этот метод возвращает \fBOK\fP\&.
 .UNINDENT
 .INDENT 0.0
 .TP
