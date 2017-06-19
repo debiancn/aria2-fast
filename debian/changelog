@@ -1,9 +1,12 @@
-aria2 (1.31.0-2) unstable; urgency=medium
+aria2 (1.32.0-1) unstable; urgency=medium
+
+  [ Kartik Mistry ]
+  * New upstream release.
 
   [ Patrick Ruckstuhl ]
   *  Change build depends to libgcrypt20-dev (Closes: #864094)
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 19 Jun 2017 19:33:05 +0530
+ -- Kartik Mistry <kartik@debian.org>  Mon, 19 Jun 2017 19:34:28 +0530
 
 aria2 (1.31.0-1) unstable; urgency=low
 
