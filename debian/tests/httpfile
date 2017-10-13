@@ -8,7 +8,10 @@ python3 -m http.server $PORT &
 HTTP_PID=$!
 trap "kill $HTTP_PID" EXIT TERM INT
 # let the http server settle down
-sleep 2
+for i in $(seq 30); do
+    ss -nlt | grep -qF :$PORT && break
+    sleep 1
+done
 
 aria2c -d $ADTTMP http://localhost:$PORT/debian/control
 
