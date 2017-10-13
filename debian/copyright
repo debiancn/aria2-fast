@@ -1,10 +1,10 @@
-Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: aria2
 Upstream-Contact: Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
 Source: https://aria2.github.io
 
 Files: *
-Copyright: (C) 2006-2016, Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>,
+Copyright: (C) 2006-2017, Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>,
                           Ross Smith II <aria2spam@netebb.com>,
                           Nils Maier <maierman@web.de>,
                           See AUTHORS for full list.
@@ -39,8 +39,8 @@ License: GPL-2+ with OpenSSL exception
  source files in the program, then also delete it here.
 
 Files: debian/*
-Copyright: (C) 2006-2016, Patrick Ruckstuhl <patrick@ch.tario.org>,
-           (C) 2010-2016, Kartik Mistry <kartik@debian.org>
+Copyright: (C) 2006-2017, Patrick Ruckstuhl <patrick@ch.tario.org>,
+           (C) 2010-2017, Kartik Mistry <kartik@debian.org>
 License: GPL-2+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License as published by the Free Software

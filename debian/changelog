@@ -2,6 +2,8 @@ aria2 (1.32.0-2) unstable; urgency=medium
   [ Patrick Ruckstuhl ]
   * debian/control
     + Updated Standards-Version to 4.1.1
+  * debian/copyright
+    + Update URL to https, updated year to 2017
   * debian/tests/httpfile
     + Improved waiting for http server startup (Closes: #878253)
 
