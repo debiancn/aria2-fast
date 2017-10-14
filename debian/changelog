@@ -8,7 +8,7 @@ aria2 (1.32.0-2) unstable; urgency=medium
   * debian/tests/httpfile
     + Improved waiting for http server startup (Closes: #878253)
 
- -- Kartik Mistry <kartik@debian.org> Fri, 13 Oct 2017 14:26:22 +0530
+ -- Kartik Mistry <kartik@debian.org>  Sat, 14 Oct 2017 16:45:21 +0530
 
 aria2 (1.32.0-1) unstable; urgency=medium
 
