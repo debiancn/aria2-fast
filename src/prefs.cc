@@ -482,6 +482,8 @@ PrefPtr PREF_SEED_RATIO = makePref("seed-ratio");
 PrefPtr PREF_BT_KEEP_ALIVE_INTERVAL = makePref("bt-keep-alive-interval");
 // values: a string, less than or equals to 20 bytes length
 PrefPtr PREF_PEER_ID_PREFIX = makePref("peer-id-prefix");
+// values: a string representing the extended BT handshake peer user agent
+PrefPtr PREF_PEER_AGENT = makePref("peer-agent");
 // values: true | false
 PrefPtr PREF_ENABLE_PEER_EXCHANGE = makePref("enable-peer-exchange");
 // values: true | false
@@ -563,6 +565,8 @@ PrefPtr PREF_BT_FORCE_ENCRYPTION = makePref("bt-force-encryption");
 // values: true | false
 PrefPtr PREF_BT_ENABLE_HOOK_AFTER_HASH_CHECK =
     makePref("bt-enable-hook-after-hash-check");
+// values: true | false
+PrefPtr PREF_BT_LOAD_SAVED_METADATA = makePref("bt-load-saved-metadata");
 
 /**
  * Metalink related preferences
