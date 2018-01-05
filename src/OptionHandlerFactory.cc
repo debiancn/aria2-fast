@@ -319,14 +319,14 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(
-        new ParameterOptionHandler(PREF_FILE_ALLOCATION, TEXT_FILE_ALLOCATION,
-                                   V_PREALLOC, {V_NONE, V_PREALLOC, V_TRUNC,
+    OptionHandler* op(new ParameterOptionHandler(
+        PREF_FILE_ALLOCATION, TEXT_FILE_ALLOCATION, V_PREALLOC,
+        {V_NONE, V_PREALLOC, V_TRUNC,
 #ifdef HAVE_SOME_FALLOCATE
-                                                V_FALLOC
+         V_FALLOC
 #endif // HAVE_SOME_FALLOCATE
-                                               },
-                                   'a'));
+        },
+        'a'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FILE);
     op->setInitialOption(true);
@@ -1528,6 +1528,16 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
+    OptionHandler* op(new BooleanOptionHandler(
+        PREF_BT_LOAD_SAVED_METADATA, TEXT_BT_LOAD_SAVED_METADATA, A2_V_FALSE,
+        OptionHandler::OPT_ARG));
+    op->addTag(TAG_BITTORRENT);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
     OptionHandler* op(new DefaultOptionHandler(
         PREF_BT_LPD_INTERFACE, TEXT_BT_LPD_INTERFACE, NO_DEFAULT_VALUE,
         "interface, IP address", OptionHandler::REQ_ARG));
@@ -1840,6 +1850,12 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     snprintf(prefix, sizeof(prefix), "A2-%d-%d-%d-", major, minor, micro);
     OptionHandler* op(new DefaultOptionHandler(PREF_PEER_ID_PREFIX,
                                                TEXT_PEER_ID_PREFIX, prefix));
+    op->addTag(TAG_BITTORRENT);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new DefaultOptionHandler(PREF_PEER_AGENT, TEXT_PEER_AGENT,
+                                               "aria2/" PACKAGE_VERSION));
     op->addTag(TAG_BITTORRENT);
     handlers.push_back(op);
   }

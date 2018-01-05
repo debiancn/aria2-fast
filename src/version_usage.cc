@@ -54,7 +54,7 @@ void showVersion()
 {
   std::cout
       << PACKAGE << _(" version ") << PACKAGE_VERSION << "\n"
-      << "Copyright (C) 2006, 2016 Tatsuhiro Tsujikawa"
+      << "Copyright (C) 2006, 2017 Tatsuhiro Tsujikawa"
       << "\n"
       << "\n"
       << _("This program is free software; you can redistribute it and/or "
@@ -108,9 +108,8 @@ void showUsage(const std::string& keyword,
     out->printf("\n");
     out->printf(_("Options:"));
     out->printf("\n");
-    for (std::vector<const OptionHandler *>::const_iterator
-             i = handlers.begin(),
-             eoi = handlers.end();
+    for (std::vector<const OptionHandler*>::const_iterator i = handlers.begin(),
+                                                           eoi = handlers.end();
          i != eoi; ++i) {
       write(out, *(*i));
       out->printf("\n");
@@ -125,7 +124,7 @@ void showUsage(const std::string& keyword,
       out->printf("\n");
       out->printf(_("Options:"));
       out->printf("\n");
-      for (std::vector<const OptionHandler *>::const_iterator
+      for (std::vector<const OptionHandler*>::const_iterator
                i = handlers.begin(),
                eoi = handlers.end();
            i != eoi; ++i) {
