@@ -434,6 +434,8 @@ extern PrefPtr PREF_SEED_RATIO;
 extern PrefPtr PREF_BT_KEEP_ALIVE_INTERVAL;
 // values: a string, less than or equals to 20 bytes length
 extern PrefPtr PREF_PEER_ID_PREFIX;
+// values: a string representing the extended BT handshake peer user agent
+extern PrefPtr PREF_PEER_AGENT;
 // values: true | false
 extern PrefPtr PREF_ENABLE_PEER_EXCHANGE;
 // values: true | false
@@ -514,6 +516,8 @@ extern PrefPtr PREF_BT_DETACH_SEED_ONLY;
 extern PrefPtr PREF_BT_FORCE_ENCRYPTION;
 // values: true | false
 extern PrefPtr PREF_BT_ENABLE_HOOK_AFTER_HASH_CHECK;
+// values: true | false
+extern PrefPtr PREF_BT_LOAD_SAVED_METADATA;
 
 /**
  * Metalink related preferences

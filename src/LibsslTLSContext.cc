@@ -132,7 +132,7 @@ OpenSSLTLSContext::OpenSSLTLSContext(TLSSessionSide side, TLSVersion minVer)
 #ifdef SSL_OP_NO_COMPRESSION
                                    | SSL_OP_NO_COMPRESSION
 #endif // SSL_OP_NO_COMPRESSION
-                      );
+  );
   SSL_CTX_set_mode(sslCtx_, SSL_MODE_AUTO_RETRY);
   SSL_CTX_set_mode(sslCtx_, SSL_MODE_ENABLE_PARTIAL_WRITE);
 #ifdef SSL_MODE_RELEASE_BUFFERS

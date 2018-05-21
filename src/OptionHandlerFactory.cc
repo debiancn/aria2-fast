@@ -319,14 +319,14 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(
-        new ParameterOptionHandler(PREF_FILE_ALLOCATION, TEXT_FILE_ALLOCATION,
-                                   V_PREALLOC, {V_NONE, V_PREALLOC, V_TRUNC,
+    OptionHandler* op(new ParameterOptionHandler(
+        PREF_FILE_ALLOCATION, TEXT_FILE_ALLOCATION, V_PREALLOC,
+        {V_NONE, V_PREALLOC, V_TRUNC,
 #ifdef HAVE_SOME_FALLOCATE
-                                                V_FALLOC
+         V_FALLOC
 #endif // HAVE_SOME_FALLOCATE
-                                               },
-                                   'a'));
+        },
+        'a'));
     op->addTag(TAG_BASIC);
     op->addTag(TAG_FILE);
     op->setInitialOption(true);
@@ -755,7 +755,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
         new LocalFilePathOptionHandler(
             PREF_RPC_CERTIFICATE, TEXT_RPC_CERTIFICATE, NO_DEFAULT_VALUE, false)
 #endif // HAVE_APPLETLS
-            );
+    );
     op->addTag(TAG_RPC);
     handlers.push_back(op);
   }
@@ -1041,7 +1041,7 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
         new LocalFilePathOptionHandler(PREF_CERTIFICATE, TEXT_CERTIFICATE,
                                        NO_DEFAULT_VALUE, false)
 #endif // HAVE_APPLETLS
-            );
+    );
     op->addTag(TAG_HTTP);
     op->addTag(TAG_HTTPS);
     handlers.push_back(op);
@@ -1480,10 +1480,10 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     handlers.push_back(op);
   }
   {
-    OptionHandler* op(new DefaultOptionHandler(PREF_BT_EXCLUDE_TRACKER,
-                                               TEXT_BT_EXCLUDE_TRACKER,
-                                               NO_DESCRIPTION, "URI,... "
-                                                               "or *"));
+    OptionHandler* op(new DefaultOptionHandler(
+        PREF_BT_EXCLUDE_TRACKER, TEXT_BT_EXCLUDE_TRACKER, NO_DESCRIPTION,
+        "URI,... "
+        "or *"));
     op->addTag(TAG_BITTORRENT);
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);
@@ -1522,6 +1522,16 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
         OptionHandler::OPT_ARG));
     op->addTag(TAG_BITTORRENT);
     op->addTag(TAG_CHECKSUM);
+    op->setInitialOption(true);
+    op->setChangeGlobalOption(true);
+    op->setChangeOptionForReserved(true);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new BooleanOptionHandler(
+        PREF_BT_LOAD_SAVED_METADATA, TEXT_BT_LOAD_SAVED_METADATA, A2_V_FALSE,
+        OptionHandler::OPT_ARG));
+    op->addTag(TAG_BITTORRENT);
     op->setInitialOption(true);
     op->setChangeGlobalOption(true);
     op->setChangeOptionForReserved(true);
@@ -1840,6 +1850,12 @@ std::vector<OptionHandler*> OptionHandlerFactory::createOptionHandlers()
     snprintf(prefix, sizeof(prefix), "A2-%d-%d-%d-", major, minor, micro);
     OptionHandler* op(new DefaultOptionHandler(PREF_PEER_ID_PREFIX,
                                                TEXT_PEER_ID_PREFIX, prefix));
+    op->addTag(TAG_BITTORRENT);
+    handlers.push_back(op);
+  }
+  {
+    OptionHandler* op(new DefaultOptionHandler(PREF_PEER_AGENT, TEXT_PEER_AGENT,
+                                               "aria2/" PACKAGE_VERSION));
     op->addTag(TAG_BITTORRENT);
     handlers.push_back(op);
   }
