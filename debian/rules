@@ -13,4 +13,4 @@ override_dh_auto_configure:
 		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 override_dh_auto_test:
-
+	#Disable tests

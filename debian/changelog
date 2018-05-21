@@ -4,8 +4,10 @@ aria2 (1.34.0-1) unstable; urgency=low
   * debian/control:
     + Updated Standards-Version to 4.1.4
     + Updated Vcs-* URLs.
+  * debian/rules:
+    + Removed whitespace.
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 21 May 2018 13:47:57 +0530
+ -- Kartik Mistry <kartik@debian.org>  Mon, 21 May 2018 17:46:40 +0530
 
 aria2 (1.33.1-1) unstable; urgency=low
 
