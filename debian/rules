@@ -4,7 +4,7 @@ DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/default.mk
 
 %:
-	dh $@ --with autotools-dev
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
@@ -14,6 +14,7 @@ override_dh_auto_configure:
 		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 override_dh_auto_test:
+	#Disable tests
 
 override_dh_auto_install:
 	dh_auto_install

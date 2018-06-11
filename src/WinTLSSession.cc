@@ -213,8 +213,10 @@ int WinTLSSession::closeConnection()
         return rv;
       }
 
-      // Alright data is sent or buffered
-      if (rv - len != 0) {
+      // Ignore error here because we probably don't handle those
+      // errors gracefully.  Just shutdown connection.  If rv is
+      // positive, then data is sent or buffered
+      if (rv > 0 && rv - len != 0) {
         return TLS_ERR_WOULDBLOCK;
       }
     }
@@ -384,8 +386,17 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
                 static_cast<char*>(sendRecordBuffers_[1].pvBuffer));
     status_ = ::EncryptMessage(&handle_, 0, &desc, 0);
     if (status_ != SEC_E_OK) {
-      A2_LOG_ERROR(fmt("WinTLS: Failed to encrypt a message! %s",
-                       getLastErrorString().c_str()));
+      if (state_ != st_closing) {
+        A2_LOG_ERROR(fmt("WinTLS: Failed to encrypt a message! %s",
+                         getLastErrorString().c_str()));
+      }
+      else {
+        // On closing state, don't log this message in error level
+        // because it seems that the encryption tends to fail in that
+        // state.
+        A2_LOG_DEBUG(fmt("WinTLS: Failed to encrypt a message! %s",
+                         getLastErrorString().c_str()));
+      }
       state_ = st_error;
       return TLS_ERR_ERROR;
     }
@@ -514,18 +525,14 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
       return TLS_ERR_ERROR;
     }
 
-    // Decrypted message successfully.
-    bool ate = false;
-    for (auto& buf : bufs) {
-      if (buf.BufferType == SECBUFFER_DATA && buf.cbBuffer > 0) {
-        decBuf_.write(buf.pvBuffer, buf.cbBuffer);
-      }
-      else if (buf.BufferType == SECBUFFER_EXTRA && buf.cbBuffer > 0) {
-        readBuf_.eat(readBuf_.size() - buf.cbBuffer);
-        ate = true;
-      }
+    // Decrypted message successfully.  Inspired from curl schannel.c.
+    if (bufs[1].BufferType == SECBUFFER_DATA && bufs[1].cbBuffer > 0) {
+      decBuf_.write(bufs[1].pvBuffer, bufs[1].cbBuffer);
     }
-    if (!ate) {
+    if (bufs[3].BufferType == SECBUFFER_EXTRA && bufs[3].cbBuffer > 0) {
+      readBuf_.eat(readBuf_.size() - bufs[3].cbBuffer);
+    }
+    else {
       readBuf_.clear();
     }
 
@@ -616,7 +623,7 @@ restart:
     // ... and start sending it
     state_ = st_handshake_write;
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_write_last:
   case st_handshake_write: {
@@ -648,7 +655,7 @@ restart:
     // Have to read one or more response messages.
     state_ = st_handshake_read;
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_read: {
   read:
@@ -768,7 +775,7 @@ restart:
       goto restart;
     }
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_done:
     if (obtainTLSRecordSizes() != 0) {

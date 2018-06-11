@@ -1,3 +1,26 @@
+aria2 (1.34.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Updated Standards-Version to 4.1.4
+    + Updated Vcs-* URLs.
+  * debian/rules:
+    + Removed whitespace.
+
+ -- Kartik Mistry <kartik@debian.org>  Mon, 21 May 2018 17:46:40 +0530
+
+aria2 (1.33.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * debian/control:
+    + Updated Standards-Version to 4.1.3
+    + Bumped debheper to 10. Set debian/compat to 11.
+    + Removed Build-Depends on autotools-dev.
+  * debian/rules:
+    + Removed obsolete --with autotools-dev flag.
+
+ -- Kartik Mistry <kartik@debian.org>  Fri, 05 Jan 2018 22:25:22 +0530
+
 aria2-fast (1.32.0-2) unstable; urgency=medium
 
   [ Patrick Ruckstuhl ]

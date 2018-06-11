@@ -495,9 +495,6 @@
 /* Define to 1 if you have the <utime.h> header file. */
 #undef HAVE_UTIME_H
 
-/* Define to 1 if you have the `uv_last_error' function. */
-#undef HAVE_UV_LAST_ERROR
-
 /* Define to 1 if you have the `vfork' function. */
 #undef HAVE_VFORK
 

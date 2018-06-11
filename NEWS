@@ -1,62 +1,52 @@
-aria2 1.32.0
+aria2 1.34.0
 ============
 
 Release Note
 ------------
 
-This release fixes several minor bugs, and spelling mistakes.
+This release fixes several bugs.  See Changes for details.
 
 Changes
 -------
 
-* Clarify --max-concurrent-downloads option
+* mingw: Use SetFileTime to avoid DST adjustment
 
-  GH-833
+  GH-1079
 
-* Fix compile error with toolchain which lacks IPV6_TCLASS
+* UnknownLengthPieceStorage: return piece length
 
-  GH-895
+  show something in console status when downloading items
+  with unknown content length
 
-* Log directed URI in notice log level
+  Patch from kwkam
 
-  GH-884
+  GH-1065
 
-* Fix typo
+* WinConsoleFile: fix colour properly
 
-  Patch from Tse Kit Yam
+  Patch from kwkam
 
-  GH-879, GH-899
+  GH-1058
 
-* Spelling fixes
+* util: also detect xdg_* env variables on windows
 
-  Patch from klemens
+  so if people like to keep FHS they could define XDG_* for it
 
-  GH-870
+  Patch from kwkam
 
-* Remove unused Android parts
+  GH-1057
 
-  These parts where unused after merging
-  https://github.com/aria2/aria2/pull/736
+* MacOS: Allocate once (apfs compat)
 
-  Patch from Fredrik Fornwall
+* Fix bug that signal handler does not work with libaria2
 
-  GH-868
+  This commit fixes the bug that signal handler does not work with
+  libaria2 when aria2::RUN_ONCE is passed to aria2::run().
 
-* Save control file early
+  GH-1053
 
-  GH-859
+* Retry on HTTP 502
 
-* Update links in Dockerfile.raspberrypi
+  Patch from nicolov
 
-  Some links used in Dockerfile.raspberrypi are not accessible
-  anymore, because they were pointing to old versions of some source
-  packages and new versions were released.  This commit fixes this by
-  changing the links to point to the newest versions.
-
-  Patch from Michał Leśniewski
-
-  GH-860
-
-* Propagate disk full error on pre-allocation to last error code
-
-  GH-856
+  GH-1038
