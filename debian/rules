@@ -8,9 +8,13 @@ include /usr/share/dpkg/default.mk
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
+		--program-suffix='-fast' \
 		--with-gnutls \
 		--without-openssl \
 		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
 
 override_dh_auto_test:
 
+override_dh_auto_install:
+	dh_auto_install
+	rm -rf debian/aria2-fast/usr/share/locale debian/aria2-fast/usr/share/doc/aria2

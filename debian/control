@@ -1,4 +1,4 @@
-Source: aria2
+Source: aria2-fast
 Section: net
 Priority: optional
 Maintainer: Patrick Ruckstuhl <patrick@ch.tario.org>
@@ -18,11 +18,13 @@ Homepage: https://aria2.github.io/
 Vcs-Git: https://anonscm.debian.org/cgit/collab-maint/aria2.git
 Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/aria2.git
 
-Package: aria2
+Package: aria2-fast
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends}
+Depends: aria2, ${misc:Depends}, ${shlibs:Depends}
 Recommends: ca-certificates
 Description: High speed download utility
  Aria2 is a command line download client with resuming and segmented
  downloading. Supported protocols are HTTP/HTTPS/FTP/BitTorrent and it also
  supports Metalink.
+ .
+ This version contains a small patch to maximize aria2 download speed.
