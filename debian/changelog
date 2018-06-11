@@ -1,4 +1,4 @@
-aria2 (1.34.0-1) unstable; urgency=low
+aria2-fast (1.34.0-1) unstable; urgency=low
 
   * New upstream release.
   * debian/control:
@@ -9,7 +9,7 @@ aria2 (1.34.0-1) unstable; urgency=low
 
  -- Kartik Mistry <kartik@debian.org>  Mon, 21 May 2018 17:46:40 +0530
 
-aria2 (1.33.1-1) unstable; urgency=low
+aria2-fast (1.33.1-1) unstable; urgency=low
 
   * New upstream release.
   * debian/control:
