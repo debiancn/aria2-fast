@@ -10,7 +10,8 @@ override_dh_auto_configure:
 	dh_auto_configure -- \
 		--with-gnutls \
 		--without-openssl \
-		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
+		--enable-libaria2
 
 override_dh_auto_test:
 	#Disable tests
