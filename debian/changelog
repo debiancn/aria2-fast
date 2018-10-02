@@ -6,8 +6,9 @@ aria2 (1.34.0-3) unstable; urgency=medium
   [ Kartik Mistry ]
   * debian/control:
     + Added missing SFTP support (Closes: #909776)
+    + Updated Standards-Version to 4.2.1
 
- -- Kartik Mistry <kartik@debian.org>  Tue, 02 Oct 2018 10:19:15 +0530
+ -- Kartik Mistry <kartik@debian.org>  Tue, 02 Oct 2018 10:27:45 +0530
 
 aria2 (1.34.0-2) unstable; urgency=low
 
