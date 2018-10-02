@@ -8,6 +8,7 @@ Build-Depends: debhelper (>= 11),
                libc-ares-dev,
                libgcrypt20-dev | libgcrypt-dev,
                libgnutls28-dev,
+               libssh2-1-dev,
                libsqlite3-dev,
                libxml2-dev,
                pkg-config,
@@ -24,7 +25,7 @@ Recommends: ca-certificates
 Description: High speed download utility
  Aria2 is a command line download client with resuming and
  segmented downloading. Supported protocols are HTTP/HTTPS/
- FTP/BitTorrent and it also supports Metalink.
+ SFTP/FTP/BitTorrent and it also supports Metalink.
 
 Package: libaria2-0
 Section: libs
@@ -41,6 +42,6 @@ Depends: libaria2-0 (= ${binary:Version}), ${misc:Depends}
 Description: High speed download utility (Development files)
  Aria2 is a command line download client with resuming and
  segmented downloading. Supported protocols are HTTP/HTTPS/
- FTP/BitTorrent and it also supports Metalink.
+ SFTP/FTP/BitTorrent and it also supports Metalink.
  .
  This package provides development files for libaria2.
