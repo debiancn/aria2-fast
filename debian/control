@@ -15,16 +15,32 @@ Build-Depends: debhelper (>= 11),
                zlib1g-dev | libz-dev
 Standards-Version: 4.2.1
 Homepage: https://aria2.github.io/
-Vcs-Git: https://salsa.debian.org/debian/aria2.git
-Vcs-Browser: https://salsa.debian.org/debian/aria2
+Vcs-Git: https://github.com/debiancn/aria2-fast.git
+Vcs-Browser: https://github.com/debiancn/aria2-fast
 
 Package: aria2-fast
-Architecture: any
-Depends: aria2, ${misc:Depends}, ${shlibs:Depends}
+Architecture: all
+Depends: aria2, libaria2-fast-0, ${misc:Depends}
 Recommends: ca-certificates
-Description: High speed download utility
+Description: High speed download utility - ultra high version
  Aria2 is a command line download client with resuming and
  segmented downloading. Supported protocols are HTTP/HTTPS/
  SFTP/FTP/BitTorrent and it also supports Metalink.
  .
- This version contains a small patch to maximize aria2 download speed.
+ This is a dummy package, which drags aria2 lib containing a
+ small patch to maximize aria2 download speed, thus turns
+ normal aria2 frontend into an evil one.
+
+Package: libaria2-fast-0
+Section: libs
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Provides: libaria2-0
+Conflicts: libaria2-0
+Replaces: libaria2-0
+Description: C++ library interface to aria2 - ultra high version
+ This C++ library offers interface to the core functionality
+ of aria2 like networking and downloading.
+ .
+ This version contains a small patch to maximize aria2 download
+ speed.
