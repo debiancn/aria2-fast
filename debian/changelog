@@ -1,3 +1,28 @@
+aria2 (1.34.0-3) unstable; urgency=medium
+
+  [ Ondřej Nový ]
+  * d/tests: Use AUTOPKGTEST_TMP instead of ADTTMP
+
+  [ Kartik Mistry ]
+  * debian/control:
+    + Added missing SFTP support (Closes: #909776)
+    + Updated Standards-Version to 4.2.1
+  * debian/rules, debian/control:
+    + Fixed hardening support.
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 02 Oct 2018 11:09:22 +0530
+
+aria2 (1.34.0-2) unstable; urgency=low
+
+  * debian/rules:
+    + Enable libaria2 library (Closes: #812159)
+  * debian/control:
+    + New binaries: libaria2-0, libaria2-0-dev.
+    + Updated Standards-Version to 4.1.5
+  * Added debian/*.install files.
+
+ -- Kartik Mistry <kartik@debian.org>  Tue, 10 Jul 2018 09:19:46 +0530
+
 aria2-fast (1.34.0-1) unstable; urgency=low
 
   * New upstream release.

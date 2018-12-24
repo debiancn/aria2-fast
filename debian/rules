@@ -1,5 +1,6 @@
 #!/usr/bin/make -f
 
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 DPKG_EXPORT_BUILDFLAGS = 1
 include /usr/share/dpkg/default.mk
 
@@ -11,7 +12,8 @@ override_dh_auto_configure:
 		--program-suffix='-fast' \
 		--with-gnutls \
 		--without-openssl \
-		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt
+		--with-ca-bundle=/etc/ssl/certs/ca-certificates.crt \
+		--enable-libaria2
 
 override_dh_auto_test:
 	#Disable tests
