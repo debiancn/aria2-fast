@@ -22,7 +22,7 @@ Package: aria2-fast
 Architecture: all
 Depends: aria2, libaria2-fast-0, ${misc:Depends}
 Recommends: ca-certificates
-Description: High speed download utility - ultra high version
+Description: High speed download utility - even faster
  Aria2 is a command line download client with resuming and
  segmented downloading. Supported protocols are HTTP/HTTPS/
  SFTP/FTP/BitTorrent and it also supports Metalink.
@@ -38,7 +38,7 @@ Depends: ${misc:Depends}, ${shlibs:Depends}
 Provides: libaria2-0
 Conflicts: libaria2-0
 Replaces: libaria2-0
-Description: C++ library interface to aria2 - ultra high version
+Description: C++ library interface to aria2 - even faster
  This C++ library offers interface to the core functionality
  of aria2 like networking and downloading.
  .
