@@ -3,7 +3,7 @@ aria2 (1.34.0-4) unstable; urgency=low
   * debian/control:
     + Added Multi-Arch: same for libaria2-0 and libaria2-0-dev.
 
- -- Kartik Mistry <kartik@debian.org>  Mon, 03 Dec 2018 19:57:26 +0530
+ -- Kartik Mistry <kartik@debian.org>  Tue, 19 Feb 2019 17:51:05 +0530
 
 aria2 (1.34.0-3) unstable; urgency=medium
 
