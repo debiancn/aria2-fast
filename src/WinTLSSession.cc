@@ -44,17 +44,17 @@
 #include "util.h"
 
 #ifndef SECBUFFER_ALERT
-#define SECBUFFER_ALERT 17
+#  define SECBUFFER_ALERT 17
 #endif
 
 #ifndef SZ_ALG_MAX_SIZE
-#define SZ_ALG_MAX_SIZE 64
+#  define SZ_ALG_MAX_SIZE 64
 #endif
 #ifndef SECPKGCONTEXT_CIPHERINFO_V1
-#define SECPKGCONTEXT_CIPHERINFO_V1 1
+#  define SECPKGCONTEXT_CIPHERINFO_V1 1
 #endif
 #ifndef SECPKG_ATTR_CIPHER_INFO
-#define SECPKG_ATTR_CIPHER_INFO 0x64
+#  define SECPKG_ATTR_CIPHER_INFO 0x64
 #endif
 
 namespace {
@@ -788,12 +788,6 @@ restart:
     A2_LOG_INFO(
         fmt("WinTLS: connected with: %s", getCipherSuite(&handle_).c_str()));
     switch (getProtocolVersion(&handle_)) {
-    case 0x300:
-      version = TLS_PROTO_SSL3;
-      break;
-    case 0x301:
-      version = TLS_PROTO_TLS10;
-      break;
     case 0x302:
       version = TLS_PROTO_TLS11;
       break;
@@ -801,8 +795,8 @@ restart:
       version = TLS_PROTO_TLS12;
       break;
     default:
-      version = TLS_PROTO_NONE;
-      break;
+      assert(0);
+      abort();
     }
     return TLS_ERR_OK;
   }

@@ -42,22 +42,23 @@
 #include <iostream>
 
 #ifdef HAVE_OPENSSL
-#include <openssl/err.h>
-#include <openssl/ssl.h>
+#  include <openssl/err.h>
+#  include <openssl/ssl.h>
+#  include "libssl_compat.h"
 #endif // HAVE_OPENSSL
 #ifdef HAVE_LIBGCRYPT
-#include <gcrypt.h>
+#  include <gcrypt.h>
 #endif // HAVE_LIBGCRYPT
 #ifdef HAVE_LIBGNUTLS
-#include <gnutls/gnutls.h>
+#  include <gnutls/gnutls.h>
 #endif // HAVE_LIBGNUTLS
 
 #ifdef ENABLE_ASYNC_DNS
-#include <ares.h>
+#  include <ares.h>
 #endif // ENABLE_ASYNC_DNS
 
 #ifdef HAVE_LIBSSH2
-#include <libssh2.h>
+#  include <libssh2.h>
 #endif // HAVE_LIBSSH2
 
 #include "a2netcompat.h"
@@ -68,7 +69,7 @@
 #include "OptionParser.h"
 #include "prefs.h"
 #ifdef HAVE_LIBGMP
-#include "a2gmp.h"
+#  include "a2gmp.h"
 #endif // HAVE_LIBGMP
 #include "LogFactory.h"
 #include "util.h"
@@ -111,12 +112,14 @@ bool Platform::setUp()
 #endif // ENABLE_NLS
 
 #ifdef HAVE_OPENSSL
+#  if !OPENSSL_101_API
   // for SSL initialization
   SSL_load_error_strings();
   SSL_library_init();
   // Need this to "decrypt" p12 files.
   OpenSSL_add_all_algorithms();
-#endif // HAVE_OPENSSL
+#  endif // !OPENSSL_101_API
+#endif   // HAVE_OPENSSL
 #ifdef HAVE_LIBGCRYPT
   if (!gcry_check_version("1.2.4")) {
     throw DL_ABORT_EX("gcry_check_version() failed.");

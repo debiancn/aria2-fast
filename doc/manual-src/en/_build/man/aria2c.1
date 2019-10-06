@@ -1,6 +1,6 @@
 .\" Man page generated from reStructuredText.
 .
-.TH "ARIA2C" "1" "May 15, 2018" "1.34.0" "aria2"
+.TH "ARIA2C" "1" "Oct 06, 2019" "1.35.0" "aria2"
 .SH NAME
 aria2c \- The ultra fast download utility
 .
@@ -1682,7 +1682,7 @@ Default: \fBtrue\fP
 .TP
 .B \-\-gid=<GID>
 Set GID manually. aria2 identifies each download by the ID called
-GID. The GID must be hex string of 16 characters, thus [0\-9a\-zA\-Z]
+GID. The GID must be hex string of 16 characters, thus [0\-9a\-fA\-F]
 are allowed and leading zeros must not be stripped. The GID all 0 is
 reserved and must not be used. The GID must be unique, otherwise
 error is reported and the download is not added.  This option is
@@ -1770,8 +1770,8 @@ Default: \fB0\fP
 .TP
 .B \-\-min\-tls\-version=<VERSION>
 Specify minimum SSL/TLS version to enable.
-Possible Values: \fBSSLv3\fP, \fBTLSv1\fP, \fBTLSv1.1\fP, \fBTLSv1.2\fP
-Default: \fBTLSv1\fP
+Possible Values: \fBTLSv1.1\fP, \fBTLSv1.2\fP, \fBTLSv1.3\fP
+Default: \fBTLSv1.2\fP
 .UNINDENT
 .INDENT 0.0
 .TP

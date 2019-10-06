@@ -34,6 +34,7 @@
 /* copyright --> */
 #include "LibsslTLSContext.h"
 
+#include <cassert>
 #include <sstream>
 
 #include <openssl/err.h>
@@ -112,16 +113,21 @@ OpenSSLTLSContext::OpenSSLTLSContext(TLSSessionSide side, TLSVersion minVer)
 
   long ver_opts = 0;
   switch (minVer) {
+#ifdef TLS1_3_VERSION
+  case TLS_PROTO_TLS13:
+    ver_opts |= SSL_OP_NO_TLSv1_2;
+    // fall through
+#endif // TLS1_3_VERSION
   case TLS_PROTO_TLS12:
     ver_opts |= SSL_OP_NO_TLSv1_1;
   // fall through
   case TLS_PROTO_TLS11:
     ver_opts |= SSL_OP_NO_TLSv1;
-  // fall through
-  case TLS_PROTO_TLS10:
     ver_opts |= SSL_OP_NO_SSLv3;
-  default:
     break;
+  default:
+    assert(0);
+    abort();
   };
 
   // Disable SSLv2 and enable all workarounds for buggy servers
@@ -146,7 +152,7 @@ OpenSSLTLSContext::OpenSSLTLSContext(TLSSessionSide side, TLSVersion minVer)
   }
 
 #if OPENSSL_VERSION_NUMBER >= 0x0090800fL
-#ifndef OPENSSL_NO_ECDH
+#  ifndef OPENSSL_NO_ECDH
   auto ecdh = EC_KEY_new_by_curve_name(NID_X9_62_prime256v1);
   if (ecdh == nullptr) {
     A2_LOG_WARN(fmt("Failed to enable ECDHE cipher suites. Cause: %s",
@@ -156,8 +162,8 @@ OpenSSLTLSContext::OpenSSLTLSContext(TLSSessionSide side, TLSVersion minVer)
     SSL_CTX_set_tmp_ecdh(sslCtx_, ecdh);
     EC_KEY_free(ecdh);
   }
-#endif // OPENSSL_NO_ECDH
-#endif // OPENSSL_VERSION_NUMBER >= 0x0090800fL
+#  endif // OPENSSL_NO_ECDH
+#endif   // OPENSSL_VERSION_NUMBER >= 0x0090800fL
 }
 
 OpenSSLTLSContext::~OpenSSLTLSContext() { SSL_CTX_free(sslCtx_); }
