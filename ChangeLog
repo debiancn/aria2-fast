@@ -1,310 +1,353 @@
-commit 823bcc4ab0d2ca3b9f3da282f0e6bd7b342b7d94 (HEAD, tag: release-1.32.0, origin/master, origin/HEAD, master)
+commit 7f79854b2ed6ef4978a8526831034b34b1fb3871 (HEAD, tag: release-1.35.0, origin/master, origin/HEAD, master)
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-17
+AuthorDate: 2019-10-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-17
+CommitDate: 2019-10-06
 
-    Bump up version number to 1.32.0
+    Fix makerelease
 
-commit d56ec91cd4cf55b373e4fb6ba28712913d57d03b
+commit 708e2637e8dfdfa949d98632fe4b4ed32ff0c083
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-17
+AuthorDate: 2019-10-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-17
+CommitDate: 2019-10-06
+
+    Bump up version number to 1.35.0
+
+commit b468c08a94d81841b5175dc7f1f59023ad54300d
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-10-06
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-10-06
 
     Update NEWS
 
-commit 315218a3b21c3721479e0e5fd057067d5da71404
+commit a93fc6aff199e9351ca64ed6850ac6ec9515d075
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-17
+AuthorDate: 2019-10-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-17
+CommitDate: 2019-10-06
 
-    Update third-party libraries for binary releases
+    Update bash_completion
 
-commit 442b2bcbdc59dcff4b8e4b87438ec39f71fae06a
+commit c0a6622bdb38a8637fe76788ef68f4d0180416a3
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-17
+AuthorDate: 2019-10-06
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-17
+CommitDate: 2019-10-06
 
     Update AUTHORS
 
-commit c90ff13d82c7712bb9620e67ea3f9539afd93628
-Merge: e665ef8f a52a2d84
+commit 4a645d9dcf3f974fcbf3b9dc5e68b955fe681576
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-10
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-05-10
+AuthorDate: 2019-09-21
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-21
 
-    Merge pull request #910 from ITriskTI/master
+    Bump copyright year in --version
+
+commit 0cb248434ff237c359cff51751d5720493dcfddd
+Merge: 23f3c4d8 286982d2
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-09-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-15
+
+    Merge branch 'update-mingw-build-dep'
+
+commit 286982d2c22c98dc4f5efe57c81473d0c5044ce9
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-09-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-15
+
+    Update mingw build dependencies
+
+commit 23f3c4d8eba9b4a8acee30f7a7c4f2c5b919bc7b
+Merge: 7f6578aa 80df9349
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-09-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-15
+
+    Merge branch 'update-android-build-dep'
+
+commit 80df934955720d2b5102bed93b4612d288038113
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-09-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-15
+
+    Fix compiler warning
+
+commit 9f5758570a51feca6a468aea6a29377566addd87
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-09-15
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-09-15
+
+    Update android build dependencies
+    
+    Update android build dependencies.  Use android NDK r20 and build
+    aarch64 binary.
+
+commit 7f6578aa7d9b2618aed13917c5681b93683a37a7
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-06-22
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-06-22
+
+    clang-format-8
+
+commit 0abde365832134114e7f8ba6695c8280e83cdca3
+Merge: ecba2625 376854cf
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2019-05-19
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2019-05-19
+
+    Merge pull request #1213 from Chaneybenjamini/libressl-pr
+    
+    Fix build with Libressl version 2.7.x
+
+commit ecba2625da8d66c674da32b30a7f5c522a5444d6
+Merge: 4af4a7cf 52da4e40
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-04-08
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-04-08
+
+    Merge branch 'modernize-tls'
+
+commit 52da4e40ea22d1db13c1eadeac5baed4e8fd5dd8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-04-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-04-07
+
+    Drop SSLv3.0 and TLSv1.0 and add TLSv1.3
+    
+    TLSv1.3 support is added for GNUTLS and OpenSSL.
+
+commit 4af4a7cfc36936350bd2aa92a6e20384fc653a47
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-04-07
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-04-07
+
+    clang-format-7
+
+commit eb7a15513a354e1af8a2646e8a351140c9fcc07c
+Merge: 37368130 0e31e37c
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2019-04-07
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2019-04-07
+
+    Merge pull request #1315 from neheb/patch-1
+    
+    Platform: Fix compilation without deprecated OpenSSL APIs
+
+commit 0e31e37c0f6ad0b3f393f024d1f6d8ce448e4746
+Author:     Rosen Penev <rosenp@gmail.com>
+AuthorDate: 2018-12-08
+Commit:     Rosen Penev <rosenp@gmail.com>
+CommitDate: 2019-01-22
+
+    Platform: Fix compilation without deprecated OpenSSL APIs
+
+commit 37368130ca7de5491a75fd18a20c5c5cc641824a
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2019-01-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2019-01-05
+
+    Mask headers
+
+commit 879e4a89b637007823709349c8f63b458551abc0
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-12-02
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-12-02
+
+    FileEntry: Use implicitly-declared copy constructor
+
+commit 6fb0fe2196251471b4e1cab2427c9e5ceb000f08
+Merge: 6c30b13a 03f40af3
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2018-11-26
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2018-11-26
+
+    Merge pull request #1306 from aria2/remove-linux-getrandom
+    
+    Remove linux getrandom and use C++ stdlib instead
+
+commit 03f40af361e7a1e57722fb4207929fdd1ad39263
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-11-25
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-11-25
+
+    Remove linux getrandom and use C++ stdlib instead
+
+commit 6c30b13a91646d5b9ed26d12806850d33ec6f94b
+Merge: 34fc5579 c6b7cca5
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2018-11-18
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2018-11-18
+
+    Merge pull request #1300 from aria2/accept-metalink
+    
+    Don't send Accept Metalink header if Metalink is disabled
+
+commit c6b7cca5fe2ffa15ccf46feb44ede208a8e135b8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-11-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-11-18
+
+    Don't send Accept Metalink header if Metalink is disabled
+
+commit 34fc557944975873b62874abb72082e91a211974
+Merge: 7e5757c2 71a98203
+Author:     Tatsuhiro Tsujikawa <404610+tatsuhiro-t@users.noreply.github.com>
+AuthorDate: 2018-11-01
+Commit:     GitHub <noreply@github.com>
+CommitDate: 2018-11-01
+
+    Merge pull request #1277 from ITriskTI/patch-1
     
     Update aria2c.rst
 
-commit a52a2d84375f78abf021f3a24d0dc1c232e6fb77
-Author:     it-0x21-rr <it-0x21-rr@ns-5-04.usr>
-AuthorDate: 2017-05-10
-Commit:     it-0x21-rr <it-0x21-rr@ns-5-04.usr>
-CommitDate: 2017-05-10
+commit 71a98203a01e029eb8d510c9dd51e4f6ee8be022
+Author:     ITriskTI <ITriskTI@gmail.com>
+AuthorDate: 2018-10-14
+Commit:     ITriskTI <ITriskTI@gmail.com>
+CommitDate: 2018-10-14
 
     Update aria2c.rst
 
-commit e665ef8f3eb4153dcb5766160fa11276d4829478
-Merge: 5eb1f2c5 9ac47a62
+commit 7e5757c238c5f751409081615abd36c9fc646f59
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-09
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-05-09
-
-    Merge pull request #907 from aria2/clarify-max-concurrent-downloads
-    
-    Clarify --max-concurrent-downloads option
-
-commit 5eb1f2c574351e95abc6aa0066771b72f791a853
-Merge: 63ad6e00 fe2226b9
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-08
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-05-08
-
-    Merge pull request #906 from aria2/fix-compile-error
-    
-    Fix compile error with toolchain which lacks IPV6_TCLASS
-
-commit 9ac47a62b4952175b23697d7ca04b6f5a912c357
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-08
+AuthorDate: 2018-10-13
 Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-08
-
-    Clarify --max-concurrent-downloads option
-
-commit fe2226b988c96c2380686b6a68665fd830445ddd
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-08
-
-    Fix compile error with toolchain which lacks IPV6_TCLASS
-
-commit 63ad6e00725b40d48c784b9451fbc13716fa9ac8
-Merge: 3cbc83dc e07356a5
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-05-08
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-08
-
-    Merge branch 'tsekityam-master'
-
-commit e07356a502fc7bad3cfefb27a0077625ea93a7bf
-Author:     Tse Kit Yam <me@kytse.com>
-AuthorDate: 2017-05-03
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-05-08
-
-    Fix typo
-    
-    Although I haven’t checked the code, I believe `unpauseAll` only works
-    on paused downloads.
-
-commit 3cbc83dc07ccb4b990d828c0c2d4252ce51a0683
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-29
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-04-29
+CommitDate: 2018-10-13
 
     Update doc
 
-commit a28396065e3ab0ef6c1379f944088e6da48f5ce7
+commit 8e5dbad079786ecc8c6e76de47b5b2ab637e460b
+Merge: 475e6c59 7a58936e
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-16
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-04-16
-
-    Fix broken text formatting
-
-commit 79a20e046f3abb53643682dc2efb3096cf550799
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-15
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-04-15
-
-    Fix typo
-
-commit e441cf05755ca783f245cf8012f419979bbd85d2
-Merge: 1d77985a c7a13f93
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-13
+AuthorDate: 2018-09-13
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-04-13
+CommitDate: 2018-09-13
 
-    Merge pull request #885 from aria2/notice-log-level-redirection-uri
+    Merge pull request #1259 from eric1932/patch-1
     
-    Log directed URI in notice log level
+    Update README.rst
 
-commit c7a13f934cf690a15cff4daece8eec6ead10a08d
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-09
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-04-09
-
-    Log directed URI in notice log level
-
-commit 1d77985abd809ac18e875020854d1e4d1fd09630
-Merge: b51e5814 1e8cf515
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-04-02
+commit 7a58936e061d3d73284f148dba8eb2ef32067ab3
+Author:     eric1932 <eric1932@users.noreply.github.com>
+AuthorDate: 2018-09-12
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-04-02
+CommitDate: 2018-09-12
 
-    Merge pull request #879 from tsekityam/patch-1
+    Update README.rst
+
+commit 475e6c59970c95561ca9eb6b4a02fb54ec4a91fc
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-06-18
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-06-18
+
+    Fix "UDP" typo
     
-    Fix typo
+    Patch from Sergey Matveev
 
-commit 1e8cf5151e59d04e7b13033e01da435c452daeeb
-Author:     Tse Kit Yam <tsekityam@users.noreply.github.com>
-AuthorDate: 2017-04-01
+commit e0a827ff98e665a118e2001dfe29b14847a33070
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-06-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-06-09
+
+    Enable IndentPPDirectives
+
+commit 6f40026944d817a25a0275301eb295e49f23345c
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-06-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-06-09
+
+    Update .clang-format
+
+commit 67d07534ea0315b5cbc6ff3ab91a1aceac0bcca8
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-06-09
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-06-09
+
+    clang-format-6.0
+
+commit eb30bb1a520173b8721c912f8e244c42c2867772
+Merge: 906c77cc b8df7b08
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-06-05
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-04-01
+CommitDate: 2018-06-05
 
-    Fix typo
+    Merge pull request #1214 from aria2/fix-gnutls-empty-cn-bug
+    
+    gnutls: Fix bug that commonName is always empty
 
-commit b51e5814f1786cb80a36a97d1f360020dcd71ff9
-Merge: f0adbde2 aa5567d7
+commit 906c77cc9c5c969a0043f81ca8b76690040cf1f2
+Merge: 388d1ca3 e3d4a080
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-21
+AuthorDate: 2018-06-05
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-03-21
+CommitDate: 2018-06-05
 
-    Merge pull request #870 from ka7/feature/spelling
+    Merge pull request #1195 from tcely/patch-1
     
-    Feature/spelling
+    remove comment about missing multi target
 
-commit aa5567d774692e54cb0c6761a34f9d84faccc8f7
-Author:     klemens <ka7@github.com>
-AuthorDate: 2017-03-20
-Commit:     klemens <ka7@github.com>
-CommitDate: 2017-03-20
-
-    spelling fixes
-
-commit ec2ce4ffe5ca6af1a509dcd5a4d8bf0d5644401d
-Author:     klemens <ka7@github.com>
-AuthorDate: 2017-03-20
-Commit:     klemens <ka7@github.com>
-CommitDate: 2017-03-20
-
-    spelling fixes
-
-commit f0adbde2e6bd46eef13367dc564524c70c0c3916
-Merge: 7db393ec 68edbb35
+commit b8df7b0880a62e241d0df7f5df964dc51a8dbe5d
 Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-19
+AuthorDate: 2018-06-05
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-06-05
+
+    gnutls: Fix bug that commonName is always empty
+
+commit 376854cfc4dd2141eeb1358fca0a2df84b3d1955
+Author:     Ben Chaney <chaneybenjamini@gmail.com>
+AuthorDate: 2018-06-03
+Commit:     Ben Chaney <chaneybenjamini@gmail.com>
+CommitDate: 2018-06-03
+
+    Fix openssl API version logic for libressl 2.7.x
+
+commit 388d1ca3303128a233cafd275a4472e3c9cd0a17
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-05-17
+
+    Fix compile warning
+
+commit e8e04d6f22a507e8374651d3d2343cd9fb986993
+Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+AuthorDate: 2018-05-17
+Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
+CommitDate: 2018-05-17
+
+    Fix build failure when InternalDHKeyExchange is used
+
+commit e3d4a0802059a09b6ed6d032a0f007ed509e8112
+Author:     tcely <tcely@users.noreply.github.com>
+AuthorDate: 2018-05-13
 Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-03-19
+CommitDate: 2018-05-13
 
-    Merge pull request #868 from fornwall/android-cleanup
-    
-    Remove unused Android parts
-
-commit 68edbb358c49d9a4aa7690b14dc904a0fc166844
-Author:     Fredrik Fornwall <fredrik@fornwall.net>
-AuthorDate: 2017-03-18
-Commit:     Fredrik Fornwall <fredrik@fornwall.net>
-CommitDate: 2017-03-18
-
-    Remove unused Android parts
-    
-    These parts where unused after merging https://github.com/aria2/aria2/pull/736
-
-commit 7db393ec3dca29c905e9fe257a8756879be692f6
-Merge: 9eff8100 bfc54d0b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-05
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-03-05
-
-    Merge branch 'save-control-file-early'
-
-commit bfc54d0b9a694e5d87efd8ed11b5393bc4b66f93
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-03-02
-
-    Save control file early
-
-commit 9eff8100ef28ccda14161a35628c51063cf66f66
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-03-02
-
-    Refactor
-
-commit 924e115e3e1c49ac7d9eab4389dc627da0bbf9b7
-Merge: 6289aafa 0cee6f5a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-02
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-03-02
-
-    Merge pull request #860 from mlesniew/update_raspberry_pi_dockerfile
-    
-    Update links in Dockerfile.raspberrypi
-
-commit 6289aafaf850e854e5b03710726db984df7cf82b
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-03-02
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-03-02
-
-    Increase backlog to 1024
-
-commit 0cee6f5a34f0fe9089fb06bca62bbcea6d1a654f
-Author:     Michał Leśniewski <mlesniew@gmail.com>
-AuthorDate: 2017-03-01
-Commit:     Michał Leśniewski <mlesniew@gmail.com>
-CommitDate: 2017-03-02
-
-    Update links in Dockerfile.raspberrypi
-    
-    Some links used in Dockerfile.raspberrypi are not accessible anymore,
-    because they were pointing to old versions of some source packages and
-    new versions were released.  This commit fixes this by changing the
-    links to point to the newest versions.
-
-commit 147c68f4bc3b7b4285cf0007632830d5f5b63f7d
-Merge: 857d6a2a 8fc0c851
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-02-26
-Commit:     GitHub <noreply@github.com>
-CommitDate: 2017-02-26
-
-    Merge pull request #857 from aria2/fix-disk-full-error
-    
-    Propagate disk full error on pre-allocation to last error code
-
-commit 8fc0c85125fc4d30decdedd4c1f454999397406a
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-02-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-02-23
-
-    Propagate disk full error on pre-allocation to last error code
-
-commit 857d6a2a8e924618d37e75e6eda5e008a431cc48
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-01-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-01-23
-
-    Fix compiler warning with Android NDK clang
-
-commit 13b2c4a0f93bc8345e80fcc7030f90e0530d6734
-Author:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-AuthorDate: 2017-01-23
-Commit:     Tatsuhiro Tsujikawa <tatsuhiro.t@gmail.com>
-CommitDate: 2017-01-23
-
-    Compile using Android NDK clang
+    remove comment about missing multi target

@@ -50,7 +50,7 @@
 #include "ChunkChecksum.h"
 #include "MessageDigest.h"
 #ifdef ENABLE_BITTORRENT
-#include "magnet.h"
+#  include "magnet.h"
 #endif // ENABLE_BITTORRENT
 
 namespace aria2 {
@@ -254,7 +254,7 @@ void MetalinkParserController::commitResourceTransaction()
   else {
     tEntry_->resources.push_back(std::move(tResource_));
   }
-#else // !ENABLE_BITTORRENT
+#else  // !ENABLE_BITTORRENT
   tEntry_->resources.push_back(std::move(tResource_));
 #endif // !ENABLE_BITTORRENT
   tResource_.reset();

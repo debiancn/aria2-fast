@@ -163,12 +163,6 @@
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
-/* Define to 1 if you have the `getrandom' function. */
-#undef HAVE_GETRANDOM
-
-/* Define to 1 if getrandom linux syscall interface is available. */
-#undef HAVE_GETRANDOM_INTERFACE
-
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
 
@@ -494,9 +488,6 @@
 
 /* Define to 1 if you have the <utime.h> header file. */
 #undef HAVE_UTIME_H
-
-/* Define to 1 if you have the `uv_last_error' function. */
-#undef HAVE_UV_LAST_ERROR
 
 /* Define to 1 if you have the `vfork' function. */
 #undef HAVE_VFORK

@@ -35,10 +35,10 @@
 /* copyright --> */
 
 #ifdef __MINGW32__
-#ifdef _WIN32_WINNT
-#undef _WIN32_WINNT
-#endif // _WIN32_WINNT
-#define _WIN32_WINNT 0x0600
+#  ifdef _WIN32_WINNT
+#    undef _WIN32_WINNT
+#  endif // _WIN32_WINNT
+#  define _WIN32_WINNT 0x0600
 #endif // __MINGW32__
 
 #include "LibuvEventPoll.h"
@@ -65,23 +65,8 @@ template <typename T> static void close_callback(uv_handle_t* handle)
   delete reinterpret_cast<T*>(handle);
 }
 
-#if !defined(UV_VERSION_MINOR) ||                                              \
-    (UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10)
-
-static void timer_callback(uv_timer_t* handle, int status)
-{
-  uv_stop(handle->loop);
-}
-
-static void timer_callback(uv_timer_t* handle) { timer_callback(handle, 0); }
-
-#else // !defined(UV_VERSION_MINOR) || (UV_VERSION_MAJOR == 0 &&
-// UV_VERSION_MINOR <= 10)
-
 static void timer_callback(uv_timer_t* handle) { uv_stop(handle->loop); }
-
-#endif // !defined(UV_VERSION_MINOR) || UV_VERSION_MINOR <= 10
-}
+} // namespace
 
 namespace aria2 {
 
@@ -189,14 +174,8 @@ int LibuvEventPoll::translateEvents(EventPoll::EventType events)
 
 void LibuvEventPoll::pollCallback(KPoll* poll, int status, int events)
 {
-#if HAVE_UV_LAST_ERROR
-  if (status == -1) {
-    uv_err_t err = uv_last_error(loop_);
-    switch (err.code) {
-#else
   if (status < 0) {
     switch (status) {
-#endif
     case UV_EAGAIN:
     case UV_EINTR:
       return;

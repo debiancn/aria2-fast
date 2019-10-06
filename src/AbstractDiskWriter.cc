@@ -36,7 +36,7 @@
 
 #include <unistd.h>
 #ifdef HAVE_MMAP
-#include <sys/mman.h>
+#  include <sys/mman.h>
 #endif // HAVE_MMAP
 #include <fcntl.h>
 
@@ -119,7 +119,7 @@ void AbstractDiskWriter::openFile(int64_t totalLength)
 #else  // !__MINGW32__
         e.getErrNum() == ENOENT
 #endif // !__MINGW32__
-        ) {
+    ) {
       initAndOpenFile(totalLength);
     }
     else {
@@ -133,17 +133,17 @@ void AbstractDiskWriter::closeFile()
 #if defined(HAVE_MMAP) || defined(__MINGW32__)
   if (mapaddr_) {
     int errNum = 0;
-#ifdef __MINGW32__
+#  ifdef __MINGW32__
     if (!UnmapViewOfFile(mapaddr_)) {
       errNum = GetLastError();
     }
     CloseHandle(mapView_);
     mapView_ = INVALID_HANDLE_VALUE;
-#else  // !__MINGW32__
+#  else  // !__MINGW32__
     if (munmap(mapaddr_, maplen_) == -1) {
       errNum = errno;
     }
-#endif // !__MINGW32__
+#  endif // !__MINGW32__
     if (errNum != 0) {
       int errNum = fileError();
       A2_LOG_ERROR(fmt("Unmapping file %s failed: %s", filename_.c_str(),
@@ -201,9 +201,10 @@ HANDLE openFileWithFlags(const std::string& filename, int flags,
                    FILE_ATTRIBUTE_NORMAL, /* hTemplateFile */ 0);
   if (hn == INVALID_HANDLE_VALUE) {
     int errNum = GetLastError();
-    throw DL_ABORT_EX3(errNum, fmt(EX_FILE_OPEN, filename.c_str(),
-                                   fileStrerror(errNum).c_str()),
-                       errCode);
+    throw DL_ABORT_EX3(
+        errNum,
+        fmt(EX_FILE_OPEN, filename.c_str(), fileStrerror(errNum).c_str()),
+        errCode);
   }
   return hn;
 }
@@ -217,18 +218,19 @@ int openFileWithFlags(const std::string& filename, int flags,
     ;
   if (fd < 0) {
     int errNum = errno;
-    throw DL_ABORT_EX3(errNum, fmt(EX_FILE_OPEN, filename.c_str(),
-                                   util::safeStrerror(errNum).c_str()),
-                       errCode);
+    throw DL_ABORT_EX3(
+        errNum,
+        fmt(EX_FILE_OPEN, filename.c_str(), util::safeStrerror(errNum).c_str()),
+        errCode);
   }
   util::make_fd_cloexec(fd);
-#if defined(__APPLE__) && defined(__MACH__)
+#  if defined(__APPLE__) && defined(__MACH__)
   // This may reduce memory consumption on Mac OS X.
   fcntl(fd, F_NOCACHE, 1);
-#endif // __APPLE__ && __MACH__
+#  endif // __APPLE__ && __MACH__
   return fd;
 }
-#endif // !__MINGW32__
+#endif   // !__MINGW32__
 } // namespace
 
 void AbstractDiskWriter::openExistingFile(int64_t totalLength)
@@ -343,17 +345,17 @@ void AbstractDiskWriter::ensureMmapWrite(size_t len, int64_t offset)
     if (mapaddr_) {
       if (static_cast<int64_t>(len + offset) > maplen_) {
         int errNum = 0;
-#ifdef __MINGW32__
+#  ifdef __MINGW32__
         if (!UnmapViewOfFile(mapaddr_)) {
           errNum = GetLastError();
         }
         CloseHandle(mapView_);
         mapView_ = INVALID_HANDLE_VALUE;
-#else  // !__MINGW32__
+#  else  // !__MINGW32__
         if (munmap(mapaddr_, maplen_) == -1) {
           errNum = errno;
         }
-#endif // !__MINGW32__
+#  endif // !__MINGW32__
         if (errNum != 0) {
           A2_LOG_ERROR(fmt("Unmapping file %s failed: %s", filename_.c_str(),
                            fileStrerror(errNum).c_str()));
@@ -383,7 +385,7 @@ void AbstractDiskWriter::ensureMmapWrite(size_t len, int64_t offset)
 
       int errNum = 0;
       if (static_cast<int64_t>(len + offset) <= filesize) {
-#ifdef __MINGW32__
+#  ifdef __MINGW32__
         mapView_ = CreateFileMapping(fd_, 0, PAGE_READWRITE, filesize >> 32,
                                      filesize & 0xffffffffu, 0);
         if (mapView_) {
@@ -398,7 +400,7 @@ void AbstractDiskWriter::ensureMmapWrite(size_t len, int64_t offset)
         else {
           errNum = GetLastError();
         }
-#else  // !__MINGW32__
+#  else  // !__MINGW32__
         auto pa =
             mmap(nullptr, filesize, PROT_READ | PROT_WRITE, MAP_SHARED, fd_, 0);
 
@@ -408,7 +410,7 @@ void AbstractDiskWriter::ensureMmapWrite(size_t len, int64_t offset)
         else {
           mapaddr_ = reinterpret_cast<unsigned char*>(pa);
         }
-#endif // !__MINGW32__
+#  endif // !__MINGW32__
         if (mapaddr_) {
           A2_LOG_DEBUG(fmt("Mapping file %s succeeded, length=%" PRId64 "",
                            filename_.c_str(), static_cast<uint64_t>(filesize)));
@@ -454,9 +456,10 @@ void AbstractDiskWriter::writeData(const unsigned char* data, size_t len,
           error_code::NOT_ENOUGH_DISK_SPACE);
     }
     else {
-      throw DL_ABORT_EX3(errNum, fmt(EX_FILE_WRITE, filename_.c_str(),
-                                     fileStrerror(errNum).c_str()),
-                         error_code::FILE_IO_ERROR);
+      throw DL_ABORT_EX3(
+          errNum,
+          fmt(EX_FILE_WRITE, filename_.c_str(), fileStrerror(errNum).c_str()),
+          error_code::FILE_IO_ERROR);
     }
   }
 }
@@ -467,9 +470,10 @@ ssize_t AbstractDiskWriter::readData(unsigned char* data, size_t len,
   ssize_t ret;
   if ((ret = readDataInternal(data, len, offset)) < 0) {
     int errNum = fileError();
-    throw DL_ABORT_EX3(errNum, fmt(EX_FILE_READ, filename_.c_str(),
-                                   fileStrerror(errNum).c_str()),
-                       error_code::FILE_IO_ERROR);
+    throw DL_ABORT_EX3(
+        errNum,
+        fmt(EX_FILE_READ, filename_.c_str(), fileStrerror(errNum).c_str()),
+        error_code::FILE_IO_ERROR);
   }
   return ret;
 }
@@ -513,7 +517,7 @@ void AbstractDiskWriter::allocate(int64_t offset, int64_t length, bool sparse)
     return;
   }
 #ifdef HAVE_SOME_FALLOCATE
-#ifdef __MINGW32__
+#  ifdef __MINGW32__
   truncate(offset + length);
   if (!SetFileValidData(fd_, offset + length)) {
     auto errNum = fileError();
@@ -524,29 +528,25 @@ void AbstractDiskWriter::allocate(int64_t offset, int64_t length, bool sparse)
         "(see --file-allocation).",
         fileStrerror(errNum).c_str()));
   }
-#elif defined(__APPLE__) && defined(__MACH__)
-  auto toalloc = offset + length - size();
-  while (toalloc > 0) {
-    fstore_t fstore = {
-        F_ALLOCATECONTIG | F_ALLOCATEALL, F_PEOFPOSMODE, 0,
-        // Allocate in 1GB chunks or else some OSX versions may choke.
-        std::min(toalloc, (int64_t)1 << 30), 0};
+#  elif defined(__APPLE__) && defined(__MACH__)
+  const auto toalloc = offset + length - size();
+  fstore_t fstore = {F_ALLOCATECONTIG | F_ALLOCATEALL, F_PEOFPOSMODE, 0,
+                     toalloc, 0};
+  if (fcntl(fd_, F_PREALLOCATE, &fstore) == -1) {
+    // Retry non-contig.
+    fstore.fst_flags = F_ALLOCATEALL;
     if (fcntl(fd_, F_PREALLOCATE, &fstore) == -1) {
-      // Retry non-contig.
-      fstore.fst_flags = F_ALLOCATEALL;
-      if (fcntl(fd_, F_PREALLOCATE, &fstore) == -1) {
-        int err = errno;
-        throw DL_ABORT_EX3(
-            err, fmt("fcntl(F_PREALLOCATE) of %" PRId64 " failed. cause: %s",
-                     fstore.fst_length, util::safeStrerror(err).c_str()),
-            error_code::FILE_IO_ERROR);
-      }
+      int err = errno;
+      throw DL_ABORT_EX3(
+          err,
+          fmt("fcntl(F_PREALLOCATE) of %" PRId64 " failed. cause: %s",
+              fstore.fst_length, util::safeStrerror(err).c_str()),
+          error_code::FILE_IO_ERROR);
     }
-    toalloc -= fstore.fst_bytesalloc;
   }
   // This forces the allocation on disk.
   ftruncate(fd_, offset + length);
-#elif HAVE_FALLOCATE
+#  elif HAVE_FALLOCATE
   // For linux, we use fallocate to detect file system supports
   // fallocate or not.
   int r;
@@ -560,17 +560,18 @@ void AbstractDiskWriter::allocate(int64_t offset, int64_t length, bool sparse)
         isDiskFullError(errNum) ? error_code::NOT_ENOUGH_DISK_SPACE
                                 : error_code::FILE_IO_ERROR);
   }
-#elif HAVE_POSIX_FALLOCATE
+#  elif HAVE_POSIX_FALLOCATE
   int r = posix_fallocate(fd_, offset, length);
   if (r != 0) {
-    throw DL_ABORT_EX3(r, fmt("posix_fallocate failed. cause: %s",
-                              util::safeStrerror(r).c_str()),
-                       isDiskFullError(r) ? error_code::NOT_ENOUGH_DISK_SPACE
-                                          : error_code::FILE_IO_ERROR);
+    throw DL_ABORT_EX3(
+        r,
+        fmt("posix_fallocate failed. cause: %s", util::safeStrerror(r).c_str()),
+        isDiskFullError(r) ? error_code::NOT_ENOUGH_DISK_SPACE
+                           : error_code::FILE_IO_ERROR);
   }
-#else
-#error "no *_fallocate function available."
-#endif
+#  else
+#    error "no *_fallocate function available."
+#  endif
 #endif // HAVE_SOME_FALLOCATE
 }
 

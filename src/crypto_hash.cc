@@ -4,6 +4,7 @@
 
 #include "crypto_hash.h"
 #include "crypto_endian.h"
+#include "a2functional.h"
 
 #include <cstring>
 #include <stdexcept>
@@ -11,11 +12,11 @@
 
 // Compiler hints
 #if defined(__GNUG__)
-#define likely(x) __builtin_expect(!!(x), 1)
-#define unlikely(x) __builtin_expect(!!(x), 0)
+#  define likely(x) __builtin_expect(!!(x), 1)
+#  define unlikely(x) __builtin_expect(!!(x), 0)
 #else // ! __GNUG_
-#define likely(x) (x)
-#define unlikely(x) (x)
+#  define likely(x) (x)
+#  define unlikely(x) (x)
 #endif // ! __GNUG__
 
 // Basic operations
@@ -51,9 +52,9 @@ template <typename T> static forceinline T par(T b, T c, T d)
 }
 
 #ifdef __GNUG__
-#define __hash_maybe_memfence __asm__("" ::: "memory")
+#  define __hash_maybe_memfence __asm__("" ::: "memory")
 #else // __GNUG__
-#define __hash_maybe_memfence
+#  define __hash_maybe_memfence
 #endif // __GNUG__
 
 // Template for the |::transform|s
@@ -1055,22 +1056,22 @@ std::unique_ptr<Algorithm> crypto::hash::create(Algorithms algo)
 {
   switch (algo) {
   case algoMD5:
-    return std::unique_ptr<MD5>(new MD5());
+    return aria2::make_unique<MD5>();
 
   case algoSHA1:
-    return std::unique_ptr<SHA1>(new SHA1());
+    return aria2::make_unique<SHA1>();
 
   case algoSHA224:
-    return std::unique_ptr<SHA224>(new SHA224());
+    return aria2::make_unique<SHA224>();
 
   case algoSHA256:
-    return std::unique_ptr<SHA256>(new SHA256());
+    return aria2::make_unique<SHA256>();
 
   case algoSHA384:
-    return std::unique_ptr<SHA384>(new SHA384());
+    return aria2::make_unique<SHA384>();
 
   case algoSHA512:
-    return std::unique_ptr<SHA512>(new SHA512());
+    return aria2::make_unique<SHA512>();
 
   default:
     throw std::domain_error("Invalid hash algorithm");

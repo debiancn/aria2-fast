@@ -150,10 +150,9 @@ const std::string V_ARC4("arc4");
 const std::string V_HTTP("http");
 const std::string V_HTTPS("https");
 const std::string V_FTP("ftp");
-const std::string A2_V_SSL3("SSLv3");
-const std::string A2_V_TLS10("TLSv1");
 const std::string A2_V_TLS11("TLSv1.1");
 const std::string A2_V_TLS12("TLSv1.2");
+const std::string A2_V_TLS13("TLSv1.3");
 
 PrefPtr PREF_VERSION = makePref("version");
 PrefPtr PREF_HELP = makePref("help");
@@ -482,6 +481,8 @@ PrefPtr PREF_SEED_RATIO = makePref("seed-ratio");
 PrefPtr PREF_BT_KEEP_ALIVE_INTERVAL = makePref("bt-keep-alive-interval");
 // values: a string, less than or equals to 20 bytes length
 PrefPtr PREF_PEER_ID_PREFIX = makePref("peer-id-prefix");
+// values: a string representing the extended BT handshake peer user agent
+PrefPtr PREF_PEER_AGENT = makePref("peer-agent");
 // values: true | false
 PrefPtr PREF_ENABLE_PEER_EXCHANGE = makePref("enable-peer-exchange");
 // values: true | false
@@ -563,6 +564,8 @@ PrefPtr PREF_BT_FORCE_ENCRYPTION = makePref("bt-force-encryption");
 // values: true | false
 PrefPtr PREF_BT_ENABLE_HOOK_AFTER_HASH_CHECK =
     makePref("bt-enable-hook-after-hash-check");
+// values: true | false
+PrefPtr PREF_BT_LOAD_SAVED_METADATA = makePref("bt-load-saved-metadata");
 
 /**
  * Metalink related preferences

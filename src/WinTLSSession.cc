@@ -44,17 +44,17 @@
 #include "util.h"
 
 #ifndef SECBUFFER_ALERT
-#define SECBUFFER_ALERT 17
+#  define SECBUFFER_ALERT 17
 #endif
 
 #ifndef SZ_ALG_MAX_SIZE
-#define SZ_ALG_MAX_SIZE 64
+#  define SZ_ALG_MAX_SIZE 64
 #endif
 #ifndef SECPKGCONTEXT_CIPHERINFO_V1
-#define SECPKGCONTEXT_CIPHERINFO_V1 1
+#  define SECPKGCONTEXT_CIPHERINFO_V1 1
 #endif
 #ifndef SECPKG_ATTR_CIPHER_INFO
-#define SECPKG_ATTR_CIPHER_INFO 0x64
+#  define SECPKG_ATTR_CIPHER_INFO 0x64
 #endif
 
 namespace {
@@ -213,8 +213,10 @@ int WinTLSSession::closeConnection()
         return rv;
       }
 
-      // Alright data is sent or buffered
-      if (rv - len != 0) {
+      // Ignore error here because we probably don't handle those
+      // errors gracefully.  Just shutdown connection.  If rv is
+      // positive, then data is sent or buffered
+      if (rv > 0 && rv - len != 0) {
         return TLS_ERR_WOULDBLOCK;
       }
     }
@@ -384,8 +386,17 @@ ssize_t WinTLSSession::writeData(const void* data, size_t len)
                 static_cast<char*>(sendRecordBuffers_[1].pvBuffer));
     status_ = ::EncryptMessage(&handle_, 0, &desc, 0);
     if (status_ != SEC_E_OK) {
-      A2_LOG_ERROR(fmt("WinTLS: Failed to encrypt a message! %s",
-                       getLastErrorString().c_str()));
+      if (state_ != st_closing) {
+        A2_LOG_ERROR(fmt("WinTLS: Failed to encrypt a message! %s",
+                         getLastErrorString().c_str()));
+      }
+      else {
+        // On closing state, don't log this message in error level
+        // because it seems that the encryption tends to fail in that
+        // state.
+        A2_LOG_DEBUG(fmt("WinTLS: Failed to encrypt a message! %s",
+                         getLastErrorString().c_str()));
+      }
       state_ = st_error;
       return TLS_ERR_ERROR;
     }
@@ -514,18 +525,14 @@ ssize_t WinTLSSession::readData(void* data, size_t len)
       return TLS_ERR_ERROR;
     }
 
-    // Decrypted message successfully.
-    bool ate = false;
-    for (auto& buf : bufs) {
-      if (buf.BufferType == SECBUFFER_DATA && buf.cbBuffer > 0) {
-        decBuf_.write(buf.pvBuffer, buf.cbBuffer);
-      }
-      else if (buf.BufferType == SECBUFFER_EXTRA && buf.cbBuffer > 0) {
-        readBuf_.eat(readBuf_.size() - buf.cbBuffer);
-        ate = true;
-      }
+    // Decrypted message successfully.  Inspired from curl schannel.c.
+    if (bufs[1].BufferType == SECBUFFER_DATA && bufs[1].cbBuffer > 0) {
+      decBuf_.write(bufs[1].pvBuffer, bufs[1].cbBuffer);
     }
-    if (!ate) {
+    if (bufs[3].BufferType == SECBUFFER_EXTRA && bufs[3].cbBuffer > 0) {
+      readBuf_.eat(readBuf_.size() - bufs[3].cbBuffer);
+    }
+    else {
       readBuf_.clear();
     }
 
@@ -616,7 +623,7 @@ restart:
     // ... and start sending it
     state_ = st_handshake_write;
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_write_last:
   case st_handshake_write: {
@@ -648,7 +655,7 @@ restart:
     // Have to read one or more response messages.
     state_ = st_handshake_read;
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_read: {
   read:
@@ -768,7 +775,7 @@ restart:
       goto restart;
     }
   }
-  // Fall through
+    // Fall through
 
   case st_handshake_done:
     if (obtainTLSRecordSizes() != 0) {
@@ -781,12 +788,6 @@ restart:
     A2_LOG_INFO(
         fmt("WinTLS: connected with: %s", getCipherSuite(&handle_).c_str()));
     switch (getProtocolVersion(&handle_)) {
-    case 0x300:
-      version = TLS_PROTO_SSL3;
-      break;
-    case 0x301:
-      version = TLS_PROTO_TLS10;
-      break;
     case 0x302:
       version = TLS_PROTO_TLS11;
       break;
@@ -794,8 +795,8 @@ restart:
       version = TLS_PROTO_TLS12;
       break;
     default:
-      version = TLS_PROTO_NONE;
-      break;
+      assert(0);
+      abort();
     }
     return TLS_ERR_OK;
   }

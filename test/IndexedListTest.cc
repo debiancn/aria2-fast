@@ -109,7 +109,7 @@ void IndexedListTest::testErase()
     CPPUNIT_ASSERT_EQUAL((size_t)(std::distance(i, list.end())), list.size());
 
     int* pp = ++p;
-    for (IndexedList<int, int *>::iterator j = list.begin(); j != list.end();
+    for (IndexedList<int, int*>::iterator j = list.begin(); j != list.end();
          ++j, ++pp) {
       CPPUNIT_ASSERT_EQUAL(*pp, **j);
     }
@@ -405,7 +405,7 @@ namespace {
 struct RemoveOdd {
   bool operator()(int* p) const { return *p % 2 == 1; }
 };
-}
+} // namespace
 void IndexedListTest::testRemoveIf()
 {
   int a[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};

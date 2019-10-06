@@ -22,9 +22,9 @@
 #include "FileEntry.h"
 #include "RpcMethodFactory.h"
 #ifdef ENABLE_BITTORRENT
-#include "BtRegistry.h"
-#include "BtRuntime.h"
-#include "bittorrent_helper.h"
+#  include "BtRegistry.h"
+#  include "BtRuntime.h"
+#  include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
 
 namespace aria2 {
@@ -1287,7 +1287,9 @@ void RpcMethodTest::testGetSessionInfo()
 void RpcMethodTest::testPause()
 {
   std::vector<std::string> uris{
-      "http://url1", "http://url2", "http://url3",
+      "http://url1",
+      "http://url2",
+      "http://url3",
   };
   option_->put(PREF_FORCE_SEQUENTIAL, A2_V_TRUE);
   std::vector<std::shared_ptr<RequestGroup>> groups;

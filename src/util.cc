@@ -36,21 +36,21 @@
 
 #ifdef __sun
 // For opensolaris, just include signal.h which includes sys/signal.h
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
-#endif // HAVE_SIGNAL_H
-#else  // !__sun
-#ifdef HAVE_SYS_SIGNAL_H
-#include <sys/signal.h>
-#endif // HAVE_SYS_SIGNAL_H
-#ifdef HAVE_SIGNAL_H
-#include <signal.h>
-#endif // HAVE_SIGNAL_H
-#endif // !__sun
+#  ifdef HAVE_SIGNAL_H
+#    include <signal.h>
+#  endif // HAVE_SIGNAL_H
+#else    // !__sun
+#  ifdef HAVE_SYS_SIGNAL_H
+#    include <sys/signal.h>
+#  endif // HAVE_SYS_SIGNAL_H
+#  ifdef HAVE_SIGNAL_H
+#    include <signal.h>
+#  endif // HAVE_SIGNAL_H
+#endif   // !__sun
 
 #include <sys/types.h>
 #ifdef HAVE_PWD_H
-#include <pwd.h>
+#  include <pwd.h>
 #endif // HAVE_PWD_H
 
 #include <array>
@@ -91,7 +91,7 @@
 
 // For libc6 which doesn't define ULLONG_MAX properly because of broken limits.h
 #ifndef ULLONG_MAX
-#define ULLONG_MAX 18446744073709551615ULL
+#  define ULLONG_MAX 18446744073709551615ULL
 #endif // ULLONG_MAX
 
 namespace aria2 {
@@ -323,7 +323,7 @@ bool isUtf8(const std::string& str)
         firstChar == 0x0au ||                                // \n
         firstChar == 0x0cu ||                                // \f
         firstChar == 0x0du                                   // \r
-        ) {
+    ) {
       // UTF8-1 (without ctrl chars)
     }
     else if (in(firstChar, 0xc2u, 0xdfu)) {
@@ -810,28 +810,375 @@ static const uint8_t utf8d[] = {
      * The first part of the table maps bytes to character classes that
      * to reduce the size of the transition table and create bitmasks.
      */
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 9, 9, 9, 9, 9, 9,
-    9, 9, 9, 9, 9, 9, 9, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
-    7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 8, 8, 2, 2, 2, 2, 2, 2,
-    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 10,
-    3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 3, 3, 11, 6, 6, 6, 5, 8, 8, 8, 8, 8,
-    8, 8, 8, 8, 8, 8,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    9,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    7,
+    8,
+    8,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    2,
+    10,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    3,
+    4,
+    3,
+    3,
+    11,
+    6,
+    6,
+    6,
+    5,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
+    8,
 
     /*
      * The second part is a transition table that maps a combination
      * of a state of the automaton and a character class to a state.
      */
-    0, 12, 24, 36, 60, 96, 84, 12, 12, 12, 48, 72, 12, 12, 12, 12, 12, 12, 12,
-    12, 12, 12, 12, 12, 12, 0, 12, 12, 12, 12, 12, 0, 12, 0, 12, 12, 12, 24, 12,
-    12, 12, 12, 12, 24, 12, 24, 12, 12, 12, 12, 12, 12, 12, 12, 12, 24, 12, 12,
-    12, 12, 12, 24, 12, 12, 12, 12, 12, 12, 12, 24, 12, 12, 12, 12, 12, 12, 12,
-    12, 12, 36, 12, 36, 12, 12, 12, 36, 12, 12, 12, 12, 12, 36, 12, 36, 12, 12,
-    12, 36, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
+    0,
+    12,
+    24,
+    36,
+    60,
+    96,
+    84,
+    12,
+    12,
+    12,
+    48,
+    72,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    0,
+    12,
+    12,
+    12,
+    12,
+    12,
+    0,
+    12,
+    0,
+    12,
+    12,
+    12,
+    24,
+    12,
+    12,
+    12,
+    12,
+    12,
+    24,
+    12,
+    24,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    24,
+    12,
+    12,
+    12,
+    12,
+    12,
+    24,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    24,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    36,
+    12,
+    36,
+    12,
+    12,
+    12,
+    36,
+    12,
+    12,
+    12,
+    12,
+    12,
+    36,
+    12,
+    36,
+    12,
+    12,
+    12,
+    36,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
+    12,
 };
 
 static uint32_t utf8dfa(uint32_t* state, uint32_t* codep, uint32_t byte)
@@ -1341,7 +1688,7 @@ static BOOL WINAPI HandlerRoutine(DWORD ctrlType)
   }
   return FALSE;
 }
-}
+} // namespace
 #endif
 
 void setGlobalSignalHandler(int sig, sigset_t* mask, signal_handler_t handler,
@@ -1402,12 +1749,12 @@ std::string getHomeDir()
   if (p) {
     return p;
   }
-#ifdef HAVE_PWD_H
+#  ifdef HAVE_PWD_H
   auto pw = getpwuid(geteuid());
   if (pw && pw->pw_dir) {
     return pw->pw_dir;
   }
-#endif // HAVE_PWD_H
+#  endif // HAVE_PWD_H
   return A2STR::NIL;
 }
 
@@ -1441,7 +1788,13 @@ std::string getXDGDir(const std::string& environmentVariable,
 {
   std::string filename;
   const char* p = getenv(environmentVariable.c_str());
-  if (p && p[0] == '/') {
+  if (p &&
+#ifndef __MINGW32__
+      p[0] == '/'
+#else  // __MINGW32__
+      p[0] && p[1] == ':'
+#endif // __MINGW32__
+  ) {
     filename = p;
   }
   else {
@@ -1541,7 +1894,7 @@ void sleep(long seconds)
 #elif defined(HAVE_USLEEP)
   ::usleep(seconds * 1000000);
 #else
-#error no sleep function is available (nanosleep?)
+#  error no sleep function is available (nanosleep?)
 #endif
 }
 
@@ -1582,7 +1935,7 @@ void usleep(long microseconds)
   if (msec)
     Sleep(msec);
 #else
-#error no usleep function is available (nanosleep?)
+#  error no usleep function is available (nanosleep?)
 #endif
 }
 
@@ -1592,9 +1945,10 @@ void mkdirs(const std::string& dirpath)
   if (!dir.mkdirs()) {
     int errNum = errno;
     if (!dir.isDir()) {
-      throw DL_ABORT_EX3(errNum, fmt(EX_MAKE_DIR, dir.getPath().c_str(),
-                                     safeStrerror(errNum).c_str()),
-                         error_code::DIR_CREATE_ERROR);
+      throw DL_ABORT_EX3(
+          errNum,
+          fmt(EX_MAKE_DIR, dir.getPath().c_str(), safeStrerror(errNum).c_str()),
+          error_code::DIR_CREATE_ERROR);
     }
   }
 }
@@ -1834,12 +2188,11 @@ std::string escapePath(const std::string& s)
     unsigned char c = cc;
     if (in(c, 0x00u, 0x1fu) || c == 0x7fu
 #ifdef __MINGW32__
-        ||
-        std::find(std::begin(WIN_INVALID_PATH_CHARS),
-                  std::end(WIN_INVALID_PATH_CHARS),
-                  c) != std::end(WIN_INVALID_PATH_CHARS)
+        || std::find(std::begin(WIN_INVALID_PATH_CHARS),
+                     std::end(WIN_INVALID_PATH_CHARS),
+                     c) != std::end(WIN_INVALID_PATH_CHARS)
 #endif // __MINGW32__
-            ) {
+    ) {
       d += fmt("%%%02X", c);
     }
     else {
@@ -2117,19 +2470,16 @@ bool strless(const char* a, const char* b) { return strcmp(a, b) < 0; }
 #ifdef ENABLE_SSL
 TLSVersion toTLSVersion(const std::string& ver)
 {
-  if (ver == A2_V_SSL3) {
-    return TLS_PROTO_SSL3;
-  }
-  if (ver == A2_V_TLS10) {
-    return TLS_PROTO_TLS10;
-  }
   if (ver == A2_V_TLS11) {
     return TLS_PROTO_TLS11;
   }
   if (ver == A2_V_TLS12) {
     return TLS_PROTO_TLS12;
   }
-  return TLS_PROTO_TLS10;
+  if (ver == A2_V_TLS13) {
+    return TLS_PROTO_TLS13;
+  }
+  return TLS_PROTO_TLS12;
 }
 #endif // ENABLE_SSL
 

@@ -63,7 +63,7 @@
 #include "Notifier.h"
 #include "ApiCallbackDownloadEventListener.h"
 #ifdef ENABLE_BITTORRENT
-#include "bittorrent_helper.h"
+#  include "bittorrent_helper.h"
 #endif // ENABLE_BITTORRENT
 
 namespace aria2 {
@@ -722,7 +722,10 @@ struct RequestGroupDH : public DownloadHandle {
   {
     return group->getNumConnection();
   }
-  virtual int getErrorCode() CXX11_OVERRIDE { return 0; }
+  virtual int getErrorCode() CXX11_OVERRIDE
+  {
+    return group->getLastErrorCode();
+  }
   virtual const std::vector<A2Gid>& getFollowedBy() CXX11_OVERRIDE
   {
     return group->followedBy();

@@ -331,6 +331,8 @@
     "                              bytes are specified, only first 20 bytes are\n" \
     "                              used. If less than 20 bytes are specified, random\n" \
     "                              byte data are added to make its length 20 bytes.")
+#define TEXT_PEER_AGENT                                                 \
+  _(" --peer-agent=PEER_AGENT  Set client reported during Extended torrent handshakes")
 #define TEXT_ENABLE_PEER_EXCHANGE                                       \
   _(" --enable-peer-exchange[=true|false] Enable Peer Exchange extension.")
 #define TEXT_ENABLE_DHT                                         \
@@ -1000,7 +1002,7 @@
 #define TEXT_GID                                \
   _(" --gid=GID                    Set GID manually. aria2 identifies each\n" \
     "                              download by the ID called GID. The GID must be\n" \
-    "                              hex string of 16 characters, thus [0-9a-zA-Z]\n" \
+    "                              hex string of 16 characters, thus [0-9a-fA-F]\n" \
     "                              are allowed and leading zeros must not be\n" \
     "                              stripped. The GID all 0 is reserved and must\n" \
     "                              not be used. The GID must be unique, otherwise\n" \
@@ -1116,5 +1118,13 @@
     "                              keep in mind that there is no upper bound to the\n" \
     "                              number of unfinished download result to keep. If\n" \
     "                              that is undesirable, turn this option off.")
+
+#define TEXT_BT_LOAD_SAVED_METADATA \
+  _(" --bt-load-saved-metadata[=true|false]\n" \
+    "                              Before getting torrent metadata from DHT when\n" \
+    "                              downloading with magnet link, first try to read\n" \
+    "                              file saved by --bt-save-metadata option. If it is\n" \
+    "                              successful, then skip downloading metadata from\n" \
+    "                              DHT.")
 
 // clang-format on

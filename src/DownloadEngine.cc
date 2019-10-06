@@ -68,10 +68,10 @@
 #include "fmt.h"
 #include "wallclock.h"
 #ifdef ENABLE_BITTORRENT
-#include "BtRegistry.h"
+#  include "BtRegistry.h"
 #endif // ENABLE_BITTORRENT
 #ifdef ENABLE_WEBSOCKET
-#include "WebSocketSessionMan.h"
+#  include "WebSocketSessionMan.h"
 #endif // ENABLE_WEBSOCKET
 #include "Option.h"
 #include "util_security.h"
@@ -150,14 +150,22 @@ void executeCommand(std::deque<std::unique_ptr<Command>>& commands,
 namespace {
 class GlobalHaltRequestedFinalizer {
 public:
-  GlobalHaltRequestedFinalizer() = default;
-  ~GlobalHaltRequestedFinalizer() { global::globalHaltRequested = 5; }
+  GlobalHaltRequestedFinalizer(bool oneshot) : oneshot_(oneshot) {}
+  ~GlobalHaltRequestedFinalizer()
+  {
+    if (!oneshot_) {
+      global::globalHaltRequested = 5;
+    }
+  }
+
+private:
+  bool oneshot_;
 };
 } // namespace
 
 int DownloadEngine::run(bool oneshot)
 {
-  GlobalHaltRequestedFinalizer ghrf;
+  GlobalHaltRequestedFinalizer ghrf(oneshot);
   while (!commands_.empty() || !routineCommands_.empty()) {
     if (!commands_.empty()) {
       waitData();

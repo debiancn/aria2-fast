@@ -1,62 +1,53 @@
-aria2 1.32.0
+aria2 1.35.0
 ============
 
 Release Note
 ------------
 
-This release fixes several minor bugs, and spelling mistakes.
+This release fixes several bugs.  See Changes for details.
 
 Changes
 -------
 
-* Clarify --max-concurrent-downloads option
+* Update mingw build dependencies
 
-  GH-833
+  GH-1469
 
-* Fix compile error with toolchain which lacks IPV6_TCLASS
+* Update android build dependencies
 
-  GH-895
+  Update android build dependencies.  Use android NDK r20 and build
+  aarch64 binary.
 
-* Log directed URI in notice log level
+  GH-1467
 
-  GH-884
+* Drop SSLv3.0 and TLSv1.0 and add TLSv1.3
 
-* Fix typo
+  TLSv1.3 support is added for GNUTLS and OpenSSL.
 
-  Patch from Tse Kit Yam
+  GH-1385
 
-  GH-879, GH-899
+* Platform: Fix compilation without deprecated OpenSSL APIs
 
-* Spelling fixes
+  Patch from Rosen Penev
 
-  Patch from klemens
+  GH-1315
 
-  GH-870
+* Remove linux getrandom and use C++ stdlib instead
 
-* Remove unused Android parts
+  GH-1306
 
-  These parts where unused after merging
-  https://github.com/aria2/aria2/pull/736
+* Don't send Accept Metalink header if Metalink is disabled
 
-  Patch from Fredrik Fornwall
+  GH-1300
 
-  GH-868
+* gnutls: Fix bug that commonName is always empty
 
-* Save control file early
+  GH-1214
 
-  GH-859
+* Fix openssl API version logic for libressl 2.7.x
 
-* Update links in Dockerfile.raspberrypi
+  Patch from Ben Chaney
 
-  Some links used in Dockerfile.raspberrypi are not accessible
-  anymore, because they were pointing to old versions of some source
-  packages and new versions were released.  This commit fixes this by
-  changing the links to point to the newest versions.
+  GH-1213
 
-  Patch from Michał Leśniewski
-
-  GH-860
-
-* Propagate disk full error on pre-allocation to last error code
-
-  GH-856
+* Fix build failure when InternalDHKeyExchange is used
