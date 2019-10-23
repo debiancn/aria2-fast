@@ -46,14 +46,20 @@ Description: C++ library interface to aria2 - even faster
  This version contains a small patch to maximize aria2 download
  speed.
 
-Package: libaria2-0-dev
+Package: libaria2-fast-0-dev
 Section: libdevel
 Architecture: any
 Multi-Arch: same
-Depends: libaria2-0 (= ${binary:Version}), ${misc:Depends}
-Description: High speed download utility (Development files)
+Depends: libaria2-fast-0 (= ${binary:Version}), ${misc:Depends}
+Provides: libaria2-0-dev
+Conflicts: libaria2-0-dev
+Replaces: libaria2-0-devs
+Description: High speed download utility - even faster (Development files)
  Aria2 is a command line download client with resuming and
  segmented downloading. Supported protocols are HTTP/HTTPS/
  SFTP/FTP/BitTorrent and it also supports Metalink.
+ .
+ This version contains a small patch to maximize aria2 download
+ speed.
  .
  This package provides development files for libaria2.
