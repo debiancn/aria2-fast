@@ -34,6 +34,8 @@
 /* copyright --> */
 #include "LibgnutlsTLSSession.h"
 
+#include <cassert>
+
 #include <gnutls/x509.h>
 
 #include "TLSContext.h"
@@ -47,14 +49,14 @@ TLSVersion getProtocolFromSession(gnutls_session_t& session)
 {
   auto proto = gnutls_protocol_get_version(session);
   switch (proto) {
-  case GNUTLS_SSL3:
-    return TLS_PROTO_SSL3;
-  case GNUTLS_TLS1_0:
-    return TLS_PROTO_TLS10;
   case GNUTLS_TLS1_1:
     return TLS_PROTO_TLS11;
   case GNUTLS_TLS1_2:
     return TLS_PROTO_TLS12;
+#if GNUTLS_VERSION_NUMBER >= 0x030604
+  case GNUTLS_TLS1_3:
+    return TLS_PROTO_TLS13;
+#endif // GNUTLS_VERSION_NUMBER >= 0x030604
   default:
     return TLS_PROTO_NONE;
   }
@@ -91,7 +93,7 @@ GnuTLSSession::~GnuTLSSession()
 #if (GNUTLS_VERSION_NUMBER >= 0x030103 &&                                      \
      GNUTLS_VERSION_NUMBER <= 0x030112) ||                                     \
     (GNUTLS_VERSION_NUMBER >= 0x030200 && GNUTLS_VERSION_NUMBER <= 0x030208)
-#define A2_DISABLE_OCSP 1
+#  define A2_DISABLE_OCSP 1
 #endif
 
 int GnuTLSSession::init(sock_t sockfd)
@@ -99,11 +101,11 @@ int GnuTLSSession::init(sock_t sockfd)
 #if GNUTLS_VERSION_NUMBER >= 0x030000
   unsigned int flags =
       tlsContext_->getSide() == TLS_CLIENT ? GNUTLS_CLIENT : GNUTLS_SERVER;
-#ifdef A2_DISABLE_OCSP
+#  ifdef A2_DISABLE_OCSP
   if (tlsContext_->getSide() == TLS_CLIENT) {
     flags |= GNUTLS_NO_EXTENSIONS;
   }
-#endif // A2_DISABLE_OCSP
+#  endif // A2_DISABLE_OCSP
 
   rv_ = gnutls_init(&sslSession_, flags);
 #else  // GNUTLS_VERSION_NUMBER >= 0x030000
@@ -133,16 +135,19 @@ int GnuTLSSession::init(sock_t sockfd)
 #else
   std::string pri = "SECURE128:+SIGN-RSA-SHA1";
   switch (tlsContext_->getMinTLSVersion()) {
+  case TLS_PROTO_TLS13:
+    pri += ":-VERS-TLS1.2";
+  // fall through
   case TLS_PROTO_TLS12:
     pri += ":-VERS-TLS1.1";
   // fall through
   case TLS_PROTO_TLS11:
     pri += ":-VERS-TLS1.0";
-  // fall through
-  case TLS_PROTO_TLS10:
     pri += ":-VERS-SSL3.0";
-  default:
     break;
+  default:
+    assert(0);
+    abort();
   };
   rv_ = gnutls_priority_set_direct(sslSession_, pri.c_str(), &err);
 #endif
@@ -340,6 +345,9 @@ int GnuTLSSession::tlsConnect(const std::string& hostname, TLSVersion& version,
           if (altNameLen > 0) {
             commonName.assign(altName, altNameLen);
           }
+        }
+        else {
+          commonName.assign(altName, altNameLen);
         }
       }
     }

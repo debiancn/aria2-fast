@@ -2,21 +2,21 @@
 # Copyright (c) 2007 Rosetta Contributors and Canonical Ltd 2007
 # This file is distributed under the same license as the aria2 package.
 # AUTHOR NOVEMBER/2012 <gsavix@gmail.com>, 2007..2012.
-# Rafael Fontenelle <rafaelff@gnome.org>, 2017.
+# Rafael Fontenelle <rafaelff@gnome.org>, 2017, 2018.
 msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2018-05-15 21:34+0900\n"
-"PO-Revision-Date: 2017-02-21 00:57+0000\n"
+"POT-Creation-Date: 2019-10-06 10:18+0900\n"
+"PO-Revision-Date: 2018-12-31 11:33+0000\n"
 "Last-Translator: Rafael Fontenelle <Unknown>\n"
 "Language-Team: Brazilian Portuguese <pt_BR@li.org>\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2018-05-15 12:12+0000\n"
-"X-Generator: Launchpad (build 18640)\n"
+"X-Launchpad-Export-Date: 2019-10-06 01:04+0000\n"
+"X-Generator: Launchpad (build af2eefe214bd95389a09b7c956720881bab16807)\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
 #: src/DownloadEngine.cc:255
@@ -274,7 +274,7 @@ msgstr ""
 " --referer=REFERÊNCIA         Define uma referência http (referer). Isso\n"
 "                              afeta todos os downloads http ou https.\n"
 "                              Se \"*\" for informado, a URI do download\n"
-"                              também será usada como (referrer). Isso\n"
+"                              também será usada como \"referrer\". Isso\n"
 "                              pode ser útil em conjunto com a opção -P."
 
 #: src/usage_text.h:107
@@ -920,6 +920,8 @@ msgid ""
 " --peer-agent=PEER_AGENT  Set client reported during Extended torrent "
 "handshakes"
 msgstr ""
+" --peer-agent=AGENTE_PEER     Define cliente relatado durante negociações\n"
+"                              estendidas de torrent"
 
 #: src/usage_text.h:337
 msgid " --enable-peer-exchange[=true|false] Enable Peer Exchange extension."
@@ -934,7 +936,7 @@ msgid ""
 "                              in a torrent, aria2 doesn't use DHT for that\n"
 "                              download even if ``true`` is given."
 msgstr ""
-" --enable-dht[=true|false]    Habilita funcionalidade IPv4 DHT. Isto\n"
+" --enable-dht[=true|false]    Habilita funcionalidade IPv4 do DHT. Isto\n"
 "                              também habilita suporte a rastreador UDP.\n"
 "                              Se uma flag particular for habilitada em\n"
 "                              um torrent, aria2 não usa DHT para aquele\n"
@@ -966,16 +968,15 @@ msgid ""
 "                              network."
 msgstr ""
 " --dht-entry-point=SERVIDOR:PORTA\n"
-"                              Define servidor e porta como ponto de entrada "
-"para\n"
-"                              rede IPv4 DHT."
+"                              Define servidor e porta como ponto de entrada\n"
+"                              para rede IPv4 DHT."
 
 #: src/usage_text.h:353
 msgid ""
 " --dht-file-path=PATH         Change the IPv4 DHT routing table file to PATH."
 msgstr ""
 " --dht-file-path=CAMINHO      Altera o arquivo da tabela de roteamento\n"
-"                              IPv4 DHT para CAMINHO."
+"                              IPv4 do DHT para CAMINHO."
 
 #: src/usage_text.h:355
 msgid ""
@@ -1130,7 +1131,7 @@ msgid ""
 msgstr ""
 " --metalink-preferred-protocol=PROTO\n"
 "                              Especifica o protocolo preferencial.\n"
-"                              Especifique 'none' se você não tiver um\n"
+"                              Especifique \"none\" se você não tiver um\n"
 "                              protocolo preferencial."
 
 #: src/usage_text.h:410
@@ -1422,7 +1423,7 @@ msgid ""
 msgstr ""
 " --server-stat-timeout=SEG    Especifica o tempo limite em segundos para\n"
 "                              invalidar o perfil de desempenho dos\n"
-"                              servidores desde o último ontato com eles."
+"                              servidores desde o último contato com eles."
 
 #: src/usage_text.h:513
 msgid ""
@@ -2801,11 +2802,12 @@ msgstr ""
 "                              1M = 1024K)."
 
 #: src/usage_text.h:1003
+#, fuzzy
 msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
 "be\n"
-"                              hex string of 16 characters, thus [0-9a-zA-Z]\n"
+"                              hex string of 16 characters, thus [0-9a-fA-F]\n"
 "                              are allowed and leading zeros must not be\n"
 "                              stripped. The GID all 0 is reserved and must\n"
 "                              not be used. The GID must be unique, "
@@ -3142,6 +3144,16 @@ msgid ""
 "from\n"
 "                              DHT."
 msgstr ""
+" --bt-load-saved-metadata[=true|false]\n"
+"                              antes de obter os metadados de torrent do DHT "
+"ao\n"
+"                              baixar com link magnético, primeiro tenta ler "
+"o\n"
+"                              arquivo salvado pela opção --bt-save-"
+"metadata.\n"
+"                              Se obtiver sucesso, então pula a etapa de "
+"baixar\n"
+"                              metadado do DHT."
 
 #: src/version_usage.cc:56
 msgid " version "
@@ -3504,7 +3516,7 @@ msgstr "Não é um diretório"
 #: src/message.h:121
 #, c-format
 msgid "Insufficient checksums. checksumLength=%d, numChecksum=%d"
-msgstr "Checksum insuficiente. tamanho do checkshum=%d, numchecksum=%d"
+msgstr "Checksum insuficiente. tamanho do checksum=%d, numchecksum=%d"
 
 #: src/message.h:122
 #, c-format
@@ -3768,7 +3780,7 @@ msgid ""
 "integrity and confidentiality of the connection might be compromised.\n"
 "Peer: %s"
 msgstr ""
-"aria2c precisava se conectar a outro lado usando um protocolo TLS "
+"aria2c teve que se conectar a outro lado usando um protocolo TLS "
 "desconhecido. A integridade e a confidencialidade da conexão podem ser "
 "comprometidas.\n"
 "Peer: %s"
@@ -3781,7 +3793,7 @@ msgid ""
 "compromised.\n"
 "Protocol: %s, Peer: %s"
 msgstr ""
-"aria2c precisava para conectar a outro lado usando um protocolo TLS antigo e "
+"aria2c teve que se conectar a outro lado usando um protocolo TLS antigo e "
 "vulnerável. A integridade e confidencialidade da conexão podem ser "
 "comprometidas.\n"
 "Protocolo: %s, Peer: %s"

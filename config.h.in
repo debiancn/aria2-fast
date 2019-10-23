@@ -163,12 +163,6 @@
 /* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
-/* Define to 1 if you have the `getrandom' function. */
-#undef HAVE_GETRANDOM
-
-/* Define to 1 if getrandom linux syscall interface is available. */
-#undef HAVE_GETRANDOM_INTERFACE
-
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
 

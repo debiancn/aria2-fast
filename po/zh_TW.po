@@ -8,16 +8,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: aria2\n"
 "Report-Msgid-Bugs-To: https://aria2.github.io/\n"
-"POT-Creation-Date: 2018-05-15 21:34+0900\n"
-"PO-Revision-Date: 2016-03-16 02:20+0000\n"
-"Last-Translator: Mingye Wang <arthur2e5@aosc.xyz>\n"
+"POT-Creation-Date: 2019-10-06 10:18+0900\n"
+"PO-Revision-Date: 2019-01-26 16:01+0000\n"
+"Last-Translator: pan93412 <Unknown>\n"
 "Language-Team: Chinese (Taiwan) <chinese-l10n@googlegroups.com>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Launchpad-Export-Date: 2018-05-15 12:12+0000\n"
-"X-Generator: Launchpad (build 18640)\n"
+"X-Launchpad-Export-Date: 2019-10-06 01:04+0000\n"
+"X-Generator: Launchpad (build af2eefe214bd95389a09b7c956720881bab16807)\n"
 "X-Poedit-Bookmarks: 82,-1,-1,-1,-1,-1,-1,-1,-1,-1\n"
 
 #: src/DownloadEngine.cc:255
@@ -109,6 +109,9 @@ msgid ""
 "option\n"
 "                              will be ignored."
 msgstr ""
+" -o, --out=檔案               下載檔案的檔案名稱。\n"
+"                              它總是相對於 -d 選項給定的路徑。\n"
+"                              當使用 -Z 選項，此選項將會被忽略。"
 
 #: src/usage_text.h:46
 msgid ""
@@ -447,6 +450,12 @@ msgid ""
 "                              appended after the name, but before the file\n"
 "                              extension, if any."
 msgstr ""
+" --auto-file-renaming[=true|false] 如果同樣的檔案已經存在，重新命名檔案名"
+"稱。\n"
+"                              此選項只在 HTTP(s)/ftp 下載作用。\n"
+"                              新的檔案名稱將會在任何情況下，於檔案名稱後但副"
+"檔名\n"
+"                              前增加一個點和一個數字。"
 
 #: src/usage_text.h:181
 msgid ""
@@ -612,6 +621,11 @@ msgid ""
 "                              See also --split and --optimize-concurrent-"
 "downloads options."
 msgstr ""
+" -j, --max-concurrent-downloads=N 設定每個靜態 (HTTP/FTP) 連結、Torrent 與 "
+"Metalink \n"
+"                              並行下載的最大數量。也請查看 --split 和 --"
+"optimize-concurrent-downloads\n"
+"                              選項。"
 
 #: src/usage_text.h:249
 msgid ""
@@ -2149,7 +2163,7 @@ msgstr ""
 
 #: src/usage_text.h:947
 msgid " --enable-mmap[=true|false]   Map files into memory."
-msgstr ""
+msgstr " --enable-mmap[=true|false]   將檔案映射到記憶體。"
 
 #: src/usage_text.h:949
 msgid ""
@@ -2239,7 +2253,7 @@ msgid ""
 " --gid=GID                    Set GID manually. aria2 identifies each\n"
 "                              download by the ID called GID. The GID must "
 "be\n"
-"                              hex string of 16 characters, thus [0-9a-zA-Z]\n"
+"                              hex string of 16 characters, thus [0-9a-fA-F]\n"
 "                              are allowed and leading zeros must not be\n"
 "                              stripped. The GID all 0 is reserved and must\n"
 "                              not be used. The GID must be unique, "
@@ -2272,7 +2286,7 @@ msgstr " --enable-color[=true|false]  為終端啟用彩色輸出。"
 
 #: src/usage_text.h:1024
 msgid " --rpc-secret=TOKEN           Set RPC secret authorization token."
-msgstr ""
+msgstr " --rpc-secret=憑證           設定 RPC 私密授權憑證。"
 
 #: src/usage_text.h:1026
 msgid ""
@@ -2423,6 +2437,8 @@ msgid ""
 " --stderr[=true|false]        Redirect all console output that would be\n"
 "                              otherwise printed in stdout to stderr."
 msgstr ""
+" --stderr[=true|false]        將所有會在 stdout 輸出的終端器輸出內容導向到 "
+"stderr。"
 
 #: src/usage_text.h:1113
 msgid ""
@@ -2592,6 +2608,8 @@ msgid ""
 " Make sure that URI is quoted with single(') or double(\") quotation if it\n"
 " contains \"&\" or any characters that have special meaning in shell."
 msgstr ""
+" 如果這 URL 包含「&」或任何在 Shell 有特別意義的字元，請\n"
+"確保 URL 用單 (') 或雙 (\") 引號括住。"
 
 #: src/version_usage.cc:172
 #, c-format
@@ -2605,6 +2623,13 @@ msgid ""
 " --max-connection-per-server=4 --min-split-size=1M.\n"
 "\n"
 msgstr ""
+"關於連線數\n"
+" 自 1.10.0 版本開始，Aria2 每個主機預設將使用 1 個連線和 20MiB 的分割大小限"
+"制。\n"
+" 所以不管你使用 -s 選項指定了什麼值，它就只會使用每個主機 1 個連線。\n"
+" 若要讓它如 1.9.x 般運作，請使用 --max-connection-per-server=4 --min-split-"
+"size=1M。\n"
+"\n"
 
 #: src/version_usage.cc:181
 #, c-format
@@ -2661,13 +2686,14 @@ msgid ""
 "Lowering lowest-speed-limit since known max speed is too near (new:%d was:%d "
 "max:%d)"
 msgstr ""
+"降低最低速度限制，因為跟已知的最快速度過於接近 (新值：%d 舊值：%d 最大值：%d)"
 
 #: src/AdaptiveURISelector.cc:238
 #, c-format
 msgid ""
 "Lowering lowest-speed-limit since we have no clue about available speed (now:"
 "%d was:%d)"
-msgstr ""
+msgstr "降低最低速度限制，因為沒有可用速度的線索 (新值：%d 舊值：%d)"
 
 #: src/BtStopDownloadCommand.cc:65
 #, c-format
@@ -2815,7 +2841,7 @@ msgstr "下載已完成。"
 #: src/message.h:128
 #, c-format
 msgid "Removed %lu have entries."
-msgstr ""
+msgstr "%lu 個項目已刪除"
 
 #: src/message.h:129
 #, c-format
@@ -2905,7 +2931,7 @@ msgstr "無法解析 metalink XML 檔案。XML 檔案可能存在格式錯誤。
 #: src/message.h:150
 #, c-format
 msgid "Too small payload size for %s, size=%lu."
-msgstr ""
+msgstr "供 %s 使用的酬載大小過小，大小=%lu。"
 
 #: src/message.h:151
 #, c-format
@@ -3038,6 +3064,9 @@ msgid ""
 "integrity and confidentiality of the connection might be compromised.\n"
 "Peer: %s"
 msgstr ""
+"aria2c 連線到使用未知 TLS 協定的對端主機。連線的完整性以及加密性可能會因此被"
+"犧牲。\n"
+"對端：%s"
 
 #: src/message.h:193
 #, c-format
@@ -3307,7 +3336,7 @@ msgstr "接收資料失敗，原因：%s"
 #: src/message.h:266
 #, c-format
 msgid "Failed to peek data, cause: %s"
-msgstr ""
+msgstr "無法窺視 (peek) 資料，因為：%s"
 
 #: src/message.h:267
 #, c-format
@@ -3322,7 +3351,7 @@ msgstr "檔案 %s 已存在，但 %s 不存在。"
 #: src/message.h:270
 #, c-format
 msgid "Invalid payload size for %s, size=%lu. It should be %lu."
-msgstr ""
+msgstr "供 %s 使用的酬載大小無效，大小=%lu。應為 %lu。"
 
 #: src/message.h:271
 #, c-format
@@ -3356,7 +3385,7 @@ msgstr "偵測到洪泛。"
 msgid ""
 "Drop connection because no request/piece messages were exchanged in a "
 "certain period(%ld seconds)."
-msgstr ""
+msgstr "斷開連線，因為一定期限 (%ld 秒) 內沒有交換的請求/piece 訊息。"
 
 #: src/message.h:281
 msgid "The infoHash in torrent file doesn't match to one in .aria2 file."
